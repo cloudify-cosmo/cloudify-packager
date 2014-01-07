@@ -23,7 +23,7 @@ env.status = False
 #env.key_filename = ["~/.ssh/id_rsa.pub"]
 
 
-#ACTIONS
+#TASKS
 
 @task
 def create(package_name):
@@ -33,4 +33,37 @@ def create(package_name):
     EXEC:   fab create:package_name
     """
 
-    packager.create_package(package_name)
+    packager.run_script(package_name, 'pkg')
+
+
+@task
+def get(package_name):
+    """
+    ACT:    downloads a package
+    ARGS:   package_name = name of package to create
+    EXEC:   fab get:package_name
+    """
+
+    packager.run_script(package_name, 'get')
+
+
+@task
+def remove(package_name):
+    """
+    ACT:    removes a package
+    ARGS:   package_name = name of package to create
+    EXEC:   fab remove:package_name
+    """
+
+    packager.run_script(package_name, 'remove')
+
+
+@task
+def bootstrap(package_name):
+    """
+    ACT:    bootstraps a package
+    ARGS:   package_name = name of package to create
+    EXEC:   fab bootstrap:package_name
+    """
+
+    packager.run_script(package_name, 'bootstrap')

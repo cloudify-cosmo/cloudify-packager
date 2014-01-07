@@ -13,6 +13,3 @@ echo "creating ${PKG_NAME} app link..."
 sudo ln -s ${BASE_DIR}/${VER_VAR}/ ${HOME_DIR}
 echo "appending ${PKG_NAME} to path..."
 export PATH=$PATH:${HOME_DIR}/bin
-
-echo "installing all gems..."
-${HOME_DIR}/bin/gem install --force --local ${GEMS_DIR}/*.gem
