@@ -1,4 +1,4 @@
-PKG_NAME="nodejs"
+PKG_NAME="${1:-nodejs}"
 PKG_DIR="/packages/${PKG_NAME}"
 
 echo "removing ${PKG_NAME}..."

@@ -1,6 +1,12 @@
+#!/bin/bash
+source /cosmo-packager/cosmo-packager/package-scripts/die
+
 PKG_NAME="workflow-gems"
 PKG_DIR="/packages/${PKG_NAME}"
+BOOTSTRAP_DIR="/cosmo-bootstrap/${PKG_NAME}"
 
+echo "creating bootstrap dir..."
+sudo mkdir -p ${BOOTSTRAP_DIR}
 echo "creating ${PKG_NAME} dir..."
 sudo mkdir -p ${PKG_DIR}
 cd ${PKG_DIR}
@@ -13,5 +19,5 @@ sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} ruote -v 2.3.0.2
 sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} rest-client -v 1.6.7
 
 echo "installing testing gems (dev only)..."
-sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} rack-test -v 0.6.2
-sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} test-unit -v 2.5.5
+# sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} rack-test -v 0.6.2
+# sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} test-unit -v 2.5.5

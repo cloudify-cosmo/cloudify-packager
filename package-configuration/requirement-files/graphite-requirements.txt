@@ -1,3 +1,0 @@
-whisper
-carbon
-graphite-web

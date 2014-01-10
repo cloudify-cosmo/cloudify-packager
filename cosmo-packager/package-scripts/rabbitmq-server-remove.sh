@@ -1,4 +1,4 @@
-PKG_NAME="${1:-nginx}"
+PKG_NAME="${1:-rabbitmq-server}"
 PKG_DIR="/packages/${PKG_NAME}"
 
 echo "removing ${PKG_NAME}..."

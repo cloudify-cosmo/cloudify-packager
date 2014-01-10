@@ -1,8 +1,8 @@
-PKG_NAME="nodejs"
+PKG_NAME="${1:-nodejs}"
 PKG_DIR="/packages/${PKG_NAME}"
 
 PKG_FILES="/${PKG_DIR}/archives/*.deb"
-BOOTSTRAP_SCRIPT="/cosmo-packager/package-scripts/${PKG_NAME}-bootstrap.sh"
+BOOTSTRAP_SCRIPT="/cosmo-packager/cosmo-packager/package-scripts/${PKG_NAME}-bootstrap.sh"
 
 SRC_TYPE="dir"
 DST_TYPE="deb"
