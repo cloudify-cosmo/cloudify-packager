@@ -28,7 +28,7 @@ env.status = False
 
 #TASKS
 @task
-def get_cosmo():
+def get_cosmo_components():
     """
     ACT:    retrieves cosmo 3rd parties
     EXEC:   fab g3po
@@ -45,11 +45,11 @@ def get_cosmo():
     get.get_python_modules('dsl-parser-modules')
     get.get_python_modules('celery-modules')
     get.get_python_modules('manager-rest-modules')
-    get.get_workflow_gems()
+    get.get_ruby_gems('workflow-gems')
 
 
 @task
-def pkg_cosmo():
+def pkg_cosmo_components():
     """
     ACT:    packages cosmo 3rd parties
     EXEC:   fab c3po
@@ -66,7 +66,7 @@ def pkg_cosmo():
     pkg.pkg_python_modules('dsl-parser-modules')
     pkg.pkg_python_modules('celery-modules')
     pkg.pkg_python_modules('manager-rest-modules')
-    get.get_workflow_gems()
+    pkg.pkg_ruby_gems('workflow-gems')
 
 
 

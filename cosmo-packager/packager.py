@@ -15,13 +15,28 @@ logging.config.dictConfig(config.PACKAGER_LOGGER)
 lgr = logging.getLogger('packager')
 
 
+def get_package_configuration(component):
+
+    try:
+        package_config = config.PACKAGES[component]
+        return package_config
+    except KeyError:
+        lgr.error('package configuration for %s was not found, terminating...' % component)
+        sys.exit()
+
+
 def pack(src_type, dst_type, name, src_path, version, bootstrap_script=False):
 
     lgr.debug('packing %s' % name)
-    if bootstrap_script:
-        local('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (src_type, dst_type, bootstrap_script, name, version, src_path))
+    if is_dir(package['package_dir']):
+        with lcd('%s/archives/' % package['package_dir']):
+            if bootstrap_script:
+                local('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (src_type, dst_type, bootstrap_script, name, version, src_path))
+            else:
+                local('sudo fpm -s %s -t %s -n %s -v %s -f -p %s %s' % (src_type, dst_type, name, version, src_path))
     else:
-        local('sudo fpm -s %s -t %s -n %s -v %s -f -p %s %s' % (src_type, dst_type, name, version, src_path))
+        lgr.error('package dir %s does\'nt exist, termintating...' % package['package_dir'])
+        sys.exit()
 
 
 def make_package_dirs(bootstrap_dir, pkg_dir):
@@ -79,13 +94,13 @@ def apt_get(list):
         local ('sudo apt-get -y install %s' % package)
 
 
-def get_gem(gem, dir):
+def get_ruby_gem(gem, dir):
 
     lgr.debug('downloading gem %s' % gem)
     local('sudo gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
 
 
-def get_module(module, dir):
+def get_python_module(module, dir):
 
     lgr.debug('downloading module %s' % module)
     local('sudo /usr/local/bin/pip install --no-install --no-use-wheel --download "%s/" %s' % (dir, module))

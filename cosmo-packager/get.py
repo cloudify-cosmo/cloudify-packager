@@ -2,7 +2,6 @@
 
 from fabric.api import *
 import config
-from config import PACKAGES as PKGS
 
 import logging
 import logging.config
@@ -20,29 +19,27 @@ def get_python_modules(component):
 	"""
 	ACT:    retrives python modules for Cosmo components
     ARGS:   component = Cosmo component to downloads packages for.
-    EXEC:   fab get_python_modules
+    EXEC:   fab get.get_python_modules:component
 	"""
 
-	try:
-		package = PKGS[component]
-	except:
-		lgr.error('package not found: %s' % component)
-		sys.exit()
+	package = get_package_configuration(component)
 
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
 		)
 	for module in package['modules']:
-		get_module(module, package['package_dir'])
+		get_python_module(module, package['package_dir'])
 
 
 @task
 def get_riemann():
 	"""
+	ACT:    retrives riemann
+    EXEC:   fab get.get_riemann
 	"""
 
-	package = PKGS['riemann']
+	package = get_package_configuration('riemann')
 
 	make_package_dirs(
 		package['bootstrap_dir'],
@@ -57,9 +54,11 @@ def get_riemann():
 @task
 def get_rabbitmq():
 	"""
+	ACT:    retrives rabbitmq
+    EXEC:   fab get.get_rabbitmq
 	"""
 
-	package = PKGS['rabbitmq-server']
+	package = get_package_configuration('rabbitmq-server')
 
 	make_package_dirs(
 		package['bootstrap_dir'],
@@ -86,18 +85,20 @@ def get_rabbitmq():
 
 
 @task
-def get_workflow_gems():
+def get_ruby_gems(component):
 	"""
+	ACT:    retrives workflow gems
+    EXEC:   fab get.get_ruby_gems:component
 	"""
 
-	package = PKGS['workflow-gems']
+	package = get_package_configuration(component)
 
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
 		)
 	for gem in package['gems']:
-		get_gem(gem, package['package_dir'])
+		get_ruby_gem(gem, package['package_dir'])
 	# sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} rack-test -v 0.6.2
 	# sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} test-unit -v 2.5.5
 
@@ -105,9 +106,11 @@ def get_workflow_gems():
 @task
 def get_elasticsearch():
 	"""
+	ACT:    retrives elasticsearch
+    EXEC:   fab get.get_elasticsearch
 	"""
 
-	package = PKGS['elasticsearch']
+	package = get_package_configuration('elasticsearch')
 
 	make_package_dirs(
 		package['bootstrap_dir'],
@@ -130,9 +133,11 @@ def get_elasticsearch():
 @task
 def get_logstash():
 	"""
+	ACT:    retrives logstash
+    EXEC:   fab get.get_logstash
 	"""
 
-	package = PKGS['logstash']
+	package = get_package_configuration('logstash')
 
 	make_package_dirs(
 		package['bootstrap_dir'],
@@ -165,7 +170,7 @@ def get_jruby():
 	"""
 	"""
 
-	package = PKGS['jruby']
+	package = get_package_configuration('jruby')
 
 	make_package_dirs(
 		package['bootstrap_dir'],
@@ -182,7 +187,7 @@ def get_nginx():
 	"""
 	"""
 
-	package = PKGS['nginx']
+	package = get_package_configuration('nginx')
 
 	make_package_dirs(
 		package['bootstrap_dir'],
@@ -210,7 +215,7 @@ def get_nodejs():
 	"""
 	"""
 
-	package = PKGS['nodejs']
+	package = get_package_configuration('nodejs')
 
 	make_package_dirs(
 		package['bootstrap_dir'],
@@ -235,7 +240,7 @@ def get_openjdk():
 	"""
 	"""
 
-	package = PKGS['openjdk-7-jdk']
+	package = get_package_configuration('openjdk-7-jdk')
 
 	make_package_dirs(
 		package['bootstrap_dir'],

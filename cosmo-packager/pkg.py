@@ -2,7 +2,6 @@
 
 from fabric.api import *
 import config
-from config import PACKAGES as PKGS
 
 import logging
 import logging.config
@@ -20,19 +19,14 @@ def pkg_python_modules(component):
 	"""
 	"""
 
-	package = PKGS[component]
+	package = get_package_configuration(component)
 
-	SRC_TYPE="dir"
-	DST_TYPE="deb"
-	BOOTSTRAP_SCRIPT="%s/%s-bootstrap.sh" % (config.PACKAGER_SCRIPTS_DIR, component)
-	
-	with lcd('%s/archives/' % package['package_dir']):
-		pack(SRC_TYPE, DST_TYPE, 
-			package['name'],
-			package['package_dir'],
-			package['version'],
-			BOOTSTRAP_SCRIPT
-			)
+	pack(package['src_package_type'], package['dst_package_type'], 
+		package['name'],
+		package['package_dir'],
+		package['version'],
+		package['bootstrap_script']
+		)
 		
 	lgr.debug("isolating debs...")
 	cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
@@ -43,7 +37,7 @@ def pkg_riemann():
 	"""
 	"""
 
-	package = PKGS['riemann']
+	package = get_package_configuration('riemann')
 
 	lgr.debug("isolating debs...")
 	cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
@@ -54,30 +48,25 @@ def pkg_rabbitmq():
 	"""
 	"""
 
-	package = PKGS['rabbitmq-server']
+	package = get_package_configuration('rabbitmq-server')
 
 	lgr.debug("isolating debs...")
 	cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
 
 
 @task
-def pkg_workflow_gems(component):
+def pkg_ruby_gems(component):
 	"""
 	"""
 
-	package = PKGS[component]
+	package = get_package_configuration(component)
 
-	SRC_TYPE="dir"
-	DST_TYPE="deb"
-	BOOTSTRAP_SCRIPT="%s/%s-bootstrap.sh" % (config.PACKAGER_SCRIPTS_DIR, component)
-	
-	with lcd('%s/archives/' % package['package_dir']):
-		pack(SRC_TYPE, DST_TYPE, 
-			package['name'],
-			package['package_dir'],
-			package['version'],
-			BOOTSTRAP_SCRIPT
-			)
+	pack(package['src_package_type'], package['dst_package_type'], 
+		package['name'],
+		package['package_dir'],
+		package['version'],
+		package['bootstrap_script']
+		)
 	
 	lgr.debug("isolating debs...")
 	cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
@@ -88,19 +77,14 @@ def pkg_elasticsearch():
 	"""
 	"""
 
-	package = PKGS['elasticsearch']
+	package = get_package_configuration('elasticsearch')
 
-	SRC_TYPE="dir"
-	DST_TYPE="deb"
-	BOOTSTRAP_SCRIPT="%s/%s-bootstrap.sh" % (config.PACKAGER_SCRIPTS_DIR, package['name'])
-	
-	with lcd('%s/archives/' % package['package_dir']):
-		pack(SRC_TYPE, DST_TYPE, 
-			package['name'],
-			package['package_dir'],
-			package['version'],
-			BOOTSTRAP_SCRIPT
-			)
+	pack(package['src_package_type'], package['dst_package_type'], 
+		package['name'],
+		package['package_dir'],
+		package['version'],
+		package['bootstrap_script']
+		)
 	
 	lgr.debug("isolating debs...")
 	cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
@@ -111,20 +95,15 @@ def pkg_logstash():
 	"""
 	"""
 
-	package = PKGS['logstash']
+	package = get_package_configuration('logstash')
 
-	SRC_TYPE="dir"
-	DST_TYPE="deb"
-	BOOTSTRAP_SCRIPT="%s/%s-bootstrap.sh" % (config.PACKAGER_SCRIPTS_DIR, package['name'])
+	pack(package['src_package_type'], package['dst_package_type'], 
+		package['name'],
+		package['package_dir'],
+		package['version'],
+		package['bootstrap_script']
+		)
 	
-	with lcd('%s/archives/' % package['package_dir']):
-		pack(SRC_TYPE, DST_TYPE, 
-			package['name'],
-			package['package_dir'],
-			package['version'],
-			BOOTSTRAP_SCRIPT
-			)
-		
 	lgr.debug("isolating debs...")
 	cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
 
@@ -134,23 +113,14 @@ def pkg_jruby():
 	"""
 	"""
 
-	package = PKGS['jruby']
+	package = get_package_configuration('jruby')
 
-	SRC_TYPE="dir"
-	DST_TYPE="deb"
-	BOOTSTRAP_SCRIPT="%s/%s-bootstrap.sh" % (config.PACKAGER_SCRIPTS_DIR, package['name'])
-	
-	if is_dir(package['package_dir']):
-		with lcd('%s/archives/' % package['package_dir']):
-			pack(SRC_TYPE, DST_TYPE, 
-				package['name'],
-				package['package_dir'],
-				package['version'],
-				BOOTSTRAP_SCRIPT
-				)
-	else:
-		lgr.error('package dir %s does\'nt exist, termintating...' % package['package_dir'])
-		sys.exit()
+	pack(package['src_package_type'], package['dst_package_type'], 
+		package['name'],
+		package['package_dir'],
+		package['version'],
+		package['bootstrap_script']
+		)
 
 	lgr.debug("isolating debs...")
 	cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
@@ -161,7 +131,7 @@ def pkg_nginx():
 	"""
 	"""
 
-	package = PKGS['nginx']
+	package = get_package_configuration('nginx')
 
 	lgr.debug("isolating debs...")
 	cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
@@ -172,7 +142,7 @@ def pkg_nodejs():
 	"""
 	"""
 
-	package = PKGS['nodejs']
+	package = get_package_configuration('nodejs')
 
 	lgr.debug("isolating debs...")
 	cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
@@ -183,7 +153,7 @@ def pkg_openjdk():
 	"""
 	"""
 
-	package = PKGS['openjdk-7-jdk']
+	package = get_package_configuration('openjdk-7-jdk')
 
 	lgr.debug("isolating debs...")
 	cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
