@@ -17,8 +17,10 @@ lgr = logging.getLogger('packager')
 
 def get_package_configuration(component):
 
+    lgr.debug('retrieving configuration for %s' % component)
     try:
         package_config = config.PACKAGES[component]
+        lgr.debug('%s config retrieved successfully' % component)
         return package_config
     except KeyError:
         lgr.error('package configuration for %s was not found, terminating...' % component)
@@ -31,9 +33,13 @@ def pack(src_type, dst_type, name, src_path, version, bootstrap_script=False):
     if is_dir(package['package_dir']):
         with lcd('%s/archives/' % package['package_dir']):
             if bootstrap_script:
-                local('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (src_type, dst_type, bootstrap_script, name, version, src_path))
+                x = local('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (src_type, dst_type, bootstrap_script, name, version, src_path))
             else:
-                local('sudo fpm -s %s -t %s -n %s -v %s -f -p %s %s' % (src_type, dst_type, name, version, src_path))
+                x = local('sudo fpm -s %s -t %s -n %s -v %s -f -p %s %s' % (src_type, dst_type, name, version, src_path))
+            if x.succeeded:
+                lgr.debug('successfully packed %s:%s' % (name, version))
+            else:
+                lgr.error('unsuccessfully packed %s:%s' % (name, version))
     else:
         lgr.error('package dir %s does\'nt exist, termintating...' % package['package_dir'])
         sys.exit()
@@ -41,69 +47,115 @@ def pack(src_type, dst_type, name, src_path, version, bootstrap_script=False):
 
 def make_package_dirs(bootstrap_dir, pkg_dir):
 
+    lgr.debug('creating package directories')
     mkdir(bootstrap_dir)
     mkdir('%s/archives' % pkg_dir)
 
 
-def wget(url, dir=False):
+def wget(url, dir):
 
     lgr.debug('downloading %s to %s' % (url, dir))
-    if dir:
-        local('sudo wget %s -P %s' % (url, dir))
+    try:
+        x = local('sudo wget %s -P %s' % (url, dir))
+        if x.succeeded:
+            lgr.debug('successfully downloaded %s to %s' % (url, dir))
+        else:
+            lgr.error('unsuccessfully downloaded %s to %s' % (url, dir))
+    except:
+        lgr.error('failed downloading %s' % url)
+
+
+def rmdir(dir):
+
+    lgr.debug('removing directory %s' % dir)
+    x = local('sudo rm -rf %s' % dir)
+    if x.succeeded:
+        lgr.debug('successfully removed directory %s' % dir)
     else:
-        local('sudo wget %s' % url)
+        lgr.error('unsuccessfully removed directory %s' % dir)
 
 
 def mkdir(dir):
 
     lgr.debug('creating directory %s' % dir)
-    local('sudo mkdir -p %s' % dir)
+    x = local('sudo mkdir -p %s' % dir)
+    if x.succeeded:
+        lgr.debug('successfully created directory %s' % dir)
+    else:
+        lgr.error('unsuccessfully created directory %s' % dir)
 
 
 def cp(src, dst, recurse=True):
 
     lgr.debug('copying %s to %s' % (src, dst))
     if recurse:
-        local('sudo cp -R %s %s' % (src, dst))
+        x = local('sudo cp -R %s %s' % (src, dst))
     else:
-        local('sudo cp %s %s' % (src, dst))
+        x = local('sudo cp %s %s' % (src, dst))
+    if x.succeeded:
+        lgr.debug('successfully copied %s to %s' % (src, dst))
+    else:
+        lgr.error('unsuccessfully copied %s to %s' % (src, dst))
 
 
 def apt_download(pkg, dir):
 
     lgr.debug('downloading %s to %s' % (pkg, dir))
-    local('sudo apt-get -y install %s -d -o=dir::cache=%s' % (pkg, dir))
-
+    x = local('sudo apt-get -y install %s -d -o=dir::cache=%s' % (pkg, dir))
+    if x.succeeded:
+        lgr.debug('successfully downloaded %s to %s' % (pkg, dst))
+    else:
+        lgr.error('unsuccessfully downloaded %s to %s' % (pkg, dst))
 
 def add_key(key_file):
 
     lgr.debug('adding key %s' % key_file)
-    local('sudo apt-key add %s' % key_file)
+    x = local('sudo apt-key add %s' % key_file)
+    if x.succeeded:
+        lgr.debug('successfully added key %s' % key_file)
+    else:
+        lgr.error('unsuccessfully added key %s' % key_file)
 
 
 def apt_update():
 
     lgr.debug('updating local apt repo')
-    local('sudo apt-get update')
+    x = local('sudo apt-get update')
+    if x.succeeded:
+        lgr.debug('successfully ran apt-get update')
+    else:
+        lgr.error('unsuccessfully ran apt-get update')
 
 
 def apt_get(list):
 
     for package in list:
         lgr.debug('installing %s')
-        local ('sudo apt-get -y install %s' % package)
+        x = local ('sudo apt-get -y install %s' % package)
+        if x.succeeded:
+            lgr.debug('successfully installed %s' % package)
+        else:
+            lgr.error('unsuccessfully installed %s' % package)
 
 
 def get_ruby_gem(gem, dir):
 
     lgr.debug('downloading gem %s' % gem)
-    local('sudo gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+    x = local('sudo gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+    if x.succeeded:
+        lgr.debug('successfully downloaded ruby gem %s to %s' % (gem, dir))
+    else:
+        lgr.error('unsuccessfully downloaded ruby gem %s' % gem)
 
 
 def get_python_module(module, dir):
 
     lgr.debug('downloading module %s' % module)
-    local('sudo /usr/local/bin/pip install --no-install --no-use-wheel --download "%s/" %s' % (dir, module))
+    x = local('sudo /usr/local/bin/pip install --no-install --no-use-wheel --download "%s/" %s' % (dir, module))
+    if x.succeeded:
+        lgr.debug('successfully downloaded python module %s to %s' % (gem, dir))
+    else:
+        lgr.error('unsuccessfully downloaded python module %s' % gem)
 
 
 def run_script(package_name, action, arg_s=''):
@@ -129,8 +181,13 @@ def run_script(package_name, action, arg_s=''):
 
 def is_dir(dir):
 
-    well_is_it = os.path.isdir(dir)
-    return well_is_it
+    lgr.debug('checking if %s exists' % dir)
+    if os.path.isdir(dir):
+        lgr.debug('%s exists' % dir)
+        return True
+    else:
+        lgr.debug('%s does not exist' % dir)
+        return False
 
 
 def check_prereqs(package_name, action):

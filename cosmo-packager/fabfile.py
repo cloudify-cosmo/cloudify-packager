@@ -2,10 +2,22 @@
 PROVIDE DOCUMENTATION LINK
 """
 
+
+# TODO:
+# add external components configuration to packager
+# write logstash base config (input - udp, filter - json, output - elasticsearch)
+# write elasticsearch base config (threading, storage, etc...)
+# write packager tests
+# add cosmo base packages
+# create external components bootstrap script
+# create external components package task
+# create cosmo components bootstrap script
+# create cosmo components package task
+
 from fabric.api import *
 import packager
-import get
-import pkg
+from get import *
+from pkg import *
 from config import PACKAGES as PKGS
 
 #env.user = ''
@@ -34,18 +46,17 @@ def get_cosmo_components():
     EXEC:   fab g3po
     """
 
-    get.get_jruby()
-    get.get_openjdk()
-    get.get_logstash()
-    get.get_elasticsearch()
-    get.get_openjdk()
-    get.get_riemann()
-    get.get_rabbitmq()
-    get.get_nodejs()
-    get.get_python_modules('dsl-parser-modules')
-    get.get_python_modules('celery-modules')
-    get.get_python_modules('manager-rest-modules')
-    get.get_ruby_gems('workflow-gems')
+    get_jruby()
+    get_openjdk()
+    get_logstash()
+    get_elasticsearch()
+    get_riemann()
+    get_rabbitmq()
+    get_nodejs()
+    get_python_modules('dsl-parser-modules')
+    get_python_modules('celery-modules')
+    get_python_modules('manager-rest-modules')
+    # get_ruby_gems('workflow-gems')
 
 
 @task
@@ -55,22 +66,40 @@ def pkg_cosmo_components():
     EXEC:   fab c3po
     """
 
-    pkg.pkg_jruby()
-    pkg.pkg_openjdk()
-    pkg.pkg_logstash()
-    pkg.pkg_elasticsearch()
-    pkg.pkg_openjdk()
-    pkg.pkg_riemann()
-    pkg.pkg_rabbitmq()
-    pkg.pkg_nodejs()
-    pkg.pkg_python_modules('dsl-parser-modules')
-    pkg.pkg_python_modules('celery-modules')
-    pkg.pkg_python_modules('manager-rest-modules')
-    pkg.pkg_ruby_gems('workflow-gems')
-
+    pkg_jruby()
+    pkg_openjdk()
+    pkg_logstash()
+    pkg_elasticsearch()
+    pkg_riemann()
+    pkg_rabbitmq()
+    pkg_nodejs()
+    pkg_python_modules('dsl-parser-modules')
+    pkg_python_modules('celery-modules')
+    pkg_python_modules('manager-rest-modules')
+    # pkg_ruby_gems('workflow-gems')
 
 
 @task
+def bootstrap_cosmo_components():
+    """
+    ACT:    bootstraps cosmo 3rd parties
+    EXEC:   fab bs3po
+    """
+
+    bootstrap('openjdk-7-jdk')
+    bootstrap('jruby')
+    bootstrap('riemann')
+    bootstrap('rabbitmq-server')
+    bootstrap('logstash')
+    bootstrap('elasticsearch')
+    bootstrap('nodejs')
+    # bootstrap('dsl-parser-modules')
+    # bootstrap('celery-modules')
+    # bootstrap('manager-rest-modules')
+    # bootstrap('workflow-gems')
+
+
+# @task
 def bs():
     """
     ACT:    bootstraps cosmo
@@ -80,7 +109,7 @@ def bs():
     packager.run_script('cosmo', 'bootstrap')
 
 
-@task
+# @task
 def create(package_name, arg_s=''):
     """
     ACT:    creates a packages (and potentially appends a bootstrap script to it)
@@ -91,7 +120,7 @@ def create(package_name, arg_s=''):
     packager.run_script(package_name, 'pkg', arg_s)
 
 
-@task
+# @task
 def retrieve(package_name, arg_s=''):
     """
     ACT:    downloads a package

@@ -24,6 +24,7 @@ def get_python_modules(component):
 
 	package = get_package_configuration(component)
 
+	rmdir(package['package_dir'])
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
@@ -41,6 +42,7 @@ def get_riemann():
 
 	package = get_package_configuration('riemann')
 
+	rmdir(package['package_dir'])
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
@@ -60,19 +62,16 @@ def get_rabbitmq():
 
 	package = get_package_configuration('rabbitmq-server')
 
+	rmdir(package['package_dir'])
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
 		)
-	
-	PACKAGE_REPO = package['source_url']
-	PACKAGE_KEY_URL = package['source_key']
-	PACKAGE_KEY_FILE = package['key_file']
 
 	lgr.debug("adding package repo to src repo...")
-	local('sudo sed -i "2i deb %s" /etc/apt/sources.list' % PACKAGE_REPO)
-	wget(PACKAGE_KEY_URL, package['package_dir'])
-	add_key('%s/%s' % (package['package_dir'], PACKAGE_KEY_FILE))
+	local('sudo sed -i "2i deb %s" /etc/apt/sources.list' % package['source_url'])
+	wget(package['source_key'], package['package_dir'])
+	add_key('%s/%s' % (package['package_dir'], package['key_file']))
 	apt_update()
 	apt_download(
 		package['erlang'],
@@ -93,6 +92,7 @@ def get_ruby_gems(component):
 
 	package = get_package_configuration(component)
 
+	rmdir(package['package_dir'])
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
@@ -112,6 +112,7 @@ def get_elasticsearch():
 
 	package = get_package_configuration('elasticsearch')
 
+	rmdir(package['package_dir'])
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
@@ -139,6 +140,7 @@ def get_logstash():
 
 	package = get_package_configuration('logstash')
 
+	rmdir(package['package_dir'])
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
@@ -172,6 +174,7 @@ def get_jruby():
 
 	package = get_package_configuration('jruby')
 
+	rmdir(package['package_dir'])
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
@@ -189,20 +192,17 @@ def get_nginx():
 
 	package = get_package_configuration('nginx')
 
+	rmdir(package['package_dir'])
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
 		)
-	
-	PACKAGE_REPO = package['source_url']
-	PACKAGE_KEY_URL = package['source_key']
-	PACKAGE_KEY_FILE = package['key_file']
 
 	lgr.debug("adding package repo to src repo...")
-	local('sudo sed -i "2i deb %s" /etc/apt/sources.list' % PACKAGE_REPO)
-	local('sudo sed -i "2i deb-src %s" /etc/apt/sources.list' % PACKAGE_REPO)
-	wget(PACKAGE_KEY_URL, package['package_dir'])
-	add_key('%s/%s' % (package['package_dir'], PACKAGE_KEY_FILE))
+	local('sudo sed -i "2i deb %s" /etc/apt/sources.list' % package['source_url'])
+	local('sudo sed -i "2i deb-src %s" /etc/apt/sources.list' % package['source_url'])
+	wget(package['source_key'], package['package_dir'])
+	add_key('%s/%s' % (package['package_dir'], package['key_file']))
 	apt_update()
 	apt_download(
 		package['name'],
@@ -217,17 +217,15 @@ def get_nodejs():
 
 	package = get_package_configuration('nodejs')
 
+	rmdir(package['package_dir'])
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
 		)
-	
-	PACKAGE_PREREQS = package['prereqs']
-	PACKAGE_REPO = package['source_url']
 
-	apt_get(PACKAGE_PREREQS)
+	apt_get(package['prereqs'])
 	lgr.debug("adding package repo to src repo...")
-	local('add-apt-repository -y %s' % PACKAGE_REPO)
+	local('add-apt-repository -y %s' % package['source_url'])
 	apt_update()
 	apt_download(
 		package['name'],
@@ -242,6 +240,7 @@ def get_openjdk():
 
 	package = get_package_configuration('openjdk-7-jdk')
 
+	rmdir(package['package_dir'])
 	make_package_dirs(
 		package['bootstrap_dir'],
 		package['package_dir']
