@@ -1,17 +1,13 @@
 #!/usr/bin/env python
 
-"""cosmo-packager"""
-
-__author__ = 'nirc'
-
 from fabric.api import *
+import config
+
+import logging
+import logging.config
 
 import os
 import sys
-
-import config
-import logging
-import logging.config
 
 # __all__ = ['list']
 
@@ -19,13 +15,13 @@ logging.config.dictConfig(config.PACKAGER_LOGGER)
 lgr = logging.getLogger('packager')
 
 
-def pack(src_type, dst_type, name, files_path, version, bootstrap_script=False):
+def pack(src_type, dst_type, name, src_path, version, bootstrap_script=False):
 
     lgr.debug('packing %s' % name)
     if bootstrap_script:
-        local('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (src_type, dst_type, bootstrap_script, name, version, files_path))
+        local('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (src_type, dst_type, bootstrap_script, name, version, src_path))
     else:
-        local('sudo fpm -s %s -t %s -n %s -v %s -f %s' % (src_type, dst_type, name, version, files_path))
+        local('sudo fpm -s %s -t %s -n %s -v %s -f -p %s %s' % (src_type, dst_type, name, version, src_path))
 
 
 def make_package_dirs(bootstrap_dir, pkg_dir):
@@ -116,16 +112,16 @@ def run_script(package_name, action, arg_s=''):
         # sys.exit()
 
 
-def check_if_dir_exists(package_name):
+def is_dir(dir):
 
-    is_dir = os.path.isdir("%s/%s" % (config.PACKAGES_DIR, package_name))
-    return is_dir
+    well_is_it = os.path.isdir(dir)
+    return well_is_it
 
 
 def check_prereqs(package_name, action):
 
     if action == 'pkg':
-        if check_if_dir_exists(package_name):
+        if is_dir(package_name):
             lgr.debug('package directory exists. \
                 continuing with packing process')
             return True
@@ -139,7 +135,7 @@ def check_prereqs(package_name, action):
         return True
     elif action == 'bootstrap':
         if not package_name == 'cosmo':
-            if check_if_dir_exists(package_name):
+            if is_dir(package_name):
                 lgr.debug('%s package directory exists. \
                     continuing with packing process' % package_name)
                 return True

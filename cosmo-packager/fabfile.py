@@ -4,8 +4,8 @@ PROVIDE DOCUMENTATION LINK
 
 from fabric.api import *
 import packager
-import getters
-import creators
+import get
+import pkg
 from config import PACKAGES as PKGS
 
 #env.user = ''
@@ -28,145 +28,46 @@ env.status = False
 
 #TASKS
 @task
-def g3po():
+def get_cosmo():
     """
     ACT:    retrieves cosmo 3rd parties
     EXEC:   fab g3po
     """
-    #TODO: CREATE ARG_S FROM ARGDICT
-    # for package in PKGS.iteritems():
-        # package_name = package[0]
 
-    package_name = 'jruby'
-    get_arg_s = '"%s" "%s" "%s"' % (
-        PKGS[package_name]['name'],
-        PKGS[package_name]['version'],
-        PKGS[package_name]['source_url']
-        )
-    packager.run_script(package_name, 'get', get_arg_s)
-
-    package_name = 'logstash'
-    get_arg_s = '"%s" "%s" "%s"' % (
-        PKGS[package_name]['name'],
-        PKGS[package_name]['version'],
-        PKGS[package_name]['source_url']
-        )
-    packager.run_script(package_name, 'get', get_arg_s)
-
-    package_name = 'elasticsearch'
-    get_arg_s = '"%s" "%s" "%s"' % (
-        PKGS[package_name]['name'],
-        PKGS[package_name]['version'],
-        PKGS[package_name]['source_url']
-        )
-    packager.run_script(package_name, 'get', get_arg_s)
-
-    package_name = 'openjdk-7-jdk'
-    get_arg_s = '"%s"' % (
-        PKGS[package_name]['name']
-        )
-    packager.run_script(package_name, 'get', get_arg_s)
-
-    package_name = 'nginx'
-    get_arg_s = '"%s" "%s" "%s" "%s" "%s"' % (
-        PKGS[package_name]['name'],
-        PKGS[package_name]['version'],
-        PKGS[package_name]['source_url'],
-        PKGS[package_name]['source_key'],
-        PKGS[package_name]['key_file']
-        )
-    packager.run_script(package_name, 'get', get_arg_s)
-
-    package_name = 'riemann'
-    get_arg_s = '"%s" "%s" "%s"' % (
-        PKGS[package_name]['name'],
-        PKGS[package_name]['version'],
-        PKGS[package_name]['source_url']
-        )
-    packager.run_script(package_name, 'get', get_arg_s)
-
-    package_name = 'rabbitmq-server'
-    get_arg_s = '"%s" "%s" "%s" "%s" "%s"' % (
-        PKGS[package_name]['name'],
-        PKGS[package_name]['version'],
-        PKGS[package_name]['source_url'],
-        PKGS[package_name]['source_key'],
-        PKGS[package_name]['key_file']
-        )
-    packager.run_script(package_name, 'get', get_arg_s)
-
-    package_name = 'nodejs'
-    get_arg_s = '"%s" "%s" "%s"' % (
-        PKGS[package_name]['name'],
-        PKGS[package_name]['version'],
-        PKGS[package_name]['source_url']
-        )
-    packager.run_script(package_name, 'get', get_arg_s)
-
-    # package_name = 'workflow-gems'
-    # get_arg_s = '"%s" "%s" "%s"' % (
-        # PKGS[package_name]['name'],
-        # PKGS[package_name]['version'],
-        # PKGS[package_name]['source_url']
-        # )
-    # packager.run_script(package_name, 'get', get_arg_s)
-
-    # package_name = 'python-modules'
-    # get_arg_s = '"%s" "%s" "%s"' % (
-        # PKGS[package_name]['name'],
-        # PKGS[package_name]['version'],
-        # PKGS[package_name]['source_url']
-        # )
-    # packager.run_script(package_name, 'get', get_arg_s)
+    get.get_jruby()
+    get.get_openjdk()
+    get.get_logstash()
+    get.get_elasticsearch()
+    get.get_openjdk()
+    get.get_riemann()
+    get.get_rabbitmq()
+    get.get_nodejs()
+    get.get_python_modules('dsl-parser-modules')
+    get.get_python_modules('celery-modules')
+    get.get_python_modules('manager-rest-modules')
+    get.get_workflow_gems()
 
 
 @task
-def c3po():
+def pkg_cosmo():
     """
     ACT:    packages cosmo 3rd parties
     EXEC:   fab c3po
     """
 
-    #TODO: CREATE ARG_S FROM ARGDICT
-    # for package in PKGS.iteritems():
-        # package_name = package[0]
+    pkg.pkg_jruby()
+    pkg.pkg_openjdk()
+    pkg.pkg_logstash()
+    pkg.pkg_elasticsearch()
+    pkg.pkg_openjdk()
+    pkg.pkg_riemann()
+    pkg.pkg_rabbitmq()
+    pkg.pkg_nodejs()
+    pkg.pkg_python_modules('dsl-parser-modules')
+    pkg.pkg_python_modules('celery-modules')
+    pkg.pkg_python_modules('manager-rest-modules')
+    get.get_workflow_gems()
 
-    package_name = 'jruby'
-    pkg_arg_s = '"%s" "%s"' % (
-        PKGS[package_name]['name'],
-        PKGS[package_name]['version'],
-        )
-    packager.run_script(package_name, 'pkg', pkg_arg_s)
-
-    package_name = 'logstash'
-    pkg_arg_s = '"%s" "%s"' % (
-        PKGS[package_name]['name'],
-        PKGS[package_name]['version'],
-        )
-    packager.run_script(package_name, 'pkg', pkg_arg_s)
-
-    package_name = 'elasticsearch'
-    pkg_arg_s = '"%s" "%s"' % (
-        PKGS[package_name]['name'],
-        PKGS[package_name]['version'],
-        )
-    packager.run_script(package_name, 'pkg', pkg_arg_s)
-
-    # package_name = 'workflow-gems'
-    # get_arg_s = '"%s" "%s" "%s"' % (
-        # PKGS[package_name]['name'],
-        # PKGS[package_name]['version'],
-        # PKGS[package_name]['source_url']
-        # )
-    # packager.run_script(package_name, 'get', get_arg_s)
-
-    # package_name = 'python-modules'
-    # get_arg_s = '"%s" "%s" "%s"' % (
-        # PKGS[package_name]['name'],
-        # PKGS[package_name]['version'],
-        # PKGS[package_name]['source_url']
-        # )
-    # packager.run_script(package_name, 'get', get_arg_s)
 
 
 @task
@@ -191,7 +92,7 @@ def create(package_name, arg_s=''):
 
 
 @task
-def get(package_name, arg_s=''):
+def retrieve(package_name, arg_s=''):
     """
     ACT:    downloads a package
     ARGS:   package_name = name of package to create
