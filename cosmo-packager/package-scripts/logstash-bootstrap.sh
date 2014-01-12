@@ -1,6 +1,5 @@
 PKG_NAME="logstash"
 PKG_DIR="/packages/${PKG_NAME}"
-VERSION=""
 
 PKG_INIT_DIR="${PKG_DIR}/init"
 PKG_CONF_DIR="${PKG_DIR}/conf"

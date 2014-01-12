@@ -19,7 +19,7 @@ def get_python_modules(component):
 	"""
 	ACT:    retrives python modules for Cosmo components
     ARGS:   component = Cosmo component to downloads packages for.
-    EXEC:   fab get.get_python_modules:component
+    EXEC:   fab get_python_modules:component
 	"""
 
 	package = get_package_configuration(component)
@@ -37,7 +37,7 @@ def get_python_modules(component):
 def get_riemann():
 	"""
 	ACT:    retrives riemann
-    EXEC:   fab get.get_riemann
+    EXEC:   fab get_riemann
 	"""
 
 	package = get_package_configuration('riemann')
@@ -57,7 +57,7 @@ def get_riemann():
 def get_rabbitmq():
 	"""
 	ACT:    retrives rabbitmq
-    EXEC:   fab get.get_rabbitmq
+    EXEC:   fab get_rabbitmq
 	"""
 
 	package = get_package_configuration('rabbitmq-server')
@@ -87,7 +87,7 @@ def get_rabbitmq():
 def get_ruby_gems(component):
 	"""
 	ACT:    retrives workflow gems
-    EXEC:   fab get.get_ruby_gems:component
+    EXEC:   fab get_ruby_gems:component
 	"""
 
 	package = get_package_configuration(component)
@@ -107,7 +107,7 @@ def get_ruby_gems(component):
 def get_elasticsearch():
 	"""
 	ACT:    retrives elasticsearch
-    EXEC:   fab get.get_elasticsearch
+    EXEC:   fab get_elasticsearch
 	"""
 
 	package = get_package_configuration('elasticsearch')
@@ -135,7 +135,7 @@ def get_elasticsearch():
 def get_logstash():
 	"""
 	ACT:    retrives logstash
-    EXEC:   fab get.get_logstash
+    EXEC:   fab get_logstash
 	"""
 
 	package = get_package_configuration('logstash')

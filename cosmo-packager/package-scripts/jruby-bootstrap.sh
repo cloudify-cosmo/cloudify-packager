@@ -1,6 +1,5 @@
 PKG_NAME="jruby"
 PKG_DIR="/packages/${PKG_NAME}"
-VERSION=""
 
 BASE_DIR="/opt"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}"

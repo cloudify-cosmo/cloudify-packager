@@ -5,7 +5,7 @@ PROVIDE DOCUMENTATION LINK
 
 # TODO:
 # add external components configuration to packager
-# write logstash base config (input - udp, filter - json, output - elasticsearch)
+# write logstash base config (input - RabbitMQ, filter - json, output - elasticsearch)
 # write elasticsearch base config (threading, storage, etc...)
 # write packager tests
 # add cosmo base packages
@@ -13,6 +13,10 @@ PROVIDE DOCUMENTATION LINK
 # create external components package task
 # create cosmo components bootstrap script
 # create cosmo components package task
+
+# CONFIGURATION
+# 3rd party components configuration
+# how to bootstrap each module
 
 from fabric.api import *
 import packager
@@ -43,7 +47,7 @@ env.status = False
 def get_cosmo_components():
     """
     ACT:    retrieves cosmo 3rd parties
-    EXEC:   fab g3po
+    EXEC:   fab get_cosmo_components
     """
 
     get_jruby()
@@ -63,7 +67,7 @@ def get_cosmo_components():
 def pkg_cosmo_components():
     """
     ACT:    packages cosmo 3rd parties
-    EXEC:   fab c3po
+    EXEC:   fab pkg_comso_components
     """
 
     pkg_jruby()
@@ -82,8 +86,8 @@ def pkg_cosmo_components():
 @task
 def bootstrap_cosmo_components():
     """
-    ACT:    bootstraps cosmo 3rd parties
-    EXEC:   fab bs3po
+    ACT:    bootstraps cosmo 3rd parties (can be used to test the bootstrap scripts)
+    EXEC:   fab bootstrap_cosmo_components
     """
 
     bootstrap('openjdk-7-jdk')

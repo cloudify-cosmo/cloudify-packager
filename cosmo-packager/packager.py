@@ -16,6 +16,9 @@ lgr = logging.getLogger('packager')
 
 
 def get_package_configuration(component):
+    """
+    retrieves a package's configuration from config.PACKAGES
+    """
 
     lgr.debug('retrieving configuration for %s' % component)
     try:
@@ -27,11 +30,14 @@ def get_package_configuration(component):
         sys.exit()
 
 
-def pack(src_type, dst_type, name, src_path, version, bootstrap_script=False):
+def pack(src_type, dst_type, name, src_path, dst_path, version, bootstrap_script=False):
+    """
+    uses fpm (https://github.com/jordansissel/fpm/wiki) to create packages with/without bootstrap scripts
+    """
 
     lgr.debug('packing %s' % name)
-    if is_dir(package['package_dir']):
-        with lcd('%s/archives/' % package['package_dir']):
+    if is_dir(src_path):
+        with lcd(dst_path):
             if bootstrap_script:
                 x = local('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (src_type, dst_type, bootstrap_script, name, version, src_path))
             else:
@@ -45,14 +51,20 @@ def pack(src_type, dst_type, name, src_path, version, bootstrap_script=False):
         sys.exit()
 
 
-def make_package_dirs(bootstrap_dir, pkg_dir):
+def make_package_dirs(pkg_dir, tmp_dir):
+    """
+    creates directory for managing packages
+    """
 
     lgr.debug('creating package directories')
-    mkdir(bootstrap_dir)
-    mkdir('%s/archives' % pkg_dir)
+    mkdir('%s/archives' % tmp_dir)
+    mkdir(pkg_dir)
 
 
 def wget(url, dir):
+    """
+    wgets a url
+    """
 
     lgr.debug('downloading %s to %s' % (url, dir))
     try:
@@ -66,6 +78,9 @@ def wget(url, dir):
 
 
 def rmdir(dir):
+    """
+    deletes a directory
+    """
 
     lgr.debug('removing directory %s' % dir)
     x = local('sudo rm -rf %s' % dir)
@@ -76,6 +91,9 @@ def rmdir(dir):
 
 
 def mkdir(dir):
+    """
+    creates (recursively) a directory
+    """
 
     lgr.debug('creating directory %s' % dir)
     x = local('sudo mkdir -p %s' % dir)
@@ -86,6 +104,9 @@ def mkdir(dir):
 
 
 def cp(src, dst, recurse=True):
+    """
+    copies (recuresively or not) files or directories
+    """
 
     lgr.debug('copying %s to %s' % (src, dst))
     if recurse:
@@ -99,15 +120,23 @@ def cp(src, dst, recurse=True):
 
 
 def apt_download(pkg, dir):
+    """
+    uses apt to download package debs from ubuntu's repo
+    """
 
+    apt_purge(pkg)
     lgr.debug('downloading %s to %s' % (pkg, dir))
     x = local('sudo apt-get -y install %s -d -o=dir::cache=%s' % (pkg, dir))
     if x.succeeded:
-        lgr.debug('successfully downloaded %s to %s' % (pkg, dst))
+        lgr.debug('successfully downloaded %s to %s' % (pkg, dir))
     else:
-        lgr.error('unsuccessfully downloaded %s to %s' % (pkg, dst))
+        lgr.error('unsuccessfully downloaded %s to %s' % (pkg, dir))
+
 
 def add_key(key_file):
+    """
+    adds a key to the local repo
+    """
 
     lgr.debug('adding key %s' % key_file)
     x = local('sudo apt-key add %s' % key_file)
@@ -118,6 +147,9 @@ def add_key(key_file):
 
 
 def apt_update():
+    """
+    runs apt-get update
+    """
 
     lgr.debug('updating local apt repo')
     x = local('sudo apt-get update')
@@ -128,17 +160,35 @@ def apt_update():
 
 
 def apt_get(list):
+    """
+    apt-get installs a package
+    """
 
     for package in list:
-        lgr.debug('installing %s')
-        x = local ('sudo apt-get -y install %s' % package)
+        lgr.debug('installing %s' % package)
+        x = local('sudo apt-get -y install %s' % package)
         if x.succeeded:
             lgr.debug('successfully installed %s' % package)
         else:
             lgr.error('unsuccessfully installed %s' % package)
 
 
+def apt_purge(package):
+    """
+    completely purges a package from the local repo
+    """
+
+    x = local('sudo apt-get -y purge %s' % package)
+    if x.succeeded:
+        lgr.debug('successfully purged %s' % package)
+    else:
+        lgr.error('unsuccessfully purged %s' % package)
+
+
 def get_ruby_gem(gem, dir):
+    """
+    downloads a ruby gem
+    """
 
     lgr.debug('downloading gem %s' % gem)
     x = local('sudo gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
@@ -149,21 +199,23 @@ def get_ruby_gem(gem, dir):
 
 
 def get_python_module(module, dir):
+    """
+    downloads a python module
+    """
 
     lgr.debug('downloading module %s' % module)
     x = local('sudo /usr/local/bin/pip install --no-install --no-use-wheel --download "%s/" %s' % (dir, module))
     if x.succeeded:
-        lgr.debug('successfully downloaded python module %s to %s' % (gem, dir))
+        lgr.debug('successfully downloaded python module %s to %s' % (module, dir))
     else:
-        lgr.error('unsuccessfully downloaded python module %s' % gem)
+        lgr.error('unsuccessfully downloaded python module %s' % module)
 
 
 def run_script(package_name, action, arg_s=''):
     """
-    runs a a shell scripts after checking for its dependencies
+    runs a a shell scripts with optional arguments
     """
 
-    # if check_prereqs(package_name, action):
     SCRIPT_PATH = '%s/%s-%s.sh' % (config.PACKAGER_SCRIPTS_DIR, package_name, action)
 
     try:
@@ -180,6 +232,9 @@ def run_script(package_name, action, arg_s=''):
 
 
 def is_dir(dir):
+    """
+    checks if a directory exists
+    """
 
     lgr.debug('checking if %s exists' % dir)
     if os.path.isdir(dir):

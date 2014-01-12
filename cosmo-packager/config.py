@@ -58,7 +58,7 @@ PACKAGES = {
         "version": "0.2.2",
         "source_url": "http://aphyr.com/riemann/riemann_0.2.2_all.deb",
         "bootstrap_dir": "%s/riemann/" % PACKAGES_BOOTSTRAP_DIR,
-        "package_dir": "%s/riemann/archives" % PACKAGES_DIR
+        "package_dir": "%s/riemann" % PACKAGES_DIR
     },
     "nodejs": {
         "name": "nodejs",
@@ -109,10 +109,31 @@ PACKAGES = {
         "version": "",
         "bootstrap_dir": "%s/workflow-gems/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/workflow-gems" % PACKAGES_DIR,
-        "gems": ['rufus-scheduler -v 2.0.24', 'sinatra -v 1.4.4', 'ruby_parser -v 3.1', 'ruby_parser -v 2.3', 'ruote -v 2.3.0.2', 'rest-client -v 1.6.7'],
+        "gems": ['rufus-scheduler -v 2.0.24', 'sinatra -v 1.4.4', 'ruby_parser -v 3.1', 'ruby_parser -v 2.3', 'ruote -v 2.3.0.2'],
+        "_gems": ['rufus-scheduler -v 2.0.24', 'sinatra -v 1.4.4', 'ruby_parser -v 3.1', 'ruby_parser -v 2.3', 'ruote -v 2.3.0.2', 'rest-client -v 1.6.7'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/workflow-gems-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+    },
+    "cosmo-dsl-parser": {
+        "name": "cosmo-dsl-parser",
+        "version": "0.0.1",
+        "source_url": "https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.zip",
+        "bootstrap_dir": "%s/cosmo-dsl-parser/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/cosmo-dsl-parser" % PACKAGES_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/cosmo-dsl-parser-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+    },
+    "cosmo-manager": {
+        "name": "cosmo-manager",
+        "version": "0.0.1",
+        "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.zip",
+        "bootstrap_dir": "%s/cosmo-manager/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/cosmo-manager" % PACKAGES_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/cosmo-manager-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
     }
 }
 
