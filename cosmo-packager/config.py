@@ -45,7 +45,7 @@ PACKAGES = {
     },
     "rabbitmq-server": {
         "name": "rabbitmq-server",
-        "version": "",
+        "version": "0.0.1",
         "source_url": "http://www.rabbitmq.com/debian/ testing main",
         "source_key": "http://www.rabbitmq.com/rabbitmq-signing-key-public.asc",
         "key_file": "rabbitmq-signing-key-public.asc",
@@ -62,7 +62,7 @@ PACKAGES = {
     },
     "nodejs": {
         "name": "nodejs",
-        "version": "",
+        "version": "0.0.1",
         "source_url": "ppa:chris-lea/node.js",
         "bootstrap_dir": "%s/nodejs/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/nodejs" % PACKAGES_DIR,
@@ -70,13 +70,13 @@ PACKAGES = {
     },
     "openjdk-7-jdk": {
         "name": "openjdk-7-jdk",
-        "version": "",
+        "version": "0.0.1",
         "bootstrap_dir": "%s/openjdk-7-jdk/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/openjdk-7-jdk" % PACKAGES_DIR
     },
     "dsl-parser-modules": {
-        "name": "dsl-parser-modlues",
-        "version": "",
+        "name": "dsl-parser-modules",
+        "version": "0.0.1",
         "bootstrap_dir": "%s/dsl-parser-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/dsl-parser-modules" % PACKAGES_DIR,
         "modules": ['pyyaml', 'jsonschema'],
@@ -85,8 +85,8 @@ PACKAGES = {
         "bootstrap_script": "%s/dsl-parser-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
     },
     "manager-rest-modules": {
-        "name": "manager-rest-modlues",
-        "version": "",
+        "name": "manager-rest-modules",
+        "version": "0.0.1",
         "bootstrap_dir": "%s/manager-rest-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/manager-rest-modules" % PACKAGES_DIR,
         "modules": ['Flask', 'flask-restful', 'flask-restful-swagger', 'requests', 'bernhard'],
@@ -95,8 +95,8 @@ PACKAGES = {
         "bootstrap_script": "%s/manager-rest-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
     },
     "celery-modules": {
-        "name": "celery-modlues",
-        "version": "",
+        "name": "celery-modules",
+        "version": "0.0.1",
         "bootstrap_dir": "%s/celery-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/celery-modules" % PACKAGES_DIR,
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard'],
@@ -106,7 +106,7 @@ PACKAGES = {
     },
     "workflow-gems": {
         "name": "workflow-gems",
-        "version": "",
+        "version": "0.0.1",
         "bootstrap_dir": "%s/workflow-gems/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/workflow-gems" % PACKAGES_DIR,
         "gems": ['rufus-scheduler -v 2.0.24', 'sinatra -v 1.4.4', 'ruby_parser -v 3.1', 'ruby_parser -v 2.3', 'ruote -v 2.3.0.2'],
