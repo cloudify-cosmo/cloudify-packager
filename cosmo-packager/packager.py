@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-from fabric.api import *
-import config
-
 import logging
 import logging.config
 
+import config
+
+from fabric.api import *
 import os
 import sys
 

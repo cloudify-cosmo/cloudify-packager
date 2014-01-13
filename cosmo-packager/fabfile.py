@@ -13,16 +13,21 @@ PROVIDE DOCUMENTATION LINK
 # create external components package task
 # create cosmo components bootstrap script
 # create cosmo components package task
+# parse setup.py for each cosmo component and get deps from there..
+# check out plugin install plugin
+# 
+
 
 # CONFIGURATION
 # 3rd party components configuration
 # how to bootstrap each module
 
+
 from fabric.api import *
 import packager
 from get import *
 from pkg import *
-from config import PACKAGES as PKGS
+# from config import PACKAGES as PKGS
 
 #env.user = ''
 #env.password = ''

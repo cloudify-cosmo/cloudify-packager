@@ -1,5 +1,6 @@
 PACKAGER_SCRIPTS_DIR = "/cosmo-packager/cosmo-packager/package-scripts" # directory for bootstrap/download/removal/package scripts - if applicable
 PACKAGER_CONF_DIR = "/cosmo-packager/cosmo-packager/package-configuration" # package configurations directory
+PACKAGER_TEMPLATE_DIR= "/cosmo-packager/cosmo-packager/package-templates"
 PACKAGES_DIR = "/packages" # temporary directory to which items are downloaded and packages are created.
 PACKAGES_BOOTSTRAP_DIR = "/cosmo-bootstrap" # final directory to put the created packages in.
 
@@ -74,31 +75,56 @@ PACKAGES = {
         "bootstrap_dir": "%s/openjdk-7-jdk/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/openjdk-7-jdk" % PACKAGES_DIR
     },
+    "npm": {
+        "name": "npm",
+        "version": "0.0.1",
+        "bootstrap_dir": "%s/npm/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/npm" % PACKAGES_DIR
+    },
+    "virtualenv": {
+        "name": "virtualenv",
+        "version": "0.0.1",
+        "bootstrap_dir": "%s/virtualenv/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/virtualenv" % PACKAGES_DIR,
+        "modules": ['virtualenv'],
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/virtualenv-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+    },
     "dsl-parser-modules": {
         "name": "dsl-parser-modules",
         "version": "0.0.1",
         "bootstrap_dir": "%s/dsl-parser-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/dsl-parser-modules" % PACKAGES_DIR,
-        "modules": ['pyyaml', 'jsonschema'],
+        "virtualenv": "dsl-parser",
+        "modules": ['pyyaml', 'jsonschema', 'https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.zip'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/dsl-parser-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+        "_bootstrap_script": "%s/dsl-parser-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_script": "dsl-parser-modules-bootstrap.sh",
+        "bootstrap_template": "python-modules-bootstrap.template",
+        "bootstrap_template_vars": {
+            "var1": "HA!",
+            "var2": "DENNIS!"
+        }
     },
-    "manager-rest-modules": {
-        "name": "manager-rest-modules",
+    "manager-modules": {
+        "name": "manager-modules",
         "version": "0.0.1",
-        "bootstrap_dir": "%s/manager-rest-modules/" % PACKAGES_BOOTSTRAP_DIR,
-        "package_dir": "%s/manager-rest-modules" % PACKAGES_DIR,
-        "modules": ['Flask', 'flask-restful', 'flask-restful-swagger', 'requests', 'bernhard'],
+        "bootstrap_dir": "%s/manager-modules/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/manager-modules" % PACKAGES_DIR,
+        "virtualenv": "manager",
+        "modules": ['Flask', 'flask-restful', 'flask-restful-swagger', 'requests', 'bernhard', 'https://github.com/CloudifySource/cosmo-manager/archive/develop.zip'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/manager-rest-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+        "bootstrap_script": "%s/manager-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
     },
     "celery-modules": {
         "name": "celery-modules",
         "version": "0.0.1",
         "bootstrap_dir": "%s/celery-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/celery-modules" % PACKAGES_DIR,
+        "virtualenv": "celery",
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -115,25 +141,15 @@ PACKAGES = {
         "dst_package_type": "deb",
         "bootstrap_script": "%s/workflow-gems-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
     },
-    "cosmo-dsl-parser": {
-        "name": "cosmo-dsl-parser",
-        "version": "0.0.1",
-        "source_url": "https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.zip",
-        "bootstrap_dir": "%s/cosmo-dsl-parser/" % PACKAGES_BOOTSTRAP_DIR,
-        "package_dir": "%s/cosmo-dsl-parser" % PACKAGES_DIR,
+    "cosmo-ui": {
+        "name": "cosmo-ui",
+        "version": "1.0.0",
+        "source_url": "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
+        "bootstrap_dir": "%s/cosmo-ui/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/cosmo-ui" % PACKAGES_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/cosmo-dsl-parser-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
-    },
-    "cosmo-manager": {
-        "name": "cosmo-manager",
-        "version": "0.0.1",
-        "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.zip",
-        "bootstrap_dir": "%s/cosmo-manager/" % PACKAGES_BOOTSTRAP_DIR,
-        "package_dir": "%s/cosmo-manager" % PACKAGES_DIR,
-        "src_package_type": "dir",
-        "dst_package_type": "deb",
-        "bootstrap_script": "%s/cosmo-manager-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+        "bootstrap_script": "%s/cosmo-ui-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
     }
 }
 
@@ -145,7 +161,7 @@ PACKAGER_LOGGER = {
             "format": "%(asctime)s %(levelname)s - %(message)s"
         },
         "console": {
-            "format": "%(asctime)s %(levelname)s - %(message)s"
+            "format": "%(message)s"
         }
     },
     "handlers": {
@@ -159,6 +175,7 @@ PACKAGER_LOGGER = {
         },
         "console": {
             "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
             "formatter": "console"
         }
     },

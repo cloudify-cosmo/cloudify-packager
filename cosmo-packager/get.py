@@ -1,17 +1,53 @@
 #!/usr/bin/env python
 
-from fabric.api import *
-import config
-
 import logging
 import logging.config
 
+import config
+
+from fabric.api import *
 from packager import *
 
 # __all__ = ['list']
 
 logging.config.dictConfig(config.PACKAGER_LOGGER)
 lgr = logging.getLogger('packager')
+
+
+@task
+def get_cosmo_ui():
+	"""
+	"""
+
+	package = get_package_configuration('cosmo-ui')
+
+	rmdir(package['package_dir'])
+	make_package_dirs(
+		package['bootstrap_dir'],
+		package['package_dir']
+		)
+	wget(
+		package['source_url'],
+		package['package_dir']
+		)
+
+
+@task
+def get_npm():
+	"""
+	"""
+
+	package = get_package_configuration('npm')
+
+	rmdir(package['package_dir'])
+	make_package_dirs(
+		package['bootstrap_dir'],
+		package['package_dir']
+		)
+	apt_download(
+		package['name'],
+		package['package_dir']
+		)
 
 
 @task
