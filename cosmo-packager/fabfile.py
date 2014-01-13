@@ -5,7 +5,7 @@ PROVIDE DOCUMENTATION LINK
 
 # TODO:
 # add external components configuration to packager
-# write logstash base config (input - RabbitMQ, filter - json, output - elasticsearch)
+# write logstash base config
 # write elasticsearch base config (threading, storage, etc...)
 # write packager tests
 # add cosmo base packages
@@ -15,8 +15,7 @@ PROVIDE DOCUMENTATION LINK
 # create cosmo components package task
 # parse setup.py for each cosmo component and get deps from there..
 # check out plugin install plugin
-# 
-
+# add setup.py to cosmo-manager
 
 # CONFIGURATION
 # 3rd party components configuration
@@ -91,7 +90,8 @@ def pkg_cosmo_components():
 @task
 def bootstrap_cosmo_components():
     """
-    ACT:    bootstraps cosmo 3rd parties (can be used to test the bootstrap scripts)
+    ACT:    bootstraps cosmo components (
+        can be used to test the bootstrap scripts)
     EXEC:   fab bootstrap_cosmo_components
     """
 
@@ -121,7 +121,8 @@ def bs():
 # @task
 def create(package_name, arg_s=''):
     """
-    ACT:    creates a packages (and potentially appends a bootstrap script to it)
+    ACT:    creates a packages (
+        and potentially appends a bootstrap script to it)
     ARGS:   package_name = name of package to create
     EXEC:   fab create:package_name
     """

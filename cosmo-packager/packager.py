@@ -32,16 +32,19 @@ def get_package_configuration(component):
 
 def pack(src_type, dst_type, name, src_path, dst_path, version, bootstrap_script=False):
     """
-    uses fpm (https://github.com/jordansissel/fpm/wiki) to create packages with/without bootstrap scripts
+    uses fpm (https://github.com/jordansissel/fpm/wiki)
+    to create packages with/without bootstrap scripts
     """
 
     lgr.debug('packing %s' % name)
     if is_dir(src_path):
         with lcd(dst_path):
             if bootstrap_script:
-                x = local('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (src_type, dst_type, bootstrap_script, name, version, src_path))
+                x = local('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (
+                    src_type, dst_type, bootstrap_script, name, version, src_path))
             else:
-                x = local('sudo fpm -s %s -t %s -n %s -v %s -f -p %s %s' % (src_type, dst_type, name, version, src_path))
+                x = local('sudo fpm -s %s -t %s -n %s -v %s -f -p %s %s' % (
+                    src_type, dst_type, name, version, src_path))
             if x.succeeded:
                 lgr.debug('successfully packed %s:%s' % (name, version))
             else:
@@ -204,7 +207,7 @@ def get_python_module(module, dir):
     """
 
     lgr.debug('downloading module %s' % module)
-    x = local('sudo /usr/local/bin/pip install --no-install --no-use-wheel --download "%s/" %s' % (dir, module))
+    x = local('''sudo /usr/local/bin/pip install --no-install --no-use-wheel --process-dependency-links --download "%s/" %s''' % (dir, module))
     if x.succeeded:
         lgr.debug('successfully downloaded python module %s to %s' % (module, dir))
     else:

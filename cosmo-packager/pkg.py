@@ -16,47 +16,31 @@ lgr = logging.getLogger('packager')
 
 
 @task
+def test():
+
+    package = get_package_configuration('dsl-parser-modules')
+    formatted_text = template_formatter(
+        config.PACKAGER_TEMPLATE_DIR, package['bootstrap_template'], package)
+    print 'FORMATTED TEXT IS :%s' % formatted_text
+    # make_file(config.PACKAGER_SCRIPTS_DIR, package['bootstrap_script'], formatted_text)
+
+
+@task
 def pkg_cosmo_ui():
     """
     """
 
     package = get_package_configuration('cosmo-ui')
 
-    pack(package['src_package_type'], package['dst_package_type'], 
-        package['name'],
-        package['package_dir'],
-        '%s/archives/' % package['package_dir'],
-        package['version'],
-        package['bootstrap_script']
-        )
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
 
     if not is_dir(package['bootstrap_dir']):
         mkdir(package['bootstrap_dir'])
     lgr.debug("isolating debs...")
     cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
-
-
-@task
-def pkg_npm():
-    """
-    """
-
-    package = get_package_configuration('npm')
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
-
-
-@task
-def test():
-
-    package = get_package_configuration('dsl-parser-modules')
-    # formatted_text = template_formatter(config.PACKAGER_TEMPLATE_DIR, package['bootstrap_template'], package['bootstrap_template_vars'])
-    formatted_text = template_formatter("/cosmo-packager/cosmo-packager/package-templates", "python-modules-bootstrap.template", {"var1": "HA!","var2": "DENNIS!"})
-    print 'FORMATTED TEXT IS :%s' % formatted_text
-    # make_file(config.PACKAGER_SCRIPTS_DIR, package['bootstrap_script'], formatted_text)
 
 
 @task
@@ -66,19 +50,16 @@ def pkg_python_modules(component):
 
     package = get_package_configuration(component)
 
-    pack(package['src_package_type'], package['dst_package_type'], 
-        package['name'],
-        package['package_dir'],
-        '%s/archives/' % package['package_dir'],
-        package['version'],
-        package['bootstrap_script']
-        )
-    
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
+
     if not is_dir(package['bootstrap_dir']):
         mkdir(package['bootstrap_dir'])
     lgr.debug("isolating debs...")
     cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
-    
+
 
 @task
 def pkg_riemann():
@@ -113,13 +94,10 @@ def pkg_ruby_gems(component):
 
     package = get_package_configuration(component)
 
-    pack(package['src_package_type'], package['dst_package_type'], 
-        package['name'],
-        package['package_dir'],
-        '%s/archives/' % package['package_dir'],
-        package['version'],
-        package['bootstrap_script']
-        )
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
 
     if not is_dir(package['bootstrap_dir']):
         mkdir(package['bootstrap_dir'])
@@ -134,13 +112,10 @@ def pkg_elasticsearch():
 
     package = get_package_configuration('elasticsearch')
 
-    pack(package['src_package_type'], package['dst_package_type'], 
-        package['name'],
-        package['package_dir'],
-        '%s/archives/' % package['package_dir'],
-        package['version'],
-        package['bootstrap_script']
-        )
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
 
     if not is_dir(package['bootstrap_dir']):
         mkdir(package['bootstrap_dir'])
@@ -155,13 +130,10 @@ def pkg_logstash():
 
     package = get_package_configuration('logstash')
 
-    pack(package['src_package_type'], package['dst_package_type'], 
-        package['name'],
-        package['package_dir'],
-        '%s/archives/' % package['package_dir'],
-        package['version'],
-        package['bootstrap_script']
-        )
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
 
     if not is_dir(package['bootstrap_dir']):
         mkdir(package['bootstrap_dir'])
@@ -176,13 +148,10 @@ def pkg_jruby():
 
     package = get_package_configuration('jruby')
 
-    pack(package['src_package_type'], package['dst_package_type'], 
-        package['name'],
-        package['package_dir'],
-        '%s/archives/' % package['package_dir'],
-        package['version'],
-        package['bootstrap_script']
-        )
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
 
     if not is_dir(package['bootstrap_dir']):
         mkdir(package['bootstrap_dir'])

@@ -1,0 +1,6 @@
+{
+    "localhost": {
+        "cosmoServer": "localhost",
+        "cosmoPort": 9001
+    }
+}
