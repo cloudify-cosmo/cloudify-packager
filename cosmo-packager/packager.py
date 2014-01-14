@@ -5,14 +5,24 @@ import logging.config
 
 import config
 
-from fabric.api import *
+from fabric.api import *  # NOQA
 import os
 import sys
+from templgen import template_formatter, make_file
 
 # __all__ = ['list']
 
 logging.config.dictConfig(config.PACKAGER_LOGGER)
 lgr = logging.getLogger('packager')
+
+
+def create_bootstrap_script(component, template_file, script_file):
+    """
+    creates a script file from a template file
+    """
+    formatted_text = template_formatter(
+        config.PACKAGER_TEMPLATE_DIR, template_file, component)
+    make_file(script_file, formatted_text)
 
 
 def get_package_configuration(component):
@@ -50,7 +60,7 @@ def pack(src_type, dst_type, name, src_path, dst_path, version, bootstrap_script
             else:
                 lgr.error('unsuccessfully packed %s:%s' % (name, version))
     else:
-        lgr.error('package dir %s does\'nt exist, termintating...' % package['package_dir'])
+        lgr.error('package dir %s does\'nt exist, termintating...' % src_path)
         sys.exit()
 
 
@@ -194,7 +204,7 @@ def get_ruby_gem(gem, dir):
     """
 
     lgr.debug('downloading gem %s' % gem)
-    x = local('sudo gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+    x = local('sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
     if x.succeeded:
         lgr.debug('successfully downloaded ruby gem %s to %s' % (gem, dir))
     else:

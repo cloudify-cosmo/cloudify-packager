@@ -21,7 +21,8 @@ PACKAGES = {
         "package_dir": "%s/logstash" % PACKAGES_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/logstash-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+        "bootstrap_script": "%s/logstash-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "logstash-bootstrap.template"
     },
     "elasticsearch": {
         "name": "elasticsearch",
@@ -31,7 +32,8 @@ PACKAGES = {
         "package_dir": "%s/elasticsearch" % PACKAGES_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/elasticsearch-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+        "bootstrap_script": "%s/elasticsearch-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "elasticsearch-bootstrap.template"
     },
     "jruby": {
         "name": "jruby",
@@ -41,7 +43,8 @@ PACKAGES = {
         "package_dir": "%s/jruby" % PACKAGES_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/jruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+        "bootstrap_script": "%s/jruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "jruby-bootstrap.template"
     },
     "nginx": {
         "name": "nginx",
@@ -102,8 +105,7 @@ PACKAGES = {
         "modules": ['pyyaml', 'jsonschema', 'https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.zip'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "_bootstrap_script": "%s/dsl-parser-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_script": "dsl-parser-modules-bootstrap.sh",
+        "bootstrap_script": "%s/dsl-parser-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "python-modules-bootstrap.template"
     },
     "manager-modules": {
@@ -117,7 +119,6 @@ PACKAGES = {
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/manager-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_script": "dsl-parser-modules-bootstrap.sh",
         "bootstrap_template": "python-modules-bootstrap.template"
     },
     "celery-modules": {
@@ -130,7 +131,6 @@ PACKAGES = {
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/celery-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_script": "dsl-parser-modules-bootstrap.sh",
         "bootstrap_template": "python-modules-bootstrap.template"
     },
     "workflow-gems": {
@@ -138,11 +138,12 @@ PACKAGES = {
         "version": "0.0.1",
         "bootstrap_dir": "%s/workflow-gems/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/workflow-gems" % PACKAGES_DIR,
-        "gems": ['rufus-scheduler -v 2.0.24', 'sinatra -v 1.4.4', 'ruby_parser -v 3.1', 'ruby_parser -v 2.3', 'ruote -v 2.3.0.2'],
-        "_gems": ['rufus-scheduler -v 2.0.24', 'sinatra -v 1.4.4', 'ruby_parser -v 3.1', 'ruby_parser -v 2.3', 'ruote -v 2.3.0.2', 'rest-client -v 1.6.7'],
+        "virtualenv": VIRTUALENVS_DIR,
+        "gems": ['rufus-scheduler -v 2.0.24', 'sinatra -v 1.4.4', 'ruby_parser -v 3.1', 'ruby_parser -v 2.3', 'ruote -v 2.3.0.2', 'rest-client -v 1.6.7'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/workflow-gems-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+        "bootstrap_script": "%s/workflow-gems-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "ruby-gems-bootstrap.template"
     },
     "cosmo-ui": {
         "name": "cosmo-ui",
@@ -153,7 +154,8 @@ PACKAGES = {
         "virtualenv": "%s/cosmo-ui" % VIRTUALENVS_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/cosmo-ui-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+        "bootstrap_script": "%s/cosmo-ui-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "cosmo-ui-bootstrap.template"
     }
 }
 
@@ -165,7 +167,7 @@ PACKAGER_LOGGER = {
             "format": "%(asctime)s %(levelname)s - %(message)s"
         },
         "console": {
-            "format": "%(message)s"
+            "format": "### %(message)s"
         }
     },
     "handlers": {

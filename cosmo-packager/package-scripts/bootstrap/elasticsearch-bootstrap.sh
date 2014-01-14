@@ -1,10 +1,12 @@
-PKG_NAME="{{ name }}"
-PKG_DIR="{{ package_dir }}"
+PKG_NAME="elasticsearch"
+PKG_DIR="/packages/${PKG_NAME}"
+VERSION=""
+
+PKG_INIT_DIR="${PKG_DIR}/init"
 
 BASE_DIR="/opt"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 
-PKG_INIT_DIR="${PKG_DIR}/init"
 INIT_DIR="/etc/init"
 
 echo "creating ${PKG_NAME} home dir..."

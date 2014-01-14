@@ -19,17 +19,17 @@ def template_formatter(template_dir, template_file, var_dict):
     env = Environment(loader=FileSystemLoader(template_dir))
     template = env.get_template(template_file)
 
-    lgr.debug('generating template from %s/%s with vars: %s' % (
-        template_dir, template_file, var_dict))
+    lgr.debug('generating template from %s/%s with package vars' % (
+        template_dir, template_file))
     return(template.render(var_dict))
 
 
-def make_file(dir, output_file, content):
+def make_file(output_file, content):
     """
     creates a file from content
     """
 
-    lgr.debug('creating file %s/%s with content %s' % (
-        dir, output_file, content))
-    with open('%s/%s' % (dir, output_file), 'w+') as f:
+    lgr.debug('creating file: \n%s \nwith content: \n%s' % (
+        output_file, content))
+    with open('%s' % output_file, 'w+') as f:
         f.write(content)

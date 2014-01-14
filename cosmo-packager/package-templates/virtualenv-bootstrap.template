@@ -1,4 +1,4 @@
 PKG_NAME="{{ name }}"
-PKG_DIR="{{ package_dir }}/${PKG_NAME}"
+PKG_DIR="{{ package_dir }}"
 
 sudo pip install --no-index --find-links="${PKG_DIR}" ${PKG_DIR}/*.tar.gz

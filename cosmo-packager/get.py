@@ -5,8 +5,8 @@ import logging.config
 
 import config
 
-from fabric.api import *
-from packager import *
+from fabric.api import *  # NOQA
+from packager import *  # NOQA
 
 # __all__ = ['list']
 
@@ -15,23 +15,7 @@ lgr = logging.getLogger('packager')
 
 
 @task
-def get_cosmo_ui():
-    """
-    """
-
-    package = get_package_configuration('cosmo-ui')
-
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-    wget(
-        package['source_url'],
-        package['package_dir'])
-
-
-@task
-def get_python_modules(component):
+def get_python_modules(component):  # TESTED (failed on manager-modules due to no setup.py file)
     """
     ACT:    retrives python modules for Cosmo components
     ARGS:   component = Cosmo component to downloads packages for.
@@ -49,7 +33,50 @@ def get_python_modules(component):
 
 
 @task
-def get_riemann():
+def get_cosmo_ui():  # TESTED
+    """
+    """
+
+    package = get_package_configuration('cosmo-ui')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    wget(
+        package['source_url'],
+        package['package_dir'])
+
+    PKG_INIT_DIR = "%s/init" % package['package_dir']
+    INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+
+    lgr.debug("creating init dir...")
+    mkdir(PKG_INIT_DIR)
+    lgr.debug("getting init file...")
+    cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
+
+
+@task
+def get_ruby_gems(component):  # TESTED
+    """
+    ACT:    retrives workflow gems
+    EXEC:   fab get_ruby_gems:component
+    """
+
+    package = get_package_configuration(component)
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    for gem in package['gems']:
+        get_ruby_gem(gem, package['package_dir'])
+    # sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} rack-test -v 0.6.2
+    # sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} test-unit -v 2.5.5
+
+
+@task
+def get_riemann():  # TESTED
     """
     ACT:    retrives riemann
     EXEC:   fab get_riemann
@@ -67,7 +94,7 @@ def get_riemann():
 
 
 @task
-def get_rabbitmq():
+def get_rabbitmq():  # TESTED
     """
     ACT:    retrives rabbitmq
     EXEC:   fab get_rabbitmq
@@ -94,26 +121,7 @@ def get_rabbitmq():
 
 
 @task
-def get_ruby_gems(component):
-    """
-    ACT:    retrives workflow gems
-    EXEC:   fab get_ruby_gems:component
-    """
-
-    package = get_package_configuration(component)
-
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-    for gem in package['gems']:
-        get_ruby_gem(gem, package['package_dir'])
-    # sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} rack-test -v 0.6.2
-    # sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} test-unit -v 2.5.5
-
-
-@task
-def get_elasticsearch():
+def get_elasticsearch():  # TESTED
     """
     ACT:    retrives elasticsearch
     EXEC:   fab get_elasticsearch
@@ -139,7 +147,7 @@ def get_elasticsearch():
 
 
 @task
-def get_logstash():
+def get_logstash():  # TESTED
     """
     ACT:    retrives logstash
     EXEC:   fab get_logstash
@@ -173,7 +181,7 @@ def get_logstash():
 
 
 @task
-def get_jruby():
+def get_jruby():  # TESTED
     """
     """
 
@@ -189,7 +197,7 @@ def get_jruby():
 
 
 @task
-def get_nginx():
+def get_nginx():  # TESTED
     """
     """
 
@@ -212,7 +220,7 @@ def get_nginx():
 
 
 @task
-def get_nodejs():
+def get_nodejs():  # TESTED
     """
     """
 
@@ -233,7 +241,7 @@ def get_nodejs():
 
 
 @task
-def get_openjdk():
+def get_openjdk():  # TESTED
     """
     """
 

@@ -1,13 +1,12 @@
-PKG_NAME="{{ name }}"
-PKG_DIR="{{ package_dir }}"
-
-BASE_DIR="/opt"
-HOME_DIR="${BASE_DIR}/${PKG_NAME}"
-
-LOG_DIR="/var/log"
+PKG_NAME="logstash"
+PKG_DIR="/packages/${PKG_NAME}"
 
 PKG_INIT_DIR="${PKG_DIR}/init"
 PKG_CONF_DIR="${PKG_DIR}/conf"
+
+BASE_DIR="/opt"
+LOG_DIR="/var/log"
+HOME_DIR="${BASE_DIR}/logstash"
 
 INIT_DIR="/etc/init"
 CONF_DIR="/etc"

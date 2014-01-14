@@ -1,10 +1,30 @@
 PKG_NAME="{{ name }}"
-PKG_DIR="{{ package_dir }}/${PKG_NAME}"
+PKG_DIR="{{ package_dir }}"
 
 BASE_DIR="/opt"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 
+LOG_DIR="/var/log/cosmo-ui"
+
+PKG_INIT_DIR="${PKG_DIR}/init"
+INIT_DIR="/etc/init"
+
 echo "installing ${PKG_NAME}..."
 sudo mkdir -p ${HOME_DIR}
+echo "moving some stuff around..."
+sudo cp ${PKG_INIT_DIR}/${PKG_NAME}.conf ${INIT_DIR}
+echo "creating log dir..."
+sudo mkdir -p ${LOG_DIR}
+echo "creating log file..."
+sudo touch ${LOG_DIR}/${PKG_NAME}.log
+echo "creating cosmoui user..."
+sudo useradd --shell /usr/sbin/nologin --create-home --home-dir ${HOME_DIR} --groups adm cosmoui
+echo "pwning ${PKG_NAME} dir by cosmo-ui user..."
+sudo chown cosmoui:cosmoui ${HOME_DIR}
+echo "pwning cosmo-ui logdir by ${PKG_NAME} user..."
+sudo chown cosmoui:adm ${LOG_DIR}/
 cd ${HOME_DIR}
-sudo npm install ${PKG_DIR}/cosmo-ui*
+echo "installing ${PKG_NAME} to ${PKG_DIR}"
+sudo npm install -d ${PKG_DIR}/cosmo-ui*
+echo "starting ${PKG_NAME}..."
+sudo start cosmo-ui

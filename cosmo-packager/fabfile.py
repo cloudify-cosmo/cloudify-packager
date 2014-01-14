@@ -22,10 +22,10 @@ PROVIDE DOCUMENTATION LINK
 # how to bootstrap each module
 
 
-from fabric.api import *
+from fabric.api import *  # NOQA
 import packager
-from get import *
-from pkg import *
+from get import *  # NOQA
+from pkg import *  # NOQA
 # from config import PACKAGES as PKGS
 
 #env.user = ''
