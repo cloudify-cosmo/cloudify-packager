@@ -61,10 +61,11 @@ def get_cosmo_components():
     get_riemann()
     get_rabbitmq()
     get_nodejs()
-    get_python_modules('dsl-parser-modules')
+    get_cosmo_ui()
+    get_ruby_gems('workflow-gems')
+    # get_python_modules('dsl-parser-modules')
     get_python_modules('celery-modules')
-    get_python_modules('manager-rest-modules')
-    # get_ruby_gems('workflow-gems')
+    # get_python_modules('manager-rest-modules')
 
 
 @task
@@ -81,10 +82,11 @@ def pkg_cosmo_components():
     pkg_riemann()
     pkg_rabbitmq()
     pkg_nodejs()
+    pkg_cosmo_ui()
+    pkg_ruby_gems('workflow-gems')
     pkg_python_modules('dsl-parser-modules')
     pkg_python_modules('celery-modules')
     pkg_python_modules('manager-rest-modules')
-    # pkg_ruby_gems('workflow-gems')
 
 
 @task
@@ -102,10 +104,11 @@ def bootstrap_cosmo_components():
     bootstrap('logstash')
     bootstrap('elasticsearch')
     bootstrap('nodejs')
+    bootstrap('cosmo-ui')
+    bootstrap('workflow-gems')
     # bootstrap('dsl-parser-modules')
     # bootstrap('celery-modules')
     # bootstrap('manager-rest-modules')
-    # bootstrap('workflow-gems')
 
 
 # @task

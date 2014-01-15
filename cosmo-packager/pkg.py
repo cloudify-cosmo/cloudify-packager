@@ -18,6 +18,8 @@ lgr = logging.getLogger('packager')
 @task
 def pkg_python_modules(component):  # celery installs successfully. dsl-parser can't install due to the missing celery common module.
     """
+    ACT:    packages python modules
+    EXEC:   fab pkg_python_modules
     """
 
     package = get_package_configuration(component)
@@ -36,8 +38,10 @@ def pkg_python_modules(component):  # celery installs successfully. dsl-parser c
 
 
 @task
-def pkg_cosmo_ui():  # TESTED (lacking upstart and monit scripts)
+def pkg_cosmo_ui():  # TESTED
     """
+    ACT:    packages cosmo ui
+    EXEC:   fab pkg_cosmo_ui
     """
 
     package = get_package_configuration('cosmo-ui')
@@ -56,8 +60,11 @@ def pkg_cosmo_ui():  # TESTED (lacking upstart and monit scripts)
 
 
 @task
-def pkg_ruby_gems(component):
+def pkg_ruby_gems(component):  # TESTED
     """
+    ACT:    packages ruby gems
+    ARGS:   component = Cosmo component to package gems for
+    EXEC:   fab pkg_ruby_gems
     """
 
     package = get_package_configuration(component)
@@ -78,6 +85,8 @@ def pkg_ruby_gems(component):
 @task
 def pkg_riemann():  # TESTED
     """
+    ACT:    packages riemann
+    EXEC:   fab pkg_riemann
     """
 
     package = get_package_configuration('riemann')
@@ -91,6 +100,8 @@ def pkg_riemann():  # TESTED
 @task
 def pkg_rabbitmq():  # TESTED
     """
+    ACT:    packages rabbitmq
+    EXEC:   fab pkg_rabbitmq
     """
 
     package = get_package_configuration('rabbitmq-server')
@@ -104,6 +115,8 @@ def pkg_rabbitmq():  # TESTED
 @task
 def pkg_elasticsearch():  # TESTED
     """
+    ACT:    packages elasticsearch
+    EXEC:   fab pkg_elasticsearch
     """
 
     package = get_package_configuration('elasticsearch')
@@ -124,6 +137,8 @@ def pkg_elasticsearch():  # TESTED
 @task
 def pkg_logstash():  # TESTED
     """
+    ACT:    packages logstash
+    EXEC:   fab pkg_logstash
     """
 
     package = get_package_configuration('logstash')
@@ -144,6 +159,8 @@ def pkg_logstash():  # TESTED
 @task
 def pkg_jruby():  # TESTED
     """
+    ACT:    packages jruby
+    EXEC:   fab pkg_jruby
     """
 
     package = get_package_configuration('jruby')
@@ -164,6 +181,8 @@ def pkg_jruby():  # TESTED
 @task
 def pkg_nginx():  # TESTED
     """
+    ACT:    packages nginx
+    EXEC:   fab pkg_nginx
     """
 
     package = get_package_configuration('nginx')
@@ -177,6 +196,8 @@ def pkg_nginx():  # TESTED
 @task
 def pkg_nodejs():  # TESTED
     """
+    ACT:    packages nodejs
+    EXEC:   fab pkg_nodejs
     """
 
     package = get_package_configuration('nodejs')
@@ -190,6 +211,8 @@ def pkg_nodejs():  # TESTED
 @task
 def pkg_openjdk():  # TESTED
     """
+    ACT:    packages openjdk
+    EXEC:   fab pkg_openjdk
     """
 
     package = get_package_configuration('openjdk-7-jdk')

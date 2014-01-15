@@ -74,6 +74,32 @@ def make_package_dirs(pkg_dir, tmp_dir):
     mkdir(pkg_dir)
 
 
+def get_ruby_gem(gem, dir):
+    """
+    downloads a ruby gem
+    """
+
+    lgr.debug('downloading gem %s' % gem)
+    x = local('sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+    if x.succeeded:
+        lgr.debug('successfully downloaded ruby gem %s to %s' % (gem, dir))
+    else:
+        lgr.error('unsuccessfully downloaded ruby gem %s' % gem)
+
+
+def get_python_module(module, dir):
+    """
+    downloads a python module
+    """
+
+    lgr.debug('downloading module %s' % module)
+    x = local('''sudo /usr/local/bin/pip install --no-install --no-use-wheel --process-dependency-links --download "%s/" %s''' % (dir, module))
+    if x.succeeded:
+        lgr.debug('successfully downloaded python module %s to %s' % (module, dir))
+    else:
+        lgr.error('unsuccessfully downloaded python module %s' % module)
+
+
 def wget(url, dir):
     """
     wgets a url
@@ -196,32 +222,6 @@ def apt_purge(package):
         lgr.debug('successfully purged %s' % package)
     else:
         lgr.error('unsuccessfully purged %s' % package)
-
-
-def get_ruby_gem(gem, dir):
-    """
-    downloads a ruby gem
-    """
-
-    lgr.debug('downloading gem %s' % gem)
-    x = local('sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
-    if x.succeeded:
-        lgr.debug('successfully downloaded ruby gem %s to %s' % (gem, dir))
-    else:
-        lgr.error('unsuccessfully downloaded ruby gem %s' % gem)
-
-
-def get_python_module(module, dir):
-    """
-    downloads a python module
-    """
-
-    lgr.debug('downloading module %s' % module)
-    x = local('''sudo /usr/local/bin/pip install --no-install --no-use-wheel --process-dependency-links --download "%s/" %s''' % (dir, module))
-    if x.succeeded:
-        lgr.debug('successfully downloaded python module %s to %s' % (module, dir))
-    else:
-        lgr.error('unsuccessfully downloaded python module %s' % module)
 
 
 def run_script(package_name, action, arg_s=''):

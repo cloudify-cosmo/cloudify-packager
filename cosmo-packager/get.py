@@ -17,8 +17,8 @@ lgr = logging.getLogger('packager')
 @task
 def get_python_modules(component):  # TESTED (failed on manager-modules due to no setup.py file)
     """
-    ACT:    retrives python modules for Cosmo components
-    ARGS:   component = Cosmo component to downloads packages for.
+    ACT:    retrives python modules
+    ARGS:   component = Cosmo component to downloads modules for.
     EXEC:   fab get_python_modules:component
     """
 
@@ -35,6 +35,8 @@ def get_python_modules(component):  # TESTED (failed on manager-modules due to n
 @task
 def get_cosmo_ui():  # TESTED
     """
+    ACT:    retrives cosmo_ui
+    EXEC:   fab get_cosmo_ui
     """
 
     package = get_package_configuration('cosmo-ui')
@@ -59,7 +61,8 @@ def get_cosmo_ui():  # TESTED
 @task
 def get_ruby_gems(component):  # TESTED
     """
-    ACT:    retrives workflow gems
+    ACT:    retrives ruby gems
+    ARGS:   component = Cosmo component to download gems for.
     EXEC:   fab get_ruby_gems:component
     """
 
@@ -183,6 +186,8 @@ def get_logstash():  # TESTED
 @task
 def get_jruby():  # TESTED
     """
+    ACT:    retrives jruby
+    EXEC:   fab get_jruby
     """
 
     package = get_package_configuration('jruby')
@@ -199,6 +204,8 @@ def get_jruby():  # TESTED
 @task
 def get_nginx():  # TESTED
     """
+    ACT:    retrives nginx
+    EXEC:   fab get_nginx
     """
 
     package = get_package_configuration('nginx')
@@ -222,6 +229,8 @@ def get_nginx():  # TESTED
 @task
 def get_nodejs():  # TESTED
     """
+    ACT:    retrives nodejs
+    EXEC:   fab get_nodejs
     """
 
     package = get_package_configuration('nodejs')
@@ -243,6 +252,8 @@ def get_nodejs():  # TESTED
 @task
 def get_openjdk():  # TESTED
     """
+    ACT:    retrives openjdk
+    EXEC:   fab get_openjdk
     """
 
     package = get_package_configuration('openjdk-7-jdk')

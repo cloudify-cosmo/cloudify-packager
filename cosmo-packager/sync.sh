@@ -1,5 +1,5 @@
-COSMO_BASE_DIR="/cosmo-packager/cosmo-packager"
-VAGRANT_BASE_DIR="/vagrant/cosmo-packager/cosmo-packager"
+COSMO_BASE_DIR="/cosmo-packager"
+VAGRANT_BASE_DIR="/vagrant/cosmo-packager"
 
 echo "copying vagrant repo to local repo..."
 sudo mkdir -p /cosmo-packager

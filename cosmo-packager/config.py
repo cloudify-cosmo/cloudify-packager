@@ -94,7 +94,8 @@ PACKAGES = {
         "modules": ['virtualenv'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/virtualenv-bootstrap.sh" % PACKAGER_SCRIPTS_DIR
+        "bootstrap_script": "%s/virtualenv-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "virtualenv-bootstrap.template"
     },
     "dsl-parser-modules": {
         "name": "dsl-parser-modules",
@@ -156,6 +157,16 @@ PACKAGES = {
         "dst_package_type": "deb",
         "bootstrap_script": "%s/cosmo-ui-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "cosmo-ui-bootstrap.template"
+    },
+    "cosmo": {
+        "name": "cosmo",
+        "version": "1.0.0",
+        "bootstrap_dir": "%s/cosmo/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/cosmo" % PACKAGES_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "tar",
+        "bootstrap_script": "%s/cosmo-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "cosmo-bootstrap.template"
     }
 }
 
