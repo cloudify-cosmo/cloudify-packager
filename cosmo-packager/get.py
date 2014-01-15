@@ -15,6 +15,24 @@ lgr = logging.getLogger('packager')
 
 
 @task
+def get_pip():  # TESTED
+    """
+    ACT:    retrives pip
+    EXEC:   fab get_pip
+    """
+
+    package = get_package_configuration('python-pip')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    apt_download(
+        package['name'],
+        package['package_dir'])
+
+
+@task
 def get_python_modules(component):  # TESTED (failed on manager-modules due to no setup.py file)
     """
     ACT:    retrives python modules
@@ -33,6 +51,24 @@ def get_python_modules(component):  # TESTED (failed on manager-modules due to n
 
 
 @task
+def get_manager():  # TESTED
+    """
+    ACT:    retrives manager
+    EXEC:   fab get_manager
+    """
+
+    package = get_package_configuration('manager')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    wget(
+        package['source_url'],
+        file='%s/%s.tar.gz' % (package['package_dir'], package['name']))
+
+
+@task
 def get_cosmo_ui():  # TESTED
     """
     ACT:    retrives cosmo_ui
@@ -47,7 +83,7 @@ def get_cosmo_ui():  # TESTED
         package['package_dir'])
     wget(
         package['source_url'],
-        package['package_dir'])
+        dir=package['package_dir'])
 
     PKG_INIT_DIR = "%s/init" % package['package_dir']
     INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
@@ -93,7 +129,7 @@ def get_riemann():  # TESTED
         package['package_dir'])
     wget(
         package['source_url'],
-        package['package_dir'])
+        dir=package['package_dir'])
 
 
 @task
@@ -138,7 +174,7 @@ def get_elasticsearch():  # TESTED
         package['package_dir'])
     wget(
         package['source_url'],
-        package['package_dir'])
+        dir=package['package_dir'])
 
     PKG_INIT_DIR = "%s/init" % package['package_dir']
     INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
@@ -164,7 +200,7 @@ def get_logstash():  # TESTED
         package['package_dir'])
     wget(
         package['source_url'],
-        package['package_dir'])
+        dir=package['package_dir'])
 
     PKG_INIT_DIR = "%s/init" % package['package_dir']
     INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
@@ -198,7 +234,7 @@ def get_jruby():  # TESTED
         package['package_dir'])
     wget(
         package['source_url'],
-        package['package_dir'])
+        dir=package['package_dir'])
 
 
 @task

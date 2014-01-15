@@ -13,6 +13,12 @@ VIRTUALENVS_DIR = "/opt/cosmo"
 
 # specific package configuration
 PACKAGES = {
+    "python-pip": {
+        "name": "python-pip",
+        "version": "1.0",
+        "bootstrap_dir": "%s/python-pip/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/python-pip" % PACKAGES_DIR
+    },
     "logstash": {
         "name": "logstash",
         "version": "1.3.2",
@@ -103,7 +109,7 @@ PACKAGES = {
         "bootstrap_dir": "%s/dsl-parser-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/dsl-parser-modules" % PACKAGES_DIR,
         "virtualenv": "%s/cosmo-manager" % VIRTUALENVS_DIR,
-        "modules": ['pyyaml', 'jsonschema', 'https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.zip'],
+        "modules": ['pyyaml', 'jsonschema', 'https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.tar.gz'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/dsl-parser-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -115,12 +121,23 @@ PACKAGES = {
         "bootstrap_dir": "%s/manager-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/manager-modules" % PACKAGES_DIR,
         "virtualenv": "%s/cosmo-manager" % VIRTUALENVS_DIR,
-        "_modules": ['Flask', 'flask-restful', 'flask-restful-swagger', 'requests', 'bernhard', 'https://github.com/CloudifySource/cosmo-manager/archive/develop.zip'],
-        "modules": ['https://github.com/CloudifySource/cosmo-manager/archive/develop.zip'],
+        "modules": ['Flask', 'flask-restful', 'flask-restful-swagger', 'requests', 'bernhard'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/manager-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "python-modules-bootstrap.template"
+    },
+    "manager": {
+        "name": "manager",
+        "version": "0.0.1",
+        "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
+        "bootstrap_dir": "%s/manager/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/manager" % PACKAGES_DIR,
+        "virtualenv": "%s/cosmo-manager" % VIRTUALENVS_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/manager-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "manager-bootstrap.template"
     },
     "celery-modules": {
         "name": "celery-modules",
@@ -128,7 +145,11 @@ PACKAGES = {
         "bootstrap_dir": "%s/celery-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/celery-modules" % PACKAGES_DIR,
         "virtualenv": "%s/celery" % VIRTUALENVS_DIR,
-        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard'],
+        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard',
+                    'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
+                    'https://github.com/CloudifySource/cosmo-plugin-openstack-provisioner/archive/develop.tar.gz',
+                    'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
+                    'https://github.com/CloudifySource/cosmo-plugin-riemann-configurer/archive/develop.tar.gz'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/celery-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,

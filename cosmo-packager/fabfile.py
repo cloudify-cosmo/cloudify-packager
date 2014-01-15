@@ -1,5 +1,6 @@
 """
-PROVIDE DOCUMENTATION LINK
+DOCUMENTATION LINK:
+https://github.com/CloudifySource/cosmo-packager
 """
 
 
@@ -21,6 +22,15 @@ PROVIDE DOCUMENTATION LINK
 # 3rd party components configuration
 # how to bootstrap each module
 
+# get maven
+# cosmo.jar bootstrap (see bootstrap_lxc...) put jar file in orchestrator/target
+
+# plugins to install in celery's venv
+# plugin install
+# agent install
+# reimann configurer
+# openstack provisioner
+# vagrant (on hold)
 
 from fabric.api import *  # NOQA
 import packager

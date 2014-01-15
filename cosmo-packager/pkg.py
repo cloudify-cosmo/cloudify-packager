@@ -16,6 +16,21 @@ lgr = logging.getLogger('packager')
 
 
 @task
+def pkg_pip():  # TESTED
+    """
+    ACT:    packages pip
+    EXEC:   fab pkg_pip
+    """
+
+    package = get_package_configuration('python-pip')
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
 def pkg_python_modules(component):  # celery installs successfully. dsl-parser can't install due to the missing celery common module.
     """
     ACT:    packages python modules
@@ -26,6 +41,37 @@ def pkg_python_modules(component):  # celery installs successfully. dsl-parser c
 
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
+def pkg_manager():  # TESTED
+    """
+    ACT:    packages manager
+    EXEC:   fab pkg_manager
+    """
+
+    package = get_package_configuration('manager')
+
+    create_bootstrap_script(
+        package, package['bootstrap_template'], package['bootstrap_script'])
+
+    TAR_FILE = 'manager.tar.gz'
+
+    untar(package['package_dir'], '%s/%s' % (package['package_dir'], TAR_FILE))
+    rm('%s/%s' % (package['package_dir'], TAR_FILE))
+    mvn('%s/cosmo-manager-develop/orchestrator/pom.xml' % package['package_dir'])
+    # tar(package['package_dir'], TAR_FILE, '%s/cosmo-manager-develop' % package['package_dir'])
+    # rmdir('%s/%s' % (package['package_dir'], 'cosmo-manager-develop'))
+
     pack(
         package['src_package_type'], package['dst_package_type'], package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],

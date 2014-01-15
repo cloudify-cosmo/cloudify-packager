@@ -80,7 +80,8 @@ def get_ruby_gem(gem, dir):
     """
 
     lgr.debug('downloading gem %s' % gem)
-    x = local('sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+    # x = local('sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+    x = local('sudo /usr/local/rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
     if x.succeeded:
         lgr.debug('successfully downloaded ruby gem %s to %s' % (gem, dir))
     else:
@@ -100,18 +101,33 @@ def get_python_module(module, dir):
         lgr.error('unsuccessfully downloaded python module %s' % module)
 
 
-def wget(url, dir):
+def wget(url, dir=False, file=False):
     """
-    wgets a url
+    wgets a url to a destination directory or file
     """
 
     lgr.debug('downloading %s to %s' % (url, dir))
     try:
-        x = local('sudo wget %s -P %s' % (url, dir))
-        if x.succeeded:
-            lgr.debug('successfully downloaded %s to %s' % (url, dir))
+        if file:
+            x = local('sudo wget %s -O %s' % (url, file))
+        elif dir:
+            x = local('sudo wget %s -P %s' % (url, dir))
+        elif dir and file:
+            lgr.warning('please specify either a directory or file to download to, not both')
+            sys.exit()
         else:
-            lgr.error('unsuccessfully downloaded %s to %s' % (url, dir))
+            lgr.warning('please specify at least one of target dir or file. you\'re downloading to the current directory')
+            x = local('sudo wget %s' % url)
+        if x.succeeded:
+            if file:
+                lgr.debug('successfully downloaded %s to %s' % (url, file))
+            if dir:
+                lgr.debug('successfully downloaded %s to %s' % (url, dir))
+        else:
+            if file:
+                lgr.error('unsuccessfully downloaded %s to %s' % (url, file))
+            if dir:
+                lgr.error('unsuccessfully downloaded %s to %s' % (url, dir))
     except:
         lgr.error('failed downloading %s' % url)
 
@@ -127,6 +143,19 @@ def rmdir(dir):
         lgr.debug('successfully removed directory %s' % dir)
     else:
         lgr.error('unsuccessfully removed directory %s' % dir)
+
+
+def rm(file):
+    """
+    deletes a file or a set of files
+    """
+
+    lgr.debug('removing files %s' % file)
+    x = local('sudo rm %s' % file)
+    if x.succeeded:
+        lgr.debug('successfully removed file %s' % file)
+    else:
+        lgr.error('unsuccessfully removed file %s' % file)
 
 
 def mkdir(dir):
@@ -210,6 +239,42 @@ def apt_get(list):
             lgr.debug('successfully installed %s' % package)
         else:
             lgr.error('unsuccessfully installed %s' % package)
+
+
+def mvn(file):
+
+    lgr.debug('building from %s' % file)
+    x = local('mvn clean package -DskipTests -Pall -f %s' % file)
+    if x.succeeded:
+        lgr.debug('successfully built from %s' % file)
+    else:
+        lgr.error('unsuccessfully built from %s' % file)
+
+
+def tar(chdir, output_file, input):
+    """
+    tars a dir
+    """
+
+    lgr.debug('tar-ing %s' % output_file)
+    x = local('sudo tar -C %s -czvf %s %s' % (chdir, output_file, input))
+    if x.succeeded:
+        lgr.debug('successfully tar-ed %s' % output_file)
+    else:
+        lgr.error('unsuccessfully tar-ed %s' % output_file)
+
+
+def untar(chdir, input_file):
+    """
+    tars a dir
+    """
+
+    lgr.debug('tar-ing %s' % input_file)
+    x = local('sudo tar -C %s -xzvf %s' % (chdir, input_file))
+    if x.succeeded:
+        lgr.debug('successfully tar-ed %s' % input_file)
+    else:
+        lgr.error('unsuccessfully tar-ed %s' % input_file)
 
 
 def apt_purge(package):

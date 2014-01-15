@@ -6,8 +6,8 @@ VIRTUALENV="{{ virtualenv }}"
 if [ ! -z "${VIRTUALENV}" ]
    	then
     	echo "creating virtualenv for ${PKG_NAME} modules..."
-		sudo mkdir -p ${VIRTUALENV}
+    	# sudo mkdir -p ${VIRTUALENV}
+    	sudo virtualenv ${VIRTUALENV}
 fi
-sudo virtualenv ${VIRTUALENV}
 echo "installing requirements in virtual env..."
 sudo ${VIRTUALENV}/bin/pip install --no-index --process-dependency-links --find-links="${PKG_DIR}" ${PKG_DIR}/*.*
