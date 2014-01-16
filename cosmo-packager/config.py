@@ -41,8 +41,8 @@ PACKAGES = {
         "bootstrap_script": "%s/elasticsearch-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "elasticsearch-bootstrap.template"
     },
-    "kibana": {
-        "name": "kibana",
+    "kibana3": {
+        "name": "kibana3",
         "version": "3.0.0milestone4",
         "source_url": "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
         "bootstrap_dir": "%s/kibana/" % PACKAGES_BOOTSTRAP_DIR,
@@ -120,7 +120,7 @@ PACKAGES = {
         "bootstrap_dir": "%s/dsl-parser-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/dsl-parser-modules" % PACKAGES_DIR,
         "virtualenv": "%s/cosmo-manager" % VIRTUALENVS_DIR,
-        "modules": ['pyyaml', 'jsonschema', 'https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.tar.gz'],
+        "modules": ['pyyaml', 'jsonschema', 'pika', 'https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.tar.gz'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/dsl-parser-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -132,7 +132,7 @@ PACKAGES = {
         "bootstrap_dir": "%s/manager-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/manager-modules" % PACKAGES_DIR,
         "virtualenv": "%s/cosmo-manager" % VIRTUALENVS_DIR,
-        "modules": ['Flask', 'flask-restful', 'flask-restful-swagger', 'requests', 'bernhard'],
+        "modules": ['Flask', 'flask-restful', 'flask-restful-swagger', 'requests', 'bernhard', 'pika'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/manager-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -156,7 +156,7 @@ PACKAGES = {
         "bootstrap_dir": "%s/celery-modules/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/celery-modules" % PACKAGES_DIR,
         "virtualenv": "%s/celery" % VIRTUALENVS_DIR,
-        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard',
+        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-openstack-provisioner/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
@@ -210,7 +210,7 @@ PACKAGER_LOGGER = {
             "format": "%(asctime)s %(levelname)s - %(message)s"
         },
         "console": {
-            "format": "### %(message)s"
+            "format": "########## %(message)s"
         }
     },
     "handlers": {
@@ -236,5 +236,11 @@ PACKAGER_LOGGER = {
     }
 }
 
+# event broker config (if applicable)
 RABBITMQ_HOST = 'localhost'
+# queue name for packager events
 RABBITMQ_QUEUE = 'hello'
+# routing key..
+RABBITMQ_ROUTING_KEY = 'packager'
+# broker exchange
+RABBITMQ_EXCHANGE = ''

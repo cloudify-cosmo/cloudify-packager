@@ -319,9 +319,6 @@ def run_script(package_name, action, arg_s=''):
     except IOError:
         lgr.error('Oh Dear... the script %s does not exist' % SCRIPT_PATH)
         sys.exit()
-    # else:
-        # lgr.error('script prereqs not fulfilled. exiting')
-        # sys.exit()
 
 
 def is_dir(dir):
@@ -336,35 +333,6 @@ def is_dir(dir):
     else:
         lgr.debug('%s does not exist' % dir)
         return False
-
-
-def check_prereqs(package_name, action):
-
-    if action == 'pkg':
-        if is_dir(package_name):
-            lgr.debug('package directory exists. \
-                continuing with packing process')
-            return True
-        else:
-            lgr.error('package directory does not exist. \
-                get the package and try again')
-            return False
-    elif action == 'get':
-        return True
-    elif action == 'remove':
-        return True
-    elif action == 'bootstrap':
-        if not package_name == 'cosmo':
-            if is_dir(package_name):
-                lgr.debug('%s package directory exists. \
-                    continuing with packing process' % package_name)
-                return True
-            else:
-                lgr.error('%s package directory does not exist. \
-                    get the package and try again' % package_name)
-                return False
-        else:
-            return True
 
 
 def main():

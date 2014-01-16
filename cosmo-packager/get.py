@@ -5,8 +5,8 @@ import logging.config
 
 import config
 from event_handler import send_event as se
-
 import uuid
+
 import sys
 from fabric.api import *  # NOQA
 from packager import *  # NOQA
@@ -27,7 +27,7 @@ def get_kibana():  # TESTED
     EXEC:   fab get_kibana
     """
 
-    package = get_package_configuration('kibana')
+    package = get_package_configuration('kibana3')
 
     rmdir(package['package_dir'])
     make_package_dirs(
@@ -83,9 +83,6 @@ def get_manager():  # TESTED
 
     package = get_package_configuration('manager')
 
-    stream_id = str(uuid.uuid1())
-    se(event_type="packager.get", event_name="get_manager_start", event_description='getting manager', stream_id=stream_id)
-
     rmdir(package['package_dir'])
     make_package_dirs(
         package['bootstrap_dir'],
@@ -93,8 +90,6 @@ def get_manager():  # TESTED
     wget(
         package['source_url'],
         file='%s/%s.tar.gz' % (package['package_dir'], package['name']))
-
-    se(event_type="packager.get", event_name="get_manager_success", event_description='getting manager', stream_id=stream_id)
 
 
 @task
@@ -152,6 +147,13 @@ def get_riemann():  # TESTED
 
     package = get_package_configuration('riemann')
 
+    stream_id = str(uuid.uuid1())
+    se(event_origin="cosmo-packager",
+        event_type="packager.get.%s" % package['name'],
+        event_subtype="started",
+        event_description='started downloading %s' % package['name'],
+        event_stream_id=stream_id)
+
     rmdir(package['package_dir'])
     make_package_dirs(
         package['bootstrap_dir'],
@@ -159,6 +161,12 @@ def get_riemann():  # TESTED
     wget(
         package['source_url'],
         dir=package['package_dir'])
+
+    se(event_origin="cosmo-packager",
+        event_type="packager.get.%s" % package['name'],
+        event_subtype="success",
+        event_description='finished downloading %s' % package['name'],
+        event_stream_id=stream_id)
 
 
 @task

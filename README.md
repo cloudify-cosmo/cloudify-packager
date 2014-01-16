@@ -1,7 +1,7 @@
 Cosmo-Packager
 ==============
 
-Cosmo-Packager is meant to create a package composed of Cosmo's 3rd party requirements and Code, including the most basic plugins.
+Cosmo-Packager is meant to create a package composed of Cosmo's 3rd party requirements and Code, including the most basic plugins and configuration.
 The foundation of Cosmo-Packager is based on the premise that not all networks have an internet connection, and that 3rd party requirements change a lot less than Cosmo's code base.
 The package will already contain the most basic configuration for Cosmo's components (e.g. logstash conf file, elasticsearch init file, etc..)
 
@@ -10,18 +10,21 @@ Generally, cosmo-packager will create a package from each component.
 ### PreReqs
 The packager uses the following 3rd party components:
 
-- make
-- python-setuptools
-- rubygems
-- git
-- python-dev 
-- curl
-- fpm ()
-- fabric >=1.4
-- pip >=1.5
-- jinja2
-- rvm
-
+- make -*for installing packages on the packager server*
+- python-setuptools -*also for installing packages on the packager server*
+- rubygems -*for downloading ruby gems*
+- git -*for cloning the packager repo*
+- python-dev -*for fabric, mainly*
+- curl -*for rvm installation*
+- fpm -*main packaging framework*
+- fabric -*...*
+- pip >1.5 -*for downloading python modules*
+- jinja2 -*for creating scripts and configuration files from tempates*
+- rvm -*for more gem installation requirements*
+- opnejdk-7-jdk -*for maven*
+- maven -*for building the orchestrator - will be removed once the orchestrator is pythoned*
+- nodejs 
+- pika -*to send events to rabbitmq if it's installed on the packaging server*
 a bootstrap script is provided to install the above packages.
 
 ### Structure
@@ -31,6 +34,7 @@ a bootstrap script is provided to install the above packages.
 - get.py contains the logic for downloading and arranging a component's contents.
 - pkg.py contains the logic for packaging a component.
 - templgen.py contains the base functions for creating script/configuration files from template files.
+- event_handler.py contains the base functions for sending events to rabbitmq from the packager.
 - fabfile.py contains fabric tasks for automation/testing purposes.
 
 ### Usage

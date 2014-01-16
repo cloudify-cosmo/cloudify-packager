@@ -4,6 +4,8 @@ import logging
 import logging.config
 
 import config
+from event_handler import send_event as se
+import uuid
 
 import sys
 from fabric.api import *  # NOQA
@@ -17,6 +19,28 @@ try:
     lgr = logging.getLogger('packager')
 except ValueError:
     sys.exit('could not initiate logger. try sudo...')
+
+
+@task
+def pkg_kibana():  # TESTED
+    """
+    ACT:    packages kibana
+    EXEC:   fab pkg_kibana
+    """
+
+    package = get_package_configuration('kibana3')
+
+    create_bootstrap_script(
+        package, package['bootstrap_template'], package['bootstrap_script'])
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
 
 
 @task
@@ -146,10 +170,23 @@ def pkg_riemann():  # TESTED
 
     package = get_package_configuration('riemann')
 
+    stream_id = str(uuid.uuid1())
+    se(event_origin="cosmo-packager",
+        event_type="packager.pkg.%s" % package['name'],
+        event_subtype="started",
+        event_description='started packaging %s' % package['name'],
+        event_stream_id=stream_id)
+
     if not is_dir(package['bootstrap_dir']):
         mkdir(package['bootstrap_dir'])
     lgr.debug("isolating debs...")
     cp('%s/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+    se(event_origin="cosmo-packager",
+        event_type="packager.pkg.%s" % package['name'],
+        event_subtype="success",
+        event_description='finished packaging %s' % package['name'],
+        event_stream_id=stream_id)
 
 
 @task

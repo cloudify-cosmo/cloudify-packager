@@ -26,9 +26,9 @@ echo "pwning ${PKG_NAME} file by logstash user..."
 sudo chown logstash:logstash ${HOME_DIR}/logstash-*-flatjar.jar
 echo "creating ${PKG_NAME} file link..."
 sudo ln -s ${HOME_DIR}/logstash-*-flatjar.jar ${HOME_DIR}/logstash.jar
-echo "creating ${PKG_NAME} logfile..."
-sudo touch ${LOG_DIR}/logstash.out
-echo "pwning logstash logfile by ${PKG_NAME} user..."
-sudo chown logstash:adm ${LOG_DIR}/logstash.out
+# echo "creating ${PKG_NAME} logfile..."
+# sudo touch ${LOG_DIR}/logstash.out
+# echo "pwning logstash logfile by ${PKG_NAME} user..."
+# sudo chown logstash:adm ${LOG_DIR}/logstash.out
 echo "starting ${PKG_NAME}..."
 sudo start logstash

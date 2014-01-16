@@ -27,7 +27,7 @@ def build_event_body(**kwargs):
 
 def send_event(**kwargs):
     """
-    sends an event to an AMQP broker
+    connects to an AMQP broker and registers an event
     """
 
     body = build_event_body(**kwargs)
@@ -37,11 +37,11 @@ def send_event(**kwargs):
     except:
         lgr.warning('rabbitmq broker unreachable, event: %s will not be registered' % body)
         return
+
     channel = connection.channel()
-
-    channel.queue_declare(queue=config.RABBITMQ_QUEUE)
-
-    channel.basic_publish(exchange='',
-                          routing_key='packager',
-                          body=body)
+    channel.queue_declare(queue=config.RABBITMQ_QUEUE, durable=True)
+    channel.basic_publish(exchange=config.RABBITMQ_EXCHANGE,
+                          routing_key=config.RABBITMQ_ROUTING_KEY,
+                          body=body,
+                          properties=pika.BasicProperties(delivery_mode=2))
     connection.close()
