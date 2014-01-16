@@ -4,7 +4,9 @@ import logging
 import logging.config
 
 import config
+from event_handler import send_event as se
 
+import uuid
 import sys
 from fabric.api import *  # NOQA
 from packager import *  # NOQA
@@ -16,6 +18,24 @@ try:
     lgr = logging.getLogger('packager')
 except ValueError:
     sys.exit('could not initiate logger. try sudo...')
+
+
+@task
+def get_kibana():  # TESTED
+    """
+    ACT:    retrives kibana
+    EXEC:   fab get_kibana
+    """
+
+    package = get_package_configuration('kibana')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    wget(
+        package['source_url'],
+        dir=package['package_dir'])
 
 
 @task
@@ -63,6 +83,9 @@ def get_manager():  # TESTED
 
     package = get_package_configuration('manager')
 
+    stream_id = str(uuid.uuid1())
+    se(event_type="packager.get", event_name="get_manager_start", event_description='getting manager', stream_id=stream_id)
+
     rmdir(package['package_dir'])
     make_package_dirs(
         package['bootstrap_dir'],
@@ -70,6 +93,8 @@ def get_manager():  # TESTED
     wget(
         package['source_url'],
         file='%s/%s.tar.gz' % (package['package_dir'], package['name']))
+
+    se(event_type="packager.get", event_name="get_manager_success", event_description='getting manager', stream_id=stream_id)
 
 
 @task

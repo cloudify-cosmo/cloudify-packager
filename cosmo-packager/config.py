@@ -235,3 +235,6 @@ PACKAGER_LOGGER = {
         }
     }
 }
+
+RABBITMQ_HOST = 'localhost'
+RABBITMQ_QUEUE = 'hello'
