@@ -1,4 +1,11 @@
 PKG_NAME="{{ name }}"
 PKG_DIR="{{ package_dir }}"
 
-sudo pip install --no-index --find-links="${PKG_DIR}" ${PKG_DIR}/*.tar.gz
+echo "extracting ${PKG_NAME}..."
+sudo tar -C ${PKG_DIR} -xvf ${PKG_DIR}/*.tar.gz
+echo "removing tar..."
+sudo rm ${PKG_DIR}/*.tar.gz
+cd ${PKG_DIR}/virtualenv*
+echo "installing ${PKG_NAME}..."
+sudo python setup.py install
+# sudo pip install --no-index --find-links="${PKG_DIR}" ${PKG_DIR}/*.tar.gz

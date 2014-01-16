@@ -10,7 +10,7 @@ if [ ! -z "${VIRTUALENV}" ]
 		# sudo mkdir -p ${VIRTUALENV}
 		sudo virtualenv ${VIRTUALENV}
 fi
-echo "unpacking ${PKG_NAME}..."
+echo "deploying ${PKG_NAME} in ${VIRTUALENV}..."
 # sudo tar -C ${BASE_DIR}/ -xvf ${PKG_DIR}/${PKG_NAME}.tar.gz
 sudo mv ${PKG_DIR}/* ${VIRTUALENV}
 # sudo rm -rf ${VIRTUALENV}/${PKG_DIR}/

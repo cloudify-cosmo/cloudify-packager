@@ -15,8 +15,6 @@ https://github.com/CloudifySource/cosmo-packager
 # create cosmo components bootstrap script
 # create cosmo components package task
 # parse setup.py for each cosmo component and get deps from there..
-# check out plugin install plugin
-# add setup.py to cosmo-manager
 
 # CONFIGURATION
 # 3rd party components configuration
@@ -71,11 +69,13 @@ def get_cosmo_components():
     get_riemann()
     get_rabbitmq()
     get_nodejs()
-    get_cosmo_ui()
+    # get_cosmo_ui()
+    get_manager()
     get_ruby_gems('workflow-gems')
-    # get_python_modules('dsl-parser-modules')
+    get_python_modules('virtualenv')
+    get_python_modules('dsl-parser-modules')
     get_python_modules('celery-modules')
-    # get_python_modules('manager-rest-modules')
+    get_python_modules('manager-modules')
 
 
 @task
@@ -92,11 +92,13 @@ def pkg_cosmo_components():
     pkg_riemann()
     pkg_rabbitmq()
     pkg_nodejs()
-    pkg_cosmo_ui()
+    # pkg_cosmo_ui()
+    pkg_manager()  # TEST MAVEN BUILD SEVERAL TIMES
     pkg_ruby_gems('workflow-gems')
+    pkg_python_modules('virtualenv')
     pkg_python_modules('dsl-parser-modules')
     pkg_python_modules('celery-modules')
-    pkg_python_modules('manager-rest-modules')
+    pkg_python_modules('manager-modules')
 
 
 @task
@@ -107,7 +109,7 @@ def bootstrap_cosmo_components():
     EXEC:   fab bootstrap_cosmo_components
     """
 
-    bootstrap('openjdk-7-jdk')
+    bootstrap('openjdk-7-jdk')  # TEST again
     bootstrap('jruby')
     bootstrap('riemann')
     bootstrap('rabbitmq-server')
@@ -115,10 +117,10 @@ def bootstrap_cosmo_components():
     bootstrap('elasticsearch')
     bootstrap('nodejs')
     bootstrap('cosmo-ui')
-    bootstrap('workflow-gems')
-    # bootstrap('dsl-parser-modules')
-    # bootstrap('celery-modules')
-    # bootstrap('manager-rest-modules')
+    bootstrap('workflow-gems')  # FIX atomic installation problem
+    bootstrap('dsl-parser-modules')
+    bootstrap('celery-modules')  # FIX problem with celery common installation
+    bootstrap('manager-rest-modules')
 
 
 # @task

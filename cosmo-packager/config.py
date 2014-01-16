@@ -7,7 +7,7 @@ PACKAGER_TEMPLATE_DIR = "/cosmo-packager/cosmo-packager/package-templates"
 # temporary directory to which items are downloaded and packages are created.
 PACKAGES_DIR = "/packages"
 # final directory to put the created packages in.
-PACKAGES_BOOTSTRAP_DIR = "/cosmo-bootstrap"
+PACKAGES_BOOTSTRAP_DIR = "/cosmo"
 # directory for cosmo modules and virtual environments
 VIRTUALENVS_DIR = "/opt/cosmo"
 
@@ -40,6 +40,17 @@ PACKAGES = {
         "dst_package_type": "deb",
         "bootstrap_script": "%s/elasticsearch-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "elasticsearch-bootstrap.template"
+    },
+    "kibana": {
+        "name": "kibana",
+        "version": "3.0.0milestone4",
+        "source_url": "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
+        "bootstrap_dir": "%s/kibana/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/kibana" % PACKAGES_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/kibana-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "kibana-bootstrap.template"
     },
     "jruby": {
         "name": "jruby",

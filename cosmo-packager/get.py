@@ -5,13 +5,17 @@ import logging.config
 
 import config
 
+import sys
 from fabric.api import *  # NOQA
 from packager import *  # NOQA
 
 # __all__ = ['list']
 
-logging.config.dictConfig(config.PACKAGER_LOGGER)
-lgr = logging.getLogger('packager')
+try:
+    logging.config.dictConfig(config.PACKAGER_LOGGER)
+    lgr = logging.getLogger('packager')
+except ValueError:
+    sys.exit('could not initiate logger. try sudo...')
 
 
 @task

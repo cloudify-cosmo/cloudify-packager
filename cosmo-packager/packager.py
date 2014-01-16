@@ -12,8 +12,23 @@ from templgen import template_formatter, make_file
 
 # __all__ = ['list']
 
-logging.config.dictConfig(config.PACKAGER_LOGGER)
-lgr = logging.getLogger('packager')
+try:
+    logging.config.dictConfig(config.PACKAGER_LOGGER)
+    lgr = logging.getLogger('packager')
+except ValueError:
+    sys.exit('could not initiate logger. try sudo...')
+
+
+def check_if_package_is_installed(package):
+
+    lgr.debug('checking if %s is installed' % package)
+    try:
+        local('sudo dpkg -s %s' % package)
+        lgr.debug('%s is installed' % package)
+        return True
+    except:
+        lgr.error('%s is not installed' % package)
+        return False
 
 
 def create_bootstrap_script(component, template_file, script_file):

@@ -5,14 +5,18 @@ import logging.config
 
 import config
 
+import sys
 from fabric.api import *  # NOQA
 from packager import *  # NOQA
 from templgen import *  # NOQA
 
 # __all__ = ['list']
 
-logging.config.dictConfig(config.PACKAGER_LOGGER)
-lgr = logging.getLogger('packager')
+try:
+    logging.config.dictConfig(config.PACKAGER_LOGGER)
+    lgr = logging.getLogger('packager')
+except ValueError:
+    sys.exit('could not initiate logger. try sudo...')
 
 
 @task
@@ -60,6 +64,11 @@ def pkg_manager():  # TESTED
     """
 
     package = get_package_configuration('manager')
+
+    x = check_if_package_is_installed('openjdk-7-jdk')
+    if not x:
+        lgr.debug('prereq package is not installed. terminating...')
+        sys.exit()
 
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])

@@ -3,11 +3,15 @@ import logging.config
 
 import config
 
+import sys
 from jinja2 import Environment, FileSystemLoader
 # from jinja2 import Template
 
-logging.config.dictConfig(config.PACKAGER_LOGGER)
-lgr = logging.getLogger('packager')
+try:
+    logging.config.dictConfig(config.PACKAGER_LOGGER)
+    lgr = logging.getLogger('packager')
+except ValueError:
+    sys.exit('could not initiate logger. try sudo...')
 
 
 def template_formatter(template_dir, template_file, var_dict):
