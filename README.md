@@ -23,7 +23,6 @@ The packager uses the following 3rd party components:
 - rvm -*for more gem installation requirements*
 - opnejdk-7-jdk -*for maven*
 - maven -*for building the orchestrator - will be removed once the orchestrator is pythoned*
-- nodejs 
 - pika -*to send events to rabbitmq if it's installed on the packaging server*
 a bootstrap script is provided to install the above packages.
 

@@ -56,48 +56,48 @@ env.status = False
 
 #TASKS
 @task
-def get_cosmo_components():
+def get_cosmo():
     """
     ACT:    retrieves cosmo 3rd parties
     EXEC:   fab get_cosmo_components
     """
 
-    get_jruby()
-    get_openjdk()
+    # get_openjdk()
     get_logstash()
     get_elasticsearch()
     get_riemann()
     get_rabbitmq()
     get_nodejs()
-    # get_cosmo_ui()
+    get_nginx()
+    get_cosmo_ui()
+    get_kibana()
+    get_celery()
     get_manager()
-    get_ruby_gems('workflow-gems')
-    get_python_modules('virtualenv')
-    get_python_modules('dsl-parser-modules')
-    get_python_modules('celery-modules')
-    get_python_modules('manager-modules')
+    get_workflow_jruby()
 
 
 @task
-def pkg_cosmo_components():
+def pkg_cosmo():
     """
     ACT:    packages cosmo 3rd parties
     EXEC:   fab pkg_comso_components
     """
 
     pkg_jruby()
-    pkg_openjdk()
+    pkg_openjdk()  # errors is installing some of the dep packages (maybe related to Maven installation in packager)
     pkg_logstash()
     pkg_elasticsearch()
     pkg_riemann()
     pkg_rabbitmq()
     pkg_nodejs()
-    # pkg_cosmo_ui()
-    pkg_manager()  # TEST MAVEN BUILD SEVERAL TIMES
-    pkg_ruby_gems('workflow-gems')
+    pkg_nginx()
+    pkg_cosmo_ui()
+    # pkg_manager()  # TEST MAVEN BUILD SEVERAL TIMES
+    pkg_kibana()
+    pkg_ruby_gems('workflow-gems')  # atomic fails to install. fix.
     pkg_python_modules('virtualenv')
     pkg_python_modules('dsl-parser-modules')
-    pkg_python_modules('celery-modules')
+    pkg_python_modules('celery-modules')  # celery installs successfully. dsl-parser can't install due to the missing celery common module.
     pkg_python_modules('manager-modules')
 
 

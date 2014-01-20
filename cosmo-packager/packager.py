@@ -8,6 +8,7 @@ import config
 from fabric.api import *  # NOQA
 import os
 import sys
+import re
 from templgen import template_formatter, make_file
 
 # __all__ = ['list']
@@ -17,6 +18,11 @@ try:
     lgr = logging.getLogger('packager')
 except ValueError:
     sys.exit('could not initiate logger. try sudo...')
+
+
+def delete_pip_build_root():
+
+    rmdir('/tmp/pip_buid_root/')
 
 
 def check_if_package_is_installed(package):
@@ -95,12 +101,27 @@ def get_ruby_gem(gem, dir):
     """
 
     lgr.debug('downloading gem %s' % gem)
-    # x = local('sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
-    x = local('sudo /usr/local/rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+    try:
+        x = local('sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+    except:
+        x = local('sudo /usr/local/rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
     if x.succeeded:
         lgr.debug('successfully downloaded ruby gem %s to %s' % (gem, dir))
     else:
         lgr.error('unsuccessfully downloaded ruby gem %s' % gem)
+
+
+def pip(module, dir):
+    """
+    pip installs a module
+    """
+
+    lgr.debug('installing module %s' % module)
+    x = local('sudo %s/pip --default-timeout=100 install %s' % (dir, module))
+    if x.succeeded:
+        lgr.debug('successfully installed python module %s to %s' % (module, dir))
+    else:
+        lgr.error('unsuccessfully installed python module %s' % module)
 
 
 def get_python_module(module, dir):
@@ -114,6 +135,39 @@ def get_python_module(module, dir):
         lgr.debug('successfully downloaded python module %s to %s' % (module, dir))
     else:
         lgr.error('unsuccessfully downloaded python module %s' % module)
+
+
+def check_module_installed(name):
+    """
+    checks to see that a module is installed
+    """
+
+    lgr.debug('checking to see that %s is installed' % name)
+    x = local('pip freeze', capture=True)
+    if re.search(r'%s' % name, x.stdout):
+        lgr.debug('module %s is installed' % name)
+        return True
+    else:
+        lgr.debug('module %s is not installed' % name)
+        return False
+
+
+def venv(root_dir, name):
+    """
+    creates a virtualenv
+    """
+
+    lgr.debug('creating virtualenv %s in %s' % (name, root_dir))
+    if check_module_installed('virtualenv'):
+        with lcd(root_dir):
+            x = local('virtualenv %s' % name)
+        if x.succeeded:
+            lgr.debug('successfully created virtualenv %s in %s' % (name, root_dir))
+        else:
+            lgr.error('unsuccessfully created virtualenv %s in %s' % (name, root_dir))
+    else:
+        lgr.error('virtualenv is not installed. terminating')
+        sys.exit()
 
 
 def wget(url, dir=False, file=False):
@@ -136,13 +190,17 @@ def wget(url, dir=False, file=False):
         if x.succeeded:
             if file:
                 lgr.debug('successfully downloaded %s to %s' % (url, file))
-            if dir:
+            elif dir:
                 lgr.debug('successfully downloaded %s to %s' % (url, dir))
+            elif not dir and not file:
+                lgr.debug('successfully downloaded %s to local directory' % url)
         else:
             if file:
                 lgr.error('unsuccessfully downloaded %s to %s' % (url, file))
-            if dir:
+            elif dir:
                 lgr.error('unsuccessfully downloaded %s to %s' % (url, dir))
+            elif not dir and not file:
+                lgr.debug('unsuccessfully downloaded %s to local directory' % url)
     except:
         lgr.error('failed downloading %s' % url)
 
@@ -257,6 +315,9 @@ def apt_get(list):
 
 
 def mvn(file):
+    """
+    build a jar
+    """
 
     lgr.debug('building from %s' % file)
     x = local('mvn clean package -DskipTests -Pall -f %s' % file)
@@ -266,9 +327,20 @@ def mvn(file):
         lgr.error('unsuccessfully built from %s' % file)
 
 
+def find_in_dir(dir, pattern):
+
+    lgr.debug('looking for %s in %s' % (pattern, dir))
+    x = local('find %s -iname "%s" -exec echo {} \;' % (dir, pattern), capture=True)
+    if x.succeeded:
+        return x.stdout
+        lgr.debug('successfully found %s in %s' % (pattern, dir))
+    else:
+        lgr.error('unsuccessfully found %s in %s' % (pattern, dir))
+
+
 def tar(chdir, output_file, input):
     """
-    tars a dir
+    tars an input file or directory
     """
 
     lgr.debug('tar-ing %s' % output_file)
@@ -281,7 +353,7 @@ def tar(chdir, output_file, input):
 
 def untar(chdir, input_file):
     """
-    tars a dir
+    untars a dir
     """
 
     lgr.debug('tar-ing %s' % input_file)

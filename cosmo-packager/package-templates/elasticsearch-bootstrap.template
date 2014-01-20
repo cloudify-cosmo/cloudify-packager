@@ -14,6 +14,6 @@ sudo tar -C ${BASE_DIR}/ -xvf ${PKG_DIR}/${PKG_NAME}-*.tar.gz
 echo "moving some stuff around..."
 sudo cp ${PKG_INIT_DIR}/${PKG_NAME}.conf ${INIT_DIR}
 echo "creating ${PKG_NAME} app link..."
-sudo ln -s ${BASE_DIR}/${PKG_NAME}-*/ ${HOME_DIR}
+sudo ln -sf ${BASE_DIR}/${PKG_NAME}-*/ ${HOME_DIR}
 echo "starting ${PKG_NAME}..."
 sudo start ${PKG_NAME}

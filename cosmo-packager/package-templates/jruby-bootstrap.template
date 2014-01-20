@@ -10,3 +10,5 @@ echo "creating ${PKG_NAME} app link..."
 sudo ln -s ${BASE_DIR}/jruby-*/ ${HOME_DIR}
 echo "creating jruby binary link..."
 sudo ln -s ${HOME_DIR}/bin/jruby /usr/bin/jruby
+echo "creating gem binary link..."
+sudo ln -s ${HOME_DIR}/bin/gem /usr/bin/gem

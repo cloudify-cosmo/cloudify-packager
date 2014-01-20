@@ -21,63 +21,30 @@ except ValueError:
 
 
 @task
-def get_kibana():  # TESTED
+def get_celery():
     """
-    ACT:    retrives kibana
-    EXEC:   fab get_kibana
+    ACT:    retrives celery
+    EXEC:   fab get_celery
     """
 
-    package = get_package_configuration('kibana3')
+    package = get_package_configuration('celery')
 
     rmdir(package['package_dir'])
     make_package_dirs(
         package['bootstrap_dir'],
         package['package_dir'])
-    wget(
-        package['source_url'],
-        dir=package['package_dir'])
-
-
-@task
-def get_pip():  # TESTED
-    """
-    ACT:    retrives pip
-    EXEC:   fab get_pip
-    """
-
-    package = get_package_configuration('python-pip')
-
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-    apt_download(
-        package['name'],
-        package['package_dir'])
-
-
-@task
-def get_python_modules(component):  # TESTED (failed on manager-modules due to no setup.py file)
-    """
-    ACT:    retrives python modules
-    ARGS:   component = Cosmo component to downloads modules for.
-    EXEC:   fab get_python_modules:component
-    """
-
-    package = get_package_configuration(component)
-
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    venv(package['package_dir'],
+         package['name'])
     for module in package['modules']:
-        get_python_module(module, package['package_dir'])
+        pip(module,
+            '%s/%s/bin' % (package['package_dir'], package['name']))
 
 
 @task
-def get_manager():  # TESTED
+def get_manager():
     """
-    ACT:    retrives manager
+    ACT:    retrives cosmo manager, creates a virtualenv,
+            installs all modules and builds cosmo.jar
     EXEC:   fab get_manager
     """
 
@@ -87,13 +54,59 @@ def get_manager():  # TESTED
     make_package_dirs(
         package['bootstrap_dir'],
         package['package_dir'])
+    venv(package['package_dir'],
+         package['name'])
     wget(
         package['source_url'],
         file='%s/%s.tar.gz' % (package['package_dir'], package['name']))
+    untar('%s/%s' % (package['package_dir'], package['name']),
+          '%s/%s.tar.gz' % (package['package_dir'], package['name']))
+    for module in package['modules']:
+        pip(module,
+            '%s/%s/bin' % (package['package_dir'], package['name']))
+
+    x = check_if_package_is_installed('openjdk-7-jdk')
+    if not x:
+        lgr.debug('prereq package is not installed. terminating...')
+        sys.exit()
+    mvn('%s/%s/cosmo-manager-develop/orchestrator/pom.xml' % (package['package_dir'],
+                                                              package['name']))
 
 
 @task
-def get_cosmo_ui():  # TESTED
+def get_workflow_jruby():
+    """
+    ACT:    retrives jruby and its workflow gems
+    EXEC:   fab get_workflow_jruby
+    """
+
+    package = get_package_configuration('workflow-jruby')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    wget(package['source_url'], package['package_dir'])
+    untar(package['package_dir'], '%s/%s' % (package['package_dir'], '*.tar.gz'))
+    rm('%s/%s' % (package['package_dir'], '*.tar.gz'))
+    wget(package['gemfile_source_url'], package['package_dir'])
+    untar(package['package_dir'], '%s/%s' % (package['package_dir'], '*.tar.gz'))
+    rm('%s/%s' % (package['package_dir'], '*.tar.gz'))
+    local('ln -sf %s/%s/jruby %s' % (package['package_dir'],
+                                     package['bin_home_dir'],
+                                     '/usr/bin/jruby'))
+    local('%s/%s/jruby -S gem install bundler' % (package['package_dir'],
+                                                  package['bin_home_dir']))
+    local('%s/%s/jruby -S bundle --gemfile %s' % (package['package_dir'],
+                                                  package['bin_home_dir'],
+                                                  package['gemfile_location']))
+    # TODO: USE FIND_IN_DIR TO GET GEMFILE
+    # sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} rack-test -v 0.6.2
+    # sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} test-unit -v 2.5.5
+
+
+@task
+def get_cosmo_ui():
     """
     ACT:    retrives cosmo_ui
     EXEC:   fab get_cosmo_ui
@@ -119,27 +132,30 @@ def get_cosmo_ui():  # TESTED
 
 
 @task
-def get_ruby_gems(component):  # TESTED
+def get_nodejs():
     """
-    ACT:    retrives ruby gems
-    ARGS:   component = Cosmo component to download gems for.
-    EXEC:   fab get_ruby_gems:component
+    ACT:    retrives nodejs
+    EXEC:   fab get_nodejs
     """
 
-    package = get_package_configuration(component)
+    package = get_package_configuration('nodejs')
 
     rmdir(package['package_dir'])
     make_package_dirs(
         package['bootstrap_dir'],
         package['package_dir'])
-    for gem in package['gems']:
-        get_ruby_gem(gem, package['package_dir'])
-    # sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} rack-test -v 0.6.2
-    # sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} test-unit -v 2.5.5
+
+    apt_get(package['prereqs'])
+    lgr.debug("adding package repo to src repo...")
+    local('add-apt-repository -y %s' % package['source_url'])
+    apt_update()
+    apt_download(
+        package['name'],
+        package['package_dir'])
 
 
 @task
-def get_riemann():  # TESTED
+def get_riemann():
     """
     ACT:    retrives riemann
     EXEC:   fab get_riemann
@@ -170,7 +186,7 @@ def get_riemann():  # TESTED
 
 
 @task
-def get_rabbitmq():  # TESTED
+def get_rabbitmq():
     """
     ACT:    retrives rabbitmq
     EXEC:   fab get_rabbitmq
@@ -197,33 +213,7 @@ def get_rabbitmq():  # TESTED
 
 
 @task
-def get_elasticsearch():  # TESTED
-    """
-    ACT:    retrives elasticsearch
-    EXEC:   fab get_elasticsearch
-    """
-
-    package = get_package_configuration('elasticsearch')
-
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-    wget(
-        package['source_url'],
-        dir=package['package_dir'])
-
-    PKG_INIT_DIR = "%s/init" % package['package_dir']
-    INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
-
-    lgr.debug("creating init dir...")
-    mkdir(PKG_INIT_DIR)
-    lgr.debug("getting init file...")
-    cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
-
-
-@task
-def get_logstash():  # TESTED
+def get_logstash():
     """
     ACT:    retrives logstash
     EXEC:   fab get_logstash
@@ -257,13 +247,39 @@ def get_logstash():  # TESTED
 
 
 @task
-def get_jruby():  # TESTED
+def get_elasticsearch():
     """
-    ACT:    retrives jruby
-    EXEC:   fab get_jruby
+    ACT:    retrives elasticsearch
+    EXEC:   fab get_elasticsearch
     """
 
-    package = get_package_configuration('jruby')
+    package = get_package_configuration('elasticsearch')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    wget(
+        package['source_url'],
+        dir=package['package_dir'])
+
+    PKG_INIT_DIR = "%s/init" % package['package_dir']
+    INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+
+    lgr.debug("creating init dir...")
+    mkdir(PKG_INIT_DIR)
+    lgr.debug("getting init file...")
+    cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
+
+
+@task
+def get_kibana():
+    """
+    ACT:    retrives kibana
+    EXEC:   fab get_kibana
+    """
+
+    package = get_package_configuration('kibana3')
 
     rmdir(package['package_dir'])
     make_package_dirs(
@@ -275,7 +291,7 @@ def get_jruby():  # TESTED
 
 
 @task
-def get_nginx():  # TESTED
+def get_nginx():
     """
     ACT:    retrives nginx
     EXEC:   fab get_nginx
@@ -300,30 +316,7 @@ def get_nginx():  # TESTED
 
 
 @task
-def get_nodejs():  # TESTED
-    """
-    ACT:    retrives nodejs
-    EXEC:   fab get_nodejs
-    """
-
-    package = get_package_configuration('nodejs')
-
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-
-    apt_get(package['prereqs'])
-    lgr.debug("adding package repo to src repo...")
-    local('add-apt-repository -y %s' % package['source_url'])
-    apt_update()
-    apt_download(
-        package['name'],
-        package['package_dir'])
-
-
-@task
-def get_openjdk():  # TESTED
+def get_openjdk():
     """
     ACT:    retrives openjdk
     EXEC:   fab get_openjdk

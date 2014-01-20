@@ -1,3 +1,7 @@
+# WORKING ENVIRONMENT
+ENV = "develop"
+# base packager repo dir
+PACKAGER_BASE = "/cosmo-packager/cosmo-packager"
 # directory for bootstrap/download/removal/package scripts - if applicable
 PACKAGER_SCRIPTS_DIR = "/cosmo-packager/cosmo-packager/package-scripts"
 # package configurations directory
@@ -7,10 +11,9 @@ PACKAGER_TEMPLATE_DIR = "/cosmo-packager/cosmo-packager/package-templates"
 # temporary directory to which items are downloaded and packages are created.
 PACKAGES_DIR = "/packages"
 # final directory to put the created packages in.
-PACKAGES_BOOTSTRAP_DIR = "/cosmo"
+PACKAGES_BOOTSTRAP_DIR = "/vagrant/debs"
 # directory for cosmo modules and virtual environments
 VIRTUALENVS_DIR = "/opt/cosmo"
-
 # specific package configuration
 PACKAGES = {
     "python-pip": {
@@ -51,17 +54,6 @@ PACKAGES = {
         "dst_package_type": "deb",
         "bootstrap_script": "%s/kibana-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "kibana-bootstrap.template"
-    },
-    "jruby": {
-        "name": "jruby",
-        "version": "1.7.3",
-        "source_url": "http://jruby.org.s3.amazonaws.com/downloads/1.7.3/jruby-bin-1.7.3.tar.gz",
-        "bootstrap_dir": "%s/jruby/" % PACKAGES_BOOTSTRAP_DIR,
-        "package_dir": "%s/jruby" % PACKAGES_DIR,
-        "src_package_type": "dir",
-        "dst_package_type": "deb",
-        "bootstrap_script": "%s/jruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_template": "jruby-bootstrap.template"
     },
     "nginx": {
         "name": "nginx",
@@ -144,17 +136,18 @@ PACKAGES = {
         "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
         "bootstrap_dir": "%s/manager/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/manager" % PACKAGES_DIR,
-        "virtualenv": "%s/cosmo-manager" % VIRTUALENVS_DIR,
+        "virtualenv": "%s/manager" % VIRTUALENVS_DIR,
+        "modules": ['%s/manager/manager/cosmo-manager-develop/manager-rest/' % PACKAGES_DIR],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/manager-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "manager-bootstrap.template"
     },
-    "celery-modules": {
-        "name": "celery-modules",
+    "celery": {
+        "name": "celery",
         "version": "0.0.1",
-        "bootstrap_dir": "%s/celery-modules/" % PACKAGES_BOOTSTRAP_DIR,
-        "package_dir": "%s/celery-modules" % PACKAGES_DIR,
+        "bootstrap_dir": "%s/celery/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/celery" % PACKAGES_DIR,
         "virtualenv": "%s/celery" % VIRTUALENVS_DIR,
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
@@ -163,12 +156,49 @@ PACKAGES = {
                     'https://github.com/CloudifySource/cosmo-plugin-riemann-configurer/archive/develop.tar.gz'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/celery-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_template": "python-modules-bootstrap.template"
+        "bootstrap_script": "%s/celery-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "celery-bootstrap.template"
+    },
+    "bundler": {
+        "name": "bundler",
+        "version": "0.0.1",
+        "bootstrap_dir": "%s/bundler/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/bundler" % PACKAGES_DIR,
+        "gems": ['bundler'],
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/bundler-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "ruby-gems-bootstrap.template"
+    },
+    "workflow-jruby": {
+        "name": "workflow-jruby",
+        "version": "1.7.3",
+        "source_url": "http://jruby.org.s3.amazonaws.com/downloads/1.7.3/jruby-bin-1.7.3.tar.gz",
+        "gemfile_source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
+        "gemfile_location": "%s/workflow-jruby/cosmo-manager-develop/workflow-service/Gemfile" % PACKAGES_DIR,
+        "bootstrap_dir": "%s/workflow-jruby/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/workflow-jruby" % PACKAGES_DIR,
+        "bin_home_dir": "jruby-1.7.3/bin",
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/workflow-jruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "workflow-jruby-bootstrap.template"
+    },
+    "jruby": {
+        "name": "jruby",
+        "version": "1.7.3",
+        "source_url": "http://jruby.org.s3.amazonaws.com/downloads/1.7.3/jruby-bin-1.7.3.tar.gz",
+        "bootstrap_dir": "%s/jruby/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/jruby" % PACKAGES_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/jruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "jruby-bootstrap.template"
     },
     "workflow-gems": {
         "name": "workflow-gems",
         "version": "0.0.1",
+        "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
         "bootstrap_dir": "%s/workflow-gems/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/workflow-gems" % PACKAGES_DIR,
         "virtualenv": VIRTUALENVS_DIR,
@@ -201,7 +231,6 @@ PACKAGES = {
         "bootstrap_template": "cosmo-bootstrap.template"
     }
 }
-
 # logger configuration
 PACKAGER_LOGGER = {
     "version": 1,
@@ -235,9 +264,8 @@ PACKAGER_LOGGER = {
         }
     }
 }
-
 # event broker config (if applicable)
-RABBITMQ_HOST = 'localhost'
+RABBITMQ_HOST = '10.0.0.3'
 # queue name for packager events
 RABBITMQ_QUEUE = 'hello'
 # routing key..

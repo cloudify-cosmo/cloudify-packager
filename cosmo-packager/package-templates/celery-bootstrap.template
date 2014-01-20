@@ -6,4 +6,3 @@ HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 
 echo "unpacking ${PKG_NAME}..."
 sudo mv ${PKG_DIR}/${PKG_NAME} ${BASE_DIR}
-sudo ln -sf ${HOME_DIR}/cosmo-manager-*/ ${HOME_DIR}/${PKG_NAME}

@@ -22,13 +22,13 @@ except ValueError:
 
 
 @task
-def pkg_kibana():  # TESTED
+def pkg_celery():
     """
-    ACT:    packages kibana
-    EXEC:   fab pkg_kibana
+    ACT:    packages celery
+    EXEC:   fab pkg_celery
     """
 
-    package = get_package_configuration('kibana3')
+    package = get_package_configuration('celery')
 
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
@@ -44,44 +44,7 @@ def pkg_kibana():  # TESTED
 
 
 @task
-def pkg_pip():  # TESTED
-    """
-    ACT:    packages pip
-    EXEC:   fab pkg_pip
-    """
-
-    package = get_package_configuration('python-pip')
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
-
-
-@task
-def pkg_python_modules(component):  # celery installs successfully. dsl-parser can't install due to the missing celery common module.
-    """
-    ACT:    packages python modules
-    EXEC:   fab pkg_python_modules
-    """
-
-    package = get_package_configuration(component)
-
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
-
-
-@task
-def pkg_manager():  # TESTED
+def pkg_manager():
     """
     ACT:    packages manager
     EXEC:   fab pkg_manager
@@ -89,22 +52,8 @@ def pkg_manager():  # TESTED
 
     package = get_package_configuration('manager')
 
-    x = check_if_package_is_installed('openjdk-7-jdk')
-    if not x:
-        lgr.debug('prereq package is not installed. terminating...')
-        sys.exit()
-
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
-
-    TAR_FILE = 'manager.tar.gz'
-
-    untar(package['package_dir'], '%s/%s' % (package['package_dir'], TAR_FILE))
-    rm('%s/%s' % (package['package_dir'], TAR_FILE))
-    mvn('%s/cosmo-manager-develop/orchestrator/pom.xml' % package['package_dir'])
-    # tar(package['package_dir'], TAR_FILE, '%s/cosmo-manager-develop' % package['package_dir'])
-    # rmdir('%s/%s' % (package['package_dir'], 'cosmo-manager-develop'))
-
     pack(
         package['src_package_type'], package['dst_package_type'], package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],
@@ -117,7 +66,29 @@ def pkg_manager():  # TESTED
 
 
 @task
-def pkg_cosmo_ui():  # TESTED
+def pkg_workflow_jruby():
+    """
+    ACT:    packages workflow-jruby
+    EXEC:   fab pkg_workflow-jruby
+    """
+
+    package = get_package_configuration('workflow-jruby')
+
+    create_bootstrap_script(
+        package, package['bootstrap_template'], package['bootstrap_script'])
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
+def pkg_cosmo_ui():
     """
     ACT:    packages cosmo ui
     EXEC:   fab pkg_cosmo_ui
@@ -139,21 +110,13 @@ def pkg_cosmo_ui():  # TESTED
 
 
 @task
-def pkg_ruby_gems(component):  # TESTED
+def pkg_nodejs():
     """
-    ACT:    packages ruby gems
-    ARGS:   component = Cosmo component to package gems for
-    EXEC:   fab pkg_ruby_gems
+    ACT:    packages nodejs
+    EXEC:   fab pkg_nodejs
     """
 
-    package = get_package_configuration(component)
-
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'])
+    package = get_package_configuration('nodejs')
 
     if not is_dir(package['bootstrap_dir']):
         mkdir(package['bootstrap_dir'])
@@ -162,7 +125,7 @@ def pkg_ruby_gems(component):  # TESTED
 
 
 @task
-def pkg_riemann():  # TESTED
+def pkg_riemann():
     """
     ACT:    packages riemann
     EXEC:   fab pkg_riemann
@@ -190,7 +153,7 @@ def pkg_riemann():  # TESTED
 
 
 @task
-def pkg_rabbitmq():  # TESTED
+def pkg_rabbitmq():
     """
     ACT:    packages rabbitmq
     EXEC:   fab pkg_rabbitmq
@@ -205,29 +168,7 @@ def pkg_rabbitmq():  # TESTED
 
 
 @task
-def pkg_elasticsearch():  # TESTED
-    """
-    ACT:    packages elasticsearch
-    EXEC:   fab pkg_elasticsearch
-    """
-
-    package = get_package_configuration('elasticsearch')
-
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
-
-
-@task
-def pkg_logstash():  # TESTED
+def pkg_logstash():
     """
     ACT:    packages logstash
     EXEC:   fab pkg_logstash
@@ -249,13 +190,13 @@ def pkg_logstash():  # TESTED
 
 
 @task
-def pkg_jruby():  # TESTED
+def pkg_elasticsearch():
     """
-    ACT:    packages jruby
-    EXEC:   fab pkg_jruby
+    ACT:    packages elasticsearch
+    EXEC:   fab pkg_elasticsearch
     """
 
-    package = get_package_configuration('jruby')
+    package = get_package_configuration('elasticsearch')
 
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
@@ -271,7 +212,29 @@ def pkg_jruby():  # TESTED
 
 
 @task
-def pkg_nginx():  # TESTED
+def pkg_kibana():
+    """
+    ACT:    packages kibana
+    EXEC:   fab pkg_kibana
+    """
+
+    package = get_package_configuration('kibana3')
+
+    create_bootstrap_script(
+        package, package['bootstrap_template'], package['bootstrap_script'])
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
+def pkg_nginx():
     """
     ACT:    packages nginx
     EXEC:   fab pkg_nginx
@@ -286,22 +249,7 @@ def pkg_nginx():  # TESTED
 
 
 @task
-def pkg_nodejs():  # TESTED
-    """
-    ACT:    packages nodejs
-    EXEC:   fab pkg_nodejs
-    """
-
-    package = get_package_configuration('nodejs')
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
-
-
-@task
-def pkg_openjdk():  # TESTED
+def pkg_openjdk():
     """
     ACT:    packages openjdk
     EXEC:   fab pkg_openjdk
