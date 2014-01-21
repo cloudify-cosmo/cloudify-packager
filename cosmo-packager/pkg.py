@@ -30,10 +30,11 @@ def pkg_cloudify3():
 
     package = get_package_configuration('cloudify3')
 
+    # rmdir(package['bootstrap_dir'])
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
     cp(package['bootstrap_script'], package['package_dir'])
-    cp(package['conf_dir'], package['bootstrap_dir'])
+    cp(package['conf_dir'], package['package_dir'])
     pack(
         package['src_package_type'], package['dst_package_type'], package['name'],
         package['package_dir'], '%s' % package['package_dir'],

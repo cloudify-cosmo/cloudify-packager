@@ -11,7 +11,7 @@ PACKAGER_TEMPLATE_DIR = "/cosmo-packager/cosmo-packager/package-templates"
 # temporary directory to which items are downloaded and packages are created.
 PACKAGES_DIR = "/packages"
 # final directory to put the created packages in.
-PACKAGES_BOOTSTRAP_DIR = "/cloudify3"
+PACKAGES_BOOTSTRAP_DIR = "/cosmo"
 # directory for cosmo modules and virtual environments
 VIRTUALENVS_DIR = "/opt/cosmo"
 # specific package configuration
@@ -19,8 +19,9 @@ PACKAGES = {
     "cloudify3": {
         "name": "cloudify3",
         "version": "3.0.0",
-        "bootstrap_dir": "%s/cloudify3/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "/cloudify",
         "package_dir": "%s" % PACKAGES_BOOTSTRAP_DIR,
+        "conf_dir": "%s" % PACKAGER_CONF_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/cloudify3-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -58,8 +59,8 @@ PACKAGES = {
         "name": "kibana3",
         "version": "3.0.0milestone4",
         "source_url": "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
-        "bootstrap_dir": "%s/kibana/" % PACKAGES_BOOTSTRAP_DIR,
-        "package_dir": "%s/kibana" % PACKAGES_DIR,
+        "bootstrap_dir": "%s/kibana3/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s/kibana3" % PACKAGES_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/kibana-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,

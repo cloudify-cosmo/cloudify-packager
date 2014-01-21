@@ -1,21 +1,24 @@
-sudo dpkg -i cosmo.deb
-sudo dpkg -i openjdk-7-jdk
-sudo dpkg -i logstash
-sudo dpkg -i elasticsearch
-sudo dpkg -i kibana
-sudo dpkg -i riemann
-copy riemann conf
-start riemann
-sudo dpkg -i rabbitmq
-enable rabbit plugins
-enable trace?
-restart rabbit
-sudo dpkg -i nginx
-copy nginx conf
-restart nginx
-sudo dpkg -i workflow-jruby
-sudo dpkg -i virtualenv
-sudo dpkg -i celery
-sudo dpkg -i manager
-sudo dpkg -i nodejs
-sudo dpkg -i cosmoui
+PKG_NAME="{{ name }}"
+PKG_DIR="{{ package_dir }}"
+
+sudo dpkg -i {{ package_dir }}/openjdk-7-jdk/*.deb
+sudo dpkg -i {{ package_dir }}/logstash/*.deb
+sudo dpkg -i {{ package_dir }}/elasticsearch/*.deb
+sudo dpkg -i {{ package_dir }}/kibana3/*.deb
+sudo dpkg -i {{ package_dir }}/riemann/*.deb
+sudo cp {{ package_dir}}/{{ conf_dir }}/riemann/riemann.conf.template /etc/riemann/
+sudo /etc/init.d/riemann start
+sudo dpkg -i {{ package_dir }}/rabbitmq-server/*.deb
+sudo rabbitmq-plugins enable rabbitmq_management
+sudo rabbitmq-plugins enable rabbitmq_tracing
+sudo service rabbitmq-server restart
+sudo rabbitmqctl trace_on
+sudo dpkg -i {{ package_dir }}/nginx/*.deb
+sudo cp {{ package_dir}}/{{ conf_dir }}/nginx/default.conf /etc/nginx/conf.d/
+sudo service nginx restart
+sudo dpkg -i {{ package_dir }}/workflow-jruby/*.deb
+sudo dpkg -i {{ package_dir }}/virtualenv/*.deb
+sudo dpkg -i {{ package_dir }}/celery/*.deb
+sudo dpkg -i {{ package_dir }}/manager/*.deb
+sudo dpkg -i {{ package_dir }}/nodejs/*.deb
+sudo dpkg -i {{ package_dir }}/cosmo-ui/*.deb
