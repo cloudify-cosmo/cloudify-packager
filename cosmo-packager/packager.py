@@ -74,7 +74,7 @@ def pack(src_type, dst_type, name, src_path, dst_path, version, bootstrap_script
                 x = local('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (
                     src_type, dst_type, bootstrap_script, name, version, src_path))
             else:
-                x = local('sudo fpm -s %s -t %s -n %s -v %s -f -p %s %s' % (
+                x = local('sudo fpm -s %s -t %s -n %s -v %s -f %s' % (
                     src_type, dst_type, name, version, src_path))
             if x.succeeded:
                 lgr.debug('successfully packed %s:%s' % (name, version))

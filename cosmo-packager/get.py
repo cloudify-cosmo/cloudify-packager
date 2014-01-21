@@ -21,6 +21,24 @@ except ValueError:
 
 
 @task
+def get_python_modules(component):
+    """
+    ACT:    retrives python modules
+    ARGS:   component = Cosmo component to downloads modules for.
+    EXEC:   fab get_python_modules:component
+    """
+
+    package = get_package_configuration(component)
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    for module in package['modules']:
+        get_python_module(module, package['package_dir'])
+
+
+@task
 def get_celery():
     """
     ACT:    retrives celery
@@ -43,7 +61,7 @@ def get_celery():
 @task
 def get_manager():
     """
-    ACT:    retrives cosmo manager, creates a virtualenv,
+    ACT:    retrives cosmo manager and its config, creates a virtualenv,
             installs all modules and builds cosmo.jar
     EXEC:   fab get_manager
     """
@@ -71,6 +89,14 @@ def get_manager():
         sys.exit()
     mvn('%s/%s/cosmo-manager-develop/orchestrator/pom.xml' % (package['package_dir'],
                                                               package['name']))
+
+    PKG_INIT_DIR = "%s/init" % package['package_dir']
+    INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+
+    lgr.debug("creating init dir...")
+    mkdir(PKG_INIT_DIR)
+    lgr.debug("getting init file...")
+    cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
 
 
 @task

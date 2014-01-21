@@ -62,18 +62,22 @@ def get_cosmo():
     EXEC:   fab get_cosmo_components
     """
 
-    # get_openjdk()
+    get_openjdk()
+    apt_get(['maven'])
     get_logstash()
     get_elasticsearch()
     get_riemann()
     get_rabbitmq()
     get_nodejs()
-    get_nginx()
     get_cosmo_ui()
+    get_nginx()
     get_kibana()
     get_celery()
-    get_manager()
     get_workflow_jruby()
+    pkg_openjdk()
+    # dpkg -i openjdk before getting manager...
+    get_manager()
+    get_python_modules('virtualenv')
 
 
 @task
@@ -83,22 +87,19 @@ def pkg_cosmo():
     EXEC:   fab pkg_comso_components
     """
 
-    pkg_jruby()
-    pkg_openjdk()  # errors is installing some of the dep packages (maybe related to Maven installation in packager)
+    # pkg_openjdk()  # already packaged at get_ process
     pkg_logstash()
     pkg_elasticsearch()
     pkg_riemann()
     pkg_rabbitmq()
     pkg_nodejs()
-    pkg_nginx()
     pkg_cosmo_ui()
-    # pkg_manager()  # TEST MAVEN BUILD SEVERAL TIMES
+    pkg_nginx()
     pkg_kibana()
-    pkg_ruby_gems('workflow-gems')  # atomic fails to install. fix.
-    pkg_python_modules('virtualenv')
-    pkg_python_modules('dsl-parser-modules')
-    pkg_python_modules('celery-modules')  # celery installs successfully. dsl-parser can't install due to the missing celery common module.
-    pkg_python_modules('manager-modules')
+    pkg_celery()
+    pkg_manager()
+    pkg_workflow_jruby()
+    # pkg_virtualenv()
 
 
 @task

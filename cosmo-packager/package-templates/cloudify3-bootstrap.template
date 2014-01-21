@@ -1,0 +1,21 @@
+sudo dpkg -i cosmo.deb
+sudo dpkg -i openjdk-7-jdk
+sudo dpkg -i logstash
+sudo dpkg -i elasticsearch
+sudo dpkg -i kibana
+sudo dpkg -i riemann
+copy riemann conf
+start riemann
+sudo dpkg -i rabbitmq
+enable rabbit plugins
+enable trace?
+restart rabbit
+sudo dpkg -i nginx
+copy nginx conf
+restart nginx
+sudo dpkg -i workflow-jruby
+sudo dpkg -i virtualenv
+sudo dpkg -i celery
+sudo dpkg -i manager
+sudo dpkg -i nodejs
+sudo dpkg -i cosmoui

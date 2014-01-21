@@ -22,6 +22,68 @@ except ValueError:
 
 
 @task
+def pkg_cloudify3():
+    """
+    ACT:    packages cloudify3
+    EXEC:   fab pkg_cloudify3
+    """
+
+    package = get_package_configuration('cloudify3')
+
+    create_bootstrap_script(
+        package, package['bootstrap_template'], package['bootstrap_script'])
+    cp(package['bootstrap_script'], package['package_dir'])
+    cp(package['conf_dir'], package['bootstrap_dir'])
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s' % package['package_dir'],
+        package['version'])
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
+def pkg_additionals():
+    """
+    ACT:    packages additional files required for the bootstrap process
+            might include some configuration files, scripts or packages
+    EXEC:   fab pkg_additionals
+    """
+
+    package = get_package_configuration('virtualenv')
+
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
+
+
+@task
+def pkg_virtualenv():
+    """
+    ACT:    packages virtualenv
+    EXEC:   fab pkg_virtualenv
+    """
+
+    package = get_package_configuration('virtualenv')
+
+    create_bootstrap_script(
+        package, package['bootstrap_template'], package['bootstrap_script'])
+    pack(
+        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
 def pkg_celery():
     """
     ACT:    packages celery

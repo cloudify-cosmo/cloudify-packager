@@ -11,11 +11,21 @@ PACKAGER_TEMPLATE_DIR = "/cosmo-packager/cosmo-packager/package-templates"
 # temporary directory to which items are downloaded and packages are created.
 PACKAGES_DIR = "/packages"
 # final directory to put the created packages in.
-PACKAGES_BOOTSTRAP_DIR = "/vagrant/debs"
+PACKAGES_BOOTSTRAP_DIR = "/cloudify3"
 # directory for cosmo modules and virtual environments
 VIRTUALENVS_DIR = "/opt/cosmo"
 # specific package configuration
 PACKAGES = {
+    "cloudify3": {
+        "name": "cloudify3",
+        "version": "3.0.0",
+        "bootstrap_dir": "%s/cloudify3/" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s" % PACKAGES_BOOTSTRAP_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/cloudify3-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "cloudify3-bootstrap.template"
+    },
     "python-pip": {
         "name": "python-pip",
         "version": "1.0",
@@ -97,10 +107,10 @@ PACKAGES = {
     },
     "virtualenv": {
         "name": "virtualenv",
-        "version": "0.0.1",
+        "version": "1.10.1",
         "bootstrap_dir": "%s/virtualenv/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/virtualenv" % PACKAGES_DIR,
-        "modules": ['virtualenv'],
+        "modules": ['virtualenv==1.10.1'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/virtualenv-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
