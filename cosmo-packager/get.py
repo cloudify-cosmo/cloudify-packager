@@ -96,7 +96,7 @@ def get_manager():
     lgr.debug("creating init dir...")
     mkdir(PKG_INIT_DIR)
     lgr.debug("getting init file...")
-    cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
+    cp('%s/*.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
 
 
 @task

@@ -15,3 +15,5 @@ cd ${HOME_DIR}
 sudo virtualenv ${PKG_NAME}
 echo "starting ${PKG_NAME}..."
 sudo start manager
+echo "starting workflow-service..."
+sudo start workflow

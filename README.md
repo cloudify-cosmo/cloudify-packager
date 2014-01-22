@@ -5,7 +5,7 @@ Cosmo-Packager is meant to create a package composed of Cosmo's 3rd party requir
 The foundation of Cosmo-Packager is based on the premise that not all networks have an internet connection, and that 3rd party requirements change a lot less than Cosmo's code base.
 The package will already contain the most basic configuration for Cosmo's components (e.g. logstash conf file, elasticsearch init file, etc..)
 
-Generally, cosmo-packager will create a package from each component.
+Generally speaking (aside from very few specific configuration objects), cosmo-packager will create a package from each component.
 
 ### PreReqs
 The packager uses the following 3rd party components:
@@ -20,9 +20,8 @@ The packager uses the following 3rd party components:
 - fabric -*...*
 - pip >1.5 -*for downloading python modules*
 - jinja2 -*for creating scripts and configuration files from tempates*
-- rvm -*for more gem installation requirements*
 - opnejdk-7-jdk -*for maven*
-- maven -*for building the orchestrator - will be removed once the orchestrator is pythoned*
+- maven -*for building the orchestrator - will be removed once the orchestrator is python-ed*
 - pika -*to send events to rabbitmq if it's installed on the packaging server*
 a bootstrap script is provided to install the above packages.
 

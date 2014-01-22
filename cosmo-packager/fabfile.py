@@ -31,10 +31,10 @@ https://github.com/CloudifySource/cosmo-packager
 # vagrant (on hold)
 
 from fabric.api import *  # NOQA
-import packager
+from packager import *  # NOQA
 from get import *  # NOQA
 from pkg import *  # NOQA
-# from config import PACKAGES as PKGS
+# import config
 
 #env.user = ''
 #env.password = ''
@@ -56,28 +56,39 @@ env.status = False
 
 #TASKS
 @task
-def get_cosmo():
+def get_cosmo_components():
     """
     ACT:    retrieves cosmo 3rd parties
     EXEC:   fab get_cosmo_components
     """
 
-    get_openjdk()
-    apt_get(['maven'])
+    # get_openjdk()
     get_logstash()
     get_elasticsearch()
     get_riemann()
     get_rabbitmq()
     get_nodejs()
-    get_cosmo_ui()
     get_nginx()
     get_kibana()
-    get_celery()
-    get_workflow_jruby()
-    pkg_openjdk()
-    # dpkg -i openjdk before getting manager...
-    get_manager()
     get_python_modules('virtualenv')
+
+
+@task
+def get_cosmo_base():
+    """
+    ACT:    retrieves cosmo code
+    EXEC:   fab get_cosmo_base
+    """
+
+    get_workflow_jruby()
+    get_celery()
+    get_cosmo_ui()
+    if not check_if_package_is_installed('openjdk-7-jdk'):
+        pkg_openjdk()
+        local('sudo dpkg -i %s/*.deb' % config.PACKAGES['openjdk']['bootstrap_dir'])
+    if not check_if_package_is_installed('maven'):
+        apt_get(['maven'])
+    get_manager()
 
 
 @task
@@ -93,87 +104,10 @@ def pkg_cosmo():
     pkg_riemann()
     pkg_rabbitmq()
     pkg_nodejs()
-    pkg_cosmo_ui()
     pkg_nginx()
     pkg_kibana()
-    pkg_celery()
-    pkg_manager()
+    pkg_virtualenv()
     pkg_workflow_jruby()
-    # pkg_virtualenv()
-
-
-@task
-def bootstrap_cosmo_components():
-    """
-    ACT:    bootstraps cosmo components (
-        can be used to test the bootstrap scripts)
-    EXEC:   fab bootstrap_cosmo_components
-    """
-
-    bootstrap('openjdk-7-jdk')  # TEST again
-    bootstrap('jruby')
-    bootstrap('riemann')
-    bootstrap('rabbitmq-server')
-    bootstrap('logstash')
-    bootstrap('elasticsearch')
-    bootstrap('nodejs')
-    bootstrap('cosmo-ui')
-    bootstrap('workflow-gems')  # FIX atomic installation problem
-    bootstrap('dsl-parser-modules')
-    bootstrap('celery-modules')  # FIX problem with celery common installation
-    bootstrap('manager-rest-modules')
-
-
-# @task
-def bs():
-    """
-    ACT:    bootstraps cosmo
-    EXEC:   fab bs
-    """
-
-    packager.run_script('cosmo', 'bootstrap')
-
-
-# @task
-def create(package_name, arg_s=''):
-    """
-    ACT:    creates a packages (
-        and potentially appends a bootstrap script to it)
-    ARGS:   package_name = name of package to create
-    EXEC:   fab create:package_name
-    """
-
-    packager.run_script(package_name, 'pkg', arg_s)
-
-
-# @task
-def retrieve(package_name, arg_s=''):
-    """
-    ACT:    downloads a package
-    ARGS:   package_name = name of package to create
-    EXEC:   fab get:package_name
-    """
-
-    packager.run_script(package_name, 'get', arg_s)
-
-
-@task
-def remove(package_name, arg_s=''):
-    """
-    ACT:    removes a package
-    ARGS:   package_name = name of package to create
-    EXEC:   fab remove:package_name
-    """
-
-    packager.run_script(package_name, 'remove', arg_s)
-
-
-@task
-def bootstrap(package_name, arg_s=''):
-    """
-    ACT:    bootstraps a package
-    ARGS:   package_name = name of package to create
-    EXEC:   fab bootstrap:package_name
-    """
-
-    packager.run_script(package_name, 'bootstrap', arg_s)
+    pkg_celery()
+    pkg_cosmo_ui()
+    pkg_manager()

@@ -1,24 +1,58 @@
+function pause(){
+	read -p "$*"
+}
+
+function state_error
+{
+	echo "ERROR: ${1:-UNKNOWN} (status $?)" 1>&2
+	exit 1
+}
+
 PKG_NAME="{{ name }}"
 PKG_DIR="{{ package_dir }}"
 
-sudo dpkg -i {{ package_dir }}/openjdk-7-jdk/*.deb
-sudo dpkg -i {{ package_dir }}/logstash/*.deb
-sudo dpkg -i {{ package_dir }}/elasticsearch/*.deb
-sudo dpkg -i {{ package_dir }}/kibana3/*.deb
-sudo dpkg -i {{ package_dir }}/riemann/*.deb
-sudo cp {{ package_dir}}/{{ conf_dir }}/riemann/riemann.conf.template /etc/riemann/
-sudo /etc/init.d/riemann start
-sudo dpkg -i {{ package_dir }}/rabbitmq-server/*.deb
-sudo rabbitmq-plugins enable rabbitmq_management
-sudo rabbitmq-plugins enable rabbitmq_tracing
-sudo service rabbitmq-server restart
-sudo rabbitmqctl trace_on
-sudo dpkg -i {{ package_dir }}/nginx/*.deb
-sudo cp {{ package_dir}}/{{ conf_dir }}/nginx/default.conf /etc/nginx/conf.d/
-sudo service nginx restart
-sudo dpkg -i {{ package_dir }}/workflow-jruby/*.deb
-sudo dpkg -i {{ package_dir }}/virtualenv/*.deb
-sudo dpkg -i {{ package_dir }}/celery/*.deb
-sudo dpkg -i {{ package_dir }}/manager/*.deb
-sudo dpkg -i {{ package_dir }}/nodejs/*.deb
-sudo dpkg -i {{ package_dir }}/cosmo-ui/*.deb
+echo -e "creating cosmo log dir...\n"
+sudo mkdir -p /var/log/cosmo 											|| state_error "failed on: creating cosmo log dir"
+echo -e "installing openjdk...\n"
+sudo dpkg -i ${PKG_DIR}/openjdk-7-jdk/*.deb								|| state_error "failed on: openjdk installation"
+echo -e "installing logstash...\n"
+sudo dpkg -i ${PKG_DIR}/logstash/*.deb									|| state_error "failed on: logstash installation"
+echo -e "installing elasticsearch...\n"
+sudo dpkg -i ${PKG_DIR}/elasticsearch/*.deb								|| state_error "failed on: elasticsearch installation"
+echo -e "installing kibana3...\n"
+sudo dpkg -i ${PKG_DIR}/kibana3/*.deb								 	|| state_error "failed on: kibana3 installation"
+echo -e "installing riemann...\n"
+sudo dpkg -i ${PKG_DIR}/riemann/*.deb								 	|| state_error "failed on: riemann installation"
+echo -e "applying riemann config...\n"
+sudo cp {{ conf_dir }}/riemann/riemann.conf.template /etc/riemann/		|| state_error "failed on: riemann configuration"
+echo -e "restarting riemann...\n"
+sudo /etc/init.d/riemann start								 			|| state_error "failed on: riemann restart"
+echo -e "installing rabbitmq...\n"
+sudo dpkg -i ${PKG_DIR}/rabbitmq-server/*.deb							|| state_error "failed on: rabbitmq installation"
+echo -e "enabling rabbitmq management plugin...\n"
+sudo rabbitmq-plugins enable rabbitmq_management						|| state_error "failed on: rabbitmq configuration"
+echo -e "enabling rabbitmq tracing plugin...\n"
+sudo rabbitmq-plugins enable rabbitmq_tracing							|| state_error "failed on: rabbitmq configuration"
+echo -e "restarting rabbitmq...\n"
+sudo service rabbitmq-server restart								 	|| state_error "failed on: rabbitmq restart"
+echo -e "running rabbitmq trace...\n"
+sudo rabbitmqctl trace_on								 				|| state_error "failed on: rabbitmq configuration"
+echo -e "installing nginx...\n"
+sudo dpkg -i ${PKG_DIR}/nginx/*.deb								 		|| state_error "failed on: nginx installation"
+echo -e "applying nginx config...\n"
+sudo cp {{ conf_dir }}/nginx/default.conf /etc/nginx/conf.d/			|| state_error "failed on: nginx configuration"
+echo -e "restarting nginx...\n"
+sudo service nginx restart								 				|| state_error "failed on: nginx restart"
+echo -e "installing workflow-jruby\n"
+sudo dpkg -i ${PKG_DIR}/workflow-jruby/*.deb							|| state_error "failed on: workflow-jruby installation"
+echo -e "installing virtualenv...\n"
+sudo dpkg -i ${PKG_DIR}/virtualenv/*.deb								|| state_error "failed on: virtualenv installation"
+echo -e "installing celery and manager plugins...\n"
+sudo dpkg -i ${PKG_DIR}/celery/*.deb								 	|| state_error "failed on: celery installation"
+echo -e "installing manager...\n"
+sudo dpkg -i ${PKG_DIR}/manager/*.deb								 	|| state_error "failed on: manager installation"
+echo -e "installing nodejs...\n"
+sudo dpkg -i ${PKG_DIR}/nodejs/*.deb								 	|| state_error "failed on: nodejs installation"
+echo -e "installing cosmo-ui\n"
+sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb								 	|| state_error "failed on: cosmo-ui installation"
+echo -e "Cloudify3 installation completed successfully.\n"

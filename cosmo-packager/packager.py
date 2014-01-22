@@ -359,9 +359,9 @@ def untar(chdir, input_file):
     lgr.debug('tar-ing %s' % input_file)
     x = local('sudo tar -C %s -xzvf %s' % (chdir, input_file))
     if x.succeeded:
-        lgr.debug('successfully tar-ed %s' % input_file)
+        lgr.debug('successfully untar-ed %s' % input_file)
     else:
-        lgr.error('unsuccessfully tar-ed %s' % input_file)
+        lgr.error('unsuccessfully untar-ed %s' % input_file)
 
 
 def apt_purge(package):
