@@ -21,7 +21,7 @@ PACKAGES = {
         "version": "3.0.0",
         "bootstrap_dir": "/cloudify",
         "package_dir": "%s" % PACKAGES_BOOTSTRAP_DIR,
-        "conf_dir": "%s/package-configuration" % PACKAGES_BOOTSTRAP_DIR,
+        "conf_dir": "%s" % PACKAGER_CONF_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/cloudify3-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,

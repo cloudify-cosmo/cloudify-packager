@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+PKG_NAME="{{ name }}"
+PKG_DIR="{{ package_dir }}"
+
+echo "installing ${PKG_NAME} and its dependencies..."
+sudo dpkg -i ${PKG_DIR}/archives/*.deb

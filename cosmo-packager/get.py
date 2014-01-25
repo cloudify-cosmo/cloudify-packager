@@ -57,6 +57,22 @@ def get_celery():
         pip(module,
             '%s/%s/bin' % (package['package_dir'], package['name']))
 
+    PKG_INIT_DIR = "%s/init" % package['package_dir']
+    INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+
+    PKG_CONF_DIR = "%s/conf" % package['package_dir']
+    CONF_DIR = "%s/%s/conf" % (config.PACKAGER_CONF_DIR, package['name'])
+
+    lgr.debug("creating init dir...")
+    mkdir(PKG_INIT_DIR)
+    lgr.debug("getting init file...")
+    cp('%s/*' % INIT_DIR, PKG_INIT_DIR)
+
+    lgr.debug("creating conf dir...")
+    mkdir(PKG_CONF_DIR)
+    lgr.debug("getting conf files...")
+    cp('%s/*' % CONF_DIR, PKG_CONF_DIR)
+
 
 @task
 def get_manager():
@@ -83,20 +99,20 @@ def get_manager():
         pip(module,
             '%s/%s/bin' % (package['package_dir'], package['name']))
 
-    x = check_if_package_is_installed('openjdk-7-jdk')
-    if not x:
-        lgr.debug('prereq package is not installed. terminating...')
-        sys.exit()
-    mvn('%s/%s/cosmo-manager-develop/orchestrator/pom.xml' % (package['package_dir'],
-                                                              package['name']))
-
     PKG_INIT_DIR = "%s/init" % package['package_dir']
     INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
 
     lgr.debug("creating init dir...")
     mkdir(PKG_INIT_DIR)
     lgr.debug("getting init file...")
-    cp('%s/*.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
+    cp('%s/*.conf' % INIT_DIR, PKG_INIT_DIR)
+
+    x = check_if_package_is_installed('openjdk-7-jdk')
+    if not x:
+        lgr.debug('prereq package is not installed. terminating...')
+        sys.exit()
+    mvn('%s/%s/cosmo-manager-develop/orchestrator/pom.xml' % (package['package_dir'],
+                                                              package['name']))
 
 
 @task

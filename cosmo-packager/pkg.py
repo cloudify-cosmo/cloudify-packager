@@ -47,22 +47,6 @@ def pkg_cloudify3():
 
 
 @task
-def pkg_additionals():
-    """
-    ACT:    packages additional files required for the bootstrap process
-            might include some configuration files, scripts or packages
-    EXEC:   fab pkg_additionals
-    """
-
-    package = get_package_configuration('virtualenv')
-
-    pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'])
-
-
-@task
 def pkg_virtualenv():
     """
     ACT:    packages virtualenv

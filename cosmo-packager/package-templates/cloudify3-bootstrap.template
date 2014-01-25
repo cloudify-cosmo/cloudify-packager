@@ -1,58 +1,142 @@
+#!/usr/bin/env bash
+
 function pause(){
-	read -p "$*"
+    read -p "$*"
 }
 
 function state_error
 {
-	echo "ERROR: ${1:-UNKNOWN} (status $?)" 1>&2
-	exit 1
+    echo "ERROR: ${1:-UNKNOWN} (status $?)" 1>&2
+    exit 1
+}
+
+function state_error
+{
+    echo "ERROR: ${1:-UNKNOWN} (status $?)" 1>&2
+    exit 1
+}
+
+function check_pkg
+{
+    echo "checking to see if package $1 is installed..."
+    dpkg -s $1 || state_error "package $1 is not installed"
+    echo "package $1 is installed"
+}
+
+function check_user
+{
+    echo "checking to see if user $1 exists..."
+    id -u $1 || state_error "user $1 doesn't exists"
+    echo "user $1 exists"
+}
+
+function check_port
+{
+    echo "checking to see if port $1 is opened..."
+    nc -z $1 $2 || state_error "port $2 is closed"
+    echo "port $2 on $1 is opened"
+}
+
+function check_dir
+{
+    echo "checking to see if dir $1 exists..."
+    if [ -d $1 ]; then
+        echo "dir $1 exists"
+    else
+        state_error "dir $1 doesn't exist"
+    fi
+}
+
+function check_file
+{
+    echo "checking to see if file $1 exists..."
+    if [ -f $1 ]; then
+        echo "file $1 exists"
+        # if [ -$2 $1 ]; then
+            # echo "$1 exists and contains the right attribs"
+        # else
+            # state_error "$1 exists but does not contain the right attribs"
+        # fi
+    else
+        state_error "file $1 doesn't exists"
+}
+
+function check_upstart
+{
+    echo "checking to see if $1 daemon is running..."
+    status $1 || state_error "daemon $1 is not running"
+    echo "daemon $1 is running"
+}
+
+function check_service
+{
+    echo "checking to see if $1 service is running..."
+    service $1 status || state_error "service $1 is not running"
+    echo "service $1 is running"
 }
 
 PKG_NAME="{{ name }}"
 PKG_DIR="{{ package_dir }}"
+LOG_FILE="/varl/log/cloudify3-bootstrap.log"
 
-echo -e "creating cosmo log dir...\n"
-sudo mkdir -p /var/log/cosmo 											|| state_error "failed on: creating cosmo log dir"
-echo -e "installing openjdk...\n"
-sudo dpkg -i ${PKG_DIR}/openjdk-7-jdk/*.deb								|| state_error "failed on: openjdk installation"
-echo -e "installing logstash...\n"
-sudo dpkg -i ${PKG_DIR}/logstash/*.deb									|| state_error "failed on: logstash installation"
-echo -e "installing elasticsearch...\n"
-sudo dpkg -i ${PKG_DIR}/elasticsearch/*.deb								|| state_error "failed on: elasticsearch installation"
-echo -e "installing kibana3...\n"
-sudo dpkg -i ${PKG_DIR}/kibana3/*.deb								 	|| state_error "failed on: kibana3 installation"
-echo -e "installing riemann...\n"
-sudo dpkg -i ${PKG_DIR}/riemann/*.deb								 	|| state_error "failed on: riemann installation"
-echo -e "applying riemann config...\n"
-sudo cp {{ conf_dir }}/riemann/riemann.conf.template /etc/riemann/		|| state_error "failed on: riemann configuration"
-echo -e "restarting riemann...\n"
-sudo /etc/init.d/riemann start								 			|| state_error "failed on: riemann restart"
-echo -e "installing rabbitmq...\n"
-sudo dpkg -i ${PKG_DIR}/rabbitmq-server/*.deb							|| state_error "failed on: rabbitmq installation"
-echo -e "enabling rabbitmq management plugin...\n"
-sudo rabbitmq-plugins enable rabbitmq_management						|| state_error "failed on: rabbitmq configuration"
-echo -e "enabling rabbitmq tracing plugin...\n"
-sudo rabbitmq-plugins enable rabbitmq_tracing							|| state_error "failed on: rabbitmq configuration"
-echo -e "restarting rabbitmq...\n"
-sudo service rabbitmq-server restart								 	|| state_error "failed on: rabbitmq restart"
-echo -e "running rabbitmq trace...\n"
-sudo rabbitmqctl trace_on								 				|| state_error "failed on: rabbitmq configuration"
-echo -e "installing nginx...\n"
-sudo dpkg -i ${PKG_DIR}/nginx/*.deb								 		|| state_error "failed on: nginx installation"
-echo -e "applying nginx config...\n"
-sudo cp {{ conf_dir }}/nginx/default.conf /etc/nginx/conf.d/			|| state_error "failed on: nginx configuration"
-echo -e "restarting nginx...\n"
-sudo service nginx restart								 				|| state_error "failed on: nginx restart"
-echo -e "installing workflow-jruby\n"
-sudo dpkg -i ${PKG_DIR}/workflow-jruby/*.deb							|| state_error "failed on: workflow-jruby installation"
-echo -e "installing virtualenv...\n"
-sudo dpkg -i ${PKG_DIR}/virtualenv/*.deb								|| state_error "failed on: virtualenv installation"
-echo -e "installing celery and manager plugins...\n"
-sudo dpkg -i ${PKG_DIR}/celery/*.deb								 	|| state_error "failed on: celery installation"
-echo -e "installing manager...\n"
-sudo dpkg -i ${PKG_DIR}/manager/*.deb								 	|| state_error "failed on: manager installation"
-echo -e "installing nodejs...\n"
-sudo dpkg -i ${PKG_DIR}/nodejs/*.deb								 	|| state_error "failed on: nodejs installation"
-echo -e "installing cosmo-ui\n"
-sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb								 	|| state_error "failed on: cosmo-ui installation"
-echo -e "Cloudify3 installation completed successfully.\n"
+echo -e "\ncreating cosmo log dir..."
+sudo mkdir -p /var/log/cosmo
+check_dir "/var/log/cosmo"
+echo -e "\ninstalling openjdk..."
+sudo dpkg -i ${PKG_DIR}/openjdk-7-jdk/*.deb
+check_pkg "openjdk-7-jdk"
+echo -e "\ninstalling logstash..."
+sudo dpkg -i ${PKG_DIR}/logstash/*.deb
+check_pkg "logstash"
+echo -e "\ninstalling elasticsearch..."
+sudo dpkg -i ${PKG_DIR}/elasticsearch/*.deb
+check_pkg "elasticsearch"
+echo -e "\ninstalling kibana3..."
+sudo dpkg -i ${PKG_DIR}/kibana3/*.deb
+check_pkg "kibana3"
+echo -e "\ninstalling riemann..."
+sudo dpkg -i ${PKG_DIR}/riemann/*.deb
+check_pkg "riemann"
+echo -e "\napplying riemann config..."
+sudo cp ${PKG_DIR}/package-configuration/riemann/* /etc/riemann
+echo -e "\nrestarting riemann..."
+sudo /etc/init.d/riemann start
+echo -e "\ninstalling rabbitmq..."
+sudo dpkg -i ${PKG_DIR}/rabbitmq-server/*.deb
+check_pkg "rabbitmq-server"
+echo -e "\nenabling rabbitmq management plugin..."
+sudo rabbitmq-plugins enable rabbitmq_management
+echo -e "\nenabling rabbitmq tracing plugin..."
+sudo rabbitmq-plugins enable rabbitmq_tracing
+echo -e "\nrestarting rabbitmq..."
+sudo service rabbitmq-server restart
+check_service "rabbitmq-server"
+echo -e "\nrunning rabbitmq trace..."
+sudo rabbitmqctl trace_on
+echo -e "\ninstalling nginx..."
+sudo dpkg -i ${PKG_DIR}/nginx/*.deb
+check_pkg "nginx"
+echo -e "\napplying nginx config..."
+sudo cp ${PKG_DIR}/package-configuration/nginx/* /etc/nginx/conf.d
+echo -e "\nrestarting nginx..."
+sudo service nginx restart
+check_service "nginx"
+echo -e "\ninstalling workflow-jruby"
+sudo dpkg -i ${PKG_DIR}/workflow-jruby/*.deb
+check_pkg "workflow-jruby"
+echo -e "\ninstalling virtualenv..."
+sudo dpkg -i ${PKG_DIR}/virtualenv/*.deb
+check_pkg "virtualenv"
+echo -e "\ninstalling celery and manager plugins..."
+sudo dpkg -i ${PKG_DIR}/celery/*.deb
+check_pkg "celery"
+echo -e "\ninstalling manager..."
+sudo dpkg -i ${PKG_DIR}/manager/*.deb
+check_pkg "manager"
+echo -e "\ninstalling nodejs..."
+sudo dpkg -i ${PKG_DIR}/nodejs/*.deb
+check_pkg "nodejs"
+echo -e "\ninstalling cosmo-ui..."
+sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb
+check_pkg "cosmo-ui"
+echo -e "\nCloudify3 installation completed successfully"

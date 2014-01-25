@@ -19,11 +19,14 @@ The packager uses the following 3rd party components:
 - fpm -*main packaging framework*
 - fabric -*...*
 - pip >1.5 -*for downloading python modules*
-- jinja2 -*for creating scripts and configuration files from tempates*
-- opnejdk-7-jdk -*for maven*
-- maven -*for building the orchestrator - will be removed once the orchestrator is python-ed*
+- jinja2 -*for creating scripts and configuration files from templates*
 - pika -*to send events to rabbitmq if it's installed on the packaging server*
 a bootstrap script is provided to install the above packages.
+
+NOTE: the below packages are installed DURING The get/pkg process due to an post installation process with openjdk. will be resolved soon.
+- opnejdk-7-jdk -*for maven*
+- maven -*for building the orchestrator - will be removed once the orchestrator is python-ed*
+
 
 ### Structure
 
