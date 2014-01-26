@@ -73,8 +73,14 @@ PKG_DIR="{{ package_dir }}"
 BASE_DIR="/opt"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 
+LOG_DIR="/var/log/cosmo"
+
 PKG_INIT_DIR="${PKG_DIR}/init"
 INIT_DIR="/etc/init"
+
+echo "creating workflow log dir..."
+sudo mkdir -p ${LOG_DIR}
+check_dir "${LOG_DIR}"
 
 echo "moving some stuff aorund..."
 sudo cp ${PKG_INIT_DIR}/*.conf ${INIT_DIR}
@@ -93,6 +99,10 @@ echo "starting ${PKG_NAME}..."
 sudo start manager
 check_upstart "manager"
 
+# check if riemann is running 
 echo "starting workflow-service..."
 sudo start workflow
 check_upstart "workflow"
+
+# check manager port
+# check workflow port

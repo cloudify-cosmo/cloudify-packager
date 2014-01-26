@@ -35,7 +35,7 @@ def get_cosmo_components():
     EXEC:   fab get_cosmo_components
     """
 
-    # get_openjdk()
+    get_openjdk()
     get_logstash()
     get_elasticsearch()
     get_riemann()
@@ -53,12 +53,12 @@ def get_cosmo_base():
     EXEC:   fab get_cosmo_base
     """
 
-    get_celery()
-    get_cosmo_ui()
+    # get_celery()
+    # get_cosmo_ui()
     if not check_if_package_is_installed('openjdk-7-jdk'):
         pkg_openjdk()
-        local('sudo dpkg -i %s/*.deb' % config.PACKAGES['openjdk']['bootstrap_dir'])
-    get_workflow_jruby()
+        local('sudo dpkg -i %s/*.deb' % config.PACKAGES['openjdk-7-jdk']['bootstrap_dir'])
+    # get_workflow_jruby()
     if not check_if_package_is_installed('maven'):
         apt_get(['maven'])
     get_manager()

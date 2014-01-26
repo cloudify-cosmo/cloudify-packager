@@ -79,9 +79,6 @@ PKG_NAME="{{ name }}"
 PKG_DIR="{{ package_dir }}"
 LOG_FILE="/varl/log/cloudify3-bootstrap.log"
 
-echo -e "\ncreating cosmo log dir..."
-sudo mkdir -p /var/log/cosmo
-check_dir "/var/log/cosmo"
 echo -e "\ninstalling openjdk..."
 sudo dpkg -i ${PKG_DIR}/openjdk-7-jdk/*.deb
 check_pkg "openjdk-7-jdk"
@@ -140,3 +137,4 @@ echo -e "\ninstalling cosmo-ui..."
 sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb
 check_pkg "cosmo-ui"
 echo -e "\nCloudify3 installation completed successfully"
+# check port 22

@@ -117,3 +117,5 @@ sudo ln -sf ${HOME_DIR}/logstash-*-flatjar.jar ${HOME_DIR}/logstash.jar
 echo "starting ${PKG_NAME}..."
 sudo start logstash
 check_upstart "logstash"
+
+# check logstash process is up
