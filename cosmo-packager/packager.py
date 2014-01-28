@@ -1,3 +1,18 @@
+########
+# Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+#    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    * See the License for the specific language governing permissions and
+#    * limitations under the License.
+
 #!/usr/bin/env python
 
 import logging
@@ -152,19 +167,19 @@ def check_module_installed(name):
         return False
 
 
-def venv(root_dir, name):
+def venv(root_dir, name=False):
     """
     creates a virtualenv
     """
 
-    lgr.debug('creating virtualenv %s in %s' % (name, root_dir))
+    lgr.debug('creating virtualenv in %s' % (root_dir))
     if check_module_installed('virtualenv'):
-        with lcd(root_dir):
-            x = local('virtualenv %s' % name)
+        #with lcd(root_dir):
+        x = local('virtualenv %s' % root_dir)
         if x.succeeded:
-            lgr.debug('successfully created virtualenv %s in %s' % (name, root_dir))
+            lgr.debug('successfully created virtualenv in %s' % (root_dir))
         else:
-            lgr.error('unsuccessfully created virtualenv %s in %s' % (name, root_dir))
+            lgr.error('unsuccessfully created virtualenv in %s' % (root_dir))
     else:
         lgr.error('virtualenv is not installed. terminating')
         sys.exit()
@@ -224,10 +239,10 @@ def rm(file):
     """
 
     lgr.debug('removing files %s' % file)
-    x = local('sudo rm %s' % file)
-    if x.succeeded:
+    try:
+        local('sudo rm %s' % file)
         lgr.debug('successfully removed file %s' % file)
-    else:
+    except:
         lgr.error('unsuccessfully removed file %s' % file)
 
 

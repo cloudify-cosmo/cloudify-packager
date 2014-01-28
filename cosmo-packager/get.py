@@ -1,3 +1,18 @@
+########
+# Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+#    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    * See the License for the specific language governing permissions and
+#    * limitations under the License.
+
 #!/usr/bin/env python
 
 import logging
@@ -51,11 +66,9 @@ def get_celery():
     make_package_dirs(
         package['bootstrap_dir'],
         package['package_dir'])
-    venv(package['package_dir'],
-         package['name'])
+    venv(package['package_dir'])
     for module in package['modules']:
-        pip(module,
-            '%s/%s/bin' % (package['package_dir'], package['name']))
+        pip(module, '%s/bin' % package['package_dir'])
 
     PKG_INIT_DIR = "%s/init" % package['package_dir']
     INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
@@ -88,16 +101,14 @@ def get_manager():
     make_package_dirs(
         package['bootstrap_dir'],
         package['package_dir'])
-    venv(package['package_dir'],
-         package['name'])
+    venv(package['package_dir'])
     wget(
         package['source_url'],
         file='%s/%s.tar.gz' % (package['package_dir'], package['name']))
-    untar('%s/%s' % (package['package_dir'], package['name']),
+    untar('%s' % package['package_dir'],
           '%s/%s.tar.gz' % (package['package_dir'], package['name']))
     for module in package['modules']:
-        pip(module,
-            '%s/%s/bin' % (package['package_dir'], package['name']))
+        pip(module, '%s/bin' % package['package_dir'])
 
     PKG_INIT_DIR = "%s/init" % package['package_dir']
     INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
@@ -111,8 +122,7 @@ def get_manager():
     if not x:
         lgr.debug('prereq package is not installed. terminating...')
         sys.exit()
-    mvn('%s/%s/cosmo-manager-develop/orchestrator/pom.xml' % (package['package_dir'],
-                                                              package['name']))
+    mvn('%s/cosmo-manager-develop/orchestrator/pom.xml' % package['package_dir'])
 
 
 @task

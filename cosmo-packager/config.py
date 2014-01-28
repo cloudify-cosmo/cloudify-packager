@@ -1,3 +1,18 @@
+########
+# Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+#    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    * See the License for the specific language governing permissions and
+#    * limitations under the License.
+
 # WORKING ENVIRONMENT
 ENV = "develop"
 # base packager repo dir
@@ -13,7 +28,7 @@ PACKAGES_DIR = "/packages"
 # final directory to put the created packages in.
 PACKAGES_BOOTSTRAP_DIR = "/cosmo"
 # directory for cosmo modules and virtual environments
-VIRTUALENVS_DIR = "/opt/cosmo"
+VIRTUALENVS_DIR = "/opt"
 # specific package configuration
 PACKAGES = {
     "cloudify3": {
@@ -25,7 +40,13 @@ PACKAGES = {
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/cloudify3-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_template": "cloudify3-bootstrap.template"
+        "bootstrap_template": "cloudify3-bootstrap.template",
+        "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+        "req_free_mem": "10000",
+        "req_free_disk": "5",
+        "req_cpu_cores": "1",
+        "req_arch": "x86_64",
+        "req_os": "precise"
     },
     "python-pip": {
         "name": "python-pip",
@@ -146,9 +167,9 @@ PACKAGES = {
         "version": "0.0.1",
         "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
         "bootstrap_dir": "%s/manager/" % PACKAGES_BOOTSTRAP_DIR,
-        "package_dir": "%s/manager" % PACKAGES_DIR,
+        "package_dir": "%s/manager" % VIRTUALENVS_DIR,
         "virtualenv": "%s/manager" % VIRTUALENVS_DIR,
-        "modules": ['%s/manager/manager/cosmo-manager-develop/manager-rest/' % PACKAGES_DIR],
+        "modules": ['%s/manager/cosmo-manager-develop/manager-rest/' % VIRTUALENVS_DIR],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/manager-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -158,7 +179,7 @@ PACKAGES = {
         "name": "celery",
         "version": "0.0.1",
         "bootstrap_dir": "%s/celery/" % PACKAGES_BOOTSTRAP_DIR,
-        "package_dir": "%s/celery" % PACKAGES_DIR,
+        "package_dir": "%s/celery" % VIRTUALENVS_DIR,
         "virtualenv": "%s/celery" % VIRTUALENVS_DIR,
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
@@ -277,6 +298,7 @@ PACKAGER_LOGGER = {
 }
 # event broker config (if applicable)
 RABBITMQ_HOST = '10.0.0.3'
+# RABBITMQ_HOST = 'installcosmo.gsdev.info'
 # queue name for packager events
 RABBITMQ_QUEUE = 'hello'
 # routing key..

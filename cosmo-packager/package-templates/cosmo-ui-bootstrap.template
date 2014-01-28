@@ -55,20 +55,21 @@ function check_file
 function check_upstart
 {
 	echo "checking to see if $1 daemon is running..."
-	status $1 || state_error "daemon $1 is not running"
+	sudo status $1 || state_error "daemon $1 is not running"
 	echo "daemon $1 is running"
 }
 
 function check_service
 {
-	echo "checking to see if $1 service is running..."
-	service $1 status || state_error "service $1 is not running"
-	echo "service $1 is running"
+    echo "checking to see if $1 service is running..."
+    sudo service $1 status || state_error "service $1 is not running"
+    echo "service $1 is running"
 }
 
 
 PKG_NAME="{{ name }}"
 PKG_DIR="{{ package_dir }}"
+BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
 
 BASE_DIR="/opt"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}"
@@ -78,6 +79,8 @@ LOG_DIR="/var/log/cosmo-ui"
 PKG_INIT_DIR="${PKG_DIR}/init"
 INIT_DIR="/etc/init"
 
+
+echo -e "\n\n\n############################## INSTALLING ${PKG_NAME}"
 
 echo "installing ${PKG_NAME}..."
 sudo mkdir -p ${HOME_DIR}
@@ -95,14 +98,14 @@ echo "creating log file..."
 sudo touch ${LOG_DIR}/${PKG_NAME}.log
 check_file "${LOG_DIR}/${PKG_NAME}.log"
 
-echo "creating cosmo user..."
-sudo useradd --shell /usr/sbin/nologin --create-home --home-dir ${HOME_DIR} --groups adm cosmo
-check_user "cosmo"
+# echo "creating cosmo user..."
+# sudo useradd --shell /usr/sbin/nologin --create-home --home-dir ${HOME_DIR} --groups adm cosmo
+# check_user "cosmo"
 
-echo "pwning ${PKG_NAME} dir by cosmo user..."
-sudo chown cosmo:cosmo ${HOME_DIR}
-echo "pwning cosmo-ui logdir by ${PKG_NAME} user..."
-sudo chown cosmo:adm ${LOG_DIR}/
+# echo "pwning ${PKG_NAME} dir by cosmo user..."
+# sudo chown cosmo:cosmo ${HOME_DIR}
+# echo "pwning cosmo-ui logdir by ${PKG_NAME} user..."
+# sudo chown cosmo:adm ${LOG_DIR}/
 
 cd ${HOME_DIR}
 echo "installing ${PKG_NAME} to ${PKG_DIR}"
@@ -112,5 +115,4 @@ echo "starting ${PKG_NAME}..."
 sudo start cosmo-ui
 check_upstart "cosmo-ui"
 
-# check port 9001
-# check port 80
+check_port "localhost" "9001"

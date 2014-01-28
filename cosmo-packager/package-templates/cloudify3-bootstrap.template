@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
 
-function pause(){
-    read -p "$*"
-}
-
-function state_error
-{
-    echo "ERROR: ${1:-UNKNOWN} (status $?)" 1>&2
-    exit 1
-}
-
 function state_error
 {
     echo "ERROR: ${1:-UNKNOWN} (status $?)" 1>&2
@@ -18,28 +8,28 @@ function state_error
 
 function check_pkg
 {
-    echo "checking to see if package $1 is installed..."
-    dpkg -s $1 || state_error "package $1 is not installed"
-    echo "package $1 is installed"
+    echo -ne "checking to see if package $1 is installed..."
+    dpkg -s $1 >/dev/null || state_error "package $1 failed to install"
+    echo "package $1 was installed successfully"
 }
 
 function check_user
 {
-    echo "checking to see if user $1 exists..."
-    id -u $1 || state_error "user $1 doesn't exists"
+    echo -ne "checking to see if user $1 exists..."
+    id -u $1 >/dev/null || state_error "user $1 doesn't exists"
     echo "user $1 exists"
 }
 
 function check_port
 {
-    echo "checking to see if port $1 is opened..."
-    nc -z $1 $2 || state_error "port $2 is closed"
+    echo -ne "checking to see if port $1 is opened..."
+    nc -z $1 $2 >/dev/null || state_error "port $2 is closed"
     echo "port $2 on $1 is opened"
 }
 
 function check_dir
 {
-    echo "checking to see if dir $1 exists..."
+    echo -ne "checking to see if dir $1 exists..."
     if [ -d $1 ]; then
         echo "dir $1 exists"
     else
@@ -49,92 +39,186 @@ function check_dir
 
 function check_file
 {
-    echo "checking to see if file $1 exists..."
+    echo -ne "checking to see if file $1 exists..."
     if [ -f $1 ]; then
         echo "file $1 exists"
-        # if [ -$2 $1 ]; then
-            # echo "$1 exists and contains the right attribs"
-        # else
-            # state_error "$1 exists but does not contain the right attribs"
-        # fi
     else
         state_error "file $1 doesn't exists"
+    fi
 }
 
 function check_upstart
 {
-    echo "checking to see if $1 daemon is running..."
-    status $1 || state_error "daemon $1 is not running"
+    echo -ne "checking to see if $1 daemon is running..."
+    sudo status $1 >/dev/null || state_error "daemon $1 is not running"
     echo "daemon $1 is running"
 }
 
 function check_service
 {
-    echo "checking to see if $1 service is running..."
-    service $1 status || state_error "service $1 is not running"
+    echo -ne "checking to see if $1 service is running..."
+    sudo service $1 status >/dev/null || state_error "service $1 is not running"
     echo "service $1 is running"
 }
 
+
+################################################ DEFINE VARIABLES
+
 PKG_NAME="{{ name }}"
 PKG_DIR="{{ package_dir }}"
-LOG_FILE="/varl/log/cloudify3-bootstrap.log"
+BOOTSTRAP_LOG="{{ bootstrap_log }}"
+VERSION="{{ version }}"
+
+REQ_FREE_DISK="{{ req_free_disk }}"
+REQ_FREE_MEM="{{ req_free_mem }}"
+REQ_CPU_CORES="{{ req_cpu_cores}}"
+REQ_ARCH="{{ req_arch }}"
+REQ_OS="{{ req_os }}"
+
+FREE_DISK=$(df -Ph . | awk 'NR==2 {print $4}' | grep -Eo [0-9]+)
+FREE_MEM=$(cat /proc/meminfo | grep MemFree | awk '{print $2}')
+CPU_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
+ARCH=$(uname -m)
+OS=$(cat /etc/lsb-release | grep CODENAME | awk -F'=' '{print $2}')
+
+COMPAT=true
+
+################################################
+
+clear
+echo -e "Installing Cloudify3 version ${VERSION}..."
+echo -e "(you may tail ${BOOTSTRAP_LOG} for the full installation log)\n"
+sleep 3
+
+################################################ CHECK PREREQS
+echo "Checking weather the system meets the minimum installation requirements..."
+echo "required DISK SPACE: ${REQ_FREE_DISK}"
+echo "required FREE MEMORY: ${REQ_FREE_MEM}"
+echo "required CPU CORES: ${REQ_CPU_CORES}"
+echo "required ARCH: ${REQ_ARCH}"
+echo -e "required OS: ubuntu ${REQ_OS}\n"
+
+echo -ne "Checking disk space..."
+if [ "${FREE_DISK}" -ge "${REQ_FREE_DISK}" ]; then
+    echo "OK: ${FREE_DISK}G"
+else
+    echo -e "\e[31mThere is insufficient disk space: ${FREE_DISK}G. You need at least ${REQ_FREE_DISK}G for Cloudify to run smoothly.\e[39m"
+    COMPAT=false
+fi
+
+echo -ne "Checking free memory..."
+if [ "${FREE_MEM}" -ge "${REQ_FREE_MEM}" ]; then
+    echo "OK: ${FREE_MEM}kB"
+else
+    echo -e "\e[31mThere is insufficient memory: ${FREE_MEM}kB. You need at least ${REQ_FREE_MEM}kB for Cloudify to run smoothly.\e[39m"
+    COMPAT=false
+fi
+
+echo -ne "Checking CPU Cores..."
+if [ "${CPU_CORES}" -ge "${REQ_CPU_CORES}" ]; then
+    echo "OK: ${CPU_CORES}"
+else
+    echo -e "\e[31mThere are insufficient CPU Cores available: ${CPU_CORES}. You need at least ${REQ_CPU_CORES} for Cloudify to run smoothly.\e[39m"
+    COMPAT=false
+fi
+
+echo -ne "Checking Architecture..."
+if [ "${ARCH}" == "${REQ_ARCH}" ]; then
+    echo "OK: ${ARCH}"
+else
+    echo -e "\e[31mIncompatible Architecture: ${ARCH}. You need ${REQ_ARCH} for Cloudify to run.\e[39m"
+    COMPAT=false
+fi
+
+echo -ne "Checking OS flavor..."
+if [ "${OS}" == "${REQ_OS}" ]; then
+    echo "OK: ${OS}"
+else
+    echo -e "\e[31mIncompatible OS flavor: ${OS}. You need ${REQ_OS} for Cloudify to run.\e[39m"
+    COMPAT=false
+fi
+
+if ${COMPAT}; then
+    echo "The system meets the requirements necessary for Cloudify's installation"
+else
+    state_error "The system doesn't meet the requirements necessary for Cloudify's installation."
+fi
+
+
+################################################ INSTALL CLOUDIFY
 
 echo -e "\ninstalling openjdk..."
-sudo dpkg -i ${PKG_DIR}/openjdk-7-jdk/*.deb
+sudo dpkg -i ${PKG_DIR}/openjdk-7-jdk/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "openjdk-7-jdk"
+
 echo -e "\ninstalling logstash..."
-sudo dpkg -i ${PKG_DIR}/logstash/*.deb
+sudo dpkg -i ${PKG_DIR}/logstash/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "logstash"
+
 echo -e "\ninstalling elasticsearch..."
-sudo dpkg -i ${PKG_DIR}/elasticsearch/*.deb
+sudo dpkg -i ${PKG_DIR}/elasticsearch/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "elasticsearch"
+
 echo -e "\ninstalling kibana3..."
-sudo dpkg -i ${PKG_DIR}/kibana3/*.deb
+sudo dpkg -i ${PKG_DIR}/kibana3/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "kibana3"
+
 echo -e "\ninstalling riemann..."
-sudo dpkg -i ${PKG_DIR}/riemann/*.deb
+sudo dpkg -i ${PKG_DIR}/riemann/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "riemann"
-echo -e "\napplying riemann config..."
-sudo cp ${PKG_DIR}/package-configuration/riemann/* /etc/riemann
-echo -e "\nrestarting riemann..."
+echo -e "applying riemann config..."
+sudo cp ${PKG_DIR}/package-configuration/riemann/* /etc/riemann >> ${BOOTSTRAP_LOG} 2>&1
+echo -e "restarting riemann..."
 sudo /etc/init.d/riemann start
+
 echo -e "\ninstalling rabbitmq..."
-sudo dpkg -i ${PKG_DIR}/rabbitmq-server/*.deb
+sudo dpkg -i ${PKG_DIR}/rabbitmq-server/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "rabbitmq-server"
-echo -e "\nenabling rabbitmq management plugin..."
-sudo rabbitmq-plugins enable rabbitmq_management
-echo -e "\nenabling rabbitmq tracing plugin..."
-sudo rabbitmq-plugins enable rabbitmq_tracing
-echo -e "\nrestarting rabbitmq..."
-sudo service rabbitmq-server restart
+echo -e "enabling rabbitmq management plugin..."
+sudo rabbitmq-plugins enable rabbitmq_management >> ${BOOTSTRAP_LOG} 2>&1
+echo -e "enabling rabbitmq tracing plugin..."
+sudo rabbitmq-plugins enable rabbitmq_tracing >> ${BOOTSTRAP_LOG} 2>&1
+echo -e "restarting rabbitmq..."
+sudo service rabbitmq-server restart >> ${BOOTSTRAP_LOG} 2>&1
 check_service "rabbitmq-server"
-echo -e "\nrunning rabbitmq trace..."
-sudo rabbitmqctl trace_on
+# check_port "5672"
+# check_port "4369"
+echo -e "running rabbitmq trace..."
+sudo rabbitmqctl trace_on >> ${BOOTSTRAP_LOG} 2>&1
+
 echo -e "\ninstalling nginx..."
-sudo dpkg -i ${PKG_DIR}/nginx/*.deb
+sudo dpkg -i ${PKG_DIR}/nginx/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "nginx"
-echo -e "\napplying nginx config..."
-sudo cp ${PKG_DIR}/package-configuration/nginx/* /etc/nginx/conf.d
-echo -e "\nrestarting nginx..."
-sudo service nginx restart
+echo -e "applying nginx config..."
+sudo cp ${PKG_DIR}/package-configuration/nginx/* /etc/nginx/conf.d >> ${BOOTSTRAP_LOG} 2>&1
+echo -e "restarting nginx..."
+sudo service nginx restart >> ${BOOTSTRAP_LOG} 2>&1
 check_service "nginx"
+# check_port 80
+
 echo -e "\ninstalling workflow-jruby"
-sudo dpkg -i ${PKG_DIR}/workflow-jruby/*.deb
+sudo dpkg -i ${PKG_DIR}/workflow-jruby/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "workflow-jruby"
+
 echo -e "\ninstalling virtualenv..."
-sudo dpkg -i ${PKG_DIR}/virtualenv/*.deb
+sudo dpkg -i ${PKG_DIR}/virtualenv/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "virtualenv"
+
 echo -e "\ninstalling celery and manager plugins..."
-sudo dpkg -i ${PKG_DIR}/celery/*.deb
+sudo dpkg -i ${PKG_DIR}/celery/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "celery"
+
 echo -e "\ninstalling manager..."
-sudo dpkg -i ${PKG_DIR}/manager/*.deb
+sudo dpkg -i ${PKG_DIR}/manager/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "manager"
+
 echo -e "\ninstalling nodejs..."
-sudo dpkg -i ${PKG_DIR}/nodejs/*.deb
+sudo dpkg -i ${PKG_DIR}/nodejs/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "nodejs"
+
 echo -e "\ninstalling cosmo-ui..."
-sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb
+sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "cosmo-ui"
-echo -e "\nCloudify3 installation completed successfully"
+
+echo -e "\nCloudify3 ${VERSION} installation completed successfully!"
 # check port 22

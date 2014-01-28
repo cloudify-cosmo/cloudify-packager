@@ -45,3 +45,6 @@ def send_event(**kwargs):
                           body=body,
                           properties=pika.BasicProperties(delivery_mode=2))
     connection.close()
+
+
+# su -s /bin/sh -c 'exec "$0" "$@"' root -- /usr/bin/java -jar /opt/logstash/logstash.jar agent -f /etc/logstash.conf
