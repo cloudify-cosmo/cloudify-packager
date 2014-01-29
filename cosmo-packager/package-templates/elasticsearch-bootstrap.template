@@ -97,5 +97,3 @@ sudo ln -sf ${BASE_DIR}/${PKG_NAME}-*/ ${HOME_DIR}
 echo "starting ${PKG_NAME}..."
 sudo start elasticsearch
 check_upstart "elasticsearch"
-
-check_port "localhost" "9200"

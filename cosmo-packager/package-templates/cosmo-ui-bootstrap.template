@@ -114,5 +114,3 @@ sudo npm install -d ${PKG_DIR}/cosmo-ui*
 echo "starting ${PKG_NAME}..."
 sudo start cosmo-ui
 check_upstart "cosmo-ui"
-
-check_port "localhost" "9001"

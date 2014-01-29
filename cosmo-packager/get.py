@@ -18,7 +18,10 @@
 import logging
 import logging.config
 
-import config
+import os
+run_env = os.environ['RUN_ENV']
+config = __import__(run_env)
+
 from event_handler import send_event as se
 import uuid
 
@@ -70,21 +73,24 @@ def get_celery():
     for module in package['modules']:
         pip(module, '%s/bin' % package['package_dir'])
 
-    PKG_INIT_DIR = "%s/init" % package['package_dir']
-    INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+    CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
+    cp(CONF_DIR, package['package_dir'])
 
-    PKG_CONF_DIR = "%s/conf" % package['package_dir']
-    CONF_DIR = "%s/%s/conf" % (config.PACKAGER_CONF_DIR, package['name'])
+    # PKG_INIT_DIR = "%s/init" % package['package_dir']
+    # INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
 
-    lgr.debug("creating init dir...")
-    mkdir(PKG_INIT_DIR)
-    lgr.debug("getting init file...")
-    cp('%s/*' % INIT_DIR, PKG_INIT_DIR)
+    # PKG_CONF_DIR = "%s/conf" % package['package_dir']
+    # CONF_DIR = "%s/%s/conf" % (config.PACKAGER_CONF_DIR, package['name'])
 
-    lgr.debug("creating conf dir...")
-    mkdir(PKG_CONF_DIR)
-    lgr.debug("getting conf files...")
-    cp('%s/*' % CONF_DIR, PKG_CONF_DIR)
+    # lgr.debug("creating init dir...")
+    # mkdir(PKG_INIT_DIR)
+    # lgr.debug("getting init file...")
+    # cp('%s/*' % INIT_DIR, PKG_INIT_DIR)
+
+    # lgr.debug("creating conf dir...")
+    # mkdir(PKG_CONF_DIR)
+    # lgr.debug("getting conf files...")
+    # cp('%s/*' % CONF_DIR, PKG_CONF_DIR)
 
 
 @task
@@ -110,13 +116,16 @@ def get_manager():
     for module in package['modules']:
         pip(module, '%s/bin' % package['package_dir'])
 
-    PKG_INIT_DIR = "%s/init" % package['package_dir']
-    INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+    CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
+    cp(CONF_DIR, package['package_dir'])
 
-    lgr.debug("creating init dir...")
-    mkdir(PKG_INIT_DIR)
-    lgr.debug("getting init file...")
-    cp('%s/*.conf' % INIT_DIR, PKG_INIT_DIR)
+    # PKG_INIT_DIR = "%s/init" % package['package_dir']
+    # INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+
+    # lgr.debug("creating init dir...")
+    # mkdir(PKG_INIT_DIR)
+    # lgr.debug("getting init file...")
+    # cp('%s/*.conf' % INIT_DIR, PKG_INIT_DIR)
 
     x = check_if_package_is_installed('openjdk-7-jdk')
     if not x:
@@ -174,13 +183,16 @@ def get_cosmo_ui():
         package['source_url'],
         dir=package['package_dir'])
 
-    PKG_INIT_DIR = "%s/init" % package['package_dir']
-    INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+    CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
+    cp(CONF_DIR, package['package_dir'])
 
-    lgr.debug("creating init dir...")
-    mkdir(PKG_INIT_DIR)
-    lgr.debug("getting init file...")
-    cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
+    # PKG_INIT_DIR = "%s/init" % package['package_dir']
+    # INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+
+    # lgr.debug("creating init dir...")
+    # mkdir(PKG_INIT_DIR)
+    # lgr.debug("getting init file...")
+    # cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
 
 
 @task
@@ -281,21 +293,24 @@ def get_logstash():
         package['source_url'],
         dir=package['package_dir'])
 
-    PKG_INIT_DIR = "%s/init" % package['package_dir']
-    INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+    CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
+    cp(CONF_DIR, package['package_dir'])
 
-    PKG_CONF_DIR = "%s/conf" % package['package_dir']
-    CONF_DIR = "%s/%s/conf" % (config.PACKAGER_CONF_DIR, package['name'])
+    # PKG_INIT_DIR = "%s/init" % package['package_dir']
+    # INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
 
-    lgr.debug("creating init dir...")
-    mkdir(PKG_INIT_DIR)
-    lgr.debug("getting init file...")
-    cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
+    # PKG_CONF_DIR = "%s/conf" % package['package_dir']
+    # CONF_DIR = "%s/%s/conf" % (config.PACKAGER_CONF_DIR, package['name'])
 
-    lgr.debug("creating conf dir...")
-    mkdir(PKG_CONF_DIR)
-    lgr.debug("getting conf file...")
-    cp('%s/%s.conf' % (CONF_DIR, package['name']), PKG_CONF_DIR)
+    # lgr.debug("creating init dir...")
+    # mkdir(PKG_INIT_DIR)
+    # lgr.debug("getting init file...")
+    # cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
+
+    # lgr.debug("creating conf dir...")
+    # mkdir(PKG_CONF_DIR)
+    # lgr.debug("getting conf file...")
+    # cp('%s/%s.conf' % (CONF_DIR, package['name']), PKG_CONF_DIR)
 
 
 @task
@@ -315,13 +330,16 @@ def get_elasticsearch():
         package['source_url'],
         dir=package['package_dir'])
 
-    PKG_INIT_DIR = "%s/init" % package['package_dir']
-    INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+    CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
+    cp(CONF_DIR, package['package_dir'])
 
-    lgr.debug("creating init dir...")
-    mkdir(PKG_INIT_DIR)
-    lgr.debug("getting init file...")
-    cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
+    # PKG_INIT_DIR = "%s/init" % package['package_dir']
+    # INIT_DIR = "%s/%s/init" % (config.PACKAGER_CONF_DIR, package['name'])
+
+    # lgr.debug("creating init dir...")
+    # mkdir(PKG_INIT_DIR)
+    # lgr.debug("getting init file...")
+    # cp('%s/%s.conf' % (INIT_DIR, package['name']), PKG_INIT_DIR)
 
 
 @task

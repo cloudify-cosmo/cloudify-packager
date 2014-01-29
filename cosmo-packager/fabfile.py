@@ -22,7 +22,10 @@ from fabric.api import *  # NOQA
 from packager import *  # NOQA
 from get import *  # NOQA
 from pkg import *  # NOQA
-import config
+
+import os
+run_env = os.environ['RUN_ENV']
+config = __import__(run_env)
 
 #env.user = ''
 #env.password = ''

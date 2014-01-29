@@ -2,7 +2,10 @@
 import logging
 import logging.config
 
-import config
+import os
+run_env = os.environ['RUN_ENV']
+config = __import__(run_env)
+
 import pika
 import sys
 

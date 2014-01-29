@@ -22,9 +22,24 @@ function check_user
 
 function check_port
 {
-    echo -ne "checking to see if port $1 is opened..."
-    nc -z $1 $2 >/dev/null || state_error "port $2 is closed"
-    echo "port $2 on $1 is opened"
+    APP=$1
+    PORT=$2
+    TIMER=$3
+    HOST=$4
+
+    for i in {1..5}
+    do 
+        echo -ne "checking whether ${APP} port ${PORT} is opened on ${HOST:-localhost}..."
+        nc -z ${HOST:-localhost} ${PORT} >/dev/null
+        if [ $? -eq 0 ]; then
+            echo "${APP} port ${PORT} is opened"
+            return
+        else
+            echo "WARNING: ${APP} port ${PORT} is closed, retrying in ${TIMER:-5} seconds ($i)"
+            sleep ${TIMER:-5}
+        fi
+    done
+    state_error "${APP} port ${PORT} is closed!"
 }
 
 function check_dir
@@ -83,15 +98,11 @@ OS=$(cat /etc/lsb-release | grep CODENAME | awk -F'=' '{print $2}')
 
 COMPAT=true
 
-################################################
+################################################ CHECK PREREQS
 
 clear
-echo -e "Installing Cloudify3 version ${VERSION}..."
-echo -e "(you may tail ${BOOTSTRAP_LOG} for the full installation log)\n"
-sleep 3
 
-################################################ CHECK PREREQS
-echo "Checking weather the system meets the minimum installation requirements..."
+echo -e "\nChecking weather the system meets the minimum installation requirements..."
 echo "required DISK SPACE: ${REQ_FREE_DISK}"
 echo "required FREE MEMORY: ${REQ_FREE_MEM}"
 echo "required CPU CORES: ${REQ_CPU_CORES}"
@@ -147,9 +158,17 @@ fi
 
 ################################################ INSTALL CLOUDIFY
 
-echo -e "\ninstalling openjdk..."
-sudo dpkg -i ${PKG_DIR}/openjdk-7-jdk/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-check_pkg "openjdk-7-jdk"
+echo -e "\nInstalling Cloudify3 version ${VERSION}..."
+echo -e "(you may tail ${BOOTSTRAP_LOG} for the full installation log)\n"
+
+
+if ! dpkg -s openjdk-7-jdk >/dev/null 2>&1; then
+        echo -e "\n openjdk is not installed, installing..."
+        sudo dpkg -i ${PKG_DIR}/openjdk-7-jdk/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "openjdk-7-jdk"
+else
+        echo -e "\n openjdk is already installed, skipping..."
+fi
 
 echo -e "\ninstalling logstash..."
 sudo dpkg -i ${PKG_DIR}/logstash/*.deb >> ${BOOTSTRAP_LOG} 2>&1
@@ -181,8 +200,6 @@ sudo rabbitmq-plugins enable rabbitmq_tracing >> ${BOOTSTRAP_LOG} 2>&1
 echo -e "restarting rabbitmq..."
 sudo service rabbitmq-server restart >> ${BOOTSTRAP_LOG} 2>&1
 check_service "rabbitmq-server"
-# check_port "5672"
-# check_port "4369"
 echo -e "running rabbitmq trace..."
 sudo rabbitmqctl trace_on >> ${BOOTSTRAP_LOG} 2>&1
 
@@ -194,7 +211,6 @@ sudo cp ${PKG_DIR}/package-configuration/nginx/* /etc/nginx/conf.d >> ${BOOTSTRA
 echo -e "restarting nginx..."
 sudo service nginx restart >> ${BOOTSTRAP_LOG} 2>&1
 check_service "nginx"
-# check_port 80
 
 echo -e "\ninstalling workflow-jruby"
 sudo dpkg -i ${PKG_DIR}/workflow-jruby/*.deb >> ${BOOTSTRAP_LOG} 2>&1
@@ -220,5 +236,23 @@ echo -e "\ninstalling cosmo-ui..."
 sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 check_pkg "cosmo-ui"
 
+
+################################################ PORT VERIFICATION
+
+echo -e "\n testing service ports..."
+
+check_port "rabbitmq" "5672"
+sleep 1
+check_port "nginx (kibana)" "3000"
+sleep 1
+check_port "nginx (UI)" "80"
+sleep 1
+check_port "manager-rest" "8100"
+sleep 1
+check_port "workflow-service" "8101" "10"
+sleep 1
+check_port "UI" "9001"
+sleep 1
+check_port "elasticsearch" "9200"
+
 echo -e "\nCloudify3 ${VERSION} installation completed successfully!"
-# check port 22

@@ -68,7 +68,7 @@ PACKAGES = {
     "elasticsearch": {
         "name": "elasticsearch",
         "version": "0.90.9",
-        "source_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.9.tar.z",
+        "source_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.9.tar.gz",
         "bootstrap_dir": "%s/elasticsearch/" % PACKAGES_BOOTSTRAP_DIR,
         "package_dir": "%s/elasticsearch" % PACKAGES_DIR,
         "src_package_type": "dir",
