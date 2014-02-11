@@ -71,19 +71,35 @@ PKG_NAME="{{ name }}"
 PKG_DIR="{{ package_dir }}"
 BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
 
+PORT="{{ port }}"
 BASE_DIR="/opt"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 
+PKG_INIT_DIR="${PKG_DIR}/init"
+INIT_DIR="/etc/init.d"
 
-echo "unpacking ${PKG_NAME}..."
-sudo mv ${PKG_DIR}/jruby-* ${BASE_DIR}
-echo "creating ${PKG_NAME} app link..."
-sudo ln -sf ${BASE_DIR}/jruby-*/ ${BASE_DIR}/jruby
-check_dir "${BASE_DIR}/jruby-*"
+PKG_CONF_DIR="${PKG_DIR}/conf"
 
-echo "creating jruby binary link..."
-sudo ln -sf ${HOME_DIR}/bin/jruby /usr/bin/jruby
-# check_file ""
 
-# echo "creating gem binary link..."
-# sudo ln -s ${HOME_DIR}/bin/gem /usr/bin/gem
+echo -e "\n\n\n############################## INSTALLING ${PKG_NAME}"
+
+# echo "unpacking ${PKG_NAME}..."
+# sudo mv ${PKG_DIR}/${PKG_NAME} ${BASE_DIR}
+# check_dir "${BASE_DIR}/${PKG_NAME}"
+
+# cd ${BASE_DIR}
+sudo virtualenv ${HOME_DIR}
+
+echo "creating ${PKG_NAME} app directory..."
+sudo mkdir ${HOME_DIR}/app 
+check_dir "${HOME_DIR}/app"
+
+echo "moving some stuff around..."
+sudo cp ${HOME_DIR}/lib/python2.7/site-packages/cosmo/celery.py ${HOME_DIR}/app
+check_file "${HOME_DIR}/app/celery.py"
+sudo cp ${PKG_INIT_DIR}/celeryd ${INIT_DIR}
+check_file "${INIT_DIR}/celeryd"
+sudo cp ${PKG_CONF_DIR}/cosmo.txt ${HOME_DIR}/app
+check_file "${HOME_DIR}/app/cosmo.txt"
+sudo cp ${PKG_CONF_DIR}/celeryd /etc/default
+check_file "/etc/default/celeryd"

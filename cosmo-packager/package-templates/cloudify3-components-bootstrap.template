@@ -117,7 +117,7 @@ COMPAT=true
 
 ################################################ CHECK PREREQS
 
-# clear
+clear
 
 echo -e "\nInstalling ${PKG_NAME} version ${VERSION}..." | tee -a ${BOOTSTRAP_LOG}
 echo -e "(you may tail ${BOOTSTRAP_LOG} for the full installation log)\n" | tee -a ${BOOTSTRAP_LOG}
@@ -176,59 +176,152 @@ else
 fi
 
 
-################################################ INSTALL CLOUDIFY
+################################################ INSTALL CLOUDIFY-COMPONENTS
 
 
-echo -ne "checking whether workflow-jruby is installed..." | tee -a ${BOOTSTRAP_LOG}
-if ! dpkg -s workflow-jruby 2>&1 | grep Status: | grep installed; then
-        echo -e " workflow-jruby is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        sudo dpkg -i ${PKG_DIR}/workflow-jruby/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        check_pkg "workflow-jruby"
+echo -ne "checking whether openjdk-7-jdk is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s openjdk-7-jdk 2>&1 | grep Status: | grep installed; then
+        echo -e " openjdk-7-jdk is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING OPENJDK-7-JDK" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/openjdk-7-jdk/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "openjdk-7-jdk"
 else
-        echo -e " workflow-jruby is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e " openjdk-7-jdk is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
 fi
 
 
-echo -ne "checking whether celery and the management plugins are installed..." | tee -a ${BOOTSTRAP_LOG}
-if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
-        echo -e " celery is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        sudo dpkg -i ${PKG_DIR}/celery/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        check_pkg "celery"
+echo -ne "checking whether logstash is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s logstash 2>&1 | grep Status: | grep installed; then
+        echo -e " logstash is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING LOGSTASH" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/logstash/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "logstash"
 else
-        echo -e " celery is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e " logstash is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
 fi
 
 
-echo -ne "checking whether manager is installed..." | tee -a ${BOOTSTRAP_LOG}
-if ! dpkg -s manager 2>&1 | grep Status: | grep installed; then
-        echo -e " manager is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        sudo dpkg -i ${PKG_DIR}/manager/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        check_pkg "manager"
+echo -ne "checking whether elasticsearch is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s elasticsearch 2>&1 | grep Status: | grep installed; then
+        echo -e " elasticsearch is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING ELASTICSEARH" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/elasticsearch/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "elasticsearch"
 else
-        echo -e " manager is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e " elasticsearch is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
 fi
 
 
-echo -ne "checking whether cosmo-ui is installed..." | tee -a ${BOOTSTRAP_LOG}
-if ! dpkg -s cosmo-ui 2>&1 | grep Status: | grep installed; then
-        echo -e " cosmo-ui is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        check_pkg "cosmo-ui"
+echo -ne "checking whether kibana3 is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s kibana3 2>&1 | grep Status: | grep installed; then
+        echo -e " kibana3 is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING KIBANA3" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/kibana3/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "kibana3"
 else
-        echo -e " cosmo-ui is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e " kibana3 is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
 fi
 
 
-################################################ PORT VERIFICATION
+echo -ne "checking whether riemann is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s riemann 2>&1 | grep Status: | grep installed; then
+        echo -e " riemann is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING RIEMANN" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/riemann/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+
+        echo -e "applying riemann config..." | tee -a ${BOOTSTRAP_LOG}
+        sudo cp ${PKG_DIR}/package-configuration/riemann/* /etc/riemann >> ${BOOTSTRAP_LOG} 2>&1
+        echo -e "restarting riemann..." | tee -a ${BOOTSTRAP_LOG}
+        sudo /etc/init.d/riemann start
+
+        check_pkg "riemann"
+else
+        echo -e " riemann is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+fi
+
+
+echo -ne "checking whether rabbitmq-server is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s rabbitmq-server 2>&1 | grep Status: | grep installed; then
+        echo -e " rabbitmq-server is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING RABBITMQ" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/rabbitmq-server/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+
+        echo -e "enabling rabbitmq management plugin..." | tee -a ${BOOTSTRAP_LOG}
+        sudo rabbitmq-plugins enable rabbitmq_management >> ${BOOTSTRAP_LOG} 2>&1
+        echo -e "enabling rabbitmq tracing plugin..." | tee -a ${BOOTSTRAP_LOG}
+        sudo rabbitmq-plugins enable rabbitmq_tracing >> ${BOOTSTRAP_LOG} 2>&1
+        echo -e "restarting rabbitmq..." | tee -a ${BOOTSTRAP_LOG}
+        sudo service rabbitmq-server restart >> ${BOOTSTRAP_LOG} 2>&1
+        check_service "rabbitmq-server"
+        echo -e "running rabbitmq trace..." | tee -a ${BOOTSTRAP_LOG}
+        sudo rabbitmqctl trace_on >> ${BOOTSTRAP_LOG} 2>&1
+
+        check_pkg "rabbitmq-server"
+else
+        echo -e " rabbitmq-server is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+fi
+
+
+echo -ne "checking whether nginx is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s nginx 2>&1 | grep Status: | grep installed; then
+        echo -e " nginx is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING NGINX" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/nginx/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+
+        echo -e "applying nginx config..." | tee -a ${BOOTSTRAP_LOG}
+        sudo cp ${PKG_DIR}/package-configuration/nginx/* /etc/nginx/conf.d >> ${BOOTSTRAP_LOG} 2>&1
+        echo -e "restarting nginx..." | tee -a ${BOOTSTRAP_LOG}
+        sudo service nginx restart >> ${BOOTSTRAP_LOG} 2>&1
+        check_service "nginx"
+
+        check_pkg "nginx"
+else
+        echo -e " nginx is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+fi
+
+
+echo -ne "checking whether virtualenv is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s virtualenv 2>&1 | grep Status: | grep installed; then
+        echo -e " virtualenv is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING VIRTUALENV" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/virtualenv/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "virtualenv"
+else
+        echo -e " virtualenv is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+fi
+
+
+echo -ne "checking whether nodejs is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s nodejs 2>&1 | grep Status: | grep installed; then
+        echo -e " nodejs is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING NODEJS" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/nodejs/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "nodejs"
+else
+        echo -e " nodejs is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+fi
+
+
+################################################ POST VERIFICATION
 
 echo -e "\nperforming post installation tests...\n" | tee -a ${BOOTSTRAP_LOG}
 
-check_exec "/opt/jruby/bin/jruby"
+check_exec "java"
 sleep 1
-check_port "manager-rest" "8100"
+check_port "rabbitmq" "5672"
 sleep 1
-check_port "workflow-service" "8101" "15"
+check_port "nginx (kibana)" "3000"
 sleep 1
-check_port "UI" "9001"
+check_port "nginx (manager)" "80"
+sleep 1
+check_port "logstash" "9999"
+sleep 1
+check_port "elasticsearch" "9200"
+sleep 1
+check_port "riemann (tcp-server)" "5555"
+sleep 1
+check_port "riemann (ws-server)" "5556"
+sleep 1
+check_exec "node"
 
 echo -e "\n${PKG_NAME} ${VERSION} installation completed successfully!\n\n" | tee -a ${BOOTSTRAP_LOG}

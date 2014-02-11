@@ -83,8 +83,6 @@ INIT_DIR="/etc/init"
 CONF_DIR="/etc"
 
 
-echo -e "\n\n\n############################## INSTALLING ${PKG_NAME}"
-
 echo "creating ${PKG_NAME} application dir..."
 sudo mkdir -p ${HOME_DIR}
 check_dir "${HOME_DIR}"
@@ -93,15 +91,16 @@ echo "creating ${PKG_NAME} home dir..."
 sudo mkdir -p /home/logstash
 check_dir "/home/logstash"
 
+echo "placing jar file..."
+sudo cp ${PKG_DIR}/logstash-*-flatjar.jar ${HOME_DIR}
+check_file "${HOME_DIR}/logstash-*-flatjar.jar"
+
 echo "moving some stuff around..."
 sudo cp ${PKG_INIT_DIR}/${PKG_NAME}.conf ${INIT_DIR}
 check_file "${INIT_DIR}/${PKG_NAME}.conf"
 
 sudo cp ${PKG_CONF_DIR}/${PKG_NAME}.conf ${CONF_DIR}
 check_file "${CONF_DIR}/${PKG_NAME}.conf"
-
-sudo cp ${PKG_DIR}/logstash-*-flatjar.jar ${HOME_DIR}
-check_file "${HOME_DIR}/logstash-*-flatjar.jar"
 
 echo "creating logstash user..."
 sudo useradd --shell /usr/sbin/nologin --create-home --home-dir ${HOME_DIR} --groups adm logstash
@@ -120,5 +119,3 @@ sudo ln -sf ${HOME_DIR}/logstash-*-flatjar.jar ${HOME_DIR}/logstash.jar
 echo "starting ${PKG_NAME}..."
 sudo start logstash
 check_upstart "logstash"
-
-# check logstash process is up

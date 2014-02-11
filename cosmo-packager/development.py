@@ -26,7 +26,8 @@ PACKAGER_TEMPLATE_DIR = "/cosmo-packager/cosmo-packager/package-templates"
 # temporary directory to which items are downloaded and packages are created.
 PACKAGES_DIR = "/packages"
 # final directory to put the created packages in.
-PACKAGES_BOOTSTRAP_DIR = "/cosmo"
+COMPONENTS_BOOTSTRAP_DIR = "/cloudify3-components"
+CODE_BOOTSTRAP_DIR = "/cloudify3"
 # directory for cosmo modules and virtual environments
 VIRTUALENVS_DIR = "/opt"
 # specific package configuration
@@ -34,8 +35,9 @@ PACKAGES = {
     "cloudify3": {
         "name": "cloudify3",
         "version": "3.0.0",
+        "depends": ['cloudify3-components'],
         "bootstrap_dir": "/cloudify",
-        "package_dir": "%s" % PACKAGES_BOOTSTRAP_DIR,
+        "package_dir": "%s" % CODE_BOOTSTRAP_DIR,
         "conf_dir": "%s" % PACKAGER_CONF_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -48,17 +50,35 @@ PACKAGES = {
         "req_arch": "x86_64",
         "req_os": "precise"
     },
+    "cloudify3-components": {
+        "name": "cloudify3-components",
+        "version": "3.0.0",
+        "bootstrap_dir": "/cloudify",
+        "package_dir": "%s" % COMPONENTS_BOOTSTRAP_DIR,
+        "conf_dir": "%s" % PACKAGER_CONF_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/cloudify3-components-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "cloudify3-components-bootstrap.template",
+        "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+        "req_free_mem": "10000",
+        "req_free_disk": "5",
+        "req_cpu_cores": "1",
+        "req_arch": "x86_64",
+        "req_os": "precise"
+    },
     "python-pip": {
         "name": "python-pip",
         "version": "1.0",
-        "bootstrap_dir": "%s/python-pip/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/python-pip/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/python-pip" % PACKAGES_DIR
     },
     "logstash": {
         "name": "logstash",
         "version": "1.3.2",
         "source_url": "https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar",
-        "bootstrap_dir": "%s/logstash/" % PACKAGES_BOOTSTRAP_DIR,
+        "depends": ['openjdk-7-jdk'],
+        "bootstrap_dir": "%s/logstash/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/logstash" % PACKAGES_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -69,7 +89,8 @@ PACKAGES = {
         "name": "elasticsearch",
         "version": "0.90.9",
         "source_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.9.tar.gz",
-        "bootstrap_dir": "%s/elasticsearch/" % PACKAGES_BOOTSTRAP_DIR,
+        "depends": ['openjdk-7-jdk'],
+        "bootstrap_dir": "%s/elasticsearch/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/elasticsearch" % PACKAGES_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -80,7 +101,8 @@ PACKAGES = {
         "name": "kibana3",
         "version": "3.0.0milestone4",
         "source_url": "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
-        "bootstrap_dir": "%s/kibana3/" % PACKAGES_BOOTSTRAP_DIR,
+        "depends": ['openjdk-7-jdk', 'logstash', 'elasticsearch'],
+        "bootstrap_dir": "%s/kibana3/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/kibana3" % PACKAGES_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -93,7 +115,7 @@ PACKAGES = {
         "source_url": "http://nginx.org/packages/mainline/ubuntu/ precise nginx",
         "source_key": "http://nginx.org/keys/nginx_signing.key",
         "key_file": "nginx_signing.key",
-        "bootstrap_dir": "%s/nginx/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/nginx/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/nginx" % PACKAGES_DIR
     },
     "rabbitmq-server": {
@@ -103,34 +125,35 @@ PACKAGES = {
         "source_key": "http://www.rabbitmq.com/rabbitmq-signing-key-public.asc",
         "key_file": "rabbitmq-signing-key-public.asc",
         'erlang': "erlang-nox",
-        "bootstrap_dir": "%s/rabbitmq-server/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/rabbitmq-server/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/rabbitmq-server" % PACKAGES_DIR
     },
     "riemann": {
         "name": "riemann",
         "version": "0.2.2",
         "source_url": "http://aphyr.com/riemann/riemann_0.2.2_all.deb",
-        "bootstrap_dir": "%s/riemann/" % PACKAGES_BOOTSTRAP_DIR,
+        "depends": ['openjdk-7-jdk'],
+        "bootstrap_dir": "%s/riemann/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/riemann" % PACKAGES_DIR
     },
     "nodejs": {
         "name": "nodejs",
         "version": "0.0.1",
         "source_url": "ppa:chris-lea/node.js",
-        "bootstrap_dir": "%s/nodejs/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/nodejs/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/nodejs" % PACKAGES_DIR,
         "prereqs": ['python-software-properties', 'g++', 'make', 'python']
     },
     "openjdk-7-jdk": {
         "name": "openjdk-7-jdk",
         "version": "0.0.1",
-        "bootstrap_dir": "%s/openjdk-7-jdk/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/openjdk-7-jdk/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/openjdk-7-jdk" % PACKAGES_DIR
     },
     "virtualenv": {
         "name": "virtualenv",
         "version": "1.10.1",
-        "bootstrap_dir": "%s/virtualenv/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/virtualenv/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/virtualenv" % PACKAGES_DIR,
         "modules": ['virtualenv==1.10.1'],
         "src_package_type": "dir",
@@ -138,10 +161,21 @@ PACKAGES = {
         "bootstrap_script": "%s/virtualenv-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "virtualenv-bootstrap.template"
     },
+    "graphite": {
+        "name": "graphite",
+        "version": "0.9.12",
+        "bootstrap_dir": "%s/graphite/" % COMPONENTS_BOOTSTRAP_DIR,
+        "package_dir": "%s/graphite" % VIRTUALENVS_DIR,
+        "modules": ['carbon==0.9.10', 'whisper==0.9.12', 'graphite-web==0.9.12'],
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/graphite-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "graphite-bootstrap.template"
+    },
     "dsl-parser-modules": {
         "name": "dsl-parser-modules",
         "version": "0.0.1",
-        "bootstrap_dir": "%s/dsl-parser-modules/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/dsl-parser-modules/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/dsl-parser-modules" % PACKAGES_DIR,
         "virtualenv": "%s/cosmo-manager" % VIRTUALENVS_DIR,
         "modules": ['pyyaml', 'jsonschema', 'pika', 'https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.tar.gz'],
@@ -153,7 +187,7 @@ PACKAGES = {
     "manager-modules": {
         "name": "manager-modules",
         "version": "0.0.1",
-        "bootstrap_dir": "%s/manager-modules/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/manager-modules/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/manager-modules" % PACKAGES_DIR,
         "virtualenv": "%s/cosmo-manager" % VIRTUALENVS_DIR,
         "modules": ['Flask', 'flask-restful', 'flask-restful-swagger', 'requests', 'bernhard', 'pika'],
@@ -166,7 +200,8 @@ PACKAGES = {
         "name": "manager",
         "version": "0.0.1",
         "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
-        "bootstrap_dir": "%s/manager/" % PACKAGES_BOOTSTRAP_DIR,
+        "depends": ['openjdk-7-jdk'],
+        "bootstrap_dir": "%s/manager/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/manager" % VIRTUALENVS_DIR,
         "virtualenv": "%s/manager" % VIRTUALENVS_DIR,
         "modules": ['%s/manager/cosmo-manager-develop/manager-rest/' % VIRTUALENVS_DIR],
@@ -178,7 +213,7 @@ PACKAGES = {
     "celery": {
         "name": "celery",
         "version": "0.0.1",
-        "bootstrap_dir": "%s/celery/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/celery/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/celery" % VIRTUALENVS_DIR,
         "virtualenv": "%s/celery" % VIRTUALENVS_DIR,
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
@@ -194,7 +229,7 @@ PACKAGES = {
     "bundler": {
         "name": "bundler",
         "version": "0.0.1",
-        "bootstrap_dir": "%s/bundler/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/bundler/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/bundler" % PACKAGES_DIR,
         "gems": ['bundler'],
         "src_package_type": "dir",
@@ -206,9 +241,10 @@ PACKAGES = {
         "name": "workflow-jruby",
         "version": "1.7.3",
         "source_url": "http://jruby.org.s3.amazonaws.com/downloads/1.7.3/jruby-bin-1.7.3.tar.gz",
+        "depends": ['openjdk-7-jdk'],
         "gemfile_source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
         "gemfile_location": "%s/workflow-jruby/cosmo-manager-develop/workflow-service/Gemfile" % PACKAGES_DIR,
-        "bootstrap_dir": "%s/workflow-jruby/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/workflow-jruby/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/workflow-jruby" % PACKAGES_DIR,
         "bin_home_dir": "jruby-1.7.3/bin",
         "src_package_type": "dir",
@@ -220,7 +256,7 @@ PACKAGES = {
         "name": "jruby",
         "version": "1.7.3",
         "source_url": "http://jruby.org.s3.amazonaws.com/downloads/1.7.3/jruby-bin-1.7.3.tar.gz",
-        "bootstrap_dir": "%s/jruby/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/jruby/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/jruby" % PACKAGES_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -231,7 +267,7 @@ PACKAGES = {
         "name": "workflow-gems",
         "version": "0.0.1",
         "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
-        "bootstrap_dir": "%s/workflow-gems/" % PACKAGES_BOOTSTRAP_DIR,
+        "bootstrap_dir": "%s/workflow-gems/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/workflow-gems" % PACKAGES_DIR,
         "virtualenv": VIRTUALENVS_DIR,
         "gems": ['rufus-scheduler -v 2.0.24', 'sinatra -v 1.4.4', 'ruby_parser -v 3.1', 'ruby_parser -v 2.3', 'ruote -v 2.3.0.2', 'rest-client -v 1.6.7'],
@@ -244,23 +280,14 @@ PACKAGES = {
         "name": "cosmo-ui",
         "version": "1.0.0",
         "source_url": "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
-        "bootstrap_dir": "%s/cosmo-ui/" % PACKAGES_BOOTSTRAP_DIR,
+        "depends": ['nodejs'],
+        "bootstrap_dir": "%s/cosmo-ui/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/cosmo-ui" % PACKAGES_DIR,
         "virtualenv": "%s/cosmo-ui" % VIRTUALENVS_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/cosmo-ui-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "cosmo-ui-bootstrap.template"
-    },
-    "cosmo": {
-        "name": "cosmo",
-        "version": "1.0.0",
-        "bootstrap_dir": "%s/cosmo/" % PACKAGES_BOOTSTRAP_DIR,
-        "package_dir": "%s/cosmo" % PACKAGES_DIR,
-        "src_package_type": "dir",
-        "dst_package_type": "tar",
-        "bootstrap_script": "%s/cosmo-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_template": "cosmo-bootstrap.template"
     }
 }
 # logger configuration

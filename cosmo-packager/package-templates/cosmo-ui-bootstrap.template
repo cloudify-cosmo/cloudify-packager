@@ -80,8 +80,6 @@ PKG_INIT_DIR="${PKG_DIR}/init"
 INIT_DIR="/etc/init"
 
 
-echo -e "\n\n\n############################## INSTALLING ${PKG_NAME}"
-
 echo "installing ${PKG_NAME}..."
 sudo mkdir -p ${HOME_DIR}
 check_dir ${HOME_DIR}

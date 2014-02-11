@@ -77,8 +77,9 @@ HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 PKG_INIT_DIR="${PKG_DIR}/init"
 INIT_DIR="/etc/init"
 
+PKG_CONF_DIR="${PKG_DIR}/conf"
+CONF_DIR="/opt/elasticsearch/config"
 
-echo -e "\n\n\n############################## INSTALLING ${PKG_NAME}"
 
 echo "creating ${PKG_NAME} home dir..."
 sudo mkdir -p /home/${PKG_NAME}
@@ -89,6 +90,10 @@ sudo tar -C ${BASE_DIR}/ -xvf ${PKG_DIR}/${PKG_NAME}-*.tar.gz
 echo "moving some stuff around..."
 sudo cp ${PKG_INIT_DIR}/${PKG_NAME}.conf ${INIT_DIR}
 check_file "${INIT_DIR}/${PKG_NAME}.conf"
+
+sudo cp ${PKG_CONF_DIR}/* ${CONF_DIR}
+check_file "${CONF_DIR}/elasticsearch.yml"
+check_file "${CONF_DIR}/logging.yml"
 
 echo "creating ${PKG_NAME} app link..."
 sudo ln -sf ${BASE_DIR}/${PKG_NAME}-*/ ${HOME_DIR}

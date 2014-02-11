@@ -65,13 +65,13 @@ def get_cosmo_components():
 
 
 @task
-def get_cosmo_base():
+def get_cosmo():
     """
     ACT:    retrieves cosmo code
     EXEC:   fab get_cosmo_base
     """
 
-    # get_celery()
+    get_celery()
     get_cosmo_ui()
     if not check_if_package_is_installed('openjdk-7-jdk'):
         pkg_openjdk()
@@ -89,7 +89,7 @@ def pkg_cosmo_components():
     EXEC:   fab pkg_comso_components
     """
 
-    # pkg_openjdk()  # already packaged at get_ process
+    pkg_openjdk()  # already packaged at get_ process
     pkg_logstash()
     pkg_elasticsearch()
     pkg_riemann()
@@ -101,7 +101,7 @@ def pkg_cosmo_components():
 
 
 @task
-def pkg_cosmo_base():
+def pkg_cosmo():
     """
     ACT:    packages cosmo code
     EXEC:   fab pkg_comso_base
@@ -111,3 +111,17 @@ def pkg_cosmo_base():
     pkg_celery()
     pkg_cosmo_ui()
     pkg_manager()
+
+
+@task
+def make(more=False, extra=False):
+
+    if extra:
+        get_cosmo_components()
+        get_cosmo()
+    if more:
+        pkg_cosmo_components()
+        pkg_cosmo()
+    pkg_cloudify3_components()
+    pkg_cloudify3()
+    cp('/cloudify/*.deb', '/vagrant/debs')

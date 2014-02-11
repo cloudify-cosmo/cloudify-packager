@@ -81,8 +81,6 @@ INIT_DIR="/etc/init.d"
 PKG_CONF_DIR="${PKG_DIR}/conf"
 
 
-echo -e "\n\n\n############################## INSTALLING ${PKG_NAME}"
-
 # echo "unpacking ${PKG_NAME}..."
 # sudo mv ${PKG_DIR}/${PKG_NAME} ${BASE_DIR}
 # check_dir "${BASE_DIR}/${PKG_NAME}"

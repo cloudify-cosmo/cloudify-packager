@@ -37,16 +37,19 @@ except ValueError:
     sys.exit('could not initiate logger. try sudo...')
 
 
-def loc_ret(command, retries=3, sleeper=3):
+def loc_ret(command, retries=3, sleeper=3, capture=False):
+    """
+    runs a fab local() with retries
+    """
 
     for execution in range(retries):
         lgr.debug('running command: %s' % command)
         try:
-            r = local(command)
-            lgr.debug('succeeded in running command: %s' % command)
+            r = local(command, capture)
+            lgr.debug('ran command: %s' % command)
             return r
         except:
-            lgr.warning('failed in running command: %s -retrying (%s/%s)' % (command, execution, retries))
+            lgr.warning('failed to run command: %s -retrying (%s/%s)' % (command, execution, retries))
             sleep(sleeper)
     lgr.error('failed to run command: %s even after %s retries' % (command, execution))
     return r
@@ -93,7 +96,7 @@ def get_package_configuration(component):
         sys.exit()
 
 
-def pack(src_type, dst_type, name, src_path, dst_path, version, bootstrap_script=False):
+def pack(src_type, dst_type, name, src_path, dst_path, version, bootstrap_script=False, depends=False):
     """
     uses fpm (https://github.com/jordansissel/fpm/wiki)
     to create packages with/without bootstrap scripts
@@ -102,9 +105,14 @@ def pack(src_type, dst_type, name, src_path, dst_path, version, bootstrap_script
     lgr.debug('packing %s' % name)
     if is_dir(src_path):
         with lcd(dst_path):
-            if bootstrap_script:
+            if bootstrap_script and not depends:
                 x = loc_ret('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (
                     src_type, dst_type, bootstrap_script, name, version, src_path))
+            elif bootstrap_script and depends:
+                lgr.debug('dependencies are: %s' % ", ".join(depends))
+                dep_str = "-d " + " -d ".join(depends)
+                x = loc_ret('sudo fpm -s %s -t %s --after-install %s %s -n %s -v %s -f %s' % (
+                    src_type, dst_type, bootstrap_script, dep_str, name, version, src_path))
             else:
                 x = loc_ret('sudo fpm -s %s -t %s -n %s -v %s -f %s' % (
                     src_type, dst_type, name, version, src_path))
@@ -149,7 +157,7 @@ def pip(module, dir):
     """
 
     lgr.debug('installing module %s' % module)
-    x = loc_ret('sudo %s/pip --default-timeout=100 install %s' % (dir, module))
+    x = loc_ret('sudo %s/pip --default-timeout=45 install %s' % (dir, module))
     if x.succeeded:
         lgr.debug('successfully installed python module %s to %s' % (module, dir))
     else:
