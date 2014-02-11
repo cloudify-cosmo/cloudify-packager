@@ -117,8 +117,6 @@ COMPAT=true
 
 ################################################ CHECK PREREQS
 
-# clear
-
 echo -e "\nInstalling ${PKG_NAME} version ${VERSION}..." | tee -a ${BOOTSTRAP_LOG}
 echo -e "(you may tail ${BOOTSTRAP_LOG} for the full installation log)\n" | tee -a ${BOOTSTRAP_LOG}
 

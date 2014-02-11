@@ -107,7 +107,7 @@ REQ_CPU_CORES="{{ req_cpu_cores}}"
 REQ_ARCH="{{ req_arch }}"
 REQ_OS="{{ req_os }}"
 
-FREE_DISK=$(df -Ph . | awk 'NR==2 {print $4}' | grep -Eo [0-9]+)
+FREE_DISK=$(df -Ph . | awk 'NR==2 {print $4}' | grep -Eo [0-9]+ | awk 'NR==1 {print $1}')
 FREE_MEM=$(cat /proc/meminfo | grep MemFree | awk '{print $2}')
 CPU_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
 ARCH=$(uname -m)
@@ -116,8 +116,6 @@ OS=$(cat /etc/lsb-release | grep CODENAME | awk -F'=' '{print $2}')
 COMPAT=true
 
 ################################################ CHECK PREREQS
-
-clear
 
 echo -e "\nInstalling ${PKG_NAME} version ${VERSION}..." | tee -a ${BOOTSTRAP_LOG}
 echo -e "(you may tail ${BOOTSTRAP_LOG} for the full installation log)\n" | tee -a ${BOOTSTRAP_LOG}
