@@ -18,10 +18,11 @@
 import logging
 import logging.config
 
-import os
-run_env = os.environ['RUN_ENV']
-config = __import__(run_env)
+import config
+# run_env = os.environ['RUN_ENV']
+# config = __import__(run_env)
 
+import os
 from fabric.api import *  # NOQA
 import sys
 import re
@@ -37,7 +38,7 @@ except ValueError:
     sys.exit('could not initiate logger. try sudo...')
 
 
-def loc_ret(command, retries=3, sleeper=3, capture=False):
+def run_locally_with_retries(command, retries=3, sleeper=3, capture=False):
     """
     runs a fab local() with retries
     """
@@ -49,10 +50,20 @@ def loc_ret(command, retries=3, sleeper=3, capture=False):
             lgr.debug('ran command: %s' % command)
             return r
         except:
-            lgr.warning('failed to run command: %s -retrying (%s/%s)' % (command, execution, retries))
+            lgr.warning('failed to run command: %s -retrying (%s/%s)' %
+                        (command, execution, retries))
             sleep(sleeper)
-    lgr.error('failed to run command: %s even after %s retries' % (command, execution))
+    lgr.error('failed to run command: %s even after %s retries' %
+              (command, execution))
     return r
+
+
+def do(command):
+    """
+    runs a command
+    """
+
+    run_locally_with_retries(command)
 
 
 def delete_pip_build_root():
@@ -64,7 +75,7 @@ def check_if_package_is_installed(package):
 
     lgr.debug('checking if %s is installed' % package)
     try:
-        loc_ret('sudo dpkg -s %s' % package)
+        run_locally_with_retries('sudo dpkg -s %s' % package)
         lgr.debug('%s is installed' % package)
         return True
     except:
@@ -92,11 +103,13 @@ def get_package_configuration(component):
         lgr.debug('%s config retrieved successfully' % component)
         return package_config
     except KeyError:
-        lgr.error('package configuration for %s was not found, terminating...' % component)
+        lgr.error('package configuration for'
+                  ' %s was not found, terminating...' % component)
         sys.exit()
 
 
-def pack(src_type, dst_type, name, src_path, dst_path, version, bootstrap_script=False, depends=False):
+def pack(src_type, dst_type, name, src_path, dst_path, version,
+         bootstrap_script=False, depends=False):
     """
     uses fpm (https://github.com/jordansissel/fpm/wiki)
     to create packages with/without bootstrap scripts
@@ -106,16 +119,23 @@ def pack(src_type, dst_type, name, src_path, dst_path, version, bootstrap_script
     if is_dir(src_path):
         with lcd(dst_path):
             if bootstrap_script and not depends:
-                x = loc_ret('sudo fpm -s %s -t %s --after-install %s -n %s -v %s -f %s' % (
-                    src_type, dst_type, bootstrap_script, name, version, src_path))
+                x = run_locally_with_retries(
+                    'sudo fpm -s %s -t %s'
+                    ' --after-install %s -n %s -v %s -f %s' %
+                    (src_type, dst_type, bootstrap_script,
+                     name, version, src_path))
             elif bootstrap_script and depends:
                 lgr.debug('dependencies are: %s' % ", ".join(depends))
                 dep_str = "-d " + " -d ".join(depends)
-                x = loc_ret('sudo fpm -s %s -t %s --after-install %s %s -n %s -v %s -f %s' % (
-                    src_type, dst_type, bootstrap_script, dep_str, name, version, src_path))
+                x = run_locally_with_retries(
+                    'sudo fpm -s %s -t %s'
+                    ' --after-install %s %s -n %s -v %s -f %s' %
+                    (src_type, dst_type, bootstrap_script, dep_str,
+                     name, version, src_path))
             else:
-                x = loc_ret('sudo fpm -s %s -t %s -n %s -v %s -f %s' % (
-                    src_type, dst_type, name, version, src_path))
+                x = run_locally_with_retries(
+                    'sudo fpm -s %s -t %s -n %s -v %s -f %s' %
+                    (src_type, dst_type, name, version, src_path))
             if x.succeeded:
                 lgr.debug('successfully packed %s:%s' % (name, version))
             else:
@@ -127,7 +147,7 @@ def pack(src_type, dst_type, name, src_path, dst_path, version, bootstrap_script
 
 def make_package_dirs(pkg_dir, tmp_dir):
     """
-    creates directory for managing packages
+    creates directories for managing packages
     """
 
     lgr.debug('creating package directories')
@@ -142,9 +162,13 @@ def get_ruby_gem(gem, dir):
 
     lgr.debug('downloading gem %s' % gem)
     try:
-        x = loc_ret('sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+        x = run_locally_with_retries(
+            'sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install'
+            ' --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
     except:
-        x = loc_ret('sudo /usr/local/rvm/rubies/ruby-2.1.0/bin/gem install --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+        x = run_locally_with_retries(
+            'sudo /usr/local/rvm/rubies/ruby-2.1.0/bin/gem install'
+            ' --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
     if x.succeeded:
         lgr.debug('successfully downloaded ruby gem %s to %s' % (gem, dir))
     else:
@@ -157,9 +181,11 @@ def pip(module, dir):
     """
 
     lgr.debug('installing module %s' % module)
-    x = loc_ret('sudo %s/pip --default-timeout=45 install %s' % (dir, module))
+    x = run_locally_with_retries(
+        'sudo %s/pip --default-timeout=45 install %s' % (dir, module))
     if x.succeeded:
-        lgr.debug('successfully installed python module %s to %s' % (module, dir))
+        lgr.debug(
+            'successfully installed python module %s to %s' % (module, dir))
     else:
         lgr.error('unsuccessfully installed python module %s' % module)
 
@@ -170,9 +196,13 @@ def get_python_module(module, dir):
     """
 
     lgr.debug('downloading module %s' % module)
-    x = loc_ret('''sudo /usr/local/bin/pip install --no-install --no-use-wheel --process-dependency-links --download "%s/" %s''' % (dir, module))
+    x = run_locally_with_retries(
+        '''sudo /usr/local/bin/pip install --no-install'
+        ' --no-use-wheel --process-dependency-links --download "%s/" %s''' %
+        (dir, module))
     if x.succeeded:
-        lgr.debug('successfully downloaded python module %s to %s' % (module, dir))
+        lgr.debug('successfully downloaded python module %s to %s' %
+                  (module, dir))
     else:
         lgr.error('unsuccessfully downloaded python module %s' % module)
 
@@ -183,7 +213,7 @@ def check_module_installed(name):
     """
 
     lgr.debug('checking to see that %s is installed' % name)
-    x = loc_ret('pip freeze', capture=True)
+    x = run_locally_with_retries('pip freeze', capture=True)
     if re.search(r'%s' % name, x.stdout):
         lgr.debug('module %s is installed' % name)
         return True
@@ -200,7 +230,7 @@ def venv(root_dir, name=False):
     lgr.debug('creating virtualenv in %s' % (root_dir))
     if check_module_installed('virtualenv'):
         #with lcd(root_dir):
-        x = loc_ret('virtualenv %s' % root_dir)
+        x = run_locally_with_retries('virtualenv %s' % root_dir)
         if x.succeeded:
             lgr.debug('successfully created virtualenv in %s' % (root_dir))
         else:
@@ -218,29 +248,32 @@ def wget(url, dir=False, file=False):
     lgr.debug('downloading %s to %s' % (url, dir))
     try:
         if file:
-            x = loc_ret('sudo wget %s -O %s' % (url, file))
+            x = run_locally_with_retries('sudo wget %s -O %s' % (url, file))
         elif dir:
-            x = loc_ret('sudo wget %s -P %s' % (url, dir))
+            x = run_locally_with_retries('sudo wget %s -P %s' % (url, dir))
         elif dir and file:
-            lgr.warning('please specify either a directory or file to download to, not both')
+            lgr.warning('please specify either a directory'
+                        ' or file to download to, not both')
             sys.exit()
         else:
-            lgr.warning('please specify at least one of target dir or file. you\'re downloading to the current directory')
-            x = loc_ret('sudo wget %s' % url)
+            lgr.warning('please specify at least one of target dir or file.')
+            sys.exit()
         if x.succeeded:
             if file:
                 lgr.debug('successfully downloaded %s to %s' % (url, file))
             elif dir:
                 lgr.debug('successfully downloaded %s to %s' % (url, dir))
             elif not dir and not file:
-                lgr.debug('successfully downloaded %s to local directory' % url)
+                lgr.debug(
+                    'successfully downloaded %s to local directory' % url)
         else:
             if file:
                 lgr.error('unsuccessfully downloaded %s to %s' % (url, file))
             elif dir:
                 lgr.error('unsuccessfully downloaded %s to %s' % (url, dir))
             elif not dir and not file:
-                lgr.debug('unsuccessfully downloaded %s to local directory' % url)
+                lgr.debug(
+                    'unsuccessfully downloaded %s to local directory' % url)
     except:
         lgr.error('failed downloading %s' % url)
 
@@ -251,7 +284,7 @@ def rmdir(dir):
     """
 
     lgr.debug('removing directory %s' % dir)
-    x = loc_ret('sudo rm -rf %s' % dir)
+    x = run_locally_with_retries('sudo rm -rf %s' % dir)
     if x.succeeded:
         lgr.debug('successfully removed directory %s' % dir)
     else:
@@ -265,7 +298,7 @@ def rm(file):
 
     lgr.debug('removing files %s' % file)
     try:
-        loc_ret('sudo rm %s' % file)
+        run_locally_with_retries('sudo rm %s' % file)
         lgr.debug('successfully removed file %s' % file)
     except:
         lgr.error('unsuccessfully removed file %s' % file)
@@ -277,7 +310,7 @@ def mkdir(dir):
     """
 
     lgr.debug('creating directory %s' % dir)
-    x = loc_ret('sudo mkdir -p %s' % dir)
+    x = run_locally_with_retries('sudo mkdir -p %s' % dir)
     if x.succeeded:
         lgr.debug('successfully created directory %s' % dir)
     else:
@@ -291,9 +324,9 @@ def cp(src, dst, recurse=True):
 
     lgr.debug('copying %s to %s' % (src, dst))
     if recurse:
-        x = loc_ret('sudo cp -R %s %s' % (src, dst))
+        x = run_locally_with_retries('sudo cp -R %s %s' % (src, dst))
     else:
-        x = loc_ret('sudo cp %s %s' % (src, dst))
+        x = run_locally_with_retries('sudo cp %s %s' % (src, dst))
     if x.succeeded:
         lgr.debug('successfully copied %s to %s' % (src, dst))
     else:
@@ -307,7 +340,8 @@ def apt_download(pkg, dir):
 
     apt_purge(pkg)
     lgr.debug('downloading %s to %s' % (pkg, dir))
-    x = loc_ret('sudo apt-get -y install %s -d -o=dir::cache=%s' % (pkg, dir))
+    x = run_locally_with_retries(
+        'sudo apt-get -y install %s -d -o=dir::cache=%s' % (pkg, dir))
     if x.succeeded:
         lgr.debug('successfully downloaded %s to %s' % (pkg, dir))
     else:
@@ -320,7 +354,7 @@ def add_key(key_file):
     """
 
     lgr.debug('adding key %s' % key_file)
-    x = loc_ret('sudo apt-key add %s' % key_file)
+    x = run_locally_with_retries('sudo apt-key add %s' % key_file)
     if x.succeeded:
         lgr.debug('successfully added key %s' % key_file)
     else:
@@ -333,7 +367,7 @@ def apt_update():
     """
 
     lgr.debug('updating local apt repo')
-    x = loc_ret('sudo apt-get update')
+    x = run_locally_with_retries('sudo apt-get update')
     if x.succeeded:
         lgr.debug('successfully ran apt-get update')
     else:
@@ -347,7 +381,7 @@ def apt_get(list):
 
     for package in list:
         lgr.debug('installing %s' % package)
-        x = loc_ret('sudo apt-get -y install %s' % package)
+        x = run_locally_with_retries('sudo apt-get -y install %s' % package)
         if x.succeeded:
             lgr.debug('successfully installed %s' % package)
         else:
@@ -360,7 +394,8 @@ def mvn(file):
     """
 
     lgr.debug('building from %s' % file)
-    x = loc_ret('mvn clean package -DskipTests -Pall -f %s' % file)
+    x = run_locally_with_retries(
+        'mvn clean package -DskipTests -Pall -f %s' % file)
     if x.succeeded:
         lgr.debug('successfully built from %s' % file)
     else:
@@ -370,7 +405,8 @@ def mvn(file):
 def find_in_dir(dir, pattern):
 
     lgr.debug('looking for %s in %s' % (pattern, dir))
-    x = loc_ret('find %s -iname "%s" -exec echo {} \;' % (dir, pattern), capture=True)
+    x = run_locally_with_retries(
+        'find %s -iname "%s" -exec echo {} \;' % (dir, pattern), capture=True)
     if x.succeeded:
         return x.stdout
         lgr.debug('successfully found %s in %s' % (pattern, dir))
@@ -384,7 +420,8 @@ def tar(chdir, output_file, input):
     """
 
     lgr.debug('tar-ing %s' % output_file)
-    x = loc_ret('sudo tar -C %s -czvf %s %s' % (chdir, output_file, input))
+    x = run_locally_with_retries(
+        'sudo tar -C %s -czvf %s %s' % (chdir, output_file, input))
     if x.succeeded:
         lgr.debug('successfully tar-ed %s' % output_file)
     else:
@@ -397,7 +434,8 @@ def untar(chdir, input_file):
     """
 
     lgr.debug('tar-ing %s' % input_file)
-    x = loc_ret('sudo tar -C %s -xzvf %s' % (chdir, input_file))
+    x = run_locally_with_retries(
+        'sudo tar -C %s -xzvf %s' % (chdir, input_file))
     if x.succeeded:
         lgr.debug('successfully untar-ed %s' % input_file)
     else:
@@ -409,7 +447,7 @@ def apt_purge(package):
     completely purges a package from the local repo
     """
 
-    x = loc_ret('sudo apt-get -y purge %s' % package)
+    x = run_locally_with_retries('sudo apt-get -y purge %s' % package)
     if x.succeeded:
         lgr.debug('successfully purged %s' % package)
     else:
@@ -421,13 +459,14 @@ def run_script(package_name, action, arg_s=''):
     runs a a shell scripts with optional arguments
     """
 
-    SCRIPT_PATH = '%s/%s-%s.sh' % (config.PACKAGER_SCRIPTS_DIR, package_name, action)
+    SCRIPT_PATH = '%s/%s-%s.sh' % (
+        config.PACKAGER_SCRIPTS_DIR, package_name, action)
 
     try:
         with open(SCRIPT_PATH):
             lgr.debug('%s package: %s' % (action, package_name))
             lgr.debug('running %s %s' % (SCRIPT_PATH, arg_s))
-            loc_ret('%s %s' % (SCRIPT_PATH, arg_s))
+            run_locally_with_retries('%s %s' % (SCRIPT_PATH, arg_s))
     except IOError:
         lgr.error('Oh Dear... the script %s does not exist' % SCRIPT_PATH)
         sys.exit()

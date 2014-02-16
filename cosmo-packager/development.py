@@ -1,3 +1,4 @@
+# flake8: NOQA
 ########
 # Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
 #
@@ -112,7 +113,7 @@ PACKAGES = {
     "nginx": {
         "name": "nginx",
         "version": "1.5.8",
-        "source_url": "http://nginx.org/packages/mainline/ubuntu/ precise nginx",
+        "source_url": "http://nginx.org/packages/mainline/ubuntu/precise nginx",
         "source_key": "http://nginx.org/keys/nginx_signing.key",
         "key_file": "nginx_signing.key",
         "bootstrap_dir": "%s/nginx/" % COMPONENTS_BOOTSTRAP_DIR,
@@ -166,7 +167,11 @@ PACKAGES = {
         "version": "0.9.12",
         "bootstrap_dir": "%s/graphite/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/graphite" % VIRTUALENVS_DIR,
-        "modules": ['carbon==0.9.10', 'whisper==0.9.12', 'graphite-web==0.9.12'],
+        "modules": [
+            'carbon==0.9.10',
+            'whisper==0.9.12',
+            'graphite-web==0.9.12'
+        ],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/graphite-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -178,7 +183,12 @@ PACKAGES = {
         "bootstrap_dir": "%s/dsl-parser-modules/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/dsl-parser-modules" % PACKAGES_DIR,
         "virtualenv": "%s/cosmo-manager" % VIRTUALENVS_DIR,
-        "modules": ['pyyaml', 'jsonschema', 'pika', 'https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.tar.gz'],
+        "modules": [
+            'pyyaml',
+            'jsonschema',
+            'pika',
+            'https://github.com/CloudifySource/cosmo-plugin-dsl-parser/archive/develop.tar.gz'
+        ],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/dsl-parser-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -190,7 +200,14 @@ PACKAGES = {
         "bootstrap_dir": "%s/manager-modules/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/manager-modules" % PACKAGES_DIR,
         "virtualenv": "%s/cosmo-manager" % VIRTUALENVS_DIR,
-        "modules": ['Flask', 'flask-restful', 'flask-restful-swagger', 'requests', 'bernhard', 'pika'],
+        "modules": [
+            'Flask',
+            'flask-restful',
+            'flask-restful-swagger',
+            'requests',
+            'bernhard',
+            'pika'
+        ],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/manager-modules-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -262,6 +279,32 @@ PACKAGES = {
         "dst_package_type": "deb",
         "bootstrap_script": "%s/jruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "jruby-bootstrap.template"
+    },
+    "rvm": {
+        "name": "rvm",
+        "version": "1.25.18",
+        "source_url": "https://github.com/wayneeseguin/rvm/tarball/stable",
+        "bootstrap_dir": "%s/rvm/" % COMPONENTS_BOOTSTRAP_DIR,
+        "package_dir": "%s/rvm" % PACKAGES_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "prereqs" : ['curl']
+        "reqs": ['patch', 'gawk', 'g++', 'make', 'patch', 'libyaml-dev', 'libsqlite3-dev', 'sqlite3', 'autoconf', 'libgdbm-dev', 'libncurses5-dev', 'automake', 'libtool', 'bison', 'pkg-config', 'libffi-dev'],
+        "bootstrap_script": "%s/rvm-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "rvm-bootstrap.template",
+    },
+    "ruby2_1": {
+        "name": "ruby2.1",
+        "version": "2.1.0p0",
+        "_source_url": "wget http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.0.tar.gz",
+        "source_url": "ppa:brightbox/ruby-ng",
+        "bootstrap_dir": "%s/ruby2_1/" % COMPONENTS_BOOTSTRAP_DIR,
+        "package_dir": "%s/ruby2_1" % PACKAGES_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "prereqs": ['python-software-properties', 'python'],
+        "bootstrap_script": "%s/ruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "ruby-bootstrap.template",
     },
     "workflow-gems": {
         "name": "workflow-gems",

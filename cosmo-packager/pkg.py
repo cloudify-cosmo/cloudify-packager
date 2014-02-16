@@ -18,9 +18,9 @@
 import logging
 import logging.config
 
-import os
-run_env = os.environ['RUN_ENV']
-config = __import__(run_env)
+import config
+# run_env = os.environ['RUN_ENV']
+# config = __import__(run_env)
 
 from event_handler import send_event as se
 import uuid
@@ -55,7 +55,8 @@ def pkg_cloudify3():
     local('chmod +x %s/*.sh' % package['package_dir'])
     cp(package['conf_dir'], package['package_dir'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s' % package['package_dir'],
         package['version'], depends=package['depends'])
 
@@ -78,7 +79,8 @@ def pkg_graphite():
     # create_bootstrap_script(
         # package, package['bootstrap_template'], package['bootstrap_script'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],
         package['version'], package['bootstrap_script'])
 
@@ -104,7 +106,8 @@ def pkg_cloudify3_components():
     local('chmod +x %s/*.sh' % package['package_dir'])
     cp(package['conf_dir'], package['package_dir'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s' % package['package_dir'],
         package['version'])
 
@@ -127,7 +130,8 @@ def pkg_virtualenv():
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],
         package['version'], package['bootstrap_script'])
 
@@ -150,7 +154,8 @@ def pkg_celery():
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],
         package['version'], package['bootstrap_script'])
 
@@ -173,7 +178,8 @@ def pkg_manager():
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],
         package['version'], package['bootstrap_script'], package['depends'])
 
@@ -184,19 +190,57 @@ def pkg_manager():
 
 
 @task
-def pkg_workflow_jruby():
+def pkg_make():
     """
-    ACT:    packages workflow-jruby
-    EXEC:   fab pkg_workflow-jruby
+    ACT:    packages make
+    EXEC:   fab pkg_make
     """
 
-    package = get_package_configuration('workflow-jruby')
+    package = get_package_configuration('make')
 
-    rm('%s/archives/*.deb' % package['package_dir'])
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
+def pkg_ruby():
+    """
+    ACT:    packages ruby
+    EXEC:   fab pkg_ruby
+    """
+
+    package = get_package_configuration('ruby')
+
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'], package['depends'])
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
+def pkg_workflow_gems():
+    """
+    ACT:    packages workflow-gems
+    EXEC:   fab pkg_workflow_gems
+    """
+
+    package = get_package_configuration('workflow-gems')
+
+    create_bootstrap_script(
+        package, package['bootstrap_template'], package['bootstrap_script'])
+    pack(
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],
         package['version'], package['bootstrap_script'], package['depends'])
 
@@ -219,7 +263,8 @@ def pkg_cosmo_ui():
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],
         package['version'], package['bootstrap_script'], package['depends'])
 
@@ -300,7 +345,8 @@ def pkg_logstash():
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],
         package['version'], package['bootstrap_script'], package['depends'])
 
@@ -323,7 +369,8 @@ def pkg_elasticsearch():
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],
         package['version'], package['bootstrap_script'], package['depends'])
 
@@ -346,7 +393,8 @@ def pkg_kibana():
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])
     pack(
-        package['src_package_type'], package['dst_package_type'], package['name'],
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
         package['package_dir'], '%s/archives/' % package['package_dir'],
         package['version'], package['bootstrap_script'], package['depends'])
 

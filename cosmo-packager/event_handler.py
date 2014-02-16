@@ -2,9 +2,10 @@
 import logging
 import logging.config
 
-import os
-run_env = os.environ['RUN_ENV']
-config = __import__(run_env)
+import config
+# import os
+# run_env = os.environ['RUN_ENV']
+# config = __import__(run_env)
 
 import pika
 import sys
@@ -36,9 +37,11 @@ def send_event(**kwargs):
     body = build_event_body(**kwargs)
 
     try:
-        connection = pika.BlockingConnection(pika.ConnectionParameters(config.RABBITMQ_HOST))
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(config.RABBITMQ_HOST))
     except:
-        lgr.warning('rabbitmq broker unreachable, event: %s will not be registered' % body)
+        lgr.warning('rabbitmq broker unreachable, event: '
+                    '%s will not be registered' % body)
         return
 
     channel = connection.channel()
@@ -48,6 +51,3 @@ def send_event(**kwargs):
                           body=body,
                           properties=pika.BasicProperties(delivery_mode=2))
     connection.close()
-
-
-# su -s /bin/sh -c 'exec "$0" "$@"' root -- /usr/bin/java -jar /opt/logstash/logstash.jar agent -f /etc/logstash.conf

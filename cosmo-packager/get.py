@@ -18,9 +18,9 @@
 import logging
 import logging.config
 
-import os
-run_env = os.environ['RUN_ENV']
-config = __import__(run_env)
+import config
+# run_env = os.environ['RUN_ENV']
+# config = __import__(run_env)
 
 from event_handler import send_event as se
 import uuid
@@ -124,43 +124,117 @@ def get_manager():
     CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
     cp(CONF_DIR, package['package_dir'])
 
-    x = check_if_package_is_installed('openjdk-7-jdk')
-    if not x:
-        lgr.debug('prereq package is not installed. terminating...')
-        sys.exit()
-    mvn('%s/cosmo-manager-develop/orchestrator/pom.xml' % package['package_dir'])
+    # x = check_if_package_is_installed('openjdk-7-jdk')
+    # if not x:
+        # lgr.debug('prereq package is not installed. terminating...')
+        # sys.exit()
+    # mvn('%s/cosmo-manager-develop/orchestrator/pom.xml' %
+        # package['package_dir'])
 
 
 @task
-def get_workflow_jruby():
+def get_rvm():
     """
-    ACT:    retrives jruby and its workflow gems
-    EXEC:   fab get_workflow_jruby
+    ACT:    retrives rvm
+    EXEC:   fab get_rvm
     """
 
-    package = get_package_configuration('workflow-jruby')
+    package = get_package_configuration('rvm')
 
     rmdir(package['package_dir'])
     make_package_dirs(
         package['bootstrap_dir'],
         package['package_dir'])
-    wget(package['source_url'], package['package_dir'])
-    untar(package['package_dir'], '%s/%s' % (package['package_dir'], '*.tar.gz'))
+    apt_get(package['prereqs'])
+    do('sudo curl -sSL %s -o %s/rvm-stable.tar.gz' % (package['source_url'],
+                                                      package['package_dir']))
+
+
+@task
+def get_make():
+    """
+    ACT:    retrives make
+    EXEC:   fab get_make
+    """
+
+    package = get_package_configuration('make')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    apt_download(
+        package['name'],
+        package['package_dir'])
+
+
+@task
+def get_ruby():
+    """
+    ACT:    retrives ruby
+    EXEC:   fab get_ruby
+    """
+
+    package = get_package_configuration('ruby')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    wget(
+        package['source_url'],
+        file='%s/ruby.tar.gz' % package['package_dir'])
+
+    # mkdir(package['rvm_inst_dir'])
+    # do('sudo tar -C %s --strip-components=1'
+       # ' -xzf %s/rvm-stable.tar.gz' % (package['rvm_inst_dir'],
+                                     # config.PACKAGES['rvm']['package_dir']))
+    # do('cd %s && sudo ./install --auto-dotfiles' %
+        # package['rvm_inst_dir'])
+    # do('source /etc/profile.d/rvm.sh')
+    # do('sudo dpkg-name %s/archives/*.deb' % package['package_dir'])
+    # do('sudo dpkg -i %s/archives/*.deb' % package['package_dir'])
+    # do('rvm install 2.1.0')
+    # cp('$rvm_path/archives/*', package['package_dir'])
+
+
+@task
+def get_workflow_gems():
+    """
+    ACT:    retrives workflow gems
+    EXEC:   fab get_workflow_gems
+    """
+
+    package = get_package_configuration('workflow-gems')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    for req in package['reqs']:
+        apt_download(req, package['package_dir'])
+    do('sudo dpkg -i %s/archives/*.deb' %
+        config.PACKAGES['ruby']['package_dir'])
+    do('sudo tar -C {0} -xzvf {0}/ruby.tar.gz'.format(
+        config.PACKAGES['ruby']['package_dir']))
+    do('cd {0}/ruby-2.1.0 && sudo ./configure --prefix=/usr/local'.format(
+        config.PACKAGES['ruby']['package_dir']))
+    do('cd {0}/ruby-2.1.0 && sudo make'.format(
+        config.PACKAGES['ruby']['package_dir']))
+    do('cd {0}/ruby-2.1.0 && sudo make install'.format(
+        config.PACKAGES['ruby']['package_dir']))
+
+    wget(
+        package['gemfile_source_url'],
+        package['package_dir'])
+    untar(
+        package['package_dir'],
+        '%s/%s' % (package['package_dir'], '*.tar.gz'))
     rm('%s/%s' % (package['package_dir'], '*.tar.gz'))
-    wget(package['gemfile_source_url'], package['package_dir'])
-    untar(package['package_dir'], '%s/%s' % (package['package_dir'], '*.tar.gz'))
-    rm('%s/%s' % (package['package_dir'], '*.tar.gz'))
-    local('ln -sf %s/%s/jruby %s' % (package['package_dir'],
-                                     package['bin_home_dir'],
-                                     '/usr/bin/jruby'))
-    local('%s/%s/jruby -S gem install bundler' % (package['package_dir'],
-                                                  package['bin_home_dir']))
-    local('%s/%s/jruby -S bundle --gemfile %s' % (package['package_dir'],
-                                                  package['bin_home_dir'],
-                                                  package['gemfile_location']))
-    # TODO: USE FIND_IN_DIR TO GET GEMFILE
-    # sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} rack-test -v 0.6.2
-    # sudo gem install --no-ri --no-rdoc --install-dir ${PKG_DIR} test-unit -v 2.5.5
+    do('sudo gem install bundler')
+    do('sudo bundle --gemfile %s' % package['gemfile_location'])
+    rmdir(package['gemfile_base_dir'])
+    cp('/usr/local/lib/ruby/gems/2.1.0/cache/*.gem', package['package_dir'])
 
 
 @task
@@ -200,7 +274,7 @@ def get_nodejs():
 
     apt_get(package['prereqs'])
     lgr.debug("adding package repo to src repo...")
-    local('add-apt-repository -y %s' % package['source_url'])
+    do('add-apt-repository -y %s' % package['source_url'])
     apt_update()
     apt_download(
         package['name'],
@@ -253,8 +327,11 @@ def get_rabbitmq():
         package['package_dir'])
 
     lgr.debug("adding package repo to src repo...")
-    local('sudo sed -i "2i deb %s" /etc/apt/sources.list' % package['source_url'])
-    wget(package['source_key'], package['package_dir'])
+    do('sudo sed -i "2i deb %s" /etc/apt/sources.list' %
+       package['source_url'])
+    wget(
+        package['source_key'],
+        package['package_dir'])
     add_key('%s/%s' % (package['package_dir'], package['key_file']))
     apt_update()
     apt_download(
@@ -340,8 +417,10 @@ def get_nginx():
         package['package_dir'])
 
     lgr.debug("adding package repo to src repo...")
-    local('sudo sed -i "2i deb %s" /etc/apt/sources.list' % package['source_url'])
-    local('sudo sed -i "2i deb-src %s" /etc/apt/sources.list' % package['source_url'])
+    do('sudo sed -i "2i deb %s" /etc/apt/sources.list' %
+       package['source_url'])
+    do('sudo sed -i "2i deb-src %s" /etc/apt/sources.list' %
+       package['source_url'])
     wget(package['source_key'], package['package_dir'])
     add_key('%s/%s' % (package['package_dir'], package['key_file']))
     apt_update()

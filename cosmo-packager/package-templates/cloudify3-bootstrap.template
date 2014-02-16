@@ -107,7 +107,7 @@ REQ_CPU_CORES="{{ req_cpu_cores}}"
 REQ_ARCH="{{ req_arch }}"
 REQ_OS="{{ req_os }}"
 
-FREE_DISK=$(df -Ph . | awk 'NR==2 {print $4}' | grep -Eo [0-9]+)
+FREE_DISK=$(df -Ph . | awk 'NR==2 {print $4}' | grep -Eo [0-9]+ | awk 'NR==1 {print $1}')
 FREE_MEM=$(cat /proc/meminfo | grep MemFree | awk '{print $2}')
 CPU_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
 ARCH=$(uname -m)
@@ -177,13 +177,13 @@ fi
 ################################################ INSTALL CLOUDIFY
 
 
-echo -ne "checking whether workflow-jruby is installed..." | tee -a ${BOOTSTRAP_LOG}
-if ! dpkg -s workflow-jruby 2>&1 | grep Status: | grep installed; then
-        echo -e " workflow-jruby is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        sudo dpkg -i ${PKG_DIR}/workflow-jruby/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        check_pkg "workflow-jruby"
+echo -ne "checking whether workflow-gems is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s workflow-gems 2>&1 | grep Status: | grep installed; then
+        echo -e " workflow-gems is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        sudo dpkg -i ${PKG_DIR}/workflow-gems/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "workflow-gems"
 else
-        echo -e " workflow-jruby is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e " workflow-gems is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
 fi
 
 

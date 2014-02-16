@@ -289,6 +289,28 @@ else
 fi
 
 
+echo -ne "checking whether make is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s make 2>&1 | grep Status: | grep installed; then
+        echo -e " make is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING make" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/make/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "make"
+else
+        echo -e " make is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+fi
+
+
+echo -ne "checking whether ruby2.1 is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s ruby2.1 2>&1 | grep Status: | grep installed; then
+        echo -e " ruby2.1 is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # echo -e "\n\n\nINSTALLING ruby2.1" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo dpkg -i ${PKG_DIR}/ruby2.1/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "ruby2.1"
+else
+        echo -e " ruby2.1 is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+fi
+
+
 echo -ne "checking whether nodejs is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s nodejs 2>&1 | grep Status: | grep installed; then
         echo -e " nodejs is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}

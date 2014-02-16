@@ -22,10 +22,10 @@ from fabric.api import *  # NOQA
 from packager import *  # NOQA
 from get import *  # NOQA
 from pkg import *  # NOQA
+# import os
 
-import os
-run_env = os.environ['RUN_ENV']
-config = __import__(run_env)
+# run_env = os.environ['RUN_ENV']
+# config = __import__(run_env)
 
 #env.user = ''
 #env.password = ''
@@ -62,6 +62,8 @@ def get_cosmo_components():
     get_nginx()
     get_kibana()
     get_python_modules('virtualenv')
+    get_make()
+    get_ruby()
 
 
 @task
@@ -73,12 +75,7 @@ def get_cosmo():
 
     get_celery()
     get_cosmo_ui()
-    if not check_if_package_is_installed('openjdk-7-jdk'):
-        pkg_openjdk()
-        local('sudo dpkg -i %s/*.deb' % config.PACKAGES['openjdk-7-jdk']['bootstrap_dir'])
-    get_workflow_jruby()
-    if not check_if_package_is_installed('maven'):
-        apt_get(['maven'])
+    get_workflow_gems()
     get_manager()
 
 
@@ -98,6 +95,8 @@ def pkg_cosmo_components():
     pkg_nginx()
     pkg_kibana()
     pkg_virtualenv()
+    pkg_make()
+    pkg_ruby()
 
 
 @task
@@ -107,7 +106,7 @@ def pkg_cosmo():
     EXEC:   fab pkg_comso_base
     """
 
-    pkg_workflow_jruby()
+    pkg_workflow_gems()
     pkg_celery()
     pkg_cosmo_ui()
     pkg_manager()

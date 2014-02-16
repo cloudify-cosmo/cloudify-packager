@@ -74,5 +74,16 @@ BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
 BASE_DIR="/opt"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 
-echo "installing gems..."
-cd ${PKG_DIR} && sudo gem install *.gem --local
+
+echo "unpacking ${PKG_NAME}..."
+sudo mv ${PKG_DIR}/jruby-* ${BASE_DIR}
+echo "creating ${PKG_NAME} app link..."
+sudo ln -sf ${BASE_DIR}/jruby-*/ ${BASE_DIR}/jruby
+check_dir "${BASE_DIR}/jruby-*"
+
+echo "creating jruby binary link..."
+sudo ln -sf ${HOME_DIR}/bin/jruby /usr/bin/jruby
+# check_file ""
+
+# echo "creating gem binary link..."
+# sudo ln -s ${HOME_DIR}/bin/gem /usr/bin/gem
