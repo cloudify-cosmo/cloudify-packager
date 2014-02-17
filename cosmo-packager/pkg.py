@@ -17,14 +17,12 @@
 
 import logging
 import logging.config
-
 import config
 # run_env = os.environ['RUN_ENV']
 # config = __import__(run_env)
 
 from event_handler import send_event as se
 import uuid
-
 import sys
 from fabric.api import *  # NOQA
 from packager import *  # NOQA
@@ -427,6 +425,30 @@ def pkg_openjdk():
     """
 
     package = get_package_configuration('openjdk-7-jdk')
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
+def pkg_agent():
+    """
+    ACT:    packages agent
+    EXEC:   fab pkg_agent
+    """
+
+    package = get_package_configuration('agent')
+
+    rm('%s/archives/*.deb' % package['package_dir'])
+    create_bootstrap_script(
+        package, package['bootstrap_template'], package['bootstrap_script'])
+    pack(
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
 
     if not is_dir(package['bootstrap_dir']):
         mkdir(package['bootstrap_dir'])

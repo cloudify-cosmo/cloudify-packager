@@ -195,7 +195,10 @@ PACKAGES = {
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-openstack-provisioner/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
-                    'https://github.com/CloudifySource/cosmo-plugin-riemann-configurer/archive/develop.tar.gz'],
+                    'https://github.com/CloudifySource/cosmo-plugin-riemann-configurer/archive/develop.tar.gz',
+                    'https://github.com/CloudifySource/cosmo-plugin-kv-store/archive/develop.tar.gz',
+                    'https://github.com/CloudifySource/cosmo-celery-common/archive/develop.tar.gz'
+        ],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/celery-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -259,6 +262,18 @@ PACKAGES = {
         "dst_package_type": "deb",
         "bootstrap_script": "%s/cosmo-ui-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "cosmo-ui-bootstrap.template"
+    },
+    "agent": {
+        "name": "agent",
+        "version": "0.0.1",
+        "source_url": "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
+        "bootstrap_dir": "%s/agent/" % CODE_BOOTSTRAP_DIR,
+        "package_dir": "%s/agent" % PACKAGES_DIR,
+        "virtualenv": "%s/agent" % VIRTUALENVS_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "tar",
+        "bootstrap_script": "%s/agent-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "agent-bootstrap.template"
     }
 }
 # logger configuration

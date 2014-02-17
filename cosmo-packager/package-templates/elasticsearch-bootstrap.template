@@ -95,9 +95,9 @@ echo "moving some stuff around..."
 sudo cp ${PKG_INIT_DIR}/${PKG_NAME}.conf ${INIT_DIR}
 check_file "${INIT_DIR}/${PKG_NAME}.conf"
 
-sudo cp ${PKG_CONF_DIR}/* ${CONF_DIR}
-check_file "${CONF_DIR}/elasticsearch.yml"
-check_file "${CONF_DIR}/logging.yml"
+# sudo cp ${PKG_CONF_DIR}/* ${CONF_DIR}
+# check_file "${CONF_DIR}/elasticsearch.yml"
+# check_file "${CONF_DIR}/logging.yml"
 
 echo "starting ${PKG_NAME}..."
 sudo start elasticsearch
