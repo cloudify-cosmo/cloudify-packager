@@ -93,6 +93,17 @@ function check_service
     echo "service $1 is running" | tee -a ${BOOTSTRAP_LOG}
 }
 
+function check_and_install
+{
+    echo -ne "checking whether $1 is installed..." | tee -a ${BOOTSTRAP_LOG}
+    if ! dpkg -s $1 2>&1 | grep Status: | grep installed; then
+            echo -e " $1 is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+            sudo dpkg -i ${PKG_DIR}/$1/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+            check_pkg "$1"
+    else
+            echo -e " $1 is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+    fi
+}
 
 ################################################ DEFINE VARIABLES
 
@@ -175,16 +186,6 @@ fi
 
 
 ################################################ INSTALL CLOUDIFY
-
-
-echo -ne "checking whether workflow-gems is installed..." | tee -a ${BOOTSTRAP_LOG}
-if ! dpkg -s workflow-gems 2>&1 | grep Status: | grep installed; then
-        echo -e " workflow-gems is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        sudo dpkg -i ${PKG_DIR}/workflow-gems/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        check_pkg "workflow-gems"
-else
-        echo -e " workflow-gems is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
-fi
 
 
 echo -ne "checking whether celery and the management plugins are installed..." | tee -a ${BOOTSTRAP_LOG}

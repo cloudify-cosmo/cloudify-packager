@@ -211,10 +211,9 @@ def get_workflow_gems():
     make_package_dirs(
         package['bootstrap_dir'],
         package['package_dir'])
-    for req in package['reqs']:
-        apt_download(req, package['package_dir'])
-    do('sudo dpkg -i %s/archives/*.deb' %
-        config.PACKAGES['ruby']['package_dir'])
+    apt_get(package['reqs'])
+    # do('sudo dpkg -i %s/archives/*.deb' %
+        # config.PACKAGES['ruby']['package_dir'])
     do('sudo tar -C {0} -xzvf {0}/ruby.tar.gz'.format(
         config.PACKAGES['ruby']['package_dir']))
     do('cd {0}/ruby-2.1.0 && sudo ./configure --prefix=/usr/local'.format(

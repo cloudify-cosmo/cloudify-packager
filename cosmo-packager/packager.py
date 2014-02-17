@@ -197,8 +197,8 @@ def get_python_module(module, dir):
 
     lgr.debug('downloading module %s' % module)
     x = run_locally_with_retries(
-        '''sudo /usr/local/bin/pip install --no-install'
-        ' --no-use-wheel --process-dependency-links --download "%s/" %s''' %
+        'sudo /usr/local/bin/pip install --no-use-wheel \
+        --process-dependency-links --download "%s/" %s' %
         (dir, module))
     if x.succeeded:
         lgr.debug('successfully downloaded python module %s to %s' %

@@ -87,6 +87,10 @@ sudo mkdir -p /home/${PKG_NAME}
 echo "unpacking ${PKG_NAME}"
 sudo tar -C ${BASE_DIR}/ -xvf ${PKG_DIR}/${PKG_NAME}-*.tar.gz
 
+echo "creating ${PKG_NAME} app link..."
+sudo ln -sf ${BASE_DIR}/${PKG_NAME}-*/ ${HOME_DIR}
+# check_file symlink
+
 echo "moving some stuff around..."
 sudo cp ${PKG_INIT_DIR}/${PKG_NAME}.conf ${INIT_DIR}
 check_file "${INIT_DIR}/${PKG_NAME}.conf"
@@ -94,10 +98,6 @@ check_file "${INIT_DIR}/${PKG_NAME}.conf"
 sudo cp ${PKG_CONF_DIR}/* ${CONF_DIR}
 check_file "${CONF_DIR}/elasticsearch.yml"
 check_file "${CONF_DIR}/logging.yml"
-
-echo "creating ${PKG_NAME} app link..."
-sudo ln -sf ${BASE_DIR}/${PKG_NAME}-*/ ${HOME_DIR}
-# check_file symlink
 
 echo "starting ${PKG_NAME}..."
 sudo start elasticsearch

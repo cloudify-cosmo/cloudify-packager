@@ -67,30 +67,6 @@ def pkg_cloudify3():
 
 
 @task
-def pkg_graphite():
-    """
-    ACT:    packages graphite
-    EXEC:   fab pkg_graphite
-    """
-
-    package = get_package_configuration('graphite')
-
-    rm('%s/archives/*.deb' % package['package_dir'])
-    # create_bootstrap_script(
-        # package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
-
-
-@task
 def pkg_cloudify3_components():
     """
     ACT:    packages cloudify3-components
@@ -115,6 +91,30 @@ def pkg_cloudify3_components():
         mkdir(package['bootstrap_dir'])
     lgr.debug("isolating debs...")
     cp('%s/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
+def pkg_graphite():
+    """
+    ACT:    packages graphite
+    EXEC:   fab pkg_graphite
+    """
+
+    package = get_package_configuration('graphite')
+
+    rm('%s/archives/*.deb' % package['package_dir'])
+    # create_bootstrap_script(
+        # package, package['bootstrap_template'], package['bootstrap_script'])
+    pack(
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'], package['bootstrap_script'])
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
 
 
 @task
