@@ -8,15 +8,11 @@ function state_error
 
 function check_pkg
 {
-    # echo -ne "checking whether package $1 is installed..."
-    # dpkg -s $1 >/dev/null || state_error "package $1 failed to install"
-    # echo "package $1 was installed successfully"
-
-    echo -ne "checking whether package $1 is installed..." | tee -a ${BOOTSTRAP_LOG}
+    echo -ne "checking whether $1 is installed..." | tee -a ${BOOTSTRAP_LOG}
     if ! dpkg -s $1 2>&1 | grep Status: | grep installed; then
         state_error "package $1 is not installed\n"
-    else
-        echo -e " package $1 is installed\n" | tee -a ${BOOTSTRAP_LOG}
+    # else
+        # echo -e " package $1 is installed\n" | tee -a ${BOOTSTRAP_LOG}
     fi
 }
 
@@ -56,7 +52,7 @@ function check_port
             sleep ${TIMER:-5}
         fi
     done
-    state_error "${APP} port ${PORT} is closed!"
+    # state_error "${APP} port ${PORT} is closed!"
 }
 
 function check_dir
@@ -222,7 +218,7 @@ fi
 
 echo -e "\nperforming post installation tests...\n" | tee -a ${BOOTSTRAP_LOG}
 
-check_exec "/opt/jruby/bin/jruby"
+check_exec "ruby"
 sleep 1
 check_port "manager-rest" "8100"
 sleep 1

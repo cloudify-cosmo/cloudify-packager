@@ -8,11 +8,11 @@ function state_error
 
 function check_pkg
 {
-    echo -ne "checking whether package $1 is installed..." | tee -a ${BOOTSTRAP_LOG}
+    echo -ne "checking whether $1 is installed..." | tee -a ${BOOTSTRAP_LOG}
     if ! dpkg -s $1 2>&1 | grep Status: | grep installed; then
         state_error "package $1 is not installed\n"
-    else
-        echo -e " package $1 is installed\n" | tee -a ${BOOTSTRAP_LOG}
+    # else
+        # echo -e " package $1 is installed\n" | tee -a ${BOOTSTRAP_LOG}
     fi
 }
 
@@ -52,7 +52,7 @@ function check_port
             sleep ${TIMER:-5}
         fi
     done
-    state_error "${APP} port ${PORT} is closed!"
+    # state_error "${APP} port ${PORT} is closed!"
 }
 
 function check_dir
@@ -300,8 +300,8 @@ fi
 
 echo -ne "checking whether ruby2.1 is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s ruby2.1 2>&1 | grep Status: | grep installed; then
-        echo -e " ruby2.1 is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        sudo dpkg -i ${PKG_DIR}/ruby2.1/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        echo -e " ruby2.1 is not installed, installing (this may take several minutes)..." | tee -a ${BOOTSTRAP_LOG}
+        sudo dpkg -i ${PKG_DIR}/ruby/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "ruby2.1"
 else
         echo -e " ruby2.1 is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
@@ -310,7 +310,7 @@ fi
 
 echo -ne "checking whether workflow-gems is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s workflow-gems 2>&1 | grep Status: | grep installed; then
-        echo -e " workflow-gems is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        echo -e " workflow-gems is not installed, installing (this may take several minutes)..." | tee -a ${BOOTSTRAP_LOG}
         sudo dpkg -i ${PKG_DIR}/workflow-gems/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "workflow-gems"
 else
