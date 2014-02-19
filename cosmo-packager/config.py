@@ -175,7 +175,7 @@ PACKAGES = {
         "name": "manager",
         "version": "0.0.1",
         "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
-        "depends": ['openjdk-7-jdk'],
+        "depends": ['ruby2.1'],
         "bootstrap_dir": "%s/manager/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/manager" % VIRTUALENVS_DIR,
         "virtualenv": "%s/manager" % VIRTUALENVS_DIR,
@@ -202,18 +202,6 @@ PACKAGES = {
         "dst_package_type": "deb",
         "bootstrap_script": "%s/celery-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "celery-bootstrap.template"
-    },
-    "rvm": {
-        "name": "rvm",
-        "version": "1.25.18",
-        "source_url": "https://github.com/wayneeseguin/rvm/tarball/stable",
-        "bootstrap_dir": "%s/rvm/" % COMPONENTS_BOOTSTRAP_DIR,
-        "package_dir": "%s/rvm" % PACKAGES_DIR,
-        "src_package_type": "dir",
-        "dst_package_type": "deb",
-        "prereqs" : ['curl'],
-        "bootstrap_script": "%s/rvm-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_template": "rvm-bootstrap.template",
     },
     "make": {
         "name": "make",

@@ -10,17 +10,17 @@ function check_pkg
 {
     echo -ne "checking whether $1 is installed..." | tee -a ${BOOTSTRAP_LOG}
     if ! dpkg -s $1 2>&1 | grep Status: | grep installed; then
-        state_error "package $1 is not installed\n"
-    # else
-        # echo -e " package $1 is installed\n" | tee -a ${BOOTSTRAP_LOG}
+        state_error "package $1 is not installed \n"
+    else
+        echo -e " package $1 is installed\n" >> ${BOOTSTRAP_LOG}
     fi
 }
 
 function check_exec
 {
-    echo -ne "checking whether $1 is executable..." | tee -a ${BOOTSTRAP_LOG}
+    echo -ne "checking whether $1 is executable..." >> ${BOOTSTRAP_LOG}
     if which $1 >/dev/null; then
-        echo "$1 is executable..." | tee -a ${BOOTSTRAP_LOG}
+        echo "$1 is executable..." >> ${BOOTSTRAP_LOG}
     else
         state_error "$1 is not executable, might not be installed...." 
     fi
@@ -30,7 +30,7 @@ function check_user
 {
     echo -ne "checking whether user $1 exists..." | tee -a ${BOOTSTRAP_LOG}
     id -u $1 >/dev/null || state_error "user $1 doesn't exists"
-    echo "user $1 exists" | tee -a ${BOOTSTRAP_LOG}
+    echo "user $1 exists" >> ${BOOTSTRAP_LOG}
 }
 
 function check_port
@@ -42,51 +42,17 @@ function check_port
 
     for i in {1..5}
     do 
-        echo -ne "checking whether ${APP} port ${PORT} is opened on ${HOST:-localhost}..." | tee -a ${BOOTSTRAP_LOG}
+        echo -ne "checking whether ${APP} port ${PORT} is opened on ${HOST:-localhost}..." >> ${BOOTSTRAP_LOG}
         nc -z ${HOST:-localhost} ${PORT} >/dev/null
         if [ $? -eq 0 ]; then
-            echo "${APP} port ${PORT} is opened" | tee -a ${BOOTSTRAP_LOG}
+            echo "${APP} port ${PORT} is opened" >> ${BOOTSTRAP_LOG}
             return
         else
-            echo "WARNING: ${APP} port ${PORT} is closed, retrying in ${TIMER:-5} seconds ($i)" | tee -a ${BOOTSTRAP_LOG}
+            echo "WARNING: ${APP} port ${PORT} is closed, retrying in ${TIMER:-5} seconds ($i)" >> ${BOOTSTRAP_LOG}
             sleep ${TIMER:-5}
         fi
     done
-    # state_error "${APP} port ${PORT} is closed!"
-}
-
-function check_dir
-{
-    echo -ne "checking whether dir $1 exists..." | tee -a ${BOOTSTRAP_LOG}
-    if [ -d $1 ]; then
-        echo "dir $1 exists" | tee -a ${BOOTSTRAP_LOG}
-    else
-        state_error "dir $1 doesn't exist"
-    fi
-}
-
-function check_file
-{
-    echo -ne "checking whether file $1 exists..." | tee -a ${BOOTSTRAP_LOG}
-    if [ -f $1 ]; then
-        echo "file $1 exists" | tee -a ${BOOTSTRAP_LOG}
-    else
-        state_error "file $1 doesn't exists"
-    fi
-}
-
-function check_upstart
-{
-    echo -ne "checking whether $1 daemon is running..." | tee -a ${BOOTSTRAP_LOG}
-    sudo status $1 >/dev/null || state_error "daemon $1 is not running"
-    echo "daemon $1 is running" | tee -a ${BOOTSTRAP_LOG}
-}
-
-function check_service
-{
-    echo -ne "checking whether $1 service is running..." | tee -a ${BOOTSTRAP_LOG}
-    sudo service $1 status >/dev/null || state_error "service $1 is not running"
-    echo "service $1 is running" | tee -a ${BOOTSTRAP_LOG}
+    state_error "${APP} port ${PORT} is closed!"
 }
 
 function check_and_install
@@ -108,122 +74,45 @@ PKG_DIR="{{ package_dir }}"
 BOOTSTRAP_LOG="{{ bootstrap_log }}"
 VERSION="{{ version }}"
 
-REQ_FREE_DISK="{{ req_free_disk }}"
-REQ_FREE_MEM="{{ req_free_mem }}"
-REQ_CPU_CORES="{{ req_cpu_cores}}"
-REQ_ARCH="{{ req_arch }}"
-REQ_OS="{{ req_os }}"
-
-FREE_DISK=$(df -Ph . | awk 'NR==2 {print $4}' | grep -Eo [0-9]+ | awk 'NR==1 {print $1}')
-FREE_MEM=$(cat /proc/meminfo | grep MemFree | awk '{print $2}')
-CPU_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
-ARCH=$(uname -m)
-OS=$(cat /etc/lsb-release | grep CODENAME | awk -F'=' '{print $2}')
-
-COMPAT=true
-
-################################################ CHECK PREREQS
-
-echo -e "\nInstalling ${PKG_NAME} version ${VERSION}..." | tee -a ${BOOTSTRAP_LOG}
-echo -e "(you may tail ${BOOTSTRAP_LOG} for the full installation log)\n" | tee -a ${BOOTSTRAP_LOG}
-
-echo -e "Checking whether the system meets the minimum installation requirements...\n" | tee -a ${BOOTSTRAP_LOG}
-
-echo "required disk space: ${REQ_FREE_DISK}G" | tee -a ${BOOTSTRAP_LOG}
-echo -ne "Checking disk space..." | tee -a ${BOOTSTRAP_LOG}
-if [ "${FREE_DISK}" -ge "${REQ_FREE_DISK}" ]; then
-    echo "OK: ${FREE_DISK}G" | tee -a ${BOOTSTRAP_LOG}
-else
-    echo -e "\e[31mThere is insufficient disk space: ${FREE_DISK}G. You need at least ${REQ_FREE_DISK}G for Cloudify to run smoothly.\e[39m" | tee -a ${BOOTSTRAP_LOG}
-    COMPAT=false
-fi
-
-echo "required free memory: ${REQ_FREE_MEM}kB" | tee -a ${BOOTSTRAP_LOG}
-echo -ne "Checking free memory..." | tee -a ${BOOTSTRAP_LOG}
-if [ "${FREE_MEM}" -ge "${REQ_FREE_MEM}" ]; then
-    echo "OK: ${FREE_MEM}kB" | tee -a ${BOOTSTRAP_LOG}
-else
-    echo -e "\e[31mThere is insufficient memory: ${FREE_MEM}kB. You need at least ${REQ_FREE_MEM}kB for Cloudify to run smoothly.\e[39m" | tee -a ${BOOTSTRAP_LOG}
-    COMPAT=false
-fi
-
-echo "required cpu cores: ${REQ_CPU_CORES}" | tee -a ${BOOTSTRAP_LOG}
-echo -ne "Checking cpu Cores..." | tee -a ${BOOTSTRAP_LOG}
-if [ "${CPU_CORES}" -ge "${REQ_CPU_CORES}" ]; then
-    echo "OK: ${CPU_CORES}" | tee -a ${BOOTSTRAP_LOG}
-else
-    echo -e "\e[31mThere are insufficient CPU Cores available: ${CPU_CORES}. You need at least ${REQ_CPU_CORES} for Cloudify to run smoothly.\e[39m" | tee -a ${BOOTSTRAP_LOG}
-    COMPAT=false
-fi
-
-echo "required architecture: ${REQ_ARCH}" | tee -a ${BOOTSTRAP_LOG}
-echo -ne "Checking architecture..." | tee -a ${BOOTSTRAP_LOG}
-if [ "${ARCH}" == "${REQ_ARCH}" ]; then
-    echo "OK: ${ARCH}" | tee -a ${BOOTSTRAP_LOG}
-else
-    echo -e "\e[31mIncompatible Architecture: ${ARCH}. You need ${REQ_ARCH} for Cloudify to run.\e[39m" | tee -a ${BOOTSTRAP_LOG}
-    COMPAT=false
-fi
-
-echo -e "required os flavor: ubuntu ${REQ_OS}" | tee -a ${BOOTSTRAP_LOG}
-echo -ne "Checking os flavor..." | tee -a ${BOOTSTRAP_LOG}
-if [ "${OS}" == "${REQ_OS}" ]; then
-    echo "OK: ${OS}" | tee -a ${BOOTSTRAP_LOG}
-else
-    echo -e "\e[31mIncompatible OS flavor: ${OS}. You need ${REQ_OS} for Cloudify to run.\e[39m" | tee -a ${BOOTSTRAP_LOG}
-    COMPAT=false
-fi
-
-if ${COMPAT}; then
-    echo -e "\nThe system meets the requirements necessary for Cloudify's installation\n" | tee -a ${BOOTSTRAP_LOG}
-else
-    state_error "The system doesn't meet the requirements necessary for Cloudify's installation."
-fi
-
-
 ################################################ INSTALL CLOUDIFY
 
+echo -e "\nInstalling ${PKG_NAME} version ${VERSION}...\n" | tee -a ${BOOTSTRAP_LOG}
 
 echo -ne "checking whether celery and the management plugins are installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
-        echo -e " celery is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        echo -e "celery is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
         sudo dpkg -i ${PKG_DIR}/celery/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "celery"
 else
-        echo -e " celery is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "celery is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
 fi
-
 
 echo -ne "checking whether manager is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s manager 2>&1 | grep Status: | grep installed; then
-        echo -e " manager is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        echo -e "manager is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
         sudo dpkg -i ${PKG_DIR}/manager/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "manager"
 else
-        echo -e " manager is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "manager is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
 fi
-
 
 echo -ne "checking whether cosmo-ui is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s cosmo-ui 2>&1 | grep Status: | grep installed; then
-        echo -e " cosmo-ui is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        echo -e "cosmo-ui is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
         sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "cosmo-ui"
 else
-        echo -e " cosmo-ui is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "cosmo-ui is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
 fi
 
+################################################ PORT INSTALLATION TESTS
 
-################################################ PORT VERIFICATION
-
-echo -e "\nperforming post installation tests...\n" | tee -a ${BOOTSTRAP_LOG}
-
-check_exec "ruby"
-sleep 1
+echo -e "\nperforming post installation tests..." | tee -a ${BOOTSTRAP_LOG}
 check_port "manager-rest" "8100"
 sleep 1
-check_port "workflow-service" "8101" "15"
+check_port "workflow-service" "8101"
 sleep 1
 check_port "UI" "9001"
+echo  -e "post installation tests completed successfully.\n"
 
-echo -e "\n${PKG_NAME} ${VERSION} installation completed successfully!\n\n" | tee -a ${BOOTSTRAP_LOG}
+echo -e "${PKG_NAME} ${VERSION} installation completed successfully!\n" | tee -a ${BOOTSTRAP_LOG}
