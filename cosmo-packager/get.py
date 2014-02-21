@@ -122,31 +122,6 @@ def get_manager():
     CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
     cp(CONF_DIR, package['package_dir'])
 
-    # x = check_if_package_is_installed('openjdk-7-jdk')
-    # if not x:
-        # lgr.debug('prereq package is not installed. terminating...')
-        # sys.exit()
-    # mvn('%s/cosmo-manager-develop/orchestrator/pom.xml' %
-        # package['package_dir'])
-
-
-@task
-def get_rvm():
-    """
-    ACT:    retrives rvm
-    EXEC:   fab get_rvm
-    """
-
-    package = get_package_configuration('rvm')
-
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-    apt_get(package['prereqs'])
-    do('sudo curl -sSL %s -o %s/rvm-stable.tar.gz' % (package['source_url'],
-                                                      package['package_dir']))
-
 
 @task
 def get_make():
@@ -161,9 +136,38 @@ def get_make():
     make_package_dirs(
         package['bootstrap_dir'],
         package['package_dir'])
+    apt_purge(package['name'])
     apt_download(
         package['name'],
         package['package_dir'])
+    apt_get([package['name']])
+
+
+@task
+def get_gcc():
+    """
+    ACT:    retrives gcc
+    EXEC:   fab get_gcc
+    """
+
+    package = get_package_configuration('gcc')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    if package['reqs']:
+        for req in package['reqs']:
+            apt_purge(req)
+            apt_autoremove(req)
+            apt_download(req, package['package_dir'])
+    apt_download(
+        package['name'],
+        package['package_dir'])
+    if package['reqs']:
+            apt_get(package['reqs'])
+    apt_get(['dpkg-dev'])
+    dpkg_name('%s/archives' % package['package_dir'])
 
 
 @task
@@ -179,21 +183,29 @@ def get_ruby():
     make_package_dirs(
         package['bootstrap_dir'],
         package['package_dir'])
+    # wget(
+        # package['source_url'],
+        # file='%s/ruby.tar.gz' % package['package_dir'])
+    do('sudo /opt/ruby-build/bin/ruby-build -v %s %s' %
+        (package['version'], package['package_dir']))
+
+
+@task
+def get_zlib():
+    """
+    ACT:    retrives zlib
+    EXEC:   fab get_zlib
+    """
+
+    package = get_package_configuration('zlib')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
     wget(
         package['source_url'],
-        file='%s/ruby.tar.gz' % package['package_dir'])
-
-    # mkdir(package['rvm_inst_dir'])
-    # do('sudo tar -C %s --strip-components=1'
-       # ' -xzf %s/rvm-stable.tar.gz' % (package['rvm_inst_dir'],
-                                     # config.PACKAGES['rvm']['package_dir']))
-    # do('cd %s && sudo ./install --auto-dotfiles' %
-        # package['rvm_inst_dir'])
-    # do('source /etc/profile.d/rvm.sh')
-    # do('sudo dpkg-name %s/archives/*.deb' % package['package_dir'])
-    # do('sudo dpkg -i %s/archives/*.deb' % package['package_dir'])
-    # do('rvm install 2.1.0')
-    # cp('$rvm_path/archives/*', package['package_dir'])
+        file='%s/zlib.tar.gz' % package['package_dir'])
 
 
 @task
@@ -212,14 +224,14 @@ def get_workflow_gems():
     apt_get(package['reqs'])
     # do('sudo dpkg -i %s/archives/*.deb' %
         # config.PACKAGES['ruby']['package_dir'])
-    do('sudo tar -C {0} -xzvf {0}/ruby.tar.gz'.format(
-        config.PACKAGES['ruby']['package_dir']))
-    do('cd {0}/ruby-2.1.0 && sudo ./configure --prefix=/usr/local'.format(
-        config.PACKAGES['ruby']['package_dir']))
-    do('cd {0}/ruby-2.1.0 && sudo make'.format(
-        config.PACKAGES['ruby']['package_dir']))
-    do('cd {0}/ruby-2.1.0 && sudo make install'.format(
-        config.PACKAGES['ruby']['package_dir']))
+    # do('sudo tar -C {0} -xzvf {0}/ruby.tar.gz'.format(
+        # config.PACKAGES['ruby']['package_dir']))
+    # do('cd {0}/ruby-2.1.0 && sudo ./configure --prefix=/usr/local'.format(
+        # config.PACKAGES['ruby']['package_dir']))
+    # do('cd {0}/ruby-2.1.0 && sudo make'.format(
+        # config.PACKAGES['ruby']['package_dir']))
+    # do('cd {0}/ruby-2.1.0 && sudo make install'.format(
+        # config.PACKAGES['ruby']['package_dir']))
 
     wget(
         package['gemfile_source_url'],
@@ -228,10 +240,10 @@ def get_workflow_gems():
         package['package_dir'],
         '%s/%s' % (package['package_dir'], '*.tar.gz'))
     rm('%s/%s' % (package['package_dir'], '*.tar.gz'))
-    do('sudo gem install bundler')
-    do('sudo bundle --gemfile %s' % package['gemfile_location'])
+    do('sudo /opt/ruby/bin/gem install bundler')
+    do('sudo /opt/ruby/bin/bundle --gemfile %s' % package['gemfile_location'])
     rmdir(package['gemfile_base_dir'])
-    cp('/usr/local/lib/ruby/gems/2.1.0/cache/*.gem', package['package_dir'])
+    cp('/opt/ruby/lib/ruby/gems/2.1.0/cache/*.gem', package['package_dir'])
 
 
 @task

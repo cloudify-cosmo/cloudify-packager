@@ -55,6 +55,40 @@ function check_port
     state_error "${APP} port ${PORT} is closed!"
 }
 
+function check_dir
+{
+    echo -ne "checking whether dir $1 exists..." >> ${BOOTSTRAP_LOG}
+    if [ -d $1 ]; then
+        echo "dir $1 exists" >> ${BOOTSTRAP_LOG}
+    else
+        state_error "dir $1 doesn't exist"
+    fi
+}
+
+function check_file
+{
+    echo -ne "checking whether file $1 exists..." >> ${BOOTSTRAP_LOG}
+    if [ -f $1 ]; then
+        echo "file $1 exists" >> ${BOOTSTRAP_LOG}
+    else
+        state_error "file $1 doesn't exists"
+    fi
+}
+
+function check_upstart
+{
+    echo -ne "checking whether $1 daemon is running..." >> ${BOOTSTRAP_LOG}
+    sudo status $1 >/dev/null || state_error "daemon $1 is not running"
+    echo "daemon $1 is running" >> ${BOOTSTRAP_LOG}
+}
+
+function check_service
+{
+    echo -ne "checking whether $1 service is running..." >> ${BOOTSTRAP_LOG}
+    sudo service $1 status >/dev/null || state_error "service $1 is not running"
+    echo "service $1 is running" >> ${BOOTSTRAP_LOG}
+}
+
 function check_and_install
 {
     echo -ne "checking whether $1 is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -84,7 +118,7 @@ if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/celery/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "celery"
 else
-        echo -e "celery is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "celery is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether manager is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -93,7 +127,7 @@ if ! dpkg -s manager 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/manager/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "manager"
 else
-        echo -e "manager is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "manager is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether cosmo-ui is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -102,7 +136,7 @@ if ! dpkg -s cosmo-ui 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "cosmo-ui"
 else
-        echo -e "cosmo-ui is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "cosmo-ui is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 ################################################ PORT INSTALLATION TESTS

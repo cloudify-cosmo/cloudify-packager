@@ -37,7 +37,8 @@ except ValueError:
     sys.exit('could not initiate logger. try sudo...')
 
 
-def run_locally_with_retries(command, retries=3, sleeper=3, capture=False):
+def run_locally_with_retries(command, sudo=False, retries=5,
+                             sleeper=3, capture=False):
     """
     runs a fab local() with retries
     """
@@ -45,7 +46,10 @@ def run_locally_with_retries(command, retries=3, sleeper=3, capture=False):
     for execution in range(retries):
         lgr.debug('running command: %s' % command)
         try:
-            r = local(command, capture)
+            if sudo:
+                r = local('sudo %s' % command, capture)
+            else:
+                r = local(command, capture)
             lgr.debug('ran command: %s' % command)
             return r
         except:
@@ -54,10 +58,10 @@ def run_locally_with_retries(command, retries=3, sleeper=3, capture=False):
             sleep(sleeper)
     lgr.error('failed to run command: %s even after %s retries' %
               (command, execution))
-    return r
+    sys.exit()
 
 
-def do(command):
+def do(command, sudo=False):
     """
     runs a command
     """
@@ -332,12 +336,29 @@ def cp(src, dst, recurse=True):
         lgr.error('unsuccessfully copied %s to %s' % (src, dst))
 
 
+def dpkg_name(dir):
+    """
+    renames deb files to converntional names
+    """
+
+    lgr.debug('renaming deb files...')
+    run_locally_with_retries('dpkg-name %s/*.deb' % dir)
+
+
+def apt_autoremove(pkg):
+    """
+    autoremoves package dependencies
+    """
+
+    lgr.debug('removing unnecessary dependencies...')
+    run_locally_with_retries('sudo apt-get -y autoremove %s' % pkg)
+
+
 def apt_download(pkg, dir):
     """
     uses apt to download package debs from ubuntu's repo
     """
 
-    apt_purge(pkg)
     lgr.debug('downloading %s to %s' % (pkg, dir))
     x = run_locally_with_retries(
         'sudo apt-get -y install %s -d -o=dir::cache=%s' % (pkg, dir))

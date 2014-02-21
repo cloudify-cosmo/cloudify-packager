@@ -18,8 +18,9 @@ The packager uses the following 3rd party components:
 - fpm -*main packaging framework*
 - fabric -*...*
 - pip >1.5 -*to download python modules*
+- virtualenv -*to create python virtual environments for Cloudify's code*
 - jinja2 -*to create scripts and configuration files from templates*
-- pika -*to send events to rabbitmq if it's installed on the packaging server*
+- pika -*to send events to rabbitmq if it's installed on the packaging server (for testing purposes)*
 a bootstrap script is provided to install the above packages.
 
 NOTE: the below packages are installed DURING The get/pkg process due to an post installation process with openjdk. will be resolved soon.

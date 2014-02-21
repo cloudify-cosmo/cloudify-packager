@@ -36,7 +36,9 @@ PACKAGES = {
     "cloudify3": {
         "name": "cloudify3",
         "version": "3.0.0",
-        "depends": ['cloudify3-components'],
+        "depends": [
+            'cloudify3-components'
+        ],
         "bootstrap_dir": "/cloudify",
         "package_dir": "%s" % CODE_BOOTSTRAP_DIR,
         "conf_dir": "%s" % PACKAGER_CONF_DIR,
@@ -72,7 +74,9 @@ PACKAGES = {
         "name": "logstash",
         "version": "1.3.2",
         "source_url": "https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar",
-        "depends": ['openjdk-7-jdk'],
+        "depends": [
+            'openjdk-7-jdk'
+        ],
         "bootstrap_dir": "%s/logstash/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/logstash" % PACKAGES_DIR,
         "src_package_type": "dir",
@@ -84,7 +88,9 @@ PACKAGES = {
         "name": "elasticsearch",
         "version": "0.90.9",
         "source_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.9.tar.gz",
-        "depends": ['openjdk-7-jdk'],
+        "depends": [
+            'openjdk-7-jdk'
+        ],
         "bootstrap_dir": "%s/elasticsearch/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/elasticsearch" % PACKAGES_DIR,
         "src_package_type": "dir",
@@ -96,7 +102,11 @@ PACKAGES = {
         "name": "kibana3",
         "version": "3.0.0milestone4",
         "source_url": "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
-        "depends": ['openjdk-7-jdk', 'logstash', 'elasticsearch'],
+        "depends": [
+            'openjdk-7-jdk',
+            'logstash',
+            'elasticsearch'
+        ],
         "bootstrap_dir": "%s/kibana3/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/kibana3" % PACKAGES_DIR,
         "src_package_type": "dir",
@@ -127,7 +137,9 @@ PACKAGES = {
         "name": "riemann",
         "version": "0.2.2",
         "source_url": "http://aphyr.com/riemann/riemann_0.2.2_all.deb",
-        "depends": ['openjdk-7-jdk'],
+        "depends": [
+            'openjdk-7-jdk'
+        ],
         "bootstrap_dir": "%s/riemann/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/riemann" % PACKAGES_DIR
     },
@@ -175,7 +187,9 @@ PACKAGES = {
         "name": "manager",
         "version": "0.0.1",
         "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
-        "depends": ['ruby2.1'],
+        "depends": [
+            'ruby2.1'
+        ],
         "bootstrap_dir": "%s/manager/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/manager" % VIRTUALENVS_DIR,
         "virtualenv": "%s/manager" % VIRTUALENVS_DIR,
@@ -203,29 +217,78 @@ PACKAGES = {
         "bootstrap_script": "%s/celery-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "celery-bootstrap.template"
     },
+    "gcc": {
+        "name": "gcc",
+        "version": "0.0.1",
+        "reqs": [
+            "libc6",
+            "libc-bin",
+            "zlib1g-dev",
+            "libmpc2",
+            "libgomp1",
+            "binutils",
+            "cpp",
+            "gcc-4.6",
+            "gcc-multilib",
+            "make",
+            "manpages-dev",
+            "autoconf",
+            "automake1.9",
+            "libtool",
+            "flex",
+            "bison",
+            "gdb",
+            "gcc-doc",
+            "libc6-dev",
+            "libc-dev",
+            "gcc"
+        ],
+        "bootstrap_dir": "%s/gcc/" % COMPONENTS_BOOTSTRAP_DIR,
+        "package_dir": "%s/gcc" % PACKAGES_DIR
+    },
     "make": {
         "name": "make",
         "version": "0.0.1",
         "bootstrap_dir": "%s/make/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/make" % PACKAGES_DIR
     },
+    "zlib": {
+        "name": "zlib",
+        "version": "1.2.8",
+        "depends": [
+            'make',
+            'gcc'
+        ],
+        "source_url": "http://zlib.net/zlib-1.2.8.tar.gz",
+        "version": "0.0.1",
+        "bootstrap_dir": "%s/zlib/" % COMPONENTS_BOOTSTRAP_DIR,
+        "package_dir": "%s/zlib" % PACKAGES_DIR,
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "%s/zlib-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "zlib-bootstrap.template"        
+    },
     "ruby": {
         "name": "ruby2.1",
-        "version": "2.1.0p0",
-        "depends": ['make'],
+        "version": "2.1.0",
+        "depends": [
+            'make'
+        ],
         "source_url": "http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.0.tar.gz",
         "bootstrap_dir": "%s/ruby/" % COMPONENTS_BOOTSTRAP_DIR,
-        "package_dir": "%s/ruby" % PACKAGES_DIR,
-        "rvm_inst_dir": "%s/ruby/rvm" % PACKAGES_DIR,
+        "package_dir": "%s/ruby" % VIRTUALENVS_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/ruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "ruby-bootstrap.template",
+        "ruby_build_dir": "/opt/ruby-build"
     },
     "workflow-gems": {
         "name": "workflow-gems",
         "version": "0.0.1",
-        "depends": ['ruby2.1'],
+        "depends": [
+            'ruby2.1'
+        ],
         "gemfile_source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
         "gemfile_location": "%s/workflow-gems/cosmo-manager-develop/workflow-service/Gemfile" % PACKAGES_DIR,
         "gemfile_base_dir": "%s/workflow-gems/cosmo-manager-develop" % PACKAGES_DIR,
@@ -241,7 +304,9 @@ PACKAGES = {
         "name": "cosmo-ui",
         "version": "1.0.0",
         "source_url": "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
-        "depends": ['nodejs'],
+        "depends": [
+            'nodejs'
+        ],
         "bootstrap_dir": "%s/cosmo-ui/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/cosmo-ui" % PACKAGES_DIR,
         "virtualenv": "%s/cosmo-ui" % VIRTUALENVS_DIR,

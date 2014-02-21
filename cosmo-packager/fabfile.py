@@ -63,6 +63,8 @@ def get_cosmo_components():
     get_kibana()
     get_python_modules('virtualenv')
     get_make()
+    # get_gcc()
+    # get_zlib()
     get_ruby()
 
 
@@ -73,10 +75,11 @@ def get_cosmo():
     EXEC:   fab get_cosmo_base
     """
 
+    do('sudo apt-get install -y python-dev')
     get_celery()
-    # get_cosmo_ui()
-    # get_workflow_gems()
     get_manager()
+    get_workflow_gems()
+    # get_cosmo_ui()
 
 
 @task
@@ -96,6 +99,8 @@ def pkg_cosmo_components():
     pkg_kibana()
     pkg_virtualenv()
     pkg_make()
+    # pkg_gcc()
+    # pkg_zlib()
     pkg_ruby()
 
 
@@ -108,8 +113,8 @@ def pkg_cosmo():
 
     pkg_workflow_gems()
     pkg_celery()
-    pkg_cosmo_ui()
     pkg_manager()
+    # pkg_cosmo_ui()
 
 
 @task

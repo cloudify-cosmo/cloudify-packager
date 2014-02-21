@@ -203,6 +203,21 @@ def pkg_make():
 
 
 @task
+def pkg_gcc():
+    """
+    ACT:    packages gcc
+    EXEC:   fab pkg_gcc
+    """
+
+    package = get_package_configuration('gcc')
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
 def pkg_ruby():
     """
     ACT:    packages ruby
@@ -210,6 +225,29 @@ def pkg_ruby():
     """
 
     package = get_package_configuration('ruby')
+
+    # create_bootstrap_script(
+        # package, package['bootstrap_template'], package['bootstrap_script'])
+    pack(
+        package['src_package_type'], package['dst_package_type'],
+        package['name'],
+        package['package_dir'], '%s/archives/' % package['package_dir'],
+        package['version'])
+
+    if not is_dir(package['bootstrap_dir']):
+        mkdir(package['bootstrap_dir'])
+    lgr.debug("isolating debs...")
+    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+
+
+@task
+def pkg_zlib():
+    """
+    ACT:    packages zlib
+    EXEC:   fab pkg_zlib
+    """
+
+    package = get_package_configuration('zlib')
 
     create_bootstrap_script(
         package, package['bootstrap_template'], package['bootstrap_script'])

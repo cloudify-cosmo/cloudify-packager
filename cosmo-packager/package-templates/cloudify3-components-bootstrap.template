@@ -55,6 +55,40 @@ function check_port
     state_error "${APP} port ${PORT} is closed!"
 }
 
+function check_dir
+{
+    echo -ne "checking whether dir $1 exists..." >> ${BOOTSTRAP_LOG}
+    if [ -d $1 ]; then
+        echo "dir $1 exists" >> ${BOOTSTRAP_LOG}
+    else
+        state_error "dir $1 doesn't exist"
+    fi
+}
+
+function check_file
+{
+    echo -ne "checking whether file $1 exists..." >> ${BOOTSTRAP_LOG}
+    if [ -f $1 ]; then
+        echo "file $1 exists" >> ${BOOTSTRAP_LOG}
+    else
+        state_error "file $1 doesn't exists"
+    fi
+}
+
+function check_upstart
+{
+    echo -ne "checking whether $1 daemon is running..." >> ${BOOTSTRAP_LOG}
+    sudo status $1 >/dev/null || state_error "daemon $1 is not running"
+    echo "daemon $1 is running" >> ${BOOTSTRAP_LOG}
+}
+
+function check_service
+{
+    echo -ne "checking whether $1 service is running..." >> ${BOOTSTRAP_LOG}
+    sudo service $1 status >/dev/null || state_error "service $1 is not running"
+    echo "service $1 is running" >> ${BOOTSTRAP_LOG}
+}
+
 function check_and_install
 {
     echo -ne "checking whether $1 is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -155,7 +189,7 @@ if ! dpkg -s openjdk-7-jdk 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/openjdk-7-jdk/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "openjdk-7-jdk"
 else
-        echo -e "openjdk-7-jdk is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "openjdk-7-jdk is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether logstash is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -164,7 +198,7 @@ if ! dpkg -s logstash 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/logstash/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "logstash"
 else
-        echo -e "logstash is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "logstash is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether elasticsearch is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -173,7 +207,7 @@ if ! dpkg -s elasticsearch 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/elasticsearch/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "elasticsearch"
 else
-        echo -e "elasticsearch is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "elasticsearch is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether kibana3 is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -182,7 +216,7 @@ if ! dpkg -s kibana3 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/kibana3/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "kibana3"
 else
-        echo -e "kibana3 is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "kibana3 is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether riemann is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -197,7 +231,7 @@ if ! dpkg -s riemann 2>&1 | grep Status: | grep installed; then
 
         check_pkg "riemann"
 else
-        echo -e "riemann is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "riemann is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether rabbitmq-server is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -217,7 +251,7 @@ if ! dpkg -s rabbitmq-server 2>&1 | grep Status: | grep installed; then
 
         check_pkg "rabbitmq-server"
 else
-        echo -e "rabbitmq-server is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "rabbitmq-server is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether nginx is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -233,7 +267,7 @@ if ! dpkg -s nginx 2>&1 | grep Status: | grep installed; then
 
         check_pkg "nginx"
 else
-        echo -e "nginx is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "nginx is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether virtualenv is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -242,7 +276,7 @@ if ! dpkg -s virtualenv 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/virtualenv/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "virtualenv"
 else
-        echo -e "virtualenv is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "virtualenv is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether make is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -251,8 +285,26 @@ if ! dpkg -s make 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/make/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "make"
 else
-        echo -e "make is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "make is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
+
+# echo -ne "checking whether gcc is installed..." | tee -a ${BOOTSTRAP_LOG}
+# if ! dpkg -s gcc 2>&1 | grep Status: | grep installed; then
+        # echo -e "gcc is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # sudo dpkg -i ${PKG_DIR}/gcc/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        # check_pkg "gcc"
+# else
+        # echo -e "gcc is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
+# fi
+
+# echo -ne "checking whether zlib is installed..." | tee -a ${BOOTSTRAP_LOG}
+# if ! dpkg -s zlib 2>&1 | grep Status: | grep installed; then
+        # echo -e "zlib is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        # sudo dpkg -i ${PKG_DIR}/zlib/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        # check_pkg "zlib"
+# else
+        # echo -e "zlib is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
+# fi
 
 echo -ne "checking whether ruby2.1 is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s ruby2.1 2>&1 | grep Status: | grep installed; then
@@ -260,7 +312,7 @@ if ! dpkg -s ruby2.1 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/ruby/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "ruby2.1"
 else
-        echo -e "ruby2.1 is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "ruby2.1 is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether workflow-gems is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -268,8 +320,13 @@ if ! dpkg -s workflow-gems 2>&1 | grep Status: | grep installed; then
         echo -e "workflow-gems is not installed, installing (this may take several minutes)..." | tee -a ${BOOTSTRAP_LOG}
         sudo dpkg -i ${PKG_DIR}/workflow-gems/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "workflow-gems"
+
+        # cd /opt/ruby-2.1.0/ext/zlib >> ${BOOTSTRAP_LOG} 2>&1
+        # sudo ruby extconf.rb >> ${BOOTSTRAP_LOG} 2>&1
+        # sudo make >> ${BOOTSTRAP_LOG} 2>&1
+        # sudo make install >> ${BOOTSTRAP_LOG} 2>&1
 else
-        echo -e "workflow-gems is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "workflow-gems is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether nodejs is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -278,7 +335,7 @@ if ! dpkg -s nodejs 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/nodejs/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "nodejs"
 else
-        echo -e "nodejs is already installed, skipping...\n" | tee -a ${BOOTSTRAP_LOG}
+        echo -e "nodejs is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 ################################################ POST INSTALLATION TESTS
@@ -286,7 +343,7 @@ fi
 echo -e "\nperforming post installation tests..." | tee -a ${BOOTSTRAP_LOG}
 check_exec "java"
 sleep 1
-check_exec "ruby"
+check_exec "/opt/ruby/bin/ruby"
 sleep 1
 check_exec "node"
 sleep 1
