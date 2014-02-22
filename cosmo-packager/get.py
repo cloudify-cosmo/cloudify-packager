@@ -222,6 +222,8 @@ def get_workflow_gems():
         package['bootstrap_dir'],
         package['package_dir'])
     apt_get(package['reqs'])
+
+    # RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
     # do('sudo dpkg -i %s/archives/*.deb' %
         # config.PACKAGES['ruby']['package_dir'])
     # do('sudo tar -C {0} -xzvf {0}/ruby.tar.gz'.format(

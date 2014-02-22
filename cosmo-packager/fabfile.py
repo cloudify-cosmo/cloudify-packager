@@ -78,7 +78,7 @@ def get_cosmo():
     do('sudo apt-get install -y python-dev')
     get_celery()
     get_manager()
-    get_workflow_gems()
+    # get_workflow_gems()
     # get_cosmo_ui()
 
 
@@ -111,7 +111,7 @@ def pkg_cosmo():
     EXEC:   fab pkg_comso_base
     """
 
-    pkg_workflow_gems()
+    # pkg_workflow_gems()
     pkg_celery()
     pkg_manager()
     # pkg_cosmo_ui()
