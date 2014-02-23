@@ -79,6 +79,7 @@ PACKAGES = {
         ],
         "bootstrap_dir": "%s/logstash/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/logstash" % PACKAGES_DIR,
+        "conf_dir": "%s/logstash" % PACKAGER_CONF_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/logstash-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -93,6 +94,7 @@ PACKAGES = {
         ],
         "bootstrap_dir": "%s/elasticsearch/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/elasticsearch" % PACKAGES_DIR,
+        "conf_dir": "%s/elasticsearch" % PACKAGER_CONF_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/elasticsearch-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -122,6 +124,7 @@ PACKAGES = {
         "key_file": "nginx_signing.key",
         "bootstrap_dir": "%s/nginx/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/nginx" % PACKAGES_DIR
+        "conf_dir": "%s/nginx" % PACKAGER_CONF_DIR,
     },
     "rabbitmq-server": {
         "name": "rabbitmq-server",
@@ -142,6 +145,7 @@ PACKAGES = {
         ],
         "bootstrap_dir": "%s/riemann/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/riemann" % PACKAGES_DIR
+        "conf_dir": "%s/riemann" % PACKAGER_CONF_DIR,
     },
     "nodejs": {
         "name": "nodejs",
@@ -192,7 +196,7 @@ PACKAGES = {
         ],
         "bootstrap_dir": "%s/manager/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/manager" % VIRTUALENVS_DIR,
-        "virtualenv": "%s/manager" % VIRTUALENVS_DIR,
+        "conf_dir": "%s/manager" % PACKAGER_CONF_DIR,
         "modules": ['%s/manager/cosmo-manager-develop/manager-rest/' % VIRTUALENVS_DIR],
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -204,6 +208,7 @@ PACKAGES = {
         "version": "0.0.1",
         "bootstrap_dir": "%s/celery/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/celery/cloudify.management__worker/env" % VIRTUALENVS_DIR,
+        "conf_dir": "%s/celery" % PACKAGER_CONF_DIR,
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-openstack-provisioner/archive/develop.tar.gz',
@@ -309,7 +314,7 @@ PACKAGES = {
         ],
         "bootstrap_dir": "%s/cosmo-ui/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/cosmo-ui" % PACKAGES_DIR,
-        "virtualenv": "%s/cosmo-ui" % VIRTUALENVS_DIR,
+        "conf_dir": "%s/cosmo-ui" % PACKAGER_CONF_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/cosmo-ui-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -318,10 +323,16 @@ PACKAGES = {
     "agent": {
         "name": "agent",
         "version": "0.0.1",
-        "source_url": "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
         "bootstrap_dir": "%s/agent/" % CODE_BOOTSTRAP_DIR,
         "package_dir": "%s/agent" % PACKAGES_DIR,
-        "virtualenv": "%s/agent" % VIRTUALENVS_DIR,
+        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard',
+                    'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
+                    'https://github.com/CloudifySource/cosmo-plugin-openstack-provisioner/archive/develop.tar.gz',
+                    'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
+                    'https://github.com/CloudifySource/cosmo-plugin-riemann-configurer/archive/develop.tar.gz',
+                    'https://github.com/CloudifySource/cosmo-plugin-kv-store/archive/develop.tar.gz',
+                    'https://github.com/CloudifySource/cosmo-celery-common/archive/develop.tar.gz'
+        ],
         "src_package_type": "dir",
         "dst_package_type": "tar",
         "bootstrap_script": "%s/agent-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -329,7 +340,7 @@ PACKAGES = {
     }
 }
 # logger configuration
-PACKAGER_LOGGER = {
+LOGGER = {
     "version": 1,
     "formatters": {
         "file": {
@@ -355,8 +366,7 @@ PACKAGER_LOGGER = {
         }
     },
     "loggers": {
-        "packager": {
-            "level": "DEBUG",
+        "main": {
             "handlers": ["file", "console"]
         }
     }

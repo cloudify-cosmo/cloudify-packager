@@ -31,10 +31,17 @@ from templgen import template_formatter, make_file
 # __all__ = ['list']
 
 try:
-    logging.config.dictConfig(config.PACKAGER_LOGGER)
-    lgr = logging.getLogger('packager')
+    d = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
+    if not os.path.exists(d):
+        os.makedirs(d)
+    logging.config.dictConfig(config.LOGGER)
+    lgr = logging.getLogger('main')
+    lgr.setLevel(logging.INFO)
 except ValueError:
-    sys.exit('could not initiate logger. try sudo...')
+    sys.exit('could not initialize logger.'
+             ' verify your logger config'
+             ' and permissions to write to {0}'
+             .format(config.LOGGER['handlers']['file']['filename']))
 
 
 def run_locally_with_retries(command, sudo=False, retries=5,

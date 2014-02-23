@@ -30,10 +30,36 @@ from packager import *  # NOQA
 # __all__ = ['list']
 
 try:
-    logging.config.dictConfig(config.PACKAGER_LOGGER)
-    lgr = logging.getLogger('packager')
+    d = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
+    if not os.path.exists(d):
+        os.makedirs(d)
+    logging.config.dictConfig(config.LOGGER)
+    lgr = logging.getLogger('main')
+    lgr.setLevel(logging.DEBUG)
 except ValueError:
-    sys.exit('could not initiate logger. try sudo...')
+    sys.exit('could not initialize logger.'
+             ' verify your logger config'
+             ' and permissions to write to {0}'
+             .format(config.LOGGER['handlers']['file']['filename']))
+
+
+@task
+def get_agent():
+    """
+    ACT:    retrives agent
+    EXEC:   fab get_agent
+    """
+
+    package = get_package_configuration('agent')
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    venv(package['package_dir'])
+    for module in package['modules']:
+        pip(module, '%s/bin' % package['package_dir'])
+    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -70,9 +96,7 @@ def get_graphite():
     venv(package['package_dir'])
     for module in package['modules']:
         pip(module, '%s/bin' % package['package_dir'])
-
-    # CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
-    # cp(CONF_DIR, package['package_dir'])
+    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -91,9 +115,7 @@ def get_celery():
     venv(package['package_dir'])
     for module in package['modules']:
         pip(module, '%s/bin' % package['package_dir'])
-
-    CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
-    cp(CONF_DIR, package['package_dir'])
+    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -119,8 +141,7 @@ def get_manager():
     for module in package['modules']:
         pip(module, '%s/bin' % package['package_dir'])
 
-    CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
-    cp(CONF_DIR, package['package_dir'])
+    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -265,8 +286,7 @@ def get_cosmo_ui():
         package['source_url'],
         dir=package['package_dir'])
 
-    CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
-    cp(CONF_DIR, package['package_dir'])
+    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -370,8 +390,7 @@ def get_logstash():
         package['source_url'],
         dir=package['package_dir'])
 
-    CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
-    cp(CONF_DIR, package['package_dir'])
+    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -391,8 +410,7 @@ def get_elasticsearch():
         package['source_url'],
         dir=package['package_dir'])
 
-    CONF_DIR = "%s/%s/*" % (config.PACKAGER_CONF_DIR, package['name'])
-    cp(CONF_DIR, package['package_dir'])
+    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task

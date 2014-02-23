@@ -6,15 +6,23 @@ import config
 # run_env = os.environ['RUN_ENV']
 # config = __import__(run_env)
 
+import os
 import sys
 from jinja2 import Environment, FileSystemLoader
 # from jinja2 import Template
 
 try:
-    logging.config.dictConfig(config.PACKAGER_LOGGER)
-    lgr = logging.getLogger('packager')
+    d = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
+    if not os.path.exists(d):
+        os.makedirs(d)
+    logging.config.dictConfig(config.LOGGER)
+    lgr = logging.getLogger('main')
+    lgr.setLevel(logging.INFO)
 except ValueError:
-    sys.exit('could not initiate logger. try sudo...')
+    sys.exit('could not initialize logger.'
+             ' verify your logger config'
+             ' and permissions to write to {0}'
+             .format(config.LOGGER['handlers']['file']['filename']))
 
 
 def template_formatter(template_dir, template_file, var_dict):
