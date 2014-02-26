@@ -23,10 +23,6 @@ The packager uses the following 3rd party components:
 - pika -*to send events to rabbitmq if it's installed on the packaging server (for testing purposes)*
 a bootstrap script is provided to install the above packages.
 
-NOTE: the below packages are installed DURING The get/pkg process due to an post installation process with openjdk. will be resolved soon.
-- opnejdk-7-jdk -*for maven*
-- maven -*to build the orchestrator - will be removed once the orchestrator is python-ed*
-
 
 ### Structure
 
@@ -145,8 +141,8 @@ You can now safely dpkg -i your component's deb file/s to install it (notice you
 ### Vagrant
 A vagrantfile is provided to load 2 machines:
 
-- an Orchestrator server (which, by default, runs the cosmo-orchestrator-bootstrap.sh script)
-- a Tester server (which, by default, runs a minimal bootstrap script which only runs apt-get update so that you can test pkg installation on a clean machine)
+- an Orchestrator server (which, by default, is prepared for packaging components)
+- a Tester server (which, by default, is a clean, vagrant version ubuntu machine to test the package installation on)
 
 ##### Automated Vagrant Testing Environment
 

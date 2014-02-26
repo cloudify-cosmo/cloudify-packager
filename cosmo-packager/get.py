@@ -24,6 +24,7 @@ import config
 from event_handler import send_event as se
 import uuid
 import sys
+import os
 from fabric.api import *  # NOQA
 from packager import *  # NOQA
 

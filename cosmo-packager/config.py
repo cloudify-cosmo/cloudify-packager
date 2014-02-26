@@ -17,13 +17,13 @@
 # WORKING ENVIRONMENT
 ENV = "develop"
 # base packager repo dir
-PACKAGER_BASE = "/cosmo-packager/cosmo-packager"
+PACKAGER_BASE = "/vagrant/cosmo-packager"
 # directory for bootstrap/download/removal/package scripts - if applicable
-PACKAGER_SCRIPTS_DIR = "/cosmo-packager/cosmo-packager/package-scripts"
+PACKAGER_SCRIPTS_DIR = "/vagrant/cosmo-packager/package-scripts"
 # package configurations directory
-PACKAGER_CONF_DIR = "/cosmo-packager/cosmo-packager/package-configuration"
+PACKAGER_CONF_DIR = "/vagrant/cosmo-packager/package-configuration"
 # directory which contains configuration for all modules
-PACKAGER_TEMPLATE_DIR = "/cosmo-packager/cosmo-packager/package-templates"
+PACKAGER_TEMPLATE_DIR = "/vagrant/cosmo-packager/package-templates"
 # temporary directory to which items are downloaded and packages are created.
 PACKAGES_DIR = "/packages"
 # final directory to put the created packages in.
@@ -123,8 +123,8 @@ PACKAGES = {
         "source_key": "http://nginx.org/keys/nginx_signing.key",
         "key_file": "nginx_signing.key",
         "bootstrap_dir": "%s/nginx/" % COMPONENTS_BOOTSTRAP_DIR,
-        "package_dir": "%s/nginx" % PACKAGES_DIR
-        "conf_dir": "%s/nginx" % PACKAGER_CONF_DIR,
+        "package_dir": "%s/nginx" % PACKAGES_DIR,
+        "conf_dir": "%s/nginx" % PACKAGER_CONF_DIR
     },
     "rabbitmq-server": {
         "name": "rabbitmq-server",
@@ -144,8 +144,8 @@ PACKAGES = {
             'openjdk-7-jdk'
         ],
         "bootstrap_dir": "%s/riemann/" % COMPONENTS_BOOTSTRAP_DIR,
-        "package_dir": "%s/riemann" % PACKAGES_DIR
-        "conf_dir": "%s/riemann" % PACKAGER_CONF_DIR,
+        "package_dir": "%s/riemann" % PACKAGES_DIR,
+        "conf_dir": "%s/riemann" % PACKAGER_CONF_DIR
     },
     "nodejs": {
         "name": "nodejs",
@@ -327,9 +327,7 @@ PACKAGES = {
         "package_dir": "%s/agent" % PACKAGES_DIR,
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
-                    'https://github.com/CloudifySource/cosmo-plugin-openstack-provisioner/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
-                    'https://github.com/CloudifySource/cosmo-plugin-riemann-configurer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-kv-store/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-celery-common/archive/develop.tar.gz'
         ],

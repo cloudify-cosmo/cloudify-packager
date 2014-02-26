@@ -294,10 +294,11 @@ def rmdir(dir):
     """
 
     lgr.debug('removing directory %s' % dir)
-    x = run_locally_with_retries('sudo rm -rf %s' % dir)
-    if x.succeeded:
+    try:
+        if os.path.isdir(dir):
+            run_locally_with_retries('sudo rm -rf %s' % dir)
         lgr.debug('successfully removed directory %s' % dir)
-    else:
+    except:
         lgr.error('unsuccessfully removed directory %s' % dir)
 
 
@@ -308,7 +309,8 @@ def rm(file):
 
     lgr.debug('removing files %s' % file)
     try:
-        run_locally_with_retries('sudo rm %s' % file)
+        if os.path.isfile(file):
+            run_locally_with_retries('sudo rm %s' % file)
         lgr.debug('successfully removed file %s' % file)
     except:
         lgr.error('unsuccessfully removed file %s' % file)
