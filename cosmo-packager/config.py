@@ -29,6 +29,7 @@ PACKAGES_DIR = "/packages"
 # final directory to put the created packages in.
 COMPONENTS_BOOTSTRAP_DIR = "/cloudify3-components"
 CODE_BOOTSTRAP_DIR = "/cloudify3"
+AGENTS_BOOTSTRAP_DIR = "/agents"
 # directory for cosmo modules and virtual environments
 VIRTUALENVS_DIR = "/opt"
 # specific package configuration
@@ -320,11 +321,12 @@ PACKAGES = {
         "bootstrap_script": "%s/cosmo-ui-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "cosmo-ui-bootstrap.template"
     },
-    "agent": {
-        "name": "agent",
+    "agent-ubuntu": {
+        "name": "agent-ubuntu",
         "version": "0.0.1",
-        "bootstrap_dir": "%s/agent/" % CODE_BOOTSTRAP_DIR,
-        "package_dir": "%s/agent" % PACKAGES_DIR,
+        "bootstrap_dir": "%s/agent-ubuntu/" % AGENTS_BOOTSTRAP_DIR,
+        "package_dir": "%s/agent-ubuntu/cloudify.management__worker/env" % VIRTUALENVS_DIR,
+        "conf_dir": "%s/agent-ubuntu" % PACKAGER_CONF_DIR,
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
@@ -333,8 +335,8 @@ PACKAGES = {
         ],
         "src_package_type": "dir",
         "dst_package_type": "tar",
-        "bootstrap_script": "%s/agent-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_template": "agent-bootstrap.template"
+        "bootstrap_script": "%s/agent-ubuntu-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_template": "agent-ubuntu-bootstrap.template"
     }
 }
 # logger configuration

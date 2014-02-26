@@ -100,13 +100,13 @@ def pkg_cloudify3_components():
 
 
 @task
-def pkg_agent():
+def pkg_agent_ubuntu():
     """
-    ACT:    packages agent
-    EXEC:   fab pkg_agent
+    ACT:    packages ubuntu agent
+    EXEC:   fab pkg_agent_ubuntu
     """
 
-    package = get_package_configuration('agent')
+    package = get_package_configuration('agent-ubuntu')
 
     rm('%s/archives/*.deb' % package['package_dir'])
     create_bootstrap_script(

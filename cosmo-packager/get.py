@@ -45,13 +45,13 @@ except ValueError:
 
 
 @task
-def get_agent():
+def get_agent_ubuntu():
     """
-    ACT:    retrives agent
-    EXEC:   fab get_agent
+    ACT:    retrives ubuntu agent
+    EXEC:   fab get_agent_ubuntu
     """
 
-    package = get_package_configuration('agent')
+    package = get_package_configuration('agent-ubuntu')
 
     rmdir(package['package_dir'])
     make_package_dirs(
