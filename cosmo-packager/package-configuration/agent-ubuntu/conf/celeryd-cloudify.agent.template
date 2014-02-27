@@ -1,0 +1,20 @@
+export BROKER_URL={{ celery_agent.broker_url }}
+export MANAGEMENT_USER={{ celery_agent.management_user }}
+export HOME={{ celery_agent.home }}
+export MANAGER_REST_PORT={{ celery_agent.manager_rest_port }}
+export MANAGEMENT_IP={{ celery_agent.management_ip }}
+export CELERY_WORK_DIR={{ celery_agent.celery_work_dir }}
+export IS_MANAGEMENT_NODE={{ celery_agent.is_management_node }}
+export AGENT_IP={{ celery_agent.agent_ip }}
+export VIRTUALENV={{ celery_agent.virtualenv }}
+
+INCLUDES=plugin_installer.tasks,kv_store.tasks,worker_installer.tasks
+CELERYD_MULTI="${VIRTUALENV}/bin/celeryd-multi"
+CELERYD_USER="root"
+CELERYD_GROUP="root"
+CELERY_TASK_SERIALIZER="json"
+CELERY_RESULT_SERIALIZER="json"
+CELERY_RESULT_BACKEND="amqp://"
+DEFAULT_PID_FILE="/opt/celery/cloudify.management__worker/work/cloudify.management_worker.pid"
+DEFAULT_LOG_FILE="/opt/celery/cloudify.management__worker/work/cloudify.management_worker.log"
+CELERYD_OPTS="--events --loglevel=debug --app=cloudify --include=${INCLUDES} -Q cloudify.management --broker=amqp:// --hostname=cloudify.management"

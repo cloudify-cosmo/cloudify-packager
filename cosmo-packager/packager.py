@@ -128,14 +128,22 @@ def pack(src_type, dst_type, name, src_path, dst_path, version,
     lgr.debug('packing %s' % name)
     if is_dir(src_path):
         with lcd(dst_path):
-            if bootstrap_script and not depends:
+            if bootstrap_script and dst_type == "tar":
+                lgr.debug('retrieving bootstrap script')
+                cp(bootstrap_script, src_path)
+                x = run_locally_with_retries(
+                    'sudo fpm -s %s -t %s'
+                    ' -n %s -v %s -f %s' %
+                    (src_type, dst_type,
+                     name, version, src_path))
+            elif bootstrap_script and not depends:
                 x = run_locally_with_retries(
                     'sudo fpm -s %s -t %s'
                     ' --after-install %s -n %s -v %s -f %s' %
                     (src_type, dst_type, bootstrap_script,
                      name, version, src_path))
             elif bootstrap_script and depends:
-                lgr.debug('dependencies are: %s' % ", ".join(depends))
+                lgr.debug('packing dependencies are: %s' % ", ".join(depends))
                 dep_str = "-d " + " -d ".join(depends)
                 x = run_locally_with_retries(
                     'sudo fpm -s %s -t %s'

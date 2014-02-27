@@ -120,7 +120,7 @@ def pkg_agent_ubuntu():
     if not is_dir(package['bootstrap_dir']):
         mkdir(package['bootstrap_dir'])
     lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    cp('%s/archives/*.tar' % package['package_dir'], package['bootstrap_dir'])
 
 
 @task

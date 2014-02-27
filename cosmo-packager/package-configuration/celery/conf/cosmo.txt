@@ -1,4 +1,0 @@
-{
-	"management_ip": "localhost",
-	"ip": "cloudify.management"
-}
