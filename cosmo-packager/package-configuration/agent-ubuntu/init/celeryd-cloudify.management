@@ -18,10 +18,13 @@
 # Short-Description: celery task worker daemon
 ### END INIT INFO
 
-# some commands work asyncronously, so we'll wait this many seconds
-export CELERY_WORK_DIR="/opt/celery/cloudify.management__worker/work"
-CELERY_DEFAULTS="/etc/default/celeryd-cloudify.management"
+WORKER_MODIFIER="{{ celery_agent.ubuntu.worker_modifer }}"
+HOME_DIR="/opt/celery"
+ME=$(basename $0)
+export CELERY_WORK_DIR="${HOME_DIR}/cloudify.${WORKER_MODIFIER}/work"
+CELERY_DEFAULTS="/etc/default/${ME}"
 
+# some commands work asyncronously, so we'll wait this many seconds
 SLEEP_SECONDS=5
 
 DEFAULT_PID_FILE="/var/run/celery/%n.pid"

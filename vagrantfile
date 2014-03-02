@@ -83,7 +83,7 @@ Vagrant.configure('2') do |config|
     command = "
       echo bootstrapping... &&
 
-      # update
+      # update - (optional) if you want to install additional packages on the testing server.
       # sudo apt-get -y update &&
       
       # install prereqs

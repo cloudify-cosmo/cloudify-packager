@@ -21,8 +21,8 @@ import config
 # run_env = os.environ['RUN_ENV']
 # config = __import__(run_env)
 
-from event_handler import send_event as se
-import uuid
+# from event_handler import send_event as se
+# import uuid
 import sys
 import os
 from fabric.api import *  # NOQA
@@ -44,6 +44,16 @@ except ValueError:
              .format(config.LOGGER['handlers']['file']['filename']))
 
 
+def _prepare(package):
+
+    rmdir(package['package_dir'])
+    make_package_dirs(
+        package['bootstrap_dir'],
+        package['package_dir'])
+    if 'conf_dir' in package:
+        cp('%s/*' % package['conf_dir'], package['package_dir'])
+
+
 @task
 def get_agent_ubuntu():
     """
@@ -53,14 +63,10 @@ def get_agent_ubuntu():
 
     package = get_package_configuration('agent-ubuntu')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     venv(package['package_dir'])
     for module in package['modules']:
         pip(module, '%s/bin' % package['package_dir'])
-    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -73,10 +79,7 @@ def get_python_modules(component):
 
     package = get_package_configuration(component)
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     for module in package['modules']:
         get_python_module(module, package['package_dir'])
 
@@ -90,14 +93,10 @@ def get_graphite():
 
     package = get_package_configuration('graphite')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     venv(package['package_dir'])
     for module in package['modules']:
         pip(module, '%s/bin' % package['package_dir'])
-    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -109,14 +108,10 @@ def get_celery():
 
     package = get_package_configuration('celery')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     venv(package['package_dir'])
     for module in package['modules']:
         pip(module, '%s/bin' % package['package_dir'])
-    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -129,20 +124,17 @@ def get_manager():
 
     package = get_package_configuration('manager')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     venv(package['package_dir'])
     wget(
         package['source_url'],
-        file='%s/%s.tar.gz' % (package['package_dir'], package['name']))
-    untar('%s' % package['package_dir'],
-          '%s/%s.tar.gz' % (package['package_dir'], package['name']))
+        file='%s/%s.tar.gz' % (package['package_dir'],
+                               package['name']))
+    untar(package['package_dir'],
+          '%s/%s.tar.gz' % (package['package_dir'],
+                            package['name']))
     for module in package['modules']:
         pip(module, '%s/bin' % package['package_dir'])
-
-    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -154,10 +146,7 @@ def get_make():
 
     package = get_package_configuration('make')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     apt_purge(package['name'])
     apt_download(
         package['name'],
@@ -165,31 +154,27 @@ def get_make():
     apt_get([package['name']])
 
 
-@task
-def get_gcc():
-    """
-    ACT:    retrives gcc
-    EXEC:   fab get_gcc
-    """
+# @task
+# def get_gcc():
+#     """
+#     ACT:    retrives gcc
+#     EXEC:   fab get_gcc
+#     """
 
-    package = get_package_configuration('gcc')
+#     package = get_package_configuration('gcc')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-    if package['reqs']:
-        for req in package['reqs']:
-            apt_purge(req)
-            apt_autoremove(req)
-            apt_download(req, package['package_dir'])
-    apt_download(
-        package['name'],
-        package['package_dir'])
-    if package['reqs']:
-            apt_get(package['reqs'])
-    apt_get(['dpkg-dev'])
-    dpkg_name('%s/archives' % package['package_dir'])
+#     if package['reqs']:
+#         for req in package['reqs']:
+#             apt_purge(req)
+#             apt_autoremove(req)
+#             apt_download(req, package['package_dir'])
+#     apt_download(
+#         package['name'],
+#         package['package_dir'])
+#     if package['reqs']:
+#             apt_get(package['reqs'])
+#     apt_get(['dpkg-dev'])
+    # dpkg_name('%s/archives' % package['package_dir'])
 
 
 @task
@@ -201,10 +186,8 @@ def get_ruby():
 
     package = get_package_configuration('ruby')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
+    # RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
     # wget(
         # package['source_url'],
         # file='%s/ruby.tar.gz' % package['package_dir'])
@@ -212,22 +195,18 @@ def get_ruby():
         (package['version'], package['package_dir']))
 
 
-@task
-def get_zlib():
-    """
-    ACT:    retrives zlib
-    EXEC:   fab get_zlib
-    """
+# @task
+# def get_zlib():
+#     """
+#     ACT:    retrives zlib
+#     EXEC:   fab get_zlib
+#     """
 
-    package = get_package_configuration('zlib')
+#     package = get_package_configuration('zlib')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-    wget(
-        package['source_url'],
-        file='%s/zlib.tar.gz' % package['package_dir'])
+#     wget(
+#         package['source_url'],
+#         file='%s/zlib.tar.gz' % package['package_dir'])
 
 
 @task
@@ -239,10 +218,7 @@ def get_workflow_gems():
 
     package = get_package_configuration('workflow-gems')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     apt_get(package['reqs'])
 
     # RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
@@ -279,15 +255,10 @@ def get_cosmo_ui():
 
     package = get_package_configuration('cosmo-ui')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     wget(
         package['source_url'],
         dir=package['package_dir'])
-
-    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -299,14 +270,10 @@ def get_nodejs():
 
     package = get_package_configuration('nodejs')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-
+    _prepare(package)
     apt_get(package['prereqs'])
     lgr.debug("adding package repo to src repo...")
-    do('add-apt-repository -y %s' % package['source_url'])
+    add_ppa_repo(package['source_ppa'])
     apt_update()
     apt_download(
         package['name'],
@@ -322,26 +289,23 @@ def get_riemann():
 
     package = get_package_configuration('riemann')
 
-    stream_id = str(uuid.uuid1())
-    se(event_origin="cosmo-packager",
-        event_type="packager.get.%s" % package['name'],
-        event_subtype="started",
-        event_description='started downloading %s' % package['name'],
-        event_stream_id=stream_id)
+    _prepare(package)
+    # stream_id = str(uuid.uuid1())
+    # se(event_origin="cosmo-packager",
+    #     event_type="packager.get.%s" % package['name'],
+    #     event_subtype="started",
+    #     event_description='started downloading %s' % package['name'],
+    #     event_stream_id=stream_id)
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
     wget(
         package['source_url'],
         dir=package['package_dir'])
 
-    se(event_origin="cosmo-packager",
-        event_type="packager.get.%s" % package['name'],
-        event_subtype="success",
-        event_description='finished downloading %s' % package['name'],
-        event_stream_id=stream_id)
+    # se(event_origin="cosmo-packager",
+    #     event_type="packager.get.%s" % package['name'],
+    #     event_subtype="success",
+    #     event_description='finished downloading %s' % package['name'],
+    #     event_stream_id=stream_id)
 
 
 @task
@@ -353,22 +317,16 @@ def get_rabbitmq():
 
     package = get_package_configuration('rabbitmq-server')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-
-    lgr.debug("adding package repo to src repo...")
-    do('sudo sed -i "2i deb %s" /etc/apt/sources.list' %
-       package['source_url'])
+    _prepare(package)
+    # do('sudo sed -i "2i deb %s" /etc/apt/sources.list' %
+    #    package['source_url'])
+    add_src_repo(package['source_repo'], 'deb')
     wget(
         package['source_key'],
         package['package_dir'])
-    add_key('%s/%s' % (package['package_dir'], package['key_file']))
+    add_key(package['key_file'])
     apt_update()
-    apt_download(
-        package['erlang'],
-        package['package_dir'])
+    apt_download_reqs(package['reqs'], package['package_dir'])
     apt_download(
         package['name'],
         package['package_dir'])
@@ -383,15 +341,10 @@ def get_logstash():
 
     package = get_package_configuration('logstash')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     wget(
         package['source_url'],
         dir=package['package_dir'])
-
-    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -403,15 +356,10 @@ def get_elasticsearch():
 
     package = get_package_configuration('elasticsearch')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     wget(
         package['source_url'],
         dir=package['package_dir'])
-
-    cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task
@@ -423,10 +371,7 @@ def get_kibana():
 
     package = get_package_configuration('kibana3')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     wget(
         package['source_url'],
         dir=package['package_dir'])
@@ -441,18 +386,15 @@ def get_nginx():
 
     package = get_package_configuration('nginx')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
-
-    lgr.debug("adding package repo to src repo...")
-    do('sudo sed -i "2i deb %s" /etc/apt/sources.list' %
-       package['source_url'])
-    do('sudo sed -i "2i deb-src %s" /etc/apt/sources.list' %
-       package['source_url'])
+    _prepare(package)
+    # do('sudo sed -i "2i deb %s" /etc/apt/sources.list' %
+    #    package['source_url'])
+    # do('sudo sed -i "2i deb-src %s" /etc/apt/sources.list' %
+    #    package['source_url'])
+    add_src_repo(package['source_repo'], 'deb')
+    add_src_repo(package['source_repo'], 'deb-src')
     wget(package['source_key'], package['package_dir'])
-    add_key('%s/%s' % (package['package_dir'], package['key_file']))
+    add_key(package['key_file'])
     apt_update()
     apt_download(
         package['name'],
@@ -468,10 +410,7 @@ def get_openjdk():
 
     package = get_package_configuration('openjdk-7-jdk')
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    _prepare(package)
     apt_download(
         package['name'],
         package['package_dir'])

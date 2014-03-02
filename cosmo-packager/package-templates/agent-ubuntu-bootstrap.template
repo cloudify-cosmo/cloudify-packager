@@ -84,8 +84,6 @@ PKG_CONF_DIR="${PKG_DIR}/conf"
 
 sudo virtualenv ${HOME_DIR}
 
-echo "extracting agent..."
-sudo tar -xzvf /agents/agent-ubuntu.tar.gz -C /opt
 echo "creating ${PKG_NAME} work directory..."
 sudo mkdir -p ${WORK_DIR}
 check_dir "${WORK_DIR}"

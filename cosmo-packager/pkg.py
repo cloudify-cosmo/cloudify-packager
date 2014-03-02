@@ -21,8 +21,8 @@ import config
 # run_env = os.environ['RUN_ENV']
 # config = __import__(run_env)
 
-from event_handler import send_event as se
-import uuid
+# from event_handler import send_event as se
+# import uuid
 import sys
 import os
 from fabric.api import *  # NOQA
@@ -54,22 +54,13 @@ def pkg_cloudify3():
 
     package = get_package_configuration('cloudify3')
 
-    rm('%s/cloudify*' % package['package_dir'])
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
+    rm('{0}/cloudify*'.format(package['package_dir']))
     cp(package['bootstrap_script'], package['package_dir'])
-    local('chmod +x %s/*.sh' % package['package_dir'])
+    do('chmod +x %s/*.sh' % package['package_dir'])
     cp(package['conf_dir'], package['package_dir'])
     pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s' % package['package_dir'],
-        package['version'], depends=package['depends'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/*.deb' % package['package_dir'], package['bootstrap_dir'])
+        name=package['name'],
+        dst_path=package['package_dir'])
 
 
 @task
@@ -81,22 +72,13 @@ def pkg_cloudify3_components():
 
     package = get_package_configuration('cloudify3-components')
 
-    rm('%s/cloudify*' % package['package_dir'])
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
+    rm('{0}/cloudify*'.format(package['package_dir']))
     cp(package['bootstrap_script'], package['package_dir'])
-    local('chmod +x %s/*.sh' % package['package_dir'])
+    do('chmod +x %s/*.sh' % package['package_dir'])
     cp(package['conf_dir'], package['package_dir'])
     pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s' % package['package_dir'],
-        package['version'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/*.deb' % package['package_dir'], package['bootstrap_dir'])
+        name=package['name'],
+        dst_path=package['package_dir'])
 
 
 @task
@@ -107,20 +89,8 @@ def pkg_agent_ubuntu():
     """
 
     package = get_package_configuration('agent-ubuntu')
-
-    rm('%s/archives/*.deb' % package['package_dir'])
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.tar' % package['package_dir'], package['bootstrap_dir'])
+    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    pack(package)
 
 
 @task
@@ -131,20 +101,8 @@ def pkg_graphite():
     """
 
     package = get_package_configuration('graphite')
-
-    rm('%s/archives/*.deb' % package['package_dir'])
-    # create_bootstrap_script(
-        # package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    pack(package)
 
 
 @task
@@ -155,20 +113,8 @@ def pkg_virtualenv():
     """
 
     package = get_package_configuration('virtualenv')
-
-    rm('%s/archives/*.deb' % package['package_dir'])
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    pack(package)
 
 
 @task
@@ -179,20 +125,8 @@ def pkg_celery():
     """
 
     package = get_package_configuration('celery')
-
-    rm('%s/archives/*.deb' % package['package_dir'])
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    pack(package)
 
 
 @task
@@ -203,20 +137,8 @@ def pkg_manager():
     """
 
     package = get_package_configuration('manager')
-
-    rm('%s/archives/*.deb' % package['package_dir'])
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'], package['depends'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    pack(package)
 
 
 @task
@@ -227,26 +149,23 @@ def pkg_make():
     """
 
     package = get_package_configuration('make')
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    pack(package)
 
 
-@task
-def pkg_gcc():
-    """
-    ACT:    packages gcc
-    EXEC:   fab pkg_gcc
-    """
+# @task
+# def pkg_gcc():
+#     """
+#     ACT:    packages gcc
+#     EXEC:   fab pkg_gcc
+#     """
 
-    package = get_package_configuration('gcc')
+#     package = get_package_configuration('gcc')
 
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+#     if not is_dir(package['bootstrap_dir']):
+#         mkdir(package['bootstrap_dir'])
+#     lgr.debug("isolating debs...")
+#     cp('%s/archives/*.deb' % package['package_dir'],
+    # package['bootstrap_dir'])
 
 
 @task
@@ -257,42 +176,35 @@ def pkg_ruby():
     """
 
     package = get_package_configuration('ruby')
-
-    # create_bootstrap_script(
-        # package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    pack(package)
 
 
-@task
-def pkg_zlib():
-    """
-    ACT:    packages zlib
-    EXEC:   fab pkg_zlib
-    """
+# @task
+# def pkg_zlib():
+#     """
+#     ACT:    packages zlib
+#     EXEC:   fab pkg_zlib
+#     """
 
-    package = get_package_configuration('zlib')
+#     package = get_package_configuration('zlib')
 
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'], package['depends'])
+#     create_bootstrap_script(
+#         package, package['bootstrap_template'], package['bootstrap_script'])
+#     pack(
+#         package['src_package_type'],
+#         package['dst_package_type'],
+#         package['name'],
+#         package['package_dir'],
+#         '{0}/archives/'.format(package['package_dir']),
+#         package['version'],
+#         package['bootstrap_script'],
+#         package['depends'])
 
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+#     if not is_dir(package['bootstrap_dir']):
+#         mkdir(package['bootstrap_dir'])
+#     lgr.debug("isolating debs...")
+#     cp('%s/archives/*.deb' % package['package_dir'],
+    # package['bootstrap_dir'])
 
 
 @task
@@ -303,19 +215,7 @@ def pkg_workflow_gems():
     """
 
     package = get_package_configuration('workflow-gems')
-
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'], package['depends'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    pack(package)
 
 
 @task
@@ -326,20 +226,8 @@ def pkg_cosmo_ui():
     """
 
     package = get_package_configuration('cosmo-ui')
-
-    rm('%s/archives/*.deb' % package['package_dir'])
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'], package['depends'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    pack(package)
 
 
 @task
@@ -350,11 +238,7 @@ def pkg_nodejs():
     """
 
     package = get_package_configuration('nodejs')
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    pack(package)
 
 
 @task
@@ -366,23 +250,20 @@ def pkg_riemann():
 
     package = get_package_configuration('riemann')
 
-    stream_id = str(uuid.uuid1())
-    se(event_origin="cosmo-packager",
-        event_type="packager.pkg.%s" % package['name'],
-        event_subtype="started",
-        event_description='started packaging %s' % package['name'],
-        event_stream_id=stream_id)
+    # stream_id = str(uuid.uuid1())
+    # se(event_origin="cosmo-packager",
+    #     event_type="packager.pkg.%s" % package['name'],
+    #     event_subtype="started",
+    #     event_description='started packaging %s' % package['name'],
+    #     event_stream_id=stream_id)
 
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    pack(package)
 
-    se(event_origin="cosmo-packager",
-        event_type="packager.pkg.%s" % package['name'],
-        event_subtype="success",
-        event_description='finished packaging %s' % package['name'],
-        event_stream_id=stream_id)
+    # se(event_origin="cosmo-packager",
+    #     event_type="packager.pkg.%s" % package['name'],
+    #     event_subtype="success",
+    #     event_description='finished packaging %s' % package['name'],
+    #     event_stream_id=stream_id)
 
 
 @task
@@ -393,11 +274,7 @@ def pkg_rabbitmq():
     """
 
     package = get_package_configuration('rabbitmq-server')
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    pack(package)
 
 
 @task
@@ -408,20 +285,8 @@ def pkg_logstash():
     """
 
     package = get_package_configuration('logstash')
-
-    rm('%s/archives/*.deb' % package['package_dir'])
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'], package['depends'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    pack(package)
 
 
 @task
@@ -432,20 +297,8 @@ def pkg_elasticsearch():
     """
 
     package = get_package_configuration('elasticsearch')
-
-    rm('%s/archives/*.deb' % package['package_dir'])
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'], package['depends'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    pack(package)
 
 
 @task
@@ -456,20 +309,8 @@ def pkg_kibana():
     """
 
     package = get_package_configuration('kibana3')
-
-    rm('%s/archives/*.deb' % package['package_dir'])
-    create_bootstrap_script(
-        package, package['bootstrap_template'], package['bootstrap_script'])
-    pack(
-        package['src_package_type'], package['dst_package_type'],
-        package['name'],
-        package['package_dir'], '%s/archives/' % package['package_dir'],
-        package['version'], package['bootstrap_script'], package['depends'])
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    pack(package)
 
 
 @task
@@ -480,11 +321,7 @@ def pkg_nginx():
     """
 
     package = get_package_configuration('nginx')
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    pack(package)
 
 
 @task
@@ -495,11 +332,7 @@ def pkg_openjdk():
     """
 
     package = get_package_configuration('openjdk-7-jdk')
-
-    if not is_dir(package['bootstrap_dir']):
-        mkdir(package['bootstrap_dir'])
-    lgr.debug("isolating debs...")
-    cp('%s/archives/*.deb' % package['package_dir'], package['bootstrap_dir'])
+    pack(package)
 
 
 def main():

@@ -16,6 +16,7 @@ The packager uses the following 3rd party components:
 - git -*to clone the packager repo*
 - python-dev -*for fabric, mainly*
 - fpm -*main packaging framework*
+- ruby-build -*to compile ruby*
 - fabric -*...*
 - pip >1.5 -*to download python modules*
 - virtualenv -*to create python virtual environments for Cloudify's code*

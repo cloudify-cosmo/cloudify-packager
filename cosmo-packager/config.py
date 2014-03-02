@@ -120,22 +120,30 @@ PACKAGES = {
     "nginx": {
         "name": "nginx",
         "version": "1.5.8",
-        "source_url": "http://nginx.org/packages/mainline/ubuntu/ precise nginx",
+        "reqs": [
+            "nginx"
+        ]
+        "source_repo": "http://nginx.org/packages/mainline/ubuntu/ precise nginx",
         "source_key": "http://nginx.org/keys/nginx_signing.key",
-        "key_file": "nginx_signing.key",
+        "key_file": "%s/nginx/nginx_signing.key" % PACKAGES_DIR,
         "bootstrap_dir": "%s/nginx/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/nginx" % PACKAGES_DIR,
+        "dst_package_type": "deb",
         "conf_dir": "%s/nginx" % PACKAGER_CONF_DIR
     },
     "rabbitmq-server": {
         "name": "rabbitmq-server",
         "version": "0.0.1",
-        "source_url": "http://www.rabbitmq.com/debian/ testing main",
+        "source_repo": "http://www.rabbitmq.com/debian/ testing main",
         "source_key": "http://www.rabbitmq.com/rabbitmq-signing-key-public.asc",
         "key_file": "rabbitmq-signing-key-public.asc",
-        'erlang': "erlang-nox",
+        "reqs": [
+            "rabbitmq-server",
+            "erlang-nox"
+        ]
         "bootstrap_dir": "%s/rabbitmq-server/" % COMPONENTS_BOOTSTRAP_DIR,
-        "package_dir": "%s/rabbitmq-server" % PACKAGES_DIR
+        "package_dir": "%s/rabbitmq-server" % PACKAGES_DIR,
+        "dst_package_type": "deb"
     },
     "riemann": {
         "name": "riemann",
@@ -146,21 +154,30 @@ PACKAGES = {
         ],
         "bootstrap_dir": "%s/riemann/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/riemann" % PACKAGES_DIR,
-        "conf_dir": "%s/riemann" % PACKAGER_CONF_DIR
+        "conf_dir": "%s/riemann" % PACKAGER_CONF_DIR,
+        "dst_package_type": "deb"
     },
     "nodejs": {
         "name": "nodejs",
         "version": "0.0.1",
-        "source_url": "ppa:chris-lea/node.js",
+        "reqs": [
+            "nodejs"
+        ]        
+        "source_ppa": "ppa:chris-lea/node.js",
         "bootstrap_dir": "%s/nodejs/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/nodejs" % PACKAGES_DIR,
+        "dst_package_type": "deb",
         "prereqs": ['python-software-properties', 'g++', 'make', 'python']
     },
     "openjdk-7-jdk": {
         "name": "openjdk-7-jdk",
         "version": "0.0.1",
+        "reqs": [
+            "openjdk-7-jdk"
+        ]
         "bootstrap_dir": "%s/openjdk-7-jdk/" % COMPONENTS_BOOTSTRAP_DIR,
-        "package_dir": "%s/openjdk-7-jdk" % PACKAGES_DIR
+        "package_dir": "%s/openjdk-7-jdk" % PACKAGES_DIR,
+        "dst_package_type": "deb",
     },
     "virtualenv": {
         "name": "virtualenv",
@@ -255,8 +272,12 @@ PACKAGES = {
     "make": {
         "name": "make",
         "version": "0.0.1",
+        "reqs": [
+            "make"
+        ]
         "bootstrap_dir": "%s/make/" % COMPONENTS_BOOTSTRAP_DIR,
-        "package_dir": "%s/make" % PACKAGES_DIR
+        "package_dir": "%s/make" % PACKAGES_DIR,
+        "dst_package_type": "deb",
     },
     "zlib": {
         "name": "zlib",
