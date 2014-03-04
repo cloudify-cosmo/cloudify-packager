@@ -192,6 +192,15 @@ else
         echo -e "openjdk-7-jdk is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
+echo -ne "checking whether curl is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s curl 2>&1 | grep Status: | grep installed; then
+        echo -e "curl is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        sudo dpkg -i ${PKG_DIR}/curl/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        check_pkg "curl"
+else
+        echo -e "curl is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
+fi
+
 echo -ne "checking whether logstash is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s logstash 2>&1 | grep Status: | grep installed; then
         echo -e "logstash is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}

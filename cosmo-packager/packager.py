@@ -97,6 +97,8 @@ def create_bootstrap_script(component, template_file, script_file):
     """
     creates a script file from a template file
     """
+
+    lgr.debug('creating bootstrap script')
     formatted_text = template_formatter(
         config.PACKAGER_TEMPLATE_DIR, template_file, component)
     make_file(script_file, formatted_text)
@@ -181,15 +183,15 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
     bootstrap_script = package['bootstrap_script'] \
         if 'bootstrap_script' in package else bootstrap_script
     src_type = package['src_package_type'] \
-        if 'src_type' in package else src_type
+        if 'src_package_type' in package else src_type
     dst_type = package['dst_package_type'] \
-        if 'dst_type' in package else dst_type
+        if 'dst_package_type' in package else dst_type
     name = package['name'] \
         if 'name' in package else name
     src_path = package['package_dir'] \
-        if 'src_path' in package else src_path
-    dst_path = '{0}/archives/'.format(package['package_dir']) \
-        if 'dst_path' in package else dst_path
+        if 'package_dir' in package else src_path
+    dst_path = '{0}/archives'.format(package['package_dir']) \
+        if not dst_path else dst_path
     version = package['version'] \
         if 'version' in package else version
     bootstrap_dir = package['bootstrap_dir'] \
@@ -199,6 +201,9 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
     depends = package['depends'] \
         if 'depends' in package else depends
 
+    if src_type:
+        rmdir(dst_path)
+        mkdir(dst_path)
     if bootstrap_script:
         create_bootstrap_script(
             package,
@@ -246,8 +251,8 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
 
     if not is_dir(bootstrap_dir):
         mkdir(bootstrap_dir)
-        lgr.debug("isolating archives...")
-        cp('{0}/*.{1}*'.format(src_path, dst_type), bootstrap_dir)
+    lgr.debug("isolating archives...")
+    cp('{0}/*.{1}'.format(dst_path, dst_type), bootstrap_dir)
 
 
 def make_package_dirs(pkg_dir, tmp_dir):
@@ -402,11 +407,12 @@ def rm(file):
     deletes a file or a set of files
     """
 
-    lgr.debug('removing files %s' % file)
+    lgr.info('removing files %s' % file)
+    # print 'removing files %s' % file
     try:
         if os.path.isfile(file):
             _run_locally_with_retries('sudo rm %s' % file)
-        lgr.debug('successfully removed file %s' % file)
+        lgr.info('successfully removed file %s' % file)
     except:
         lgr.error('unsuccessfully removed file %s' % file)
 

@@ -54,6 +54,7 @@ def get_cosmo_components():
     """
 
     get_openjdk()
+    get_curl()
     get_logstash()
     get_elasticsearch()
     get_riemann()
@@ -63,8 +64,6 @@ def get_cosmo_components():
     get_kibana()
     get_python_modules('virtualenv')
     get_make()
-    # get_gcc()
-    # get_zlib()
     get_ruby()
 
 
@@ -79,7 +78,7 @@ def get_cosmo():
     get_celery()
     get_manager()
     get_workflow_gems()
-    get_cosmo_ui()
+    # get_cosmo_ui()
 
 
 @task
@@ -89,7 +88,8 @@ def pkg_cosmo_components():
     EXEC:   fab pkg_comso_components
     """
 
-    pkg_openjdk()  # already packaged at get_ process
+    pkg_openjdk()
+    pkg_curl()
     pkg_logstash()
     pkg_elasticsearch()
     pkg_riemann()
@@ -99,8 +99,6 @@ def pkg_cosmo_components():
     pkg_kibana()
     pkg_virtualenv()
     pkg_make()
-    # pkg_gcc()
-    # pkg_zlib()
     pkg_ruby()
 
 

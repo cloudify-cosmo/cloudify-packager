@@ -138,6 +138,23 @@ def get_manager():
 
 
 @task
+def get_curl():
+    """
+    ACT:    retrives curl
+    EXEC:   fab get_curl
+    """
+
+    package = get_package_configuration('curl')
+
+    _prepare(package)
+    apt_purge(package['name'])
+    apt_download(
+        package['name'],
+        package['package_dir'])
+    apt_get([package['name']])
+
+
+@task
 def get_make():
     """
     ACT:    retrives make
@@ -299,7 +316,7 @@ def get_riemann():
 
     wget(
         package['source_url'],
-        dir=package['package_dir'])
+        dir='{0}/archives'.format(package['package_dir']))
 
     # se(event_origin="cosmo-packager",
     #     event_type="packager.get.%s" % package['name'],
@@ -318,8 +335,6 @@ def get_rabbitmq():
     package = get_package_configuration('rabbitmq-server')
 
     _prepare(package)
-    # do('sudo sed -i "2i deb %s" /etc/apt/sources.list' %
-    #    package['source_url'])
     add_src_repo(package['source_repo'], 'deb')
     wget(
         package['source_key'],
@@ -387,10 +402,6 @@ def get_nginx():
     package = get_package_configuration('nginx')
 
     _prepare(package)
-    # do('sudo sed -i "2i deb %s" /etc/apt/sources.list' %
-    #    package['source_url'])
-    # do('sudo sed -i "2i deb-src %s" /etc/apt/sources.list' %
-    #    package['source_url'])
     add_src_repo(package['source_repo'], 'deb')
     add_src_repo(package['source_repo'], 'deb-src')
     wget(package['source_key'], package['package_dir'])

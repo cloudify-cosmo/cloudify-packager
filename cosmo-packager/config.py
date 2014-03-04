@@ -45,7 +45,7 @@ PACKAGES = {
         "conf_dir": "%s" % PACKAGER_CONF_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/cloudify3-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_script_internal": "%s/cloudify3-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "cloudify3-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
         "req_free_mem": "10000",
@@ -62,7 +62,7 @@ PACKAGES = {
         "conf_dir": "%s" % PACKAGER_CONF_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/cloudify3-components-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_script_internal": "%s/cloudify3-components-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "cloudify3-components-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
         "req_free_mem": "10000",
@@ -122,7 +122,7 @@ PACKAGES = {
         "version": "1.5.8",
         "reqs": [
             "nginx"
-        ]
+        ],
         "source_repo": "http://nginx.org/packages/mainline/ubuntu/ precise nginx",
         "source_key": "http://nginx.org/keys/nginx_signing.key",
         "key_file": "%s/nginx/nginx_signing.key" % PACKAGES_DIR,
@@ -136,11 +136,11 @@ PACKAGES = {
         "version": "0.0.1",
         "source_repo": "http://www.rabbitmq.com/debian/ testing main",
         "source_key": "http://www.rabbitmq.com/rabbitmq-signing-key-public.asc",
-        "key_file": "rabbitmq-signing-key-public.asc",
+        "key_file": "%s/rabbitmq-server/rabbitmq-signing-key-public.asc" % PACKAGES_DIR,
         "reqs": [
             "rabbitmq-server",
             "erlang-nox"
-        ]
+        ],
         "bootstrap_dir": "%s/rabbitmq-server/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/rabbitmq-server" % PACKAGES_DIR,
         "dst_package_type": "deb"
@@ -162,7 +162,7 @@ PACKAGES = {
         "version": "0.0.1",
         "reqs": [
             "nodejs"
-        ]        
+        ],
         "source_ppa": "ppa:chris-lea/node.js",
         "bootstrap_dir": "%s/nodejs/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/nodejs" % PACKAGES_DIR,
@@ -174,7 +174,7 @@ PACKAGES = {
         "version": "0.0.1",
         "reqs": [
             "openjdk-7-jdk"
-        ]
+        ],
         "bootstrap_dir": "%s/openjdk-7-jdk/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/openjdk-7-jdk" % PACKAGES_DIR,
         "dst_package_type": "deb",
@@ -269,12 +269,22 @@ PACKAGES = {
         "bootstrap_dir": "%s/gcc/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/gcc" % PACKAGES_DIR
     },
+    "curl": {
+        "name": "curl",
+        "version": "0.0.1",
+        "reqs": [
+            "curl"
+        ],
+        "bootstrap_dir": "%s/curl/" % COMPONENTS_BOOTSTRAP_DIR,
+        "package_dir": "%s/curl" % PACKAGES_DIR,
+        "dst_package_type": "deb",
+    },
     "make": {
         "name": "make",
         "version": "0.0.1",
         "reqs": [
             "make"
-        ]
+        ],
         "bootstrap_dir": "%s/make/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/make" % PACKAGES_DIR,
         "dst_package_type": "deb",
@@ -301,13 +311,13 @@ PACKAGES = {
         "depends": [
             'make'
         ],
-        "source_url": "http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.0.tar.gz",
+        # "source_url": "http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.0.tar.gz",
         "bootstrap_dir": "%s/ruby/" % COMPONENTS_BOOTSTRAP_DIR,
         "package_dir": "%s/ruby" % VIRTUALENVS_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "%s/ruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_template": "ruby-bootstrap.template",
+        # "bootstrap_script": "%s/ruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        # "bootstrap_template": "ruby-bootstrap.template",
         "ruby_build_dir": "/opt/ruby-build"
     },
     "workflow-gems": {
@@ -356,7 +366,7 @@ PACKAGES = {
         ],
         "src_package_type": "dir",
         "dst_package_type": "tar",
-        "bootstrap_script": "%s/agent-ubuntu-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_script_internal": "%s/agent-ubuntu-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "agent-ubuntu-bootstrap.template"
     }
 }

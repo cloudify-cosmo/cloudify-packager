@@ -67,6 +67,28 @@ function check_service
 }
 
 
+function do_curl
+{
+    TYPE=$1
+    URL=$2
+
+    for i in {1..5}
+    do 
+        echo "running curl -$1 $2"
+        sudo curl -$1 $2 | grep "ok" | grep "true"
+        echo ""
+        if [ $? -eq 0 ]; then
+            echo "success"
+            return
+        else
+            echo "WARNING: failed to curl, retrying in ${TIMER:-5} seconds ($i)"
+            sleep ${TIMER:-5}
+        fi
+    done
+    state_error "couldn't curl -$1 $2!"
+}
+
+
 PKG_NAME="elasticsearch"
 PKG_DIR="/packages/elasticsearch"
 BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
@@ -102,3 +124,16 @@ check_file "${INIT_DIR}/${PKG_NAME}.conf"
 echo "starting ${PKG_NAME}..."
 sudo start elasticsearch
 check_upstart "elasticsearch"
+
+sleep 25
+# export STORAGE_INDEX_URL="http://localhost:9200/cloudify_storage"
+echo "deleting index if exists..."
+curl --retry 5 --retry-delay 3 -XDELETE http://localhost:9200/cloudify_storage
+echo "creating index..."
+curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage
+echo "creating blueprint mapping..."
+curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/blueprint/_mapping -d '{"blueprint": {"properties": {"plan": {"enabled": false}}}}'
+echo "creating deployment mapping..."
+curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/deployment/_mapping -d '{"deployment": {"properties": {"plan": {"enabled": false}}}}'
+echo "printing mappings..."
+curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1

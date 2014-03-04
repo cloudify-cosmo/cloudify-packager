@@ -55,12 +55,11 @@ def pkg_cloudify3():
     package = get_package_configuration('cloudify3')
 
     rm('{0}/cloudify*'.format(package['package_dir']))
-    cp(package['bootstrap_script'], package['package_dir'])
+    cp(package['bootstrap_script_internal'], package['package_dir'])
     do('chmod +x %s/*.sh' % package['package_dir'])
     cp(package['conf_dir'], package['package_dir'])
-    pack(
-        name=package['name'],
-        dst_path=package['package_dir'])
+    pack(package,
+         name=package['name'])
 
 
 @task
@@ -73,12 +72,11 @@ def pkg_cloudify3_components():
     package = get_package_configuration('cloudify3-components')
 
     rm('{0}/cloudify*'.format(package['package_dir']))
-    cp(package['bootstrap_script'], package['package_dir'])
+    cp(package['bootstrap_script_internal'], package['package_dir'])
     do('chmod +x %s/*.sh' % package['package_dir'])
     cp(package['conf_dir'], package['package_dir'])
-    pack(
-        name=package['name'],
-        dst_path=package['package_dir'])
+    pack(package,
+         name=package['name'])
 
 
 @task
@@ -138,6 +136,17 @@ def pkg_manager():
 
     package = get_package_configuration('manager')
     rm('{0}/archives/*.deb'.format(package['package_dir']))
+    pack(package)
+
+
+@task
+def pkg_curl():
+    """
+    ACT:    packages curl
+    EXEC:   fab pkg_curl
+    """
+
+    package = get_package_configuration('curl')
     pack(package)
 
 
