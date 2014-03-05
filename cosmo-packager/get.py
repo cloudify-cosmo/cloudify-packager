@@ -133,6 +133,18 @@ def get_manager():
     untar(package['package_dir'],
           '%s/%s.tar.gz' % (package['package_dir'],
                             package['name']))
+    mkdir(package['file_server_dir'])
+
+    import shutil
+    shutil.copytree('%s/src/main/resources/cloudify' %
+                    package['resources_dir'],
+                    '%s/cloudify' % package['file_server_dir'])
+    # cp('%s/src/main/resources/cloudify' % package['resources_dir'],
+    #    '%s/cloudify' % package['file_server_dir'])
+    alias_mapping_resource = ('%s/src/main/resources/org/cloudifysource/cosmo/'
+                              'dsl/alias-mappings.yaml' %
+                              package['resources_dir'])
+    cp(alias_mapping_resource, '%s/cloudify/' % package['file_server_dir'])
     for module in package['modules']:
         pip(module, '%s/bin' % package['package_dir'])
 

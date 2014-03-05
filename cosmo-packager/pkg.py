@@ -55,7 +55,7 @@ def pkg_cloudify3():
     package = get_package_configuration('cloudify3')
 
     rm('{0}/cloudify*'.format(package['package_dir']))
-    cp(package['bootstrap_script_internal'], package['package_dir'])
+    # cp(package['bootstrap_script_internal'], package['package_dir'])
     do('chmod +x %s/*.sh' % package['package_dir'])
     cp(package['conf_dir'], package['package_dir'])
     pack(package,
@@ -72,7 +72,7 @@ def pkg_cloudify3_components():
     package = get_package_configuration('cloudify3-components')
 
     rm('{0}/cloudify*'.format(package['package_dir']))
-    cp(package['bootstrap_script_internal'], package['package_dir'])
+    # cp(package['bootstrap_script_internal'], package['package_dir'])
     do('chmod +x %s/*.sh' % package['package_dir'])
     cp(package['conf_dir'], package['package_dir'])
     pack(package,

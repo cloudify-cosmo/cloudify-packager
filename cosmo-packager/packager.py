@@ -122,57 +122,76 @@ def get_package_configuration(component):
 
 def get(package=False, version=False, source_repo=False, source_ppa=False,
         source_key=False, source_url=False, key_file=False, reqs=False,
-        dst_path=False, name=False, bootstrap_dir=False):
+        dst_path=False, name=False, bootstrap_dir=False, modules=False,
+        gems=False, overwrite=True):
 
     version = package['version'] \
-        if 'version' in package else version
+        if not version else version
     source_repo = package['source_repo'] \
-        if 'source_repo' in package else source_repo
+        if not source_repo else source_repo
     source_ppa = package['source_ppa'] \
-        if 'source_ppa' in package else source_ppa
+        if not source_ppa else source_ppa
     source_key = package['source_key'] \
-        if 'source_key' in package else source_key
+        if not source_key else source_key
     source_url = package['source_url'] \
-        if 'source_url' in package else source_url
+        if not source_url else source_url
     key_file = package['key_file'] \
-        if 'key_file' in package else key_file
+        if not key_file else key_file
     reqs = package['reqs'] \
-        if 'reqs' in package else reqs
-    dst_path = '{0}/archives/'.format(package['package_dir']) \
-        if 'dst_path' in package else dst_path
+        if not reqs else reqs
+    dst_path = package['package_dir'] \
+        if not dst_path else dst_path
     name = package['name'] \
-        if 'name' in package else name
+        if not name else name
     bootstrap_dir = package['bootstrap_dir'] \
-        if 'bootstrap_dir' in package else bootstrap_dir
+        if not bootstrap_dir else bootstrap_dir
     conf_dir = package['conf_dir'] \
-        if 'conf_dir' in package else conf_dir
+        if not conf_dir else conf_dir
+    modules = package['modules'] \
+        if not modules else modules
+    gems = pakcage['gems'] \
+        if not gems else gems
+    overwrite = package['overwrite'] \
+        if not overwrite else overwrite
 
-    rmdir(package['package_dir'])
+    if overwrite:
+        rmdir(dst_path)
+    else:
+        if os.path.isdir(dst_path):
+            lgr.error('the destination directory for thie package already '
+                      'exists and overwrite is disabled.')
     make_package_dirs(
         bootstrap_dir,
-        package['package_dir'])
-    if 'conf_dir' in package:
-        cp('%s/*' % conf_dir, package['package_dir'])
+        dst_path)
+    if conf_dir:
+        cp(conf_dir, dst_path)
     if source_repo:
         add_src_repo(source_repo, 'deb')  # TODO: SEND LIST OF REPOS WITh MARKS
     if source_ppa:
         add_ppa_repo(source_ppa)
     if source_key:
-        wget(source_key, package['package_dir'])
+        wget(source_key, dst_path)
     if source_url:
         wget(
             source_url,
-            package['package_dir'])
+            dst_path)
     if key_file:
         add_key(key_file)
         apt_update()
     if reqs:
-        apt_download_reqs(reqs, package['package_dir'])
+        apt_download_reqs(reqs, dst_path)
+    if modules:
+        for module in modules:
+            get_python_module(module, dst_path)
+    if gems:
+        for gem in gems:
+            get_ruby_gem(gem, dst_path)
 
 
 def pack(package=False, src_type=False, dst_type=False, name=False,
          src_path=False, dst_path=False, version=False, bootstrap_dir=False,
-         bootstrap_script=False, bootstrap_template=False, depends=False):
+         bootstrap_script=False, bootstrap_template=False, depends=False,
+         bootstrap_script_in_pkg=False):
     """
     uses fpm (https://github.com/jordansissel/fpm/wiki)
     to create packages with/without bootstrap scripts
@@ -198,19 +217,28 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
         if 'bootstrap_dir' in package else bootstrap_dir
     bootstrap_script = package['bootstrap_script'] \
         if 'bootstrap_script' in package else bootstrap_script
+    bootstrap_script_in_pkg = package['bootstrap_script_in_pkg'] \
+        if 'bootstrap_script_in_pkg' in package else bootstrap_script_in_pkg
     depends = package['depends'] \
         if 'depends' in package else depends
 
+    if src_path == dst_path:
+        lgr.error('source and destination paths must'
+                  ' be different to avoid conflics!')
     if src_type:
         rmdir(dst_path)
         mkdir(dst_path)
     if bootstrap_script:
-        create_bootstrap_script(
-            package,
-            bootstrap_template,
-            bootstrap_script)
+        if bootstrap_template:
+            create_bootstrap_script(
+                package,
+                bootstrap_template,
+                bootstrap_script)
+        if bootstrap_script_in_pkg:
+            lgr.info('copying bootstrap script to package directory')
+            cp(bootstrap_script, src_path)
     if src_type:
-        lgr.debug('packing %s' % name)
+        lgr.info('packing %s' % name)
         if is_dir(src_path):
             with lcd(dst_path):
                 if bootstrap_script and dst_type == "tar":
@@ -241,7 +269,7 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
                         'sudo fpm -s %s -t %s -n %s -v %s -f %s' %
                         (src_type, dst_type, name, version, src_path))
                 if x.succeeded:
-                    lgr.debug('successfully packed %s:%s' % (name, version))
+                    lgr.info('successfully packed %s:%s' % (name, version))
                 else:
                     lgr.error('unsuccessfully packed %s:%s' % (name, version))
         else:
@@ -423,11 +451,14 @@ def mkdir(dir):
     """
 
     lgr.debug('creating directory %s' % dir)
-    x = _run_locally_with_retries('sudo mkdir -p %s' % dir)
-    if x.succeeded:
-        lgr.debug('successfully created directory %s' % dir)
+    if not os.path.isdir(dir):
+        x = _run_locally_with_retries('sudo mkdir -p %s' % dir)
+        if x.succeeded:
+            lgr.debug('successfully created directory %s' % dir)
+        else:
+            lgr.error('unsuccessfully created directory %s' % dir)
     else:
-        lgr.error('unsuccessfully created directory %s' % dir)
+        lgr.debug('directory already exists, skipping.')
 
 
 def cp(src, dst, recurse=True):

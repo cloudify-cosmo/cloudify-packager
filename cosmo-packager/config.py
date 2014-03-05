@@ -45,7 +45,7 @@ PACKAGES = {
         "conf_dir": "%s" % PACKAGER_CONF_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script_internal": "%s/cloudify3-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_script_in_pkg": "%s/cloudify3-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "cloudify3-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
         "req_free_mem": "10000",
@@ -62,7 +62,7 @@ PACKAGES = {
         "conf_dir": "%s" % PACKAGER_CONF_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script_internal": "%s/cloudify3-components-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_script_in_pkg": "%s/cloudify3-components-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "cloudify3-components-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
         "req_free_mem": "10000",
@@ -216,6 +216,8 @@ PACKAGES = {
         "package_dir": "%s/manager" % VIRTUALENVS_DIR,
         "conf_dir": "%s/manager" % PACKAGER_CONF_DIR,
         "modules": ['%s/manager/cosmo-manager-develop/manager-rest/' % VIRTUALENVS_DIR],
+        "resources_dir": "%s/manager/cosmo-manager-develop/orchestrator/" % VIRTUALENVS_DIR,
+        "file_server_dir": "%s/manager/resources" % VIRTUALENVS_DIR,
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "%s/manager-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
@@ -240,35 +242,35 @@ PACKAGES = {
         "bootstrap_script": "%s/celery-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "celery-bootstrap.template"
     },
-    "gcc": {
-        "name": "gcc",
-        "version": "0.0.1",
-        "reqs": [
-            "libc6",
-            "libc-bin",
-            "zlib1g-dev",
-            "libmpc2",
-            "libgomp1",
-            "binutils",
-            "cpp",
-            "gcc-4.6",
-            "gcc-multilib",
-            "make",
-            "manpages-dev",
-            "autoconf",
-            "automake1.9",
-            "libtool",
-            "flex",
-            "bison",
-            "gdb",
-            "gcc-doc",
-            "libc6-dev",
-            "libc-dev",
-            "gcc"
-        ],
-        "bootstrap_dir": "%s/gcc/" % COMPONENTS_BOOTSTRAP_DIR,
-        "package_dir": "%s/gcc" % PACKAGES_DIR
-    },
+    # "gcc": {
+    #     "name": "gcc",
+    #     "version": "0.0.1",
+    #     "reqs": [
+    #         "libc6",
+    #         "libc-bin",
+    #         "zlib1g-dev",
+    #         "libmpc2",
+    #         "libgomp1",
+    #         "binutils",
+    #         "cpp",
+    #         "gcc-4.6",
+    #         "gcc-multilib",
+    #         "make",
+    #         "manpages-dev",
+    #         "autoconf",
+    #         "automake1.9",
+    #         "libtool",
+    #         "flex",
+    #         "bison",
+    #         "gdb",
+    #         "gcc-doc",
+    #         "libc6-dev",
+    #         "libc-dev",
+    #         "gcc"
+    #     ],
+    #     "bootstrap_dir": "%s/gcc/" % COMPONENTS_BOOTSTRAP_DIR,
+    #     "package_dir": "%s/gcc" % PACKAGES_DIR
+    # },
     "curl": {
         "name": "curl",
         "version": "0.0.1",
@@ -289,22 +291,22 @@ PACKAGES = {
         "package_dir": "%s/make" % PACKAGES_DIR,
         "dst_package_type": "deb",
     },
-    "zlib": {
-        "name": "zlib",
-        "version": "1.2.8",
-        "depends": [
-            'make',
-            'gcc'
-        ],
-        "source_url": "http://zlib.net/zlib-1.2.8.tar.gz",
-        "version": "0.0.1",
-        "bootstrap_dir": "%s/zlib/" % COMPONENTS_BOOTSTRAP_DIR,
-        "package_dir": "%s/zlib" % PACKAGES_DIR,
-        "src_package_type": "dir",
-        "dst_package_type": "deb",
-        "bootstrap_script": "%s/zlib-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
-        "bootstrap_template": "zlib-bootstrap.template"        
-    },
+    # "zlib": {
+    #     "name": "zlib",
+    #     "version": "1.2.8",
+    #     "depends": [
+    #         'make',
+    #         'gcc'
+    #     ],
+    #     "source_url": "http://zlib.net/zlib-1.2.8.tar.gz",
+    #     "version": "0.0.1",
+    #     "bootstrap_dir": "%s/zlib/" % COMPONENTS_BOOTSTRAP_DIR,
+    #     "package_dir": "%s/zlib" % PACKAGES_DIR,
+    #     "src_package_type": "dir",
+    #     "dst_package_type": "deb",
+    #     "bootstrap_script": "%s/zlib-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+    #     "bootstrap_template": "zlib-bootstrap.template"        
+    # },
     "ruby": {
         "name": "ruby2.1",
         "version": "2.1.0",
@@ -366,7 +368,7 @@ PACKAGES = {
         ],
         "src_package_type": "dir",
         "dst_package_type": "tar",
-        "bootstrap_script_internal": "%s/agent-ubuntu-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        "bootstrap_script_in_pkg": "%s/agent-ubuntu-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
         "bootstrap_template": "agent-ubuntu-bootstrap.template"
     }
 }
