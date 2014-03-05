@@ -49,23 +49,29 @@ def _run_locally_with_retries(command, sudo=False, retries=5,
     """
     runs a fab local() with retries
     """
+    def execute():
+        for execution in range(retries):
+            try:
+                if sudo:
+                    r = local('sudo {0}'.format(command, capture))
+                else:
+                    r = local(command, capture)
+                lgr.debug('ran command: {0}'.format(command))
+                return r
+            except:
+                lgr.warning('failed to run command: {0} -retrying ({1}/{2})'
+                            .format(command, execution, retries))
+                sleep(sleeper)
+        lgr.error('failed to run command: {0} even after {1} retries'
+                  .format(command, execution))
+        sys.exit(1)
 
-    for execution in range(retries):
-        lgr.debug('running command: %s' % command)
-        try:
-            if sudo:
-                r = local('sudo %s' % command, capture)
-            else:
-                r = local(command, capture)
-            lgr.debug('ran command: %s' % command)
-            return r
-        except:
-            lgr.warning('failed to run command: %s -retrying (%s/%s)' %
-                        (command, execution, retries))
-            sleep(sleeper)
-    lgr.error('failed to run command: %s even after %s retries' %
-              (command, execution))
-    sys.exit()
+    lgr.info('running command: {0}'.format(command))
+    if config.VERBOSE:
+        return execute()
+    else:
+        with hide('running'):
+            return execute()
 
 
 def do(command, sudo=False):
@@ -83,13 +89,13 @@ def delete_pip_build_root():
 
 def check_if_package_is_installed(package):
 
-    lgr.debug('checking if %s is installed' % package)
+    lgr.debug('checking if {0} is installed'.format(package))
     try:
-        _run_locally_with_retries('sudo dpkg -s %s' % package)
-        lgr.debug('%s is installed' % package)
+        _run_locally_with_retries('sudo dpkg -s {0}'.format(package))
+        lgr.debug('{0} is installed'.format(package))
         return True
     except:
-        lgr.error('%s is not installed' % package)
+        lgr.error('{0} is not installed'.format(package))
         return False
 
 
@@ -109,14 +115,14 @@ def get_package_configuration(component):
     retrieves a package's configuration from config.PACKAGES
     """
 
-    lgr.debug('retrieving configuration for %s' % component)
+    lgr.debug('retrieving configuration for {0}'.format(component))
     try:
         package_config = config.PACKAGES[component]
-        lgr.debug('%s config retrieved successfully' % component)
+        lgr.debug('{0} config retrieved successfully'.format(component))
         return package_config
     except KeyError:
         lgr.error('package configuration for'
-                  ' %s was not found, terminating...' % component)
+                  ' {0} was not found, terminating...'.format(component))
         sys.exit()
 
 
@@ -124,6 +130,9 @@ def get(package=False, version=False, source_repo=False, source_ppa=False,
         source_key=False, source_url=False, key_file=False, reqs=False,
         dst_path=False, name=False, bootstrap_dir=False, modules=False,
         gems=False, overwrite=True):
+    """
+    retrieves resources for packaging
+    """
 
     version = package['version'] \
         if not version else version
@@ -155,6 +164,7 @@ def get(package=False, version=False, source_repo=False, source_ppa=False,
         if not overwrite else overwrite
 
     if overwrite:
+        lgr.info('overwrite enabled. removing directory before retrieval')
         rmdir(dst_path)
     else:
         if os.path.isdir(dst_path):
@@ -194,7 +204,7 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
          bootstrap_script_in_pkg=False):
     """
     uses fpm (https://github.com/jordansissel/fpm/wiki)
-    to create packages with/without bootstrap scripts
+    to create packages
     """
 
     bootstrap_template = package['bootstrap_template'] \
@@ -235,47 +245,49 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
                 bootstrap_template,
                 bootstrap_script)
         if bootstrap_script_in_pkg:
+            lgr.info('granting execution permissions')
+            do('chmod +x {0}'.format(bootstrap_script))
             lgr.info('copying bootstrap script to package directory')
             cp(bootstrap_script, src_path)
     if src_type:
-        lgr.info('packing %s' % name)
+        lgr.info('packing {0}'.format(name))
         if is_dir(src_path):
             with lcd(dst_path):
                 if bootstrap_script and dst_type == "tar":
                     lgr.debug('retrieving bootstrap script')
                     cp(bootstrap_script, src_path)
                     x = _run_locally_with_retries(
-                        'sudo fpm -s %s -t %s'
-                        ' -n %s -v %s -f %s' %
-                        (src_type, dst_type,
-                         name, version, src_path))
+                        'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
+                        .format(src_type, dst_type, name, version, src_path))
                 elif bootstrap_script and not depends:
                     x = _run_locally_with_retries(
-                        'sudo fpm -s %s -t %s'
-                        ' --after-install %s -n %s -v %s -f %s' %
-                        (src_type, dst_type, bootstrap_script,
-                         name, version, src_path))
+                        'sudo fpm -s {0} -t {1} --after-install {2} -n {3}'
+                        ' -v {4} -f {5}'
+                        .format(src_type, dst_type, bootstrap_script,
+                                name, version, src_path))
                 elif bootstrap_script and depends:
-                    lgr.debug('package dependencies are: %s' % ", "
-                              .join(depends))
+                    lgr.debug('package dependencies are: {0}'.format(", "
+                              .join(depends)))
                     dep_str = "-d " + " -d ".join(depends)
                     x = _run_locally_with_retries(
-                        'sudo fpm -s %s -t %s'
-                        ' --after-install %s %s -n %s -v %s -f %s' %
-                        (src_type, dst_type, bootstrap_script, dep_str,
-                         name, version, src_path))
+                        'sudo fpm -s {0} -t {1} --after-install {2} {3} -n {4}'
+                        ' -v {5} -f {6}'
+                        .format(src_type, dst_type, bootstrap_script, dep_str,
+                                name, version, src_path))
                 else:
                     x = _run_locally_with_retries(
-                        'sudo fpm -s %s -t %s -n %s -v %s -f %s' %
-                        (src_type, dst_type, name, version, src_path))
+                        'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
+                        .format(src_type, dst_type, name, version, src_path))
                 if x.succeeded:
-                    lgr.info('successfully packed %s:%s' % (name, version))
+                    lgr.info('successfully packed {0}:{1}'
+                             .format(name, version))
                 else:
-                    lgr.error('unsuccessfully packed %s:%s' % (name, version))
+                    lgr.error('unsuccessfully packed {0}:{1}'
+                              .format(name, version))
         else:
             lgr.error('package dir {0} does\'nt exist, termintating...'
                       .format(src_path))
-            sys.exit()
+            sys.exit(1)
 
     if not is_dir(bootstrap_dir):
         mkdir(bootstrap_dir)
@@ -298,19 +310,20 @@ def get_ruby_gem(gem, dir):
     downloads a ruby gem
     """
 
-    lgr.debug('downloading gem %s' % gem)
+    lgr.debug('downloading gem {0}'.format(gem))
     try:
         x = _run_locally_with_retries(
             'sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install'
-            ' --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+            ' --no-ri --no-rdoc --install-dir {0} {1}'.format(dir, gem))
     except:
         x = _run_locally_with_retries(
             'sudo /usr/local/rvm/rubies/ruby-2.1.0/bin/gem install'
-            ' --no-ri --no-rdoc --install-dir %s %s' % (dir, gem))
+            ' --no-ri --no-rdoc --install-dir {0} {1}'.format(dir, gem))
     if x.succeeded:
-        lgr.debug('successfully downloaded ruby gem %s to %s' % (gem, dir))
+        lgr.debug('successfully downloaded ruby gem {0} to {1}'
+                  .format(gem, dir))
     else:
-        lgr.error('unsuccessfully downloaded ruby gem %s' % gem)
+        lgr.error('unsuccessfully downloaded ruby gem {0}'.format(gem))
 
 
 def pip(module, dir):
@@ -318,14 +331,14 @@ def pip(module, dir):
     pip installs a module
     """
 
-    lgr.debug('installing module %s' % module)
+    lgr.debug('installing module {0}'.format(module))
     x = _run_locally_with_retries(
-        'sudo %s/pip --default-timeout=45 install %s' % (dir, module))
+        'sudo {0}/pip --default-timeout=45 install {1}'.format(dir, module))
     if x.succeeded:
-        lgr.debug(
-            'successfully installed python module %s to %s' % (module, dir))
+        lgr.debug('successfully installed python module {0} to {1}'
+                  .format(module, dir))
     else:
-        lgr.error('unsuccessfully installed python module %s' % module)
+        lgr.error('unsuccessfully installed python module {0}'.format(module))
 
 
 def get_python_module(module, dir):
@@ -333,16 +346,17 @@ def get_python_module(module, dir):
     downloads a python module
     """
 
-    lgr.debug('downloading module %s' % module)
+    lgr.debug('downloading module {0}'.format(module))
     x = _run_locally_with_retries(
         'sudo /usr/local/bin/pip install --no-use-wheel \
-        --process-dependency-links --download "%s/" %s' %
-        (dir, module))
+        --process-dependency-links --download "{0}/" {1}'
+        .format(dir, module))
     if x.succeeded:
-        lgr.debug('successfully downloaded python module %s to %s' %
-                  (module, dir))
+        lgr.debug('successfully downloaded python module {0} to {1}'
+                  .format(module, dir))
     else:
-        lgr.error('unsuccessfully downloaded python module %s' % module)
+        lgr.error('unsuccessfully downloaded python module {0}'
+                  .format(module))
 
 
 def check_module_installed(name):
@@ -350,13 +364,13 @@ def check_module_installed(name):
     checks to see that a module is installed
     """
 
-    lgr.debug('checking to see that %s is installed' % name)
+    lgr.debug('checking to see that {0} is installed'.format(name))
     x = _run_locally_with_retries('pip freeze', capture=True)
-    if re.search(r'%s' % name, x.stdout):
-        lgr.debug('module %s is installed' % name)
+    if re.search(r'{0}'.format(name), x.stdout):
+        lgr.debug('module {0} is installed'.format(name))
         return True
     else:
-        lgr.debug('module %s is not installed' % name)
+        lgr.debug('module {0} is not installed'.format(name))
         return False
 
 
@@ -365,14 +379,17 @@ def venv(root_dir, name=False):
     creates a virtualenv
     """
 
-    lgr.debug('creating virtualenv in %s' % (root_dir))
+    lgr.debug('creating virtualenv in {0}'.format(root_dir))
     if check_module_installed('virtualenv'):
         #with lcd(root_dir):
-        x = _run_locally_with_retries('virtualenv %s' % root_dir)
+        x = _run_locally_with_retries('virtualenv {0}'
+                                      .format(root_dir))
         if x.succeeded:
-            lgr.debug('successfully created virtualenv in %s' % (root_dir))
+            lgr.debug('successfully created virtualenv in {0}'
+                      .format(root_dir))
         else:
-            lgr.error('unsuccessfully created virtualenv in %s' % (root_dir))
+            lgr.error('unsuccessfully created virtualenv in {0}'
+                      .format(root_dir))
     else:
         lgr.error('virtualenv is not installed. terminating')
         sys.exit()
@@ -383,12 +400,14 @@ def wget(url, dir=False, file=False):
     wgets a url to a destination directory or file
     """
 
-    lgr.debug('downloading %s to %s' % (url, dir))
+    lgr.debug('downloading {0} to {1}'.format(url, dir))
     try:
         if file:
-            x = _run_locally_with_retries('sudo wget %s -O %s' % (url, file))
+            x = _run_locally_with_retries('sudo wget {0} -O {1}'
+                                          .format(url, file))
         elif dir:
-            x = _run_locally_with_retries('sudo wget %s -P %s' % (url, dir))
+            x = _run_locally_with_retries('sudo wget {0} -P {1}'
+                                          .format(url, dir))
         elif dir and file:
             lgr.warning('please specify either a directory'
                         ' or file to download to, not both')
@@ -398,22 +417,26 @@ def wget(url, dir=False, file=False):
             sys.exit()
         if x.succeeded:
             if file:
-                lgr.debug('successfully downloaded %s to %s' % (url, file))
+                lgr.debug('successfully downloaded {0} to {1}'
+                          .format(url, file))
             elif dir:
-                lgr.debug('successfully downloaded %s to %s' % (url, dir))
+                lgr.debug('successfully downloaded {0} to {1}'
+                          .format(url, dir))
             elif not dir and not file:
-                lgr.debug(
-                    'successfully downloaded %s to local directory' % url)
+                lgr.debug('successfully downloaded {0} to local directory'
+                          .format(url))
         else:
             if file:
-                lgr.error('unsuccessfully downloaded %s to %s' % (url, file))
+                lgr.error('unsuccessfully downloaded {0} to {1}'
+                          .format(url, file))
             elif dir:
-                lgr.error('unsuccessfully downloaded %s to %s' % (url, dir))
+                lgr.error('unsuccessfully downloaded {0} to {1}'
+                          .format(url, dir))
             elif not dir and not file:
-                lgr.debug(
-                    'unsuccessfully downloaded %s to local directory' % url)
+                lgr.debug('unsuccessfully downloaded {0} to local directory'
+                          .format(url))
     except:
-        lgr.error('failed downloading %s' % url)
+        lgr.error('failed downloading {0}'.format(url))
 
 
 def rmdir(dir):
@@ -421,13 +444,13 @@ def rmdir(dir):
     deletes a directory
     """
 
-    lgr.debug('removing directory %s' % dir)
+    lgr.debug('removing directory {0}'.format(dir))
     try:
         if os.path.isdir(dir):
-            _run_locally_with_retries('sudo rm -rf %s' % dir)
-        lgr.debug('successfully removed directory %s' % dir)
+            _run_locally_with_retries('sudo rm -rf {0}'.format(dir))
+        lgr.debug('successfully removed directory {0}'.format(dir))
     except:
-        lgr.error('unsuccessfully removed directory %s' % dir)
+        lgr.error('unsuccessfully removed directory {0}'.format(dir))
 
 
 def rm(file):
@@ -435,14 +458,13 @@ def rm(file):
     deletes a file or a set of files
     """
 
-    lgr.info('removing files %s' % file)
-    # print 'removing files %s' % file
+    lgr.info('removing files {0}'.format(file))
     try:
         if os.path.isfile(file):
-            _run_locally_with_retries('sudo rm %s' % file)
-        lgr.info('successfully removed file %s' % file)
+            _run_locally_with_retries('sudo rm {0}'.format(file))
+        lgr.info('successfully removed file {0}'.format(file))
     except:
-        lgr.error('unsuccessfully removed file %s' % file)
+        lgr.error('unsuccessfully removed file {0}'.format(file))
 
 
 def mkdir(dir):
@@ -450,13 +472,13 @@ def mkdir(dir):
     creates (recursively) a directory
     """
 
-    lgr.debug('creating directory %s' % dir)
+    lgr.debug('creating directory {0}'.format(dir))
     if not os.path.isdir(dir):
-        x = _run_locally_with_retries('sudo mkdir -p %s' % dir)
+        x = _run_locally_with_retries('sudo mkdir -p {0}'.format(dir))
         if x.succeeded:
-            lgr.debug('successfully created directory %s' % dir)
+            lgr.debug('successfully created directory {0}'.format(dir))
         else:
-            lgr.error('unsuccessfully created directory %s' % dir)
+            lgr.error('unsuccessfully created directory {0}'.format(dir))
     else:
         lgr.debug('directory already exists, skipping.')
 
@@ -466,15 +488,15 @@ def cp(src, dst, recurse=True):
     copies (recuresively or not) files or directories
     """
 
-    lgr.debug('copying %s to %s' % (src, dst))
+    lgr.debug('copying {0} to {1}'.format(src, dst))
     if recurse:
-        x = _run_locally_with_retries('sudo cp -R %s %s' % (src, dst))
+        x = _run_locally_with_retries('sudo cp -R {0} {1}'.format(src, dst))
     else:
-        x = _run_locally_with_retries('sudo cp %s %s' % (src, dst))
+        x = _run_locally_with_retries('sudo cp {0} {1}'.format(src, dst))
     if x.succeeded:
-        lgr.debug('successfully copied %s to %s' % (src, dst))
+        lgr.debug('successfully copied {0} to {1}'.format(src, dst))
     else:
-        lgr.error('unsuccessfully copied %s to %s' % (src, dst))
+        lgr.error('unsuccessfully copied {0} to {1}'.format(src, dst))
 
 
 def dpkg_name(dir):
@@ -483,7 +505,7 @@ def dpkg_name(dir):
     """
 
     lgr.debug('renaming deb files...')
-    _run_locally_with_retries('dpkg-name %s/*.deb' % dir)
+    _run_locally_with_retries('dpkg-name {0}/*.deb'.format(dir))
 
 
 def apt_download_reqs(req_list, package_dir):
@@ -498,7 +520,7 @@ def apt_autoremove(pkg):
     """
 
     lgr.debug('removing unnecessary dependencies...')
-    _run_locally_with_retries('sudo apt-get -y autoremove %s' % pkg)
+    _run_locally_with_retries('sudo apt-get -y autoremove {0}'.formaT(pkg))
 
 
 def apt_download(pkg, dir):
@@ -506,13 +528,13 @@ def apt_download(pkg, dir):
     uses apt to download package debs from ubuntu's repo
     """
 
-    lgr.debug('downloading %s to %s' % (pkg, dir))
+    lgr.debug('downloading {0} to {1}'.format(pkg, dir))
     x = _run_locally_with_retries(
-        'sudo apt-get -y install %s -d -o=dir::cache=%s' % (pkg, dir))
+        'sudo apt-get -y install {0} -d -o=dir::cache={1}'.format(pkg, dir))
     if x.succeeded:
-        lgr.debug('successfully downloaded %s to %s' % (pkg, dir))
+        lgr.debug('successfully downloaded {0} to {1}'.format(pkg, dir))
     else:
-        lgr.error('unsuccessfully downloaded %s to %s' % (pkg, dir))
+        lgr.error('unsuccessfully downloaded {0} to {1}'.format(pkg, dir))
 
 
 def add_src_repo(url, mark):
@@ -542,12 +564,12 @@ def add_key(key_file):
     adds a key to the local repo
     """
 
-    lgr.debug('adding key %s' % key_file)
-    x = _run_locally_with_retries('sudo apt-key add %s' % key_file)
+    lgr.debug('adding key {0}'.format(key_file))
+    x = _run_locally_with_retries('sudo apt-key add {0}'.format(key_file))
     if x.succeeded:
-        lgr.debug('successfully added key %s' % key_file)
+        lgr.debug('successfully added key {0}'.format(key_file))
     else:
-        lgr.error('unsuccessfully added key %s' % key_file)
+        lgr.error('unsuccessfully added key {0}'.format(key_file))
 
 
 def apt_update():
@@ -569,12 +591,13 @@ def apt_get(list):
     """
 
     for package in list:
-        lgr.debug('installing %s' % package)
-        x = _run_locally_with_retries('sudo apt-get -y install %s' % package)
+        lgr.debug('installing {0}'.format(package))
+        x = _run_locally_with_retries('sudo apt-get -y install {0}'
+                                      .format(package))
         if x.succeeded:
-            lgr.debug('successfully installed %s' % package)
+            lgr.debug('successfully installed {0}'.format(package))
         else:
-            lgr.error('unsuccessfully installed %s' % package)
+            lgr.error('unsuccessfully installed {0}'.format(package))
 
 
 def mvn(file):
@@ -582,25 +605,26 @@ def mvn(file):
     build a jar
     """
 
-    lgr.debug('building from %s' % file)
+    lgr.debug('building from {0}'.format(file))
     x = _run_locally_with_retries(
-        'mvn clean package -DskipTests -Pall -f %s' % file)
+        'mvn clean package -DskipTests -Pall -f {0}'.format(file))
     if x.succeeded:
-        lgr.debug('successfully built from %s' % file)
+        lgr.debug('successfully built from {0}'.format(file))
     else:
-        lgr.error('unsuccessfully built from %s' % file)
+        lgr.error('unsuccessfully built from {0}'.format(file))
 
 
 def find_in_dir(dir, pattern):
 
-    lgr.debug('looking for %s in %s' % (pattern, dir))
+    lgr.debug('looking for {0} in {1}'.format(pattern, dir))
     x = _run_locally_with_retries(
-        'find %s -iname "%s" -exec echo {} \;' % (dir, pattern), capture=True)
+        'find {0} -iname "{1}" -exec echo {} \;'
+        .format(dir, pattern), capture=True)
     if x.succeeded:
         return x.stdout
-        lgr.debug('successfully found %s in %s' % (pattern, dir))
+        lgr.debug('successfully found {0} in {1}'.format(pattern, dir))
     else:
-        lgr.error('unsuccessfully found %s in %s' % (pattern, dir))
+        lgr.error('unsuccessfully found {0} in {1}'.format(pattern, dir))
 
 
 def tar(chdir, output_file, input):
@@ -608,13 +632,13 @@ def tar(chdir, output_file, input):
     tars an input file or directory
     """
 
-    lgr.debug('tar-ing %s' % output_file)
+    lgr.debug('tar-ing {0}'.format(output_file))
     x = _run_locally_with_retries(
-        'sudo tar -C %s -czvf %s %s' % (chdir, output_file, input))
+        'sudo tar -C {0} -czvf {1} {2}'.format(chdir, output_file, input))
     if x.succeeded:
-        lgr.debug('successfully tar-ed %s' % output_file)
+        lgr.debug('successfully tar-ed {0}'.format(output_file))
     else:
-        lgr.error('unsuccessfully tar-ed %s' % output_file)
+        lgr.error('unsuccessfully tar-ed {0}'.format(output_file))
 
 
 def untar(chdir, input_file):
@@ -622,13 +646,13 @@ def untar(chdir, input_file):
     untars a dir
     """
 
-    lgr.debug('tar-ing %s' % input_file)
+    lgr.debug('tar-ing {0}'.format(input_file))
     x = _run_locally_with_retries(
-        'sudo tar -C %s -xzvf %s' % (chdir, input_file))
+        'sudo tar -C {0} -xzvf {1}'.format(chdir, input_file))
     if x.succeeded:
-        lgr.debug('successfully untar-ed %s' % input_file)
+        lgr.debug('successfully untar-ed {0}'.format(input_file))
     else:
-        lgr.error('unsuccessfully untar-ed %s' % input_file)
+        lgr.error('unsuccessfully untar-ed {0}'.format(input_file))
 
 
 def apt_purge(package):
@@ -636,11 +660,11 @@ def apt_purge(package):
     completely purges a package from the local repo
     """
 
-    x = _run_locally_with_retries('sudo apt-get -y purge %s' % package)
+    x = _run_locally_with_retries('sudo apt-get -y purge {0}'.format(package))
     if x.succeeded:
-        lgr.debug('successfully purged %s' % package)
+        lgr.debug('successfully purged {0}'.format(package))
     else:
-        lgr.error('unsuccessfully purged %s' % package)
+        lgr.error('unsuccessfully purged {0}'.format(package))
 
 
 def run_script(package_name, action, arg_s=''):
@@ -648,16 +672,17 @@ def run_script(package_name, action, arg_s=''):
     runs a a shell scripts with optional arguments
     """
 
-    SCRIPT_PATH = '%s/%s-%s.sh' % (
+    SCRIPT_PATH = '{0}/{1}-{2}.sh'.format(
         config.PACKAGER_SCRIPTS_DIR, package_name, action)
 
     try:
         with open(SCRIPT_PATH):
-            lgr.debug('%s package: %s' % (action, package_name))
-            lgr.debug('running %s %s' % (SCRIPT_PATH, arg_s))
-            _run_locally_with_retries('%s %s' % (SCRIPT_PATH, arg_s))
+            lgr.debug('{0} package: {1}'.format(action, package_name))
+            lgr.debug('running {0} {1}'.format(SCRIPT_PATH, arg_s))
+            _run_locally_with_retries('{0} {1}'.format(SCRIPT_PATH, arg_s))
     except IOError:
-        lgr.error('Oh Dear... the script %s does not exist' % SCRIPT_PATH)
+        lgr.error('Oh Dear... the script {0} does not exist'
+                  .format(SCRIPT_PATH))
         sys.exit()
 
 
@@ -666,12 +691,12 @@ def is_dir(dir):
     checks if a directory exists
     """
 
-    lgr.debug('checking if %s exists' % dir)
+    lgr.debug('checking if {0} exists'.format(dir))
     if os.path.isdir(dir):
-        lgr.debug('%s exists' % dir)
+        lgr.debug('{0} exists'.format(dir))
         return True
     else:
-        lgr.debug('%s does not exist' % dir)
+        lgr.debug('{0} does not exist'.format(dir))
         return False
 
 
