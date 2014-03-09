@@ -49,7 +49,7 @@ def _run_locally_with_retries(command, sudo=False, retries=5,
     """
     runs a fab local() with retries
     """
-    def execute():
+    def _execute():
         for execution in range(retries):
             try:
                 if sudo:
@@ -68,10 +68,10 @@ def _run_locally_with_retries(command, sudo=False, retries=5,
 
     lgr.info('running command: {0}'.format(command))
     if config.VERBOSE:
-        return execute()
+        return _execute()
     else:
         with hide('running'):
-            return execute()
+            return _execute()
 
 
 def do(command, sudo=False):
@@ -83,11 +83,17 @@ def do(command, sudo=False):
 
 
 def delete_pip_build_root():
+    """
+    DEPRACATED
+    """
 
     rmdir('/tmp/pip_buid_root/')
 
 
 def check_if_package_is_installed(package):
+    """
+    checks if a package is installed
+    """
 
     lgr.debug('checking if {0} is installed'.format(package))
     try:

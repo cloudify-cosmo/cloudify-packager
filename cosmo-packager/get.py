@@ -100,7 +100,7 @@ def get_graphite():
 
 
 @task
-def get_celery():
+def get_celery(install=False):
     """
     ACT:    retrives celery
     EXEC:   fab get_celery
@@ -110,12 +110,13 @@ def get_celery():
 
     _prepare(package)
     venv(package['package_dir'])
-    for module in package['modules']:
-        pip(module, '%s/bin' % package['package_dir'])
+    if install:
+        for module in package['modules']:
+            pip(module, '%s/bin' % package['package_dir'])
 
 
 @task
-def get_manager():
+def get_manager(install=False):
     """
     ACT:    retrives cosmo manager and its config, creates a virtualenv,
             installs all modules and builds cosmo.jar
@@ -126,15 +127,19 @@ def get_manager():
 
     _prepare(package)
     venv(package['package_dir'])
-    wget(
-        package['source_url'],
-        file='%s/%s.tar.gz' % (package['package_dir'],
-                               package['name']))
-    untar(package['package_dir'],
-          '%s/%s.tar.gz' % (package['package_dir'],
-                            package['name']))
-    mkdir(package['file_server_dir'])
+    if install:
+        wget(
+            package['source_url'],
+            file='%s/%s.tar.gz' % (package['package_dir'],
+                                   package['name']))
+        untar(package['package_dir'],
+              '%s/%s.tar.gz' % (package['package_dir'],
+                                package['name']))
+        # TODO: DELETE TAR FILE
+    else:
+        cp(local_manager_repo, package['package_dir'])
 
+    mkdir(package['file_server_dir'])
     import shutil
     shutil.copytree('%s/src/main/resources/cloudify' %
                     package['resources_dir'],
@@ -145,8 +150,9 @@ def get_manager():
                               'dsl/alias-mappings.yaml' %
                               package['resources_dir'])
     cp(alias_mapping_resource, '%s/cloudify/' % package['file_server_dir'])
-    for module in package['modules']:
-        pip(module, '%s/bin' % package['package_dir'])
+    if install:
+        for module in package['modules']:
+            pip(module, '%s/bin' % package['package_dir'])
 
 
 @task
@@ -276,7 +282,7 @@ def get_workflow_gems():
 
 
 @task
-def get_cosmo_ui():
+def get_cosmo_ui(install=False):
     """
     ACT:    retrives cosmo_ui
     EXEC:   fab get_cosmo_ui
@@ -285,9 +291,10 @@ def get_cosmo_ui():
     package = get_package_configuration('cosmo-ui')
 
     _prepare(package)
-    wget(
-        package['source_url'],
-        dir=package['package_dir'])
+    if install:
+        wget(
+            package['source_url'],
+            dir=package['package_dir'])
 
 
 @task

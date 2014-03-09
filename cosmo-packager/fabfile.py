@@ -78,7 +78,7 @@ def get_cosmo():
     get_celery()
     get_manager()
     get_workflow_gems()
-    # get_cosmo_ui()
+    get_cosmo_ui()
 
 
 @task
