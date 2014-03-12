@@ -1,6 +1,0 @@
-Flask
-flask-restful
-flask-restful-swagger
-requests
-bernhard
-

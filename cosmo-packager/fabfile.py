@@ -138,6 +138,7 @@ def transfer():
 
     with settings(host_string=server):
         if exists('/opt/cosmo/packages'):
-            put('/cloudify/*.deb', '/opt/cosmo/packages')
+            # put('/cloudify/*.deb', '/opt/cosmo/packages')
+            put('/cloudify3/cosmo-ui/*.deb', '/opt/cosmo/packages')
         else:
             print 'wooha!'

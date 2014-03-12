@@ -48,11 +48,6 @@ PACKAGES = {
         "bootstrap_script_in_pkg": "{0}/cloudify3-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "cloudify3-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
-        "req_free_mem": "10000",
-        "req_free_disk": "5",
-        "req_cpu_cores": "1",
-        "req_arch": "x86_64",
-        "req_os": "precise"
     },
     "cloudify3-components": {
         "name": "cloudify3-components",
@@ -65,11 +60,23 @@ PACKAGES = {
         "bootstrap_script_in_pkg": "{0}/cloudify3-components-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "cloudify3-components-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
-        "req_free_mem": "10000",
-        "req_free_disk": "5",
-        "req_cpu_cores": "1",
-        "req_arch": "x86_64",
-        "req_os": "precise"
+        "bootstrap_params": {
+            "req_free_mem": "10000",
+            "req_free_disk": "5",
+            "req_cpu_cores": "1",
+            "req_arch": "x86_64",
+            "req_os": "precise"
+        },
+        "config_templates": {
+            "nginx-config__template": "{0}/nginx/default.conf.template".format(PACKAGER_CONF_DIR),
+            "nginx_conf_params": {
+                "kibana_run_dir": "/opt/kibana3",
+                "file_server_resources_path": "{0}/manager/resources".format(VIRTUALENVS_DIR),
+                "kibana_port": "3000",
+                "rest_port": "80",
+                "file_server_port": "53229"
+            }
+        }
     },
     "logstash": {
         "name": "logstash",
@@ -84,12 +91,29 @@ PACKAGES = {
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "{0}/logstash-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        "bootstrap_template": "logstash-bootstrap.template"
+        "bootstrap_template": "logstash-bootstrap.template",
+        "config_templates": {
+            "init__template": "{0}/logstash/init/logstash.conf.template".format(PACKAGER_CONF_DIR),
+            "init_params": {
+                "jar": "logstash.jar",
+                "log_file": "/var/log/logstash.out",
+                "conf_path": "/etc/logstash.conf",
+                "run_dir": "/opt/logstash",
+                "user": "root"
+            },
+            "conf__template": "{0}/logstash/conf/logstash.conf.template".format(PACKAGER_CONF_DIR),
+            "conf_params": {
+                "events_queue": "cloudify-events",
+                "logs_queue": "logs-index",
+                "test_tcp_port": "9999",
+                "events_index": "cloudify_events"
+            }
+        }
     },
     "elasticsearch": {
         "name": "elasticsearch",
-        "version": "0.90.9",
-        "source_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.9.tar.gz",
+        "version": "1.0.1",
+        "source_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
         "depends": [
             'openjdk-7-jdk'
         ],
@@ -99,7 +123,14 @@ PACKAGES = {
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "{0}/elasticsearch-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        "bootstrap_template": "elasticsearch-bootstrap.template"
+        "bootstrap_template": "elasticsearch-bootstrap.template",
+        "config_templates": {
+            "init__template": "{0}/elasticsearch/init/elasticsearch.conf.template".format(PACKAGER_CONF_DIR),
+            "init_params": {
+                "run_dir": "/opt/elasticsearch",
+                "user": "root",
+            }
+        }
     },
     "kibana3": {
         "name": "kibana3",
@@ -115,7 +146,7 @@ PACKAGES = {
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "{0}/kibana-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        "bootstrap_template": "kibana-bootstrap.template"
+        "bootstrap_template": "kibana-bootstrap.template",
     },
     "nginx": {
         "name": "nginx",
@@ -221,7 +252,21 @@ PACKAGES = {
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "{0}/manager-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        "bootstrap_template": "manager-bootstrap.template"
+        "bootstrap_template": "manager-bootstrap.template",
+        "config_templates": {
+            "init__template_gunicorn": "{0}/manager/init/manager.conf.template".format(PACKAGER_CONF_DIR),
+            "init__template_workflow": "{0}/manager/init/workflow.conf.template".format(PACKAGER_CONF_DIR),
+            "init_params": {
+                "manager_rest_path": "{0}/manager/cosmo-manager-develop/manager-rest/manager_rest/".format(VIRTUALENVS_DIR),
+                "gunicorn_user": "root",
+                "gunicorn_conf_path": "{0}/manager/conf/guni.conf".format(VIRTUALENVS_DIR),
+                "unicorn_user": "root",
+                "ruby_path": "{0}/ruby".format(VIRTUALENVS_DIR),
+                "workflow_service_path": "{0}/manager/cosmo-manager-develop/workflow-service/".format(VIRTUALENVS_DIR),
+                "workflow_service_logs_path": "/var/log/cosmo/blueprints"
+            },
+            "conf__template": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONF_DIR),
+        }
     },
     "celery": {
         "name": "celery",
@@ -238,7 +283,14 @@ PACKAGES = {
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "{0}/celery-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        "bootstrap_template": "celery-bootstrap.template"
+        "bootstrap_template": "celery-bootstrap.template",
+        "config_templates": {
+            "init__template": "{0}/celery/init/celeryd.cloudify-management.template".format(PACKAGER_CONF_DIR),
+            "init_params": {
+                "defaults_file": "/etc/default/celeryd-cloudify.management",
+            },
+            "conf__template": "{0}/celery/conf/celeryd.cloudify-management.template".format(PACKAGER_CONF_DIR),
+        }
     },
     # "gcc": {
     #     "name": "gcc",
@@ -350,7 +402,15 @@ PACKAGES = {
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "{0}/cosmo-ui-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        "bootstrap_template": "cosmo-ui-bootstrap.template"
+        "bootstrap_template": "cosmo-ui-bootstrap.template",
+        "config_templates": {
+            "init__template": "{0}/cosmo-ui/init/cosmo-ui.conf.template".format(PACKAGER_CONF_DIR),
+            "init_params": {
+                "log_file": "/var/log/cosmo-ui/cosmo-ui.log",
+                "user": "root",
+                "run_dir": "/opt/cosmo-ui"
+            }
+        }
     },
     "agent-ubuntu": {
         "name": "agent-ubuntu",
@@ -392,7 +452,7 @@ LOGGER = {
             "format": "%(asctime)s %(levelname)s - %(message)s"
         },
         "console": {
-            "format": "########## %(message)s"
+            "format": "### %(message)s"
         }
     },
     "handlers": {
