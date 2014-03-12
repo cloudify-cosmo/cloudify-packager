@@ -108,11 +108,11 @@ PKG_DIR="{{ package_dir }}"
 BOOTSTRAP_LOG="{{ bootstrap_log }}"
 VERSION="{{ version }}"
 
-REQ_FREE_DISK="{{ req_free_disk }}"
-REQ_FREE_MEM="{{ req_free_mem }}"
-REQ_CPU_CORES="{{ req_cpu_cores}}"
-REQ_ARCH="{{ req_arch }}"
-REQ_OS="{{ req_os }}"
+REQ_FREE_DISK="{{ bootstrap_params.req_free_disk }}"
+REQ_FREE_MEM="{{ bootstrap_params.req_free_mem }}"
+REQ_CPU_CORES="{{ bootstrap_params.req_cpu_cores}}"
+REQ_ARCH="{{ bootstrap_params.req_arch }}"
+REQ_OS="{{ bootstrap_params.req_os }}"
 
 FREE_DISK=$(df -Ph . | awk 'NR==2 {print $4}' | grep -Eo [0-9]+ | awk 'NR==1 {print $1}')
 FREE_MEM=$(cat /proc/meminfo | grep MemFree | awk '{print $2}')

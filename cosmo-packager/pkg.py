@@ -55,7 +55,6 @@ def pkg_cloudify3():
     package = get_package_configuration('cloudify3')
 
     rm('{0}/cloudify*'.format(package['package_dir']))
-    # do('chmod +x %s/*.sh' % package['package_dir'])
     cp(package['conf_dir'], package['package_dir'])
     pack(package)
 
@@ -70,7 +69,6 @@ def pkg_cloudify3_components():
     package = get_package_configuration('cloudify3-components')
 
     rm('{0}/cloudify*'.format(package['package_dir']))
-    # do('chmod +x %s/*.sh' % package['package_dir'])
     cp(package['conf_dir'], package['package_dir'])
     pack(package)
 
@@ -290,7 +288,6 @@ def pkg_logstash():
     """
 
     package = get_package_configuration('logstash')
-    rm('{0}/archives/*.deb'.format(package['package_dir']))
     pack(package)
 
 
@@ -302,7 +299,6 @@ def pkg_elasticsearch():
     """
 
     package = get_package_configuration('elasticsearch')
-    rm('{0}/archives/*.deb'.format(package['package_dir']))
     pack(package)
 
 

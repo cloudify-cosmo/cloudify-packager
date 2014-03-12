@@ -50,8 +50,8 @@ def _prepare(package):
     make_package_dirs(
         package['bootstrap_dir'],
         package['package_dir'])
-    if 'conf_dir' in package:
-        cp('%s/*' % package['conf_dir'], package['package_dir'])
+    # if 'conf_dir' in package:
+        # cp('%s/*' % package['conf_dir'], package['package_dir'])
 
 
 @task

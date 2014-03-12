@@ -1,0 +1,12 @@
+description "cosmo-ui agent"
+ 
+start on (local-filesystems and net-device-up IFACE=eth0)
+stop on shutdown
+
+respawn
+respawn limit 5 60
+
+script
+        chdir {{ config_templates.init_params.run_dir }}/node_modules/cosmo-ui
+        exec su -s /bin/sh -c "NODE_ENV=production /usr/bin/node {{ config_templates.init_params.run_dir }}/node_modules/cosmo-ui/cosmoui.js localhost >> {{ config_templates.init_params.log_file }} 2>&1" {{ config_templates.init_params.user }}
+end script
