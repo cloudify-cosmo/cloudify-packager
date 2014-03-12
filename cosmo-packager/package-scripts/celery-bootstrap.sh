@@ -100,8 +100,8 @@ echo "granting celeryd exec permissions..."
 sudo chmod +x ${INIT_DIR}/celeryd-cloudify.management
 # check_file permissions
 
-echo "starting ${PKG_NAME}..."
-sudo service celeryd-cloudify.management start
-check_service "celeryd-cloudify.management"
+# echo "starting ${PKG_NAME}..."
+# sudo service celeryd-cloudify.management start
+# check_service "celeryd-cloudify.management"
 
 # check celery process

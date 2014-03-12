@@ -108,9 +108,7 @@ PKG_DIR="/cloudify3"
 BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
 VERSION="3.0.0"
 
-PRIVATE_IP=$(ifconfig eth0 | grep inet | cut -f2 -d ":" | cut -f1 -d " ")
-MANAGEMENT_IP=${1:-${PRIVATE_IP}}
-
+MANAGEMENT_IP=$1
 ################################################ INSTALL CLOUDIFY
 
 echo -e "\nInstalling ${PKG_NAME} version ${VERSION}...\n" | tee -a ${BOOTSTRAP_LOG}
@@ -121,9 +119,8 @@ if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/celery/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "celery"
         
-        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g /etc/default/celeryd-cloudify.management >> ${BOOTSTRAP_LOG} 2>&1
-        sudo chown -R ubuntu:ubuntu /opt/celery
-        /etc/init.d/celeryd-cloudify.management restart >> ${BOOTSTRAP_LOG} 2>&1
+        sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g /etc/defaults/celeryd-cloudify.management
+        /etc/init.d/celeryd-cloudify.management restart
 else
         echo -e "celery is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi

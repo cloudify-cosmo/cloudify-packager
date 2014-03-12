@@ -56,7 +56,7 @@ def _run_locally_with_retries(command, sudo=False, retries=5,
                     r = local('sudo {0}'.format(command, capture))
                 else:
                     r = local(command, capture)
-                lgr.debug('ran command: {0}'.format(command))
+                # lgr.debug('ran command: {0}'.format(command))
                 return r
             except:
                 lgr.warning('failed to run command: {0} -retrying ({1}/{2})'
@@ -66,7 +66,7 @@ def _run_locally_with_retries(command, sudo=False, retries=5,
                   .format(command, execution))
         sys.exit(1)
 
-    lgr.info('running command: {0}'.format(command))
+    # lgr.info('running command: {0}'.format(command))
     if config.VERBOSE:
         return _execute()
     else:
@@ -244,24 +244,23 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
     if src_type:
         rmdir(dst_path)
         mkdir(dst_path)
-    if bootstrap_script:
-        if bootstrap_template:
-            create_bootstrap_script(
-                package,
-                bootstrap_template,
-                bootstrap_script)
-        if bootstrap_script_in_pkg:
-            lgr.info('granting execution permissions')
-            do('chmod +x {0}'.format(bootstrap_script))
-            lgr.info('copying bootstrap script to package directory')
-            cp(bootstrap_script, src_path)
+    if bootstrap_script or bootstrap_script_in_pkg:
+        if bootstrap_template and bootstrap_script:
+            create_bootstrap_script(package, bootstrap_template,
+                                    bootstrap_script)
+        if bootstrap_template and bootstrap_script_in_pkg:
+            create_bootstrap_script(package, bootstrap_template,
+                                    bootstrap_script_in_pkg)
+            if bootstrap_script_in_pkg:
+                lgr.info('granting execution permissions')
+                do('chmod +x {0}'.format(bootstrap_script_in_pkg))
+                lgr.info('copying bootstrap script to package directory')
+                cp(bootstrap_script_in_pkg, src_path)
     if src_type:
         lgr.info('packing {0}'.format(name))
         if is_dir(src_path):
             with lcd(dst_path):
-                if bootstrap_script and dst_type == "tar":
-                    lgr.debug('retrieving bootstrap script')
-                    cp(bootstrap_script, src_path)
+                if bootstrap_script_in_pkg and dst_type == "tar":
                     x = _run_locally_with_retries(
                         'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
                         .format(src_type, dst_type, name, version, src_path))

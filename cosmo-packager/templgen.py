@@ -17,7 +17,7 @@ try:
         os.makedirs(d)
     logging.config.dictConfig(config.LOGGER)
     lgr = logging.getLogger('main')
-    lgr.setLevel(logging.INFO)
+    lgr.setLevel(logging.DEBUG)
 except ValueError:
     sys.exit('could not initialize logger.'
              ' verify your logger config'

@@ -231,9 +231,7 @@ PACKAGES = {
         "conf_dir": "{0}/celery".format(PACKAGER_CONF_DIR),
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
-                    'https://github.com/CloudifySource/cosmo-plugin-openstack-provisioner/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
-                    'https://github.com/CloudifySource/cosmo-plugin-riemann-configurer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-kv-store/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-celery-common/archive/develop.tar.gz'
         ],
@@ -370,10 +368,23 @@ PACKAGES = {
         "dst_package_type": "tar",
         "bootstrap_script_in_pkg": "{0}/agent-ubuntu-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "agent-ubuntu-bootstrap.template"
-    }
+    },
+    "cli-ubuntu": {
+        "name": "cli-ubuntu",
+        "version": "0.0.1",
+        "bootstrap_dir": "{0}/cli-ubuntu/".format(CODE_BOOTSTRAP_DIR),
+        "package_dir": "{0}/cli-ubuntu".format(VIRTUALENVS_DIR),
+        "modules": [
+            'https://github.com/CloudifySource/cosmo-cli/archive/develop.zip'
+        ],
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        # "bootstrap_script": "{0}/cli-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        # "bootstrap_template": "celery-bootstrap.template"
+    },
 }
 # logger configuration
-VERBOSE = False
+VERBOSE = True
 LOGGER = {
     "version": 1,
     "formatters": {

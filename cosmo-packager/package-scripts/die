@@ -1,7 +1,0 @@
-#!/bin/bash
-
-die() {
-    echo "ERROR: $* (status $?)" 1>&2
-    exit 1
-}
-

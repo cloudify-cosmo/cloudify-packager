@@ -19,6 +19,7 @@ https://github.com/CloudifySource/cosmo-packager
 """
 
 from fabric.api import *  # NOQA
+from fabric.contrib.files import exists
 from packager import *  # NOQA
 from get import *  # NOQA
 from pkg import *  # NOQA
@@ -75,10 +76,10 @@ def get_cosmo():
     """
 
     do('sudo apt-get install -y python-dev')
-    get_celery()
-    get_manager()
+    get_celery(download=True)
+    get_manager(download=True)
     get_workflow_gems()
-    get_cosmo_ui()
+    get_cosmo_ui(download=True)
 
 
 @task
@@ -127,3 +128,16 @@ def make(more=False, extra=False):
     pkg_cloudify3_components()
     pkg_cloudify3()
     cp('/cloudify/*.deb', '/vagrant/debs')
+
+
+@task
+def transfer():
+    env.user = 'tgrid'
+    env.password = 'tgrid'
+    server = '192.168.9.228'
+
+    with settings(host_string=server):
+        if exists('/opt/cosmo/packages'):
+            put('/cloudify/*.deb', '/opt/cosmo/packages')
+        else:
+            print 'wooha!'

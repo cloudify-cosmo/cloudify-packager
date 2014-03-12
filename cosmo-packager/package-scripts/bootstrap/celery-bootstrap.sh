@@ -67,48 +67,41 @@ function check_service
 }
 
 
-PKG_NAME="cosmo-ui"
-PKG_DIR="/packages/cosmo-ui"
+PKG_NAME="celery"
+PKG_DIR="/opt/celery/cloudify.management__worker/env"
 BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
 
+PORT=""
 BASE_DIR="/opt"
-HOME_DIR="${BASE_DIR}/${PKG_NAME}"
-
-LOG_DIR="/var/log/cosmo-ui"
+HOME_DIR="${BASE_DIR}/${PKG_NAME}/cloudify.management__worker/env"
+WORK_DIR="${BASE_DIR}/${PKG_NAME}/cloudify.management__worker/work"
 
 PKG_INIT_DIR="${PKG_DIR}/init"
-INIT_DIR="/etc/init"
+INIT_DIR="/etc/init.d"
+
+PKG_CONF_DIR="${PKG_DIR}/conf"
 
 
-echo "installing ${PKG_NAME}..."
-sudo mkdir -p ${HOME_DIR}
-check_dir ${HOME_DIR}
+sudo virtualenv ${HOME_DIR}
+
+echo "creating ${PKG_NAME} work directory..."
+sudo mkdir -p ${WORK_DIR}
+check_dir "${WORK_DIR}"
 
 echo "moving some stuff around..."
-sudo cp ${PKG_INIT_DIR}/${PKG_NAME}.conf ${INIT_DIR}
-check_file "${INIT_DIR}/${PKG_NAME}.conf"
+sudo cp ${PKG_INIT_DIR}/celeryd-cloudify.management ${INIT_DIR}
+check_file "${INIT_DIR}/celeryd-cloudify.management"
+sudo cp ${PKG_CONF_DIR}/celeryd-cloudify.management /etc/default
+check_file "/etc/default/celeryd-cloudify.management"
+sudo cp ${PKG_CONF_DIR}/celeryd-includes ${WORK_DIR}
+check_file "${WORK_DIR}/celeryd-includes"
 
-echo "creating log dir..."
-sudo mkdir -p ${LOG_DIR}
-check_dir "${LOG_DIR}"
-
-echo "creating log file..."
-sudo touch ${LOG_DIR}/${PKG_NAME}.log
-check_file "${LOG_DIR}/${PKG_NAME}.log"
-
-# echo "creating cosmo user..."
-# sudo useradd --shell /usr/sbin/nologin --create-home --home-dir ${HOME_DIR} --groups adm cosmo
-# check_user "cosmo"
-
-# echo "pwning ${PKG_NAME} dir by cosmo user..."
-# sudo chown cosmo:cosmo ${HOME_DIR}
-# echo "pwning cosmo-ui logdir by ${PKG_NAME} user..."
-# sudo chown cosmo:adm ${LOG_DIR}/
-
-cd ${HOME_DIR}
-echo "installing ${PKG_NAME} to ${PKG_DIR}"
-sudo npm install -d ${PKG_DIR}/cosmo-ui*
+echo "granting celeryd exec permissions..."
+sudo chmod +x ${INIT_DIR}/celeryd-cloudify.management
+# check_file permissions
 
 echo "starting ${PKG_NAME}..."
-sudo start cosmo-ui
-check_upstart "cosmo-ui"
+sudo service celeryd-cloudify.management start
+check_service "celeryd-cloudify.management"
+
+# check celery process

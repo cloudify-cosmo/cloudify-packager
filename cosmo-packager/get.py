@@ -100,7 +100,7 @@ def get_graphite():
 
 
 @task
-def get_celery(install=False):
+def get_celery(download=False):
     """
     ACT:    retrives celery
     EXEC:   fab get_celery
@@ -110,13 +110,13 @@ def get_celery(install=False):
 
     _prepare(package)
     venv(package['package_dir'])
-    if install:
+    if download:
         for module in package['modules']:
             pip(module, '%s/bin' % package['package_dir'])
 
 
 @task
-def get_manager(install=False):
+def get_manager(download=False):
     """
     ACT:    retrives cosmo manager and its config, creates a virtualenv,
             installs all modules and builds cosmo.jar
@@ -127,7 +127,7 @@ def get_manager(install=False):
 
     _prepare(package)
     venv(package['package_dir'])
-    if install:
+    if download:
         wget(
             package['source_url'],
             file='%s/%s.tar.gz' % (package['package_dir'],
@@ -136,8 +136,8 @@ def get_manager(install=False):
               '%s/%s.tar.gz' % (package['package_dir'],
                                 package['name']))
         # TODO: DELETE TAR FILE
-    else:
-        cp(local_manager_repo, package['package_dir'])
+    # else:
+        # cp(local_manager_repo, package['package_dir'])
 
     mkdir(package['file_server_dir'])
     import shutil
@@ -150,7 +150,7 @@ def get_manager(install=False):
                               'dsl/alias-mappings.yaml' %
                               package['resources_dir'])
     cp(alias_mapping_resource, '%s/cloudify/' % package['file_server_dir'])
-    if install:
+    if download:
         for module in package['modules']:
             pip(module, '%s/bin' % package['package_dir'])
 
@@ -282,7 +282,7 @@ def get_workflow_gems():
 
 
 @task
-def get_cosmo_ui(install=False):
+def get_cosmo_ui(download=False):
     """
     ACT:    retrives cosmo_ui
     EXEC:   fab get_cosmo_ui
@@ -291,7 +291,7 @@ def get_cosmo_ui(install=False):
     package = get_package_configuration('cosmo-ui')
 
     _prepare(package)
-    if install:
+    if download:
         wget(
             package['source_url'],
             dir=package['package_dir'])
