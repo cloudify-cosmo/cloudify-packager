@@ -122,21 +122,22 @@ def generate_configs(component):
     """
 
     for key, value in component['config_templates'].iteritems():
-        if key.startswith('__template'):
+        if key.startswith('__template_file'):
             config_dir = value['config_dir']  # .split('_')[0]
-            template_dir = '/'.join(value['template_file'].split('/')[:-1])
-            template_file = value['template_file'].split('/')[-1]
+            template_dir = '/'.join(value['template']
+                                    .split('/')[:-1])
+            template_file = value['template'].split('/')[-1]
             output_file = value['output_file'] \
                 if 'output_file' in value \
                 else '.'.join(template_file.split('.')[:-1])
             output_path = '{0}/{1}/{2}'.format(
                 component['package_dir'], config_dir, output_file)
 
-            print '!!!!!!!!!!!config_dir: {0}'.format(config_dir)
-            print '!!!!!!!!!!!template_dir: {0}'.format(template_dir)
-            print '!!!!!!!!!!!template_file: {0}'.format(template_file)
-            print '!!!!!!!!!!!output_file: {0}'.format(output_file)
-            print '!!!!!!!!!!!output_path: {0}'.format(output_path)
+            # print '!!!!!!!!!!!config_dir: {0}'.format(config_dir)
+            # print '!!!!!!!!!!!template_dir: {0}'.format(template_dir)
+            # print '!!!!!!!!!!!template_file: {0}'.format(template_file)
+            # print '!!!!!!!!!!!output_file: {0}'.format(output_file)
+            # print '!!!!!!!!!!!output_path: {0}'.format(output_path)
 
             mkdir('{0}/{1}'.format(
                 component['package_dir'], config_dir))
@@ -144,6 +145,30 @@ def generate_configs(component):
                                    output_path,
                                    template_file,
                                    template_dir)
+
+        elif key.startswith('__template_dir'):
+            config_dir = value['config_dir']  # .split('_')[0]
+            # if 'templates' in value:
+            template_dir = value['templates']
+            for subdir, dirs, files in os.walk(template_dir):
+                for file in files:
+                    # print subdir + '/' + file
+                    template_file = file
+                    output_file = '.'.join(template_file.split('.')[:-1])
+                    output_path = '{0}/{1}/{2}'.format(
+                        component['package_dir'], config_dir, output_file)
+
+                    mkdir('{0}/{1}'.format(
+                        component['package_dir'], config_dir))
+                    generate_from_template(component,
+                                           output_path,
+                                           template_file,
+                                           template_dir)
+            # elif 'files' in value:
+            #     files_dir = value['files']
+            #     mkdir('{0}/{1}'.format(
+            #         component['package_dir'], config_dir))
+            #     cp(files_dir, config_dir)
 
 
 def generate_from_template(component, output_file, template_file,
