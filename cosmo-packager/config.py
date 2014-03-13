@@ -49,7 +49,9 @@ PACKAGES = {
         "bootstrap_template": "cloudify3-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
         "bootstrap_params": {
-            "celery_init_path",
+            "celery_defaults_path": "/etc/default/celeryd-cloudify.management",
+            "celery_init_path": "/etc/init.d/celeryd-cloudify.management",
+            "celery_run_dir": "{0}/celery".format(VIRTUALENVS_DIR),
         }
     },
     "cloudify3-components": {
@@ -71,18 +73,23 @@ PACKAGES = {
             "req_os": "precise",
         },
         "config_templates": {
-            "__template_nginx_conf": {
-                "file": "{0}/nginx/default.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_nginx": {
+                "template": "{0}/nginx/default.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "default.conf",
                 "config_dir": "config/nginx",
                 "dst_dir": "/etc/nginx/conf.d",
             },
-            "__params_nginx_conf": {
+            "__params_nginx": {
                 "kibana_run_dir": "/opt/kibana3",
                 "file_server_resources_path": "{0}/manager/resources".format(VIRTUALENVS_DIR),
                 "kibana_port": "3000",
                 "rest_port": "80",
                 "file_server_port": "53229",
+            },
+            "__template_dir_riemann": {
+                "templates": "{0}/riemann".format(PACKAGER_CONF_DIR),
+                "config_dir": "config/riemann",
+                "dst_dir": "/etc/riemann",
             }
         }
     },
@@ -104,14 +111,14 @@ PACKAGES = {
         "bootstrap_script": "{0}/manager-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "manager-bootstrap.template",
         "config_templates": {
-            "__template_init_gunicorn": {
-                "template_file": "{0}/manager/init/manager.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_init_gunicorn": {
+                "template": "{0}/manager/init/manager.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "manager.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
             },
-            "__template_init_workflow": {
-                "template_file": "{0}/manager/init/workflow.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_init_workflow": {
+                "template": "{0}/manager/init/workflow.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "manager.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
@@ -125,8 +132,8 @@ PACKAGES = {
                 "workflow_service_path": "{0}/manager/cosmo-manager-develop/workflow-service/".format(VIRTUALENVS_DIR),
                 "workflow_service_logs_path": "/var/log/cosmo/blueprints",
             },
-            "__template_conf": {
-                "template_file": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_conf": {
+                "template": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "guni.conf",
                 "config_dir": "config/conf",
                 "dst_dir": "/opt/manager/conf",
@@ -150,8 +157,8 @@ PACKAGES = {
         "bootstrap_script": "{0}/celery-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "celery-bootstrap.template",
         "config_templates": {
-            "__template_init": {
-                "template_file": "{0}/celery/init/celeryd.cloudify-management.template".format(PACKAGER_CONF_DIR),
+            "__template_file_init": {
+                "template": "{0}/celery/init/celeryd.cloudify-management.template".format(PACKAGER_CONF_DIR),
                 "output_file": "celeryd.cloudify-management",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init.d",
@@ -159,8 +166,8 @@ PACKAGES = {
             "__params_init": {
                 "defaults_file": "/etc/default/celeryd-cloudify.management",
             },
-            "__template_conf": {
-                "template_file": "{0}/celery/conf/celeryd.cloudify-management.template".format(PACKAGER_CONF_DIR),
+            "__template_file_conf": {
+                "template": "{0}/celery/conf/celeryd.cloudify-management.template".format(PACKAGER_CONF_DIR),
                 "output_file": "celeryd.cloudify-management.conf",
                 "config_dir": "config/conf",
                 "dst_dir": "/etc/default",
@@ -182,8 +189,8 @@ PACKAGES = {
         "bootstrap_script": "{0}/cosmo-ui-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "cosmo-ui-bootstrap.template",
         "config_templates": {
-            "__template_init": {
-                "template_file": "{0}/cosmo-ui/init/cosmo-ui.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_init": {
+                "template": "{0}/cosmo-ui/init/cosmo-ui.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "celeryd.cloudify-management",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init.d",
@@ -212,14 +219,14 @@ PACKAGES = {
         "bootstrap_script": "{0}/manager-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "manager-bootstrap.template",
         "config_templates": {
-            "__template_init_gunicorn": {
-                "template_file": "{0}/manager/init/manager.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_init_gunicorn": {
+                "template": "{0}/manager/init/manager.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "manager.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
             },
-            "__template_init_workflow": {
-                "template_file": "{0}/manager/init/workflow.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_init_workflow": {
+                "template": "{0}/manager/init/workflow.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "manager.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
@@ -233,8 +240,8 @@ PACKAGES = {
                 "workflow_service_path": "{0}/manager/cosmo-manager-develop/workflow-service/".format(VIRTUALENVS_DIR),
                 "workflow_service_logs_path": "/var/log/cosmo/blueprints",
             },
-            "__template_conf": {
-                "template_file": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_conf": {
+                "template": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "guni.conf",
                 "config_dir": "config/conf",
                 "dst_dir": "/opt/manager/conf",
@@ -258,8 +265,8 @@ PACKAGES = {
         "bootstrap_script": "{0}/celery-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "celery-bootstrap.template",
         "config_templates": {
-            "__template_init": {
-                "template_file": "{0}/celery/init/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
+            "__template_file_init": {
+                "template": "{0}/celery/init/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
                 "output_file": "celeryd.cloudify-management",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init.d",
@@ -267,8 +274,8 @@ PACKAGES = {
             "__params_init": {
                 "defaults_file": "/etc/default/celeryd-cloudify.management",
             },
-            "__template_conf": {
-                "template_file": "{0}/celery/conf/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
+            "__template_file_conf": {
+                "template": "{0}/celery/conf/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
                 "output_file": "celeryd-cloudify.management.conf",
                 "config_dir": "config/conf",
                 "dst_dir": "/etc/default",
@@ -290,8 +297,8 @@ PACKAGES = {
         "bootstrap_script": "{0}/cosmo-ui-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "cosmo-ui-bootstrap.template",
         "config_templates": {
-            "__template_init": {
-                "template_file": "{0}/cosmo-ui/init/cosmo-ui.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_init": {
+                "template": "{0}/cosmo-ui/init/cosmo-ui.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "cosmo-ui.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
@@ -318,8 +325,8 @@ PACKAGES = {
         "bootstrap_script": "{0}/logstash-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "logstash-bootstrap.template",
         "config_templates": {
-            "__template_init": {
-                "template_file": "{0}/logstash/init/logstash.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_init": {
+                "template": "{0}/logstash/init/logstash.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "logstash.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
@@ -331,8 +338,8 @@ PACKAGES = {
                 "run_dir": "/opt/logstash",
                 "user": "root",
             },
-            "__template_conf": {
-                "template_file": "{0}/logstash/conf/logstash.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_conf": {
+                "template": "{0}/logstash/conf/logstash.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "logstash.conf",
                 "config_dir": "config/conf",
                 "dst_dir": "/etc",
@@ -360,8 +367,8 @@ PACKAGES = {
         "bootstrap_script": "{0}/elasticsearch-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "elasticsearch-bootstrap.template",
         "config_templates": {
-            "__template_init": {
-                "template_file": "{0}/elasticsearch/init/elasticsearch.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_init": {
+                "template": "{0}/elasticsearch/init/elasticsearch.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "elasticsearch.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
@@ -370,8 +377,8 @@ PACKAGES = {
                 "run_dir": "/opt/elasticsearch",
                 "user": "root",
             },
-            "__template_conf": {
-                "template_file": "{0}/elasticsearch/init/elasticsearch.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_file_conf": {
+                "template": "{0}/elasticsearch/init/elasticsearch.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "elasticsearch.conf",
                 "config_dir": "config/conf",
                 "dst_dir": "/etc/init",
@@ -484,35 +491,6 @@ PACKAGES = {
         "bootstrap_script": "{0}/graphite-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "graphite-bootstrap.template"
     },
-    # "gcc": {
-    #     "name": "gcc",
-    #     "version": "0.0.1",
-    #     "reqs": [
-    #         "libc6",
-    #         "libc-bin",
-    #         "zlib1g-dev",
-    #         "libmpc2",
-    #         "libgomp1",
-    #         "binutils",
-    #         "cpp",
-    #         "gcc-4.6",
-    #         "gcc-multilib",
-    #         "make",
-    #         "manpages-dev",
-    #         "autoconf",
-    #         "automake1.9",
-    #         "libtool",
-    #         "flex",
-    #         "bison",
-    #         "gdb",
-    #         "gcc-doc",
-    #         "libc6-dev",
-    #         "libc-dev",
-    #         "gcc"
-    #     ],
-    #     "bootstrap_dir": "%s/gcc/" % COMPONENTS_BOOTSTRAP_DIR,
-    #     "package_dir": "%s/gcc" % PACKAGES_DIR
-    # },
     "curl": {
         "name": "curl",
         "version": "0.0.1",
@@ -533,22 +511,7 @@ PACKAGES = {
         "package_dir": "{0}/make".format(PACKAGES_DIR),
         "dst_package_type": "deb",
     },
-    # "zlib": {
-    #     "name": "zlib",
-    #     "version": "1.2.8",
-    #     "depends": [
-    #         'make',
-    #         'gcc'
-    #     ],
-    #     "source_url": "http://zlib.net/zlib-1.2.8.tar.gz",
-    #     "version": "0.0.1",
-    #     "bootstrap_dir": "{0}/zlib/".format(COMPONENTS_BOOTSTRAP_DIR),
-    #     "package_dir": "{0}/zlib".format(PACKAGES_DIR),
-    #     "src_package_type": "dir",
-    #     "dst_package_type": "deb",
-    #     "bootstrap_script": "{0}/zlib-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-    #     "bootstrap_template": "zlib-bootstrap.template"        
-    # },
+
     "ruby": {
         "name": "ruby2.1",
         "version": "2.1.0",
@@ -608,12 +571,55 @@ PACKAGES = {
         ],
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        # "bootstrap_script": "{0}/cli-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        # "bootstrap_template": "celery-bootstrap.template"
-    },
+    }
+        # "gcc": {
+    #     "name": "gcc",
+    #     "version": "0.0.1",
+    #     "reqs": [
+    #         "libc6",
+    #         "libc-bin",
+    #         "zlib1g-dev",
+    #         "libmpc2",
+    #         "libgomp1",
+    #         "binutils",
+    #         "cpp",
+    #         "gcc-4.6",
+    #         "gcc-multilib",
+    #         "make",
+    #         "manpages-dev",
+    #         "autoconf",
+    #         "automake1.9",
+    #         "libtool",
+    #         "flex",
+    #         "bison",
+    #         "gdb",
+    #         "gcc-doc",
+    #         "libc6-dev",
+    #         "libc-dev",
+    #         "gcc"
+    #     ],
+    #     "bootstrap_dir": "%s/gcc/" % COMPONENTS_BOOTSTRAP_DIR,
+    #     "package_dir": "%s/gcc" % PACKAGES_DIR
+    # },
+        # "zlib": {
+    #     "name": "zlib",
+    #     "version": "1.2.8",
+    #     "depends": [
+    #         'make',
+    #         'gcc'
+    #     ],
+    #     "source_url": "http://zlib.net/zlib-1.2.8.tar.gz",
+    #     "version": "0.0.1",
+    #     "bootstrap_dir": "{0}/zlib/".format(COMPONENTS_BOOTSTRAP_DIR),
+    #     "package_dir": "{0}/zlib".format(PACKAGES_DIR),
+    #     "src_package_type": "dir",
+    #     "dst_package_type": "deb",
+    #     "bootstrap_script": "{0}/zlib-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+    #     "bootstrap_template": "zlib-bootstrap.template"        
+    # },
 }
 # logger configuration
-VERBOSE = True
+VERBOSE = False
 LOGGER = {
     "version": 1,
     "formatters": {

@@ -234,6 +234,7 @@ if ! dpkg -s riemann 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/riemann/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 
         echo -e "applying riemann config..." >> ${BOOTSTRAP_LOG}
+        sudo cp ${PKG_DIR}/config/riemann/* /etc/riemann >> ${BOOTSTRAP_LOG} 2>&1
         sudo cp ${PKG_DIR}/package-configuration/riemann/* /etc/riemann >> ${BOOTSTRAP_LOG} 2>&1
         echo -e "restarting riemann..." >> ${BOOTSTRAP_LOG}
         sudo /etc/init.d/riemann start
@@ -269,7 +270,7 @@ if ! dpkg -s nginx 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/nginx/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 
         echo -e "applying nginx config..." >> ${BOOTSTRAP_LOG}
-        sudo cp ${PKG_DIR}/nginx-config/*  >> ${BOOTSTRAP_LOG} 2>&1
+        sudo cp ${PKG_DIR}/config/nginx/default.conf /etc/nginx/conf.d >> ${BOOTSTRAP_LOG} 2>&1
         echo -e "restarting nginx..." >> ${BOOTSTRAP_LOG}
         sudo service nginx restart >> ${BOOTSTRAP_LOG} 2>&1
         check_service "nginx"
