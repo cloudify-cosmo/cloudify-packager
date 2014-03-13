@@ -1,7 +1,0 @@
-copy nginx conf
-restart nginx
-copy riemann conf
-start riemann
-enable rabbit plugins
-enable trace?
-restart rabbit
