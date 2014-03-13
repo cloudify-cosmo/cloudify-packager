@@ -76,11 +76,13 @@ HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 
 LOG_DIR="/var/log"
 
-PKG_INIT_DIR="${PKG_DIR}/init"
-PKG_CONF_DIR="${PKG_DIR}/conf"
-
+PKG_INIT_DIR="${PKG_DIR}/config/init"
 INIT_DIR="/etc/init"
+INIT_FILE="logstash.conf"
+
+PKG_CONF_DIR="${PKG_DIR}/config/conf"
 CONF_DIR="/etc"
+CONF_FILE="logstash.conf"
 
 
 echo "creating ${PKG_NAME} application dir..."
@@ -96,11 +98,11 @@ sudo cp ${PKG_DIR}/logstash-*-flatjar.jar ${HOME_DIR}
 check_file "${HOME_DIR}/logstash-*-flatjar.jar"
 
 echo "moving some stuff around..."
-sudo cp ${PKG_INIT_DIR}/${PKG_NAME}.conf ${INIT_DIR}
-check_file "${INIT_DIR}/${PKG_NAME}.conf"
+sudo cp ${PKG_INIT_DIR}/${INIT_FILE} ${INIT_DIR}
+check_file "${INIT_DIR}/${INIT_FILE}"
 
-sudo cp ${PKG_CONF_DIR}/${PKG_NAME}.conf ${CONF_DIR}
-check_file "${CONF_DIR}/${PKG_NAME}.conf"
+sudo cp ${PKG_CONF_DIR}/${CONF_FILE} ${CONF_DIR}
+check_file "${CONF_DIR}/${CONF_FILE}"
 
 echo "creating logstash user..."
 sudo useradd --shell /usr/sbin/nologin --create-home --home-dir ${HOME_DIR} --groups adm logstash

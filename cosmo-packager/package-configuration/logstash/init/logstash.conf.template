@@ -18,7 +18,7 @@ chdir /home/logstash
 
 script
 
-  # This runs logstash agent as the '{{ config_templates.init_params.user }}' user
-  su -s /bin/sh -c 'exec "$0" "$@"' {{ config_templates.init_params.user }} -- /usr/bin/java -jar {{ config_templates.init_params.run_dir }}/{{ config_templates.init_params.jar }} agent -f {{ config_templates.init_params.conf_path }} & #--log {{ config_templates.init_params.log_file}} &
+  # This runs logstash agent as the '{{ config_templates.__params_init.user }}' user
+  su -s /bin/sh -c 'exec "$0" "$@"' {{ config_templates.__params_init.user }} -- /usr/bin/java -jar {{ config_templates.__params_init.run_dir }}/{{ config_templates.__params_init.jar }} agent -f {{ config_templates.__params_init.conf_path }} & #--log {{ config_templates.__params_init.log_file}} &
   emit logstash-agent-running
 end script

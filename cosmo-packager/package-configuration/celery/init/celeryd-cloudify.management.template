@@ -20,7 +20,7 @@
 
 # some commands work asyncronously, so we'll wait this many seconds
 export CELERY_WORK_DIR="{{ package_dir }}/cloudify.management__worker/work"
-CELERY_DEFAULTS="{{ config_templates.init_params.defaults_file }}"
+CELERY_DEFAULTS="{{ config_templates.__params_init.defaults_file }}"
 
 SLEEP_SECONDS=5
 
