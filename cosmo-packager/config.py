@@ -110,14 +110,20 @@ PACKAGES = {
         "dst_package_type": "deb",
         "bootstrap_script": "{0}/manager-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "manager-bootstrap.template",
+        "bootstrap_params": {
+            "resources_dir_src": "cosmo-manager-*/orchestrator/src/main/resources/cloudify/",
+            "resources_dir_dst": "filesrv",
+            "alias_file_src": "cosmo-manager-*/orchestrator/src/main/resources/org/cloudifysource/cosmo/dsl/alias-mappings.yaml",
+            "alias_file_dst": "filesrv/cloudify",
+        },
         "config_templates": {
-            "__template_file_init_gunicorn": {
+            "#__template_file_init_gunicorn": {
                 "template": "{0}/manager/init/manager.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "manager.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
             },
-            "__template_file_init_workflow": {
+            "#__template_file_init_workflow": {
                 "template": "{0}/manager/init/workflow.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "manager.conf",
                 "config_dir": "config/init",
@@ -126,7 +132,7 @@ PACKAGES = {
             "__params_init": {
                 "manager_rest_path": "{0}/manager/cosmo-manager-develop/manager-rest/manager_rest/".format(VIRTUALENVS_DIR),
                 "gunicorn_user": "root",
-                "gunicorn_conf_path": "{0}/manager/conf/guni.conf".format(VIRTUALENVS_DIR),
+                "gunicorn_conf_path": "{0}/manager/config/conf/guni.conf".format(VIRTUALENVS_DIR),
                 "unicorn_user": "root",
                 "ruby_path": "{0}/ruby".format(VIRTUALENVS_DIR),
                 "workflow_service_path": "{0}/manager/cosmo-manager-develop/workflow-service/".format(VIRTUALENVS_DIR),
@@ -136,8 +142,13 @@ PACKAGES = {
                 "template": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONF_DIR),
                 "output_file": "guni.conf",
                 "config_dir": "config/conf",
-                "dst_dir": "/opt/manager/conf",
+                # "dst_dir": "/opt/manager/config/conf",
             },
+            "__template_dir_init": {
+                "templates": "{0}/manager/init".format(PACKAGER_CONF_DIR),
+                "config_dir": "config/init",
+                "dst_dir": "/etc/init",
+            }
         }
     },
     "celery": {
@@ -194,114 +205,6 @@ PACKAGES = {
                 "output_file": "celeryd.cloudify-management",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init.d",
-            },
-            "__params_init": {
-                "log_file": "/var/log/cosmo-ui/cosmo-ui.log",
-                "user": "root",
-                "run_dir": "/opt/cosmo-ui",
-            }
-        }
-    },"manager": {
-        "name": "manager",
-        "version": "0.0.1",
-        "source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
-        "depends": [
-            'ruby2.1'
-        ],
-        "bootstrap_dir": "{0}/manager/".format(CODE_BOOTSTRAP_DIR),
-        "package_dir": "{0}/manager".format(VIRTUALENVS_DIR),
-        "conf_dir": "{0}/manager".format(PACKAGER_CONF_DIR),
-        "modules": ['{0}/manager/cosmo-manager-develop/manager-rest/'.format(VIRTUALENVS_DIR)],
-        "resources_dir": "{0}/manager/cosmo-manager-develop/orchestrator/".format(VIRTUALENVS_DIR),
-        "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_DIR),
-        "src_package_type": "dir",
-        "dst_package_type": "deb",
-        "bootstrap_script": "{0}/manager-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        "bootstrap_template": "manager-bootstrap.template",
-        "config_templates": {
-            "__template_file_init_gunicorn": {
-                "template": "{0}/manager/init/manager.conf.template".format(PACKAGER_CONF_DIR),
-                "output_file": "manager.conf",
-                "config_dir": "config/init",
-                "dst_dir": "/etc/init",
-            },
-            "__template_file_init_workflow": {
-                "template": "{0}/manager/init/workflow.conf.template".format(PACKAGER_CONF_DIR),
-                "output_file": "manager.conf",
-                "config_dir": "config/init",
-                "dst_dir": "/etc/init",
-            },
-            "__params_init": {
-                "manager_rest_path": "{0}/manager/cosmo-manager-develop/manager-rest/manager_rest/".format(VIRTUALENVS_DIR),
-                "gunicorn_user": "root",
-                "gunicorn_conf_path": "{0}/manager/conf/guni.conf".format(VIRTUALENVS_DIR),
-                "unicorn_user": "root",
-                "ruby_path": "{0}/ruby".format(VIRTUALENVS_DIR),
-                "workflow_service_path": "{0}/manager/cosmo-manager-develop/workflow-service/".format(VIRTUALENVS_DIR),
-                "workflow_service_logs_path": "/var/log/cosmo/blueprints",
-            },
-            "__template_file_conf": {
-                "template": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONF_DIR),
-                "output_file": "guni.conf",
-                "config_dir": "config/conf",
-                "dst_dir": "/opt/manager/conf",
-            },
-        }
-    },
-    "celery": {
-        "name": "celery",
-        "version": "0.0.1",
-        "bootstrap_dir": "{0}/celery/".format(CODE_BOOTSTRAP_DIR),
-        "package_dir": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_DIR),
-        "conf_dir": "{0}/celery".format(PACKAGER_CONF_DIR),
-        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
-                    'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
-                    'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
-                    'https://github.com/CloudifySource/cosmo-plugin-kv-store/archive/develop.tar.gz',
-                    'https://github.com/CloudifySource/cosmo-celery-common/archive/develop.tar.gz'
-        ],
-        "src_package_type": "dir",
-        "dst_package_type": "deb",
-        "bootstrap_script": "{0}/celery-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        "bootstrap_template": "celery-bootstrap.template",
-        "config_templates": {
-            "__template_file_init": {
-                "template": "{0}/celery/init/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
-                "output_file": "celeryd.cloudify-management",
-                "config_dir": "config/init",
-                "dst_dir": "/etc/init.d",
-            },
-            "__params_init": {
-                "defaults_file": "/etc/default/celeryd-cloudify.management",
-            },
-            "__template_file_conf": {
-                "template": "{0}/celery/conf/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
-                "output_file": "celeryd-cloudify.management.conf",
-                "config_dir": "config/conf",
-                "dst_dir": "/etc/default",
-            }
-        }
-    },
-    "cosmo-ui": {
-        "name": "cosmo-ui",
-        "version": "1.0.0",
-        "source_url": "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
-        "depends": [
-            'nodejs'
-        ],
-        "bootstrap_dir": "{0}/cosmo-ui/".format(CODE_BOOTSTRAP_DIR),
-        "package_dir": "{0}/cosmo-ui".format(PACKAGES_DIR),
-        "conf_dir": "{0}/cosmo-ui".format(PACKAGER_CONF_DIR),
-        "src_package_type": "dir",
-        "dst_package_type": "deb",
-        "bootstrap_script": "{0}/cosmo-ui-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        "bootstrap_template": "cosmo-ui-bootstrap.template",
-        "config_templates": {
-            "__template_file_init": {
-                "template": "{0}/cosmo-ui/init/cosmo-ui.conf.template".format(PACKAGER_CONF_DIR),
-                "output_file": "cosmo-ui.conf",
-                "config_dir": "config/init",
-                "dst_dir": "/etc/init",
             },
             "__params_init": {
                 "log_file": "/var/log/cosmo-ui/cosmo-ui.log",

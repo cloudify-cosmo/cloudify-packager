@@ -110,6 +110,7 @@ VERSION="3.0.0"
 
 PRIVATE_IP=$(ifconfig eth0 | grep inet | cut -f2 -d ":" | cut -f1 -d " ")
 MANAGEMENT_IP=${1:-${PRIVATE_IP}}
+USER=${1:-ubuntu}
 
 ################################################ INSTALL CLOUDIFY
 
@@ -122,7 +123,7 @@ if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
         check_pkg "celery"
         
         sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g /etc/default/celeryd-cloudify.management >> ${BOOTSTRAP_LOG} 2>&1
-        sudo chown -R ubuntu:ubuntu /opt/celery
+        sudo chown -R ${USER}:${USER} /opt/celery
         /etc/init.d/celeryd-cloudify.management restart >> ${BOOTSTRAP_LOG} 2>&1
 else
         echo -e "celery is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}

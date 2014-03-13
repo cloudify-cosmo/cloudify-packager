@@ -45,6 +45,6 @@ def make_file(output_file, content):
     """
 
     lgr.debug('creating file: {0} with content: \n{1}'.format(
-        output_file, 'content'))
+        output_file, content))
     with open('{0}'.format(output_file), 'w+') as f:
         f.write(content)
