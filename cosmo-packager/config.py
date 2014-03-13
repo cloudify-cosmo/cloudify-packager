@@ -68,13 +68,19 @@ PACKAGES = {
             "req_os": "precise"
         },
         "config_templates": {
-            "nginx-config__template": "{0}/nginx/default.conf.template".format(PACKAGER_CONF_DIR),
+            "__template_nginx_config": {
+                "file": "{0}/nginx/default.conf.template".format(PACKAGER_CONF_DIR),
+                "config_dir": "nginx-config",
+                "dst_path": "/etc/nginx/conf.d"
+            },
             "nginx_conf_params": {
                 "kibana_run_dir": "/opt/kibana3",
                 "file_server_resources_path": "{0}/manager/resources".format(VIRTUALENVS_DIR),
                 "kibana_port": "3000",
                 "rest_port": "80",
-                "file_server_port": "53229"
+                "file_server_port": "53229",
+                "nginx_dst_conf_path": "/etc/nginx/conf.d",
+                "nginx_src_conf_path": "nginx_config/default.conf"
             }
         }
     },
