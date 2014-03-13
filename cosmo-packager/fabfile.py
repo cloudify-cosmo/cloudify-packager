@@ -101,6 +101,7 @@ def pkg_cosmo_components():
     pkg_virtualenv()
     pkg_make()
     pkg_ruby()
+    pkg_workflow_gems()
 
 
 @task
@@ -110,7 +111,6 @@ def pkg_cosmo():
     EXEC:   fab pkg_comso_base
     """
 
-    pkg_workflow_gems()
     pkg_celery()
     pkg_manager()
     # pkg_cosmo_ui()
