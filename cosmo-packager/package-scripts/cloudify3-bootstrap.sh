@@ -108,9 +108,9 @@ PKG_DIR="/cloudify3"
 BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
 VERSION="3.0.0"
 
-PRIVATE_IP=$(ifconfig eth0 | grep inet | cut -f2 -d ":" | cut -f1 -d " ")
-MANAGEMENT_IP=${1:-${PRIVATE_IP}}
 CELERY_USER=${1:-ubuntu}
+PRIVATE_IP=$(ifconfig eth0 | grep inet | cut -f2 -d ":" | cut -f1 -d " ")
+MANAGEMENT_IP=${2:-${PRIVATE_IP}}
 
 ################################################ INSTALL CLOUDIFY
 
@@ -123,11 +123,13 @@ if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
         check_pkg "celery"
 
         echo "placing ip: ${MANAGEMENT_IP} in celery defaults file..." >> ${BOOTSTRAP_LOG} 2>&1
-        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g /etc/default/celeryd-cloudify.management >> ${BOOTSTRAP_LOG} 2>&1
+        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g /etc/default/celeryd-cloudify.management || state_error "could not place ip" >> ${BOOTSTRAP_LOG} 2>&1
+        echo "placing user: ${CELERY_USER} in celery defaults file..." >> ${BOOTSTRAP_LOG} 2>&1
+        sudo sed -i.bak s/USERSTRING/${CELERY_USER}/g /etc/default/celeryd-cloudify.management || state_error "could not place user" >> ${BOOTSTRAP_LOG} 2>&1
         echo "owning celery by user: ${CELERY_USER}" >> ${BOOTSTRAP_LOG} 2>&1
-        sudo chown -R ${CELERY_USER}:${CELERY_USER} /opt/celery >> ${BOOTSTRAP_LOG} 2>&1
+        sudo chown -R ${CELERY_USER}:${CELERY_USER} /opt/celery || state_error "cloud not change celery dir owner" >> ${BOOTSTRAP_LOG} 2>&1
         echo "restart celery service..." >> ${BOOTSTRAP_LOG} 2>&1
-        /etc/init.d/celeryd-cloudify.management restart >> ${BOOTSTRAP_LOG} 2>&1
+        /etc/init.d/celeryd-cloudify.management restart || state_error "could not restart celery" >> ${BOOTSTRAP_LOG} 2>&1
 else
         echo -e "celery is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
