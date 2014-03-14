@@ -40,7 +40,7 @@ function check_port
     TIMER=$3
     HOST=$4
 
-    for i in {1..5}
+    for i in {1..24}
     do 
         echo -ne "checking whether ${APP} port ${PORT} is opened on ${HOST:-localhost}..." >> ${BOOTSTRAP_LOG}
         nc -z ${HOST:-localhost} ${PORT} >/dev/null
@@ -110,7 +110,7 @@ VERSION="{{ version }}"
 
 PRIVATE_IP=$(ifconfig eth0 | grep inet | cut -f2 -d ":" | cut -f1 -d " ")
 MANAGEMENT_IP=${1:-${PRIVATE_IP}}
-USER=${1:-ubuntu}
+CELERY_USER=${1:-ubuntu}
 
 ################################################ INSTALL CLOUDIFY
 
@@ -121,9 +121,12 @@ if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
         echo -e "celery is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
         sudo dpkg -i ${PKG_DIR}/celery/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "celery"
-        
+
+        echo "placing ip: ${MANAGEMENT_IP} in celery defaults file..." >> ${BOOTSTRAP_LOG} 2>&1
         sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g {{ bootstrap_params.celery_defaults_path }} >> ${BOOTSTRAP_LOG} 2>&1
-        sudo chown -R ${USER}:${USER} {{ bootstrap_params.celery_run_dir }}
+        echo "owning celery by user: ${CELERY_USER}" >> ${BOOTSTRAP_LOG} 2>&1
+        sudo chown -R ${CELERY_USER}:${CELERY_USER} {{ bootstrap_params.celery_run_dir }} >> ${BOOTSTRAP_LOG} 2>&1
+        echo "restart celery service..." >> ${BOOTSTRAP_LOG} 2>&1
         {{ bootstrap_params.celery_init_path }} restart >> ${BOOTSTRAP_LOG} 2>&1
 else
         echo -e "celery is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
@@ -144,7 +147,7 @@ if ! dpkg -s cosmo-ui 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "cosmo-ui"
 else
-        echo -e "cosmo-ui is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
+        echo -e "cosmo-ui is already installed, skipping (this may take several minutes)..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 ################################################ PORT INSTALLATION TESTS

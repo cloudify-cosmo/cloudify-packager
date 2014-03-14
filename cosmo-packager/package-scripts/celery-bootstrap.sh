@@ -78,11 +78,11 @@ WORK_DIR="${BASE_DIR}/${PKG_NAME}/cloudify.management__worker/work"
 
 PKG_INIT_DIR="${PKG_DIR}/config/init"
 INIT_DIR="/etc/init.d"
-INIT_FILE="celeryd.cloudify-management"
+INIT_FILE="celeryd-cloudify.management"
 
 PKG_CONF_DIR="${PKG_DIR}/config/conf"
 CONF_DIR="/etc/default"
-CONF_FILE="celeryd-cloudify.management.conf"
+CONF_FILE="celeryd-cloudify.management"
 
 
 sudo virtualenv ${HOME_DIR}

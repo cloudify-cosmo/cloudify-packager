@@ -130,7 +130,7 @@ PACKAGES = {
                 "dst_dir": "/etc/init",
             },
             "__params_init": {
-                "manager_rest_path": "{0}/manager/cosmo-manager-develop/manager-rest/manager_rest/".format(VIRTUALENVS_DIR),
+                "rest_server_path": "{0}/manager/cosmo-manager-develop/manager-rest/manager_rest/".format(VIRTUALENVS_DIR),
                 "gunicorn_user": "root",
                 "gunicorn_conf_path": "{0}/manager/config/conf/guni.conf".format(VIRTUALENVS_DIR),
                 "unicorn_user": "root",
@@ -169,8 +169,8 @@ PACKAGES = {
         "bootstrap_template": "celery-bootstrap.template",
         "config_templates": {
             "__template_file_init": {
-                "template": "{0}/celery/init/celeryd.cloudify-management.template".format(PACKAGER_CONF_DIR),
-                "output_file": "celeryd.cloudify-management",
+                "template": "{0}/celery/init/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
+                "output_file": "celeryd-cloudify.management",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init.d",
             },
@@ -178,11 +178,14 @@ PACKAGES = {
                 "defaults_file": "/etc/default/celeryd-cloudify.management",
             },
             "__template_file_conf": {
-                "template": "{0}/celery/conf/celeryd.cloudify-management.template".format(PACKAGER_CONF_DIR),
-                "output_file": "celeryd.cloudify-management.conf",
+                "template": "{0}/celery/conf/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
+                "output_file": "celeryd-cloudify.management",
                 "config_dir": "config/conf",
                 "dst_dir": "/etc/default",
             },
+            "__params_conf": {
+                "work_dir": "{0}/celery/cloudify.management__worker/work".format(VIRTUALENVS_DIR),
+            }
         }
     },
     "cosmo-ui": {
@@ -202,9 +205,9 @@ PACKAGES = {
         "config_templates": {
             "__template_file_init": {
                 "template": "{0}/cosmo-ui/init/cosmo-ui.conf.template".format(PACKAGER_CONF_DIR),
-                "output_file": "celeryd.cloudify-management",
+                "output_file": "cosmo-ui.conf",
                 "config_dir": "config/init",
-                "dst_dir": "/etc/init.d",
+                "dst_dir": "/etc/init",
             },
             "__params_init": {
                 "log_file": "/var/log/cosmo-ui/cosmo-ui.log",
