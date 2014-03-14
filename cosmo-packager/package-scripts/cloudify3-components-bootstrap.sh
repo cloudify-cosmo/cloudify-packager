@@ -40,7 +40,7 @@ function check_port
     TIMER=$3
     HOST=$4
 
-    for i in {1..5}
+    for i in {1..24}
     do 
         echo -ne "checking whether ${APP} port ${PORT} is opened on ${HOST:-localhost}..." >> ${BOOTSTRAP_LOG}
         nc -z ${HOST:-localhost} ${PORT} >/dev/null
@@ -126,7 +126,7 @@ COMPAT=true
 
 echo -e "\nInstalling ${PKG_NAME} version ${VERSION}...\n" | tee -a ${BOOTSTRAP_LOG}
 echo -e "(by the way, you may tail ${BOOTSTRAP_LOG} for the full installation log)" | tee -a ${BOOTSTRAP_LOG}
-echo -e "NOTE: this should take approx 8 minutes on an average machine, maybe you should grab a cup of coffee or a sudoku or something...\n" | tee -a ${BOOTSTRAP_LOG}
+echo -e "NOTE: this should take approx 5 minutes on an average machine...\n" | tee -a ${BOOTSTRAP_LOG}
 
 echo -e "checking whether the system meets the minimum installation requirements..." | tee -a ${BOOTSTRAP_LOG}
 
@@ -320,7 +320,7 @@ fi
 
 echo -ne "checking whether ruby2.1 is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s ruby2.1 2>&1 | grep Status: | grep installed; then
-        echo -e "ruby2.1 is not installed, installing (this may take several minutes)..." | tee -a ${BOOTSTRAP_LOG}
+        echo -e "ruby2.1 is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
         sudo dpkg -i ${PKG_DIR}/ruby/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "ruby2.1"
 else
