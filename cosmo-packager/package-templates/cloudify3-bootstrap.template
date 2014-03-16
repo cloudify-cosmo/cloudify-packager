@@ -122,14 +122,14 @@ if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/celery/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "celery"
 
-        echo "placing ip: ${MANAGEMENT_IP} in celery defaults file..." >> ${BOOTSTRAP_LOG} 2>&1
-        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g {{ bootstrap_params.celery_defaults_path }} || state_error "could not place ip" >> ${BOOTSTRAP_LOG} 2>&1
-        echo "placing user: ${CELERY_USER} in celery defaults file..." >> ${BOOTSTRAP_LOG} 2>&1
-        sudo sed -i.bak s/USERSTRING/${CELERY_USER}/g {{ bootstrap_params.celery_defaults_path }} || state_error "could not place user" >> ${BOOTSTRAP_LOG} 2>&1
-        echo "owning celery by user: ${CELERY_USER}" >> ${BOOTSTRAP_LOG} 2>&1
-        sudo chown -R ${CELERY_USER}:${CELERY_USER} {{ bootstrap_params.celery_run_dir }} || state_error "cloud not change celery dir owner" >> ${BOOTSTRAP_LOG} 2>&1
-        echo "restart celery service..." >> ${BOOTSTRAP_LOG} 2>&1
-        {{ bootstrap_params.celery_init_path }} restart || state_error "could not restart celery" >> ${BOOTSTRAP_LOG} 2>&1
+        echo "placing ip: ${MANAGEMENT_IP} in celery defaults file..." >> ${BOOTSTRAP_LOG}
+        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g {{ config_templates.__params_celery.defaults_path }} >> ${BOOTSTRAP_LOG} || state_error "could not place ip" 
+        echo "placing user: ${CELERY_USER} in celery defaults file..." >> ${BOOTSTRAP_LOG}
+        sudo sed -i.bak s/USERSTRING/${CELERY_USER}/g {{ config_templates.__params_celery.defaults_path }} >> ${BOOTSTRAP_LOG} || state_error "could not place user" 
+        echo "owning celery by user: ${CELERY_USER}" >> ${BOOTSTRAP_LOG}
+        sudo chown -R ${CELERY_USER}:${CELERY_USER} {{ config_templates.__params_celery.run_dir }} >> ${BOOTSTRAP_LOG} || state_error "cloud not change celery dir owner" 
+        echo "restart celery service..." >> ${BOOTSTRAP_LOG}
+        {{ config_templates.__params_celery.init_path }} restart >> ${BOOTSTRAP_LOG} || state_error "could not restart celery" 
 else
         echo -e "celery is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
@@ -155,11 +155,11 @@ fi
 ################################################ PORT INSTALLATION TESTS
 
 echo -e "\nperforming post installation tests..." | tee -a ${BOOTSTRAP_LOG}
-check_port "manager-rest" "8100"
+check_port "manager-rest" "{{ config_templates.__params_manager.port }}"
 sleep 1
-check_port "workflow-service" "8101"
+check_port "workflow-service" "{{ config_templates.__params_workflow.port }}"
 sleep 1
-check_port "UI" "9001"
+check_port "UI" "{{ config_templates.__params_ui.port }}"
 echo  -e "post installation tests completed successfully.\n"
 
 echo -e "${PKG_NAME} ${VERSION} installation completed successfully!\n" | tee -a ${BOOTSTRAP_LOG}

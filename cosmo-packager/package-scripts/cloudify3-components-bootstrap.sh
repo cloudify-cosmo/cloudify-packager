@@ -298,26 +298,6 @@ else
         echo -e "make is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
-# RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
-# echo -ne "checking whether gcc is installed..." | tee -a ${BOOTSTRAP_LOG}
-# if ! dpkg -s gcc 2>&1 | grep Status: | grep installed; then
-        # echo -e "gcc is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        # sudo dpkg -i ${PKG_DIR}/gcc/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        # check_pkg "gcc"
-# else
-        # echo -e "gcc is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
-# fi
-
-# RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
-# echo -ne "checking whether zlib is installed..." | tee -a ${BOOTSTRAP_LOG}
-# if ! dpkg -s zlib 2>&1 | grep Status: | grep installed; then
-        # echo -e "zlib is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        # sudo dpkg -i ${PKG_DIR}/zlib/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        # check_pkg "zlib"
-# else
-        # echo -e "zlib is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
-# fi
-
 echo -ne "checking whether ruby2.1 is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s ruby2.1 2>&1 | grep Status: | grep installed; then
         echo -e "ruby2.1 is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
@@ -326,21 +306,6 @@ if ! dpkg -s ruby2.1 2>&1 | grep Status: | grep installed; then
 else
         echo -e "ruby2.1 is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
-
-# RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
-# echo -ne "checking whether workflow-gems is installed..." | tee -a ${BOOTSTRAP_LOG}
-# if ! dpkg -s workflow-gems 2>&1 | grep Status: | grep installed; then
-        # echo -e "workflow-gems is not installed, installing (this may take several minutes)..." | tee -a ${BOOTSTRAP_LOG}
-        # sudo dpkg -i ${PKG_DIR}/workflow-gems/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        # check_pkg "workflow-gems"
-# 
-        # cd /opt/ruby-2.1.0/ext/zlib >> ${BOOTSTRAP_LOG} 2>&1
-        # sudo ruby extconf.rb >> ${BOOTSTRAP_LOG} 2>&1
-        # sudo make >> ${BOOTSTRAP_LOG} 2>&1
-        # sudo make install >> ${BOOTSTRAP_LOG} 2>&1
-# else
-        # echo -e "workflow-gems is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
-# fi
 
 echo -ne "checking whether nodejs is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s nodejs 2>&1 | grep Status: | grep installed; then
@@ -356,17 +321,19 @@ fi
 echo -e "\nperforming post installation tests..." | tee -a ${BOOTSTRAP_LOG}
 check_exec "java"
 sleep 1
-check_exec "/opt/ruby/bin/ruby"
-sleep 1
 check_exec "node"
 sleep 1
-check_port "rabbitmq" "5672"
+check_exec "/opt/ruby/bin/ruby"
+sleep 1
+check_port "rabbitmq-server" "5672a"
 sleep 1
 check_port "nginx (kibana)" "3000"
 sleep 1
 check_port "nginx (manager)" "80"
 sleep 1
-check_port "logstash" "9999"
+check_port "nginx (file-server)" "53229"
+sleep 1
+check_port "logstash (tcp)" "9999"
 sleep 1
 check_port "elasticsearch" "9200"
 sleep 1

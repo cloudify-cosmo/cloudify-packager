@@ -306,12 +306,15 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
         if 'depends' in package else depends
     config_templates = package['config_templates'] \
         if 'config_templates' in package else config_templates
+    overwrite = package['overwrite'] \
+        if 'overwrite' in package else overwrite
 
     if src_path == dst_path:
         lgr.error('source and destination paths must'
                   ' be different to avoid conflics!')
     lgr.info('cleaning up before packaging...')
-    rmdir(bootstrap_dir)
+    if overwrite:
+        rmdir(bootstrap_dir)
     if src_type:
         rmdir(dst_path)
         mkdir(dst_path)
