@@ -274,7 +274,8 @@ def get(package=False, version=False, source_repo=False, source_ppa=False,
 def pack(package=False, src_type=False, dst_type=False, name=False,
          src_path=False, dst_path=False, version=False, bootstrap_dir=False,
          bootstrap_script=False, bootstrap_template=False, depends=False,
-         bootstrap_script_in_pkg=False, config_templates=False):
+         bootstrap_script_in_pkg=False, config_templates=False,
+         overwrite=True):
     """
     uses fpm (https://github.com/jordansissel/fpm/wiki)
     to create packages

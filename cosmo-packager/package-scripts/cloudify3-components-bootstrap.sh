@@ -325,7 +325,7 @@ check_exec "node"
 sleep 1
 check_exec "/opt/ruby/bin/ruby"
 sleep 1
-check_port "rabbitmq-server" "5672a"
+check_port "rabbitmq-server" "5672"
 sleep 1
 check_port "nginx (kibana)" "3000"
 sleep 1
