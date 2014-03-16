@@ -48,10 +48,22 @@ PACKAGES = {
         "bootstrap_script_in_pkg": "{0}/cloudify3-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "cloudify3-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
-        "bootstrap_params": {
-            "celery_defaults_path": "/etc/default/celeryd-cloudify.management",
-            "celery_init_path": "/etc/init.d/celeryd-cloudify.management",
-            "celery_run_dir": "{0}/celery".format(VIRTUALENVS_DIR),
+        "overwrite": False,
+        "config_templates": {
+            "__params_celery": {
+                "defaults_path": "/etc/default/celeryd-cloudify.management",
+                "init_path": "/etc/init.d/celeryd-cloudify.management",
+                "run_dir": "{0}/celery".format(VIRTUALENVS_DIR),
+            },
+            "__params_manager": {
+                "port": "8100",
+            },
+            "__params_workflow": {
+                "port": "8101",
+            },
+            "__params_ui": {
+                "port": "9001",
+            },
         }
     },
     "cloudify3-components": {
@@ -65,6 +77,7 @@ PACKAGES = {
         "bootstrap_script_in_pkg": "{0}/cloudify3-components-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "cloudify3-components-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+        "overwrite": False,
         "bootstrap_params": {
             "req_free_mem": "10000",
             "req_free_disk": "5",
@@ -86,11 +99,27 @@ PACKAGES = {
                 "rest_port": "80",
                 "file_server_port": "53229",
             },
+            "__params_rabbitmq": {
+                "port": "5672"
+            },
+            "__params_logstash": {
+                "port": "9999"
+            },
+            "__params_elasticsearch": {
+                "port": "9200"
+            },
             "__template_dir_riemann": {
                 "templates": "{0}/riemann".format(PACKAGER_CONF_DIR),
                 "config_dir": "config/riemann",
                 "dst_dir": "/etc/riemann",
-            }
+            },
+            "__params_riemann": {
+                "ws_port": "5556",
+                "tcp_port": "5555",
+            },
+            "__params_ruby": {
+                "run_dir": "/opt/ruby",
+            },
         }
     },
     "manager": {

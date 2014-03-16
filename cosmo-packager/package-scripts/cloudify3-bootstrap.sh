@@ -122,14 +122,14 @@ if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/celery/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "celery"
 
-        echo "placing ip: ${MANAGEMENT_IP} in celery defaults file..." >> ${BOOTSTRAP_LOG} 2>&1
-        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g /etc/default/celeryd-cloudify.management || state_error "could not place ip" >> ${BOOTSTRAP_LOG} 2>&1
-        echo "placing user: ${CELERY_USER} in celery defaults file..." >> ${BOOTSTRAP_LOG} 2>&1
-        sudo sed -i.bak s/USERSTRING/${CELERY_USER}/g /etc/default/celeryd-cloudify.management || state_error "could not place user" >> ${BOOTSTRAP_LOG} 2>&1
-        echo "owning celery by user: ${CELERY_USER}" >> ${BOOTSTRAP_LOG} 2>&1
-        sudo chown -R ${CELERY_USER}:${CELERY_USER} /opt/celery || state_error "cloud not change celery dir owner" >> ${BOOTSTRAP_LOG} 2>&1
-        echo "restart celery service..." >> ${BOOTSTRAP_LOG} 2>&1
-        /etc/init.d/celeryd-cloudify.management restart || state_error "could not restart celery" >> ${BOOTSTRAP_LOG} 2>&1
+        echo "placing ip: ${MANAGEMENT_IP} in celery defaults file..." >> ${BOOTSTRAP_LOG}
+        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g /etc/default/celeryd-cloudify.management >> ${BOOTSTRAP_LOG} || state_error "could not place ip" 
+        echo "placing user: ${CELERY_USER} in celery defaults file..." >> ${BOOTSTRAP_LOG}
+        sudo sed -i.bak s/USERSTRING/${CELERY_USER}/g /etc/default/celeryd-cloudify.management >> ${BOOTSTRAP_LOG} || state_error "could not place user" 
+        echo "owning celery by user: ${CELERY_USER}" >> ${BOOTSTRAP_LOG}
+        sudo chown -R ${CELERY_USER}:${CELERY_USER} /opt/celery >> ${BOOTSTRAP_LOG} || state_error "cloud not change celery dir owner" 
+        echo "restart celery service..." >> ${BOOTSTRAP_LOG}
+        /etc/init.d/celeryd-cloudify.management restart >> ${BOOTSTRAP_LOG} || state_error "could not restart celery" 
 else
         echo -e "celery is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
