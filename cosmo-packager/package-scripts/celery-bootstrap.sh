@@ -76,10 +76,13 @@ BASE_DIR="/opt"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}/cloudify.management__worker/env"
 WORK_DIR="${BASE_DIR}/${PKG_NAME}/cloudify.management__worker/work"
 
-PKG_INIT_DIR="${PKG_DIR}/init"
+PKG_INIT_DIR="${PKG_DIR}/config/init"
 INIT_DIR="/etc/init.d"
+INIT_FILE="celeryd-cloudify.management"
 
-PKG_CONF_DIR="${PKG_DIR}/conf"
+PKG_CONF_DIR="${PKG_DIR}/config/conf"
+CONF_DIR="/etc/default"
+CONF_FILE="celeryd-cloudify.management"
 
 
 sudo virtualenv ${HOME_DIR}
@@ -89,15 +92,15 @@ sudo mkdir -p ${WORK_DIR}
 check_dir "${WORK_DIR}"
 
 echo "moving some stuff around..."
-sudo cp ${PKG_INIT_DIR}/celeryd-cloudify.management ${INIT_DIR}
-check_file "${INIT_DIR}/celeryd-cloudify.management"
-sudo cp ${PKG_CONF_DIR}/celeryd-cloudify.management /etc/default
-check_file "/etc/default/celeryd-cloudify.management"
-sudo cp ${PKG_CONF_DIR}/celeryd-includes ${WORK_DIR}
-check_file "${WORK_DIR}/celeryd-includes"
+sudo cp ${PKG_INIT_DIR}/${INIT_FILE} ${INIT_DIR}
+check_file "${INIT_DIR}/${INIT_FILE}"
+sudo cp ${PKG_CONF_DIR}/${CONF_FILE} ${CONF_DIR}
+check_file "/etc/default/${CONF_FILE}"
+# sudo cp ${PKG_CONF_DIR}/celeryd-includes ${WORK_DIR}
+# check_file "${WORK_DIR}/celeryd-includes"
 
 echo "granting celeryd exec permissions..."
-sudo chmod +x ${INIT_DIR}/celeryd-cloudify.management
+sudo chmod +x ${INIT_DIR}/${INIT_FILE}
 # check_file permissions
 
 # echo "starting ${PKG_NAME}..."

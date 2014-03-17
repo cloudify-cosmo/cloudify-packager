@@ -40,7 +40,7 @@ function check_port
     TIMER=$3
     HOST=$4
 
-    for i in {1..5}
+    for i in {1..24}
     do 
         echo -ne "checking whether ${APP} port ${PORT} is opened on ${HOST:-localhost}..." >> ${BOOTSTRAP_LOG}
         nc -z ${HOST:-localhost} ${PORT} >/dev/null
@@ -108,8 +108,9 @@ PKG_DIR="/cloudify3"
 BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
 VERSION="3.0.0"
 
+CELERY_USER=${1:-ubuntu}
 PRIVATE_IP=$(ifconfig eth0 | grep inet | cut -f2 -d ":" | cut -f1 -d " ")
-MANAGEMENT_IP=${1:-${PRIVATE_IP}}
+MANAGEMENT_IP=${2:-${PRIVATE_IP}}
 
 ################################################ INSTALL CLOUDIFY
 
@@ -120,10 +121,15 @@ if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
         echo -e "celery is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
         sudo dpkg -i ${PKG_DIR}/celery/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "celery"
-        
-        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g /etc/default/celeryd-cloudify.management >> ${BOOTSTRAP_LOG} 2>&1
-        sudo chown -R ubuntu:ubuntu /opt/celery
-        /etc/init.d/celeryd-cloudify.management restart >> ${BOOTSTRAP_LOG} 2>&1
+
+        echo "placing ip: ${MANAGEMENT_IP} in celery defaults file..." >> ${BOOTSTRAP_LOG}
+        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g /etc/default/celeryd-cloudify.management >> ${BOOTSTRAP_LOG} || state_error "could not place ip" 
+        echo "placing user: ${CELERY_USER} in celery defaults file..." >> ${BOOTSTRAP_LOG}
+        sudo sed -i.bak s/USERSTRING/${CELERY_USER}/g /etc/default/celeryd-cloudify.management >> ${BOOTSTRAP_LOG} || state_error "could not place user" 
+        echo "owning celery by user: ${CELERY_USER}" >> ${BOOTSTRAP_LOG}
+        sudo chown -R ${CELERY_USER}:${CELERY_USER} /opt/celery >> ${BOOTSTRAP_LOG} || state_error "cloud not change celery dir owner" 
+        echo "restart celery service..." >> ${BOOTSTRAP_LOG}
+        /etc/init.d/celeryd-cloudify.management restart >> ${BOOTSTRAP_LOG} || state_error "could not restart celery" 
 else
         echo -e "celery is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
@@ -143,7 +149,7 @@ if ! dpkg -s cosmo-ui 2>&1 | grep Status: | grep installed; then
         sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "cosmo-ui"
 else
-        echo -e "cosmo-ui is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
+        echo -e "cosmo-ui is already installed, skipping (this may take several minutes)..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 ################################################ PORT INSTALLATION TESTS

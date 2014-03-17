@@ -76,10 +76,13 @@ HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 
 LOG_DIR="/var/log/cosmo"
 
-PKG_INIT_DIR="${PKG_DIR}/init"
+PKG_INIT_DIR="${PKG_DIR}/config/init"
 INIT_DIR="/etc/init"
+# INIT_FILE=""
 
-PKG_CONF_DIR="${PKG_DIR}/conf"
+PKG_CONF_DIR="${PKG_DIR}/config/conf"
+CONF_DIR=""
+CONF_FILE="guni.conf"
 
 
 echo "creating file server dir..."
@@ -87,8 +90,8 @@ sudo mkdir -p ${PKG_DIR}/filesrv
 check_dir "${PKG_DIR}/filesrv"
 
 echo "copying some stuff..."
-sudo cp -R ${PKG_DIR}/cosmo-manager-develop/orchestrator/src/main/resources/cloudify/ ${PKG_DIR}/filesrv/
-sudo cp ${PKG_DIR}/cosmo-manager-develop/orchestrator/src/main/resources/org/cloudifysource/cosmo/dsl/alias-mappings.yaml ${PKG_DIR}/filesrv/cloudify/
+sudo cp -R ${PKG_DIR}/cosmo-manager-*/orchestrator/src/main/resources/cloudify/ ${PKG_DIR}/filesrv/
+sudo cp ${PKG_DIR}/cosmo-manager-*/orchestrator/src/main/resources/org/cloudifysource/cosmo/dsl/alias-mappings.yaml ${PKG_DIR}/filesrv/cloudify/
 
 # echo "running gunicorn..."
 # sudo ${PKG_DIR}/bin/gunicorn -w 1 -b 0.0.0.0:8100 --timeout 300 ${PKG_DIR}/cosmo-manager-develop/manager-rest/manager_rest/server.py:app

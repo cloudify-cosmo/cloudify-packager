@@ -67,20 +67,20 @@ function check_service
 }
 
 
-PKG_NAME="{{ name }}"
-PKG_DIR="{{ package_dir }}"
+PKG_NAME="elasticsearch"
+PKG_DIR="/packages/elasticsearch"
 BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
 
 BASE_DIR="/opt"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 
-PKG_INIT_DIR="${PKG_DIR}/{{ config_templates.__template_file_init.config_dir }}"
-INIT_DIR="{{ config_templates.__template_file_init.dst_dir }}"
-INIT_FILE="{{ config_templates.__template_file_init.output_file }}"
+PKG_INIT_DIR="${PKG_DIR}/config/init"
+INIT_DIR="/etc/init"
+INIT_FILE="elasticsearch.conf"
 
-PKG_CONF_DIR="${PKG_DIR}/{{ config_templates.__template_file_conf.config_dir }}"
-CONF_DIR="{{ config_templates.__template_file_conf.dst_dir }}"
-CONF_FILE="{{ config_templates.__template_file_conf.output_file }}"
+PKG_CONF_DIR="${PKG_DIR}/config/conf"
+CONF_DIR="/etc/init"
+CONF_FILE="elasticsearch.conf"
 
 
 echo "creating ${PKG_NAME} home dir..."

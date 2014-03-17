@@ -1,21 +1,21 @@
 input {
     rabbitmq {
-        queue => "cloudify-logs"
+        queue => "{{ config_templates.__params_conf.logs_queue}}"
         host => "localhost"
         durable => "true"
         auto_delete => "true"
         exclusive => "false"
-        # key => "cloudify-logs"
+        # key => "{{ config_templates.__params_conf.logs_queue}}"
         # exchange => "test_exchange" # This matches the exchange declared above
     }
 
     rabbitmq {
-        queue => "cloudify-events"
+        queue => "{{ config_templates.__params_conf.events_queue}}"
         host => "localhost"
         durable => "true"
         auto_delete => "true"
         exclusive => "false"
-        # key => "cloudify-events"
+        # key => "{{ config_templates.__params_conf.events_queue}}"
         # exchange => "test_exchange" # This matches the exchange declared above
     }
 
@@ -29,7 +29,7 @@ input {
     # }
  
     tcp {
-        port => 9999
+        port => {{ config_templates.__params_conf.test_tcp_port }}
     }
 }
 
@@ -60,9 +60,9 @@ filter {
 }
 
 output {
-    elasticsearch {
+    elasticsearch_http {
         host => "localhost"
-        index => "cloudify_events"
+        index => "{{ config_templates.__params_conf.events_index}}"
     }
 
     # riemann {

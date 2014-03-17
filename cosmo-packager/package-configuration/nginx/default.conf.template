@@ -11,13 +11,13 @@
 #
 server {
 
-  listen                *:3000;
+  listen                *:{{ config_templates.__params_nginx.kibana_port }};
 
   server_name           kibana.cosmo;
   access_log            /var/log/nginx/kibana.access.log;
 
   location / {
-    root  /opt/kibana3;
+    root  {{ config_templates.__params_nginx.kibana_run_dir }};
     index  index.html  index.htm;
   }
 
@@ -59,7 +59,7 @@ upstream cloudify-rest {
 
 server {
 
-  listen		          *:80;
+  listen		          *:{{ config_templates.__params_nginx.rest_port }};
   server_name	        _;
 
   access_log          /var/log/nginx/cloudify.access.log;
@@ -88,12 +88,12 @@ server {
 }
 
 server {
-  listen        *:53229;
+  listen        *:{{ config_templates.__params_nginx.file_server_port }};
   server_name   _;
 
   access_log    /var/log/nginx/cloudify-files.log;
   location / {
-    root              /opt/manager/resources;
+    root              {{ config_templates.__params_nginx.file_server_resources_path }};
     autoindex on;
     allow             all;
     deny              all;

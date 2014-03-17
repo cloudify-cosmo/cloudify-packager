@@ -110,10 +110,77 @@ def create_bootstrap_script(component, template_file, script_file):
     creates a script file from a template file
     """
 
-    lgr.debug('creating bootstrap script')
+    lgr.debug('creating bootstrap script...')
     formatted_text = template_formatter(
         config.PACKAGER_TEMPLATE_DIR, template_file, component)
     make_file(script_file, formatted_text)
+
+
+def generate_configs(component):
+    """
+    generates configuration files from templates
+    """
+
+    for key, value in component['config_templates'].iteritems():
+        if key.startswith('__template_file'):
+            config_dir = value['config_dir']  # .split('_')[0]
+            template_dir = '/'.join(value['template']
+                                    .split('/')[:-1])
+            template_file = value['template'].split('/')[-1]
+            output_file = value['output_file'] \
+                if 'output_file' in value \
+                else '.'.join(template_file.split('.')[:-1])
+            output_path = '{0}/{1}/{2}'.format(
+                component['package_dir'], config_dir, output_file)
+
+            # print '!!!!!!!!!!!config_dir: {0}'.format(config_dir)
+            # print '!!!!!!!!!!!template_dir: {0}'.format(template_dir)
+            # print '!!!!!!!!!!!template_file: {0}'.format(template_file)
+            # print '!!!!!!!!!!!output_file: {0}'.format(output_file)
+            # print '!!!!!!!!!!!output_path: {0}'.format(output_path)
+
+            mkdir('{0}/{1}'.format(
+                component['package_dir'], config_dir))
+            generate_from_template(component,
+                                   output_path,
+                                   template_file,
+                                   template_dir)
+
+        elif key.startswith('__template_dir'):
+            config_dir = value['config_dir']  # .split('_')[0]
+            # if 'templates' in value:
+            template_dir = value['templates']
+            for subdir, dirs, files in os.walk(template_dir):
+                for file in files:
+                    # print subdir + '/' + file
+                    template_file = file
+                    output_file = '.'.join(template_file.split('.')[:-1])
+                    output_path = '{0}/{1}/{2}'.format(
+                        component['package_dir'], config_dir, output_file)
+
+                    mkdir('{0}/{1}'.format(
+                        component['package_dir'], config_dir))
+                    generate_from_template(component,
+                                           output_path,
+                                           template_file,
+                                           template_dir)
+            # elif 'files' in value:
+            #     files_dir = value['files']
+            #     mkdir('{0}/{1}'.format(
+            #         component['package_dir'], config_dir))
+            #     cp(files_dir, config_dir)
+
+
+def generate_from_template(component, output_file, template_file,
+                           template_dir=config.PACKAGER_TEMPLATE_DIR):
+    """
+    generates configuration files from templates
+    """
+
+    lgr.debug('generating config file...')
+    formatted_text = template_formatter(
+        template_dir, template_file, component)
+    make_file(output_file, formatted_text)
 
 
 def get_package_configuration(component):
@@ -207,7 +274,8 @@ def get(package=False, version=False, source_repo=False, source_ppa=False,
 def pack(package=False, src_type=False, dst_type=False, name=False,
          src_path=False, dst_path=False, version=False, bootstrap_dir=False,
          bootstrap_script=False, bootstrap_template=False, depends=False,
-         bootstrap_script_in_pkg=False):
+         bootstrap_script_in_pkg=False, config_templates=False,
+         overwrite=True):
     """
     uses fpm (https://github.com/jordansissel/fpm/wiki)
     to create packages
@@ -237,13 +305,24 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
         if 'bootstrap_script_in_pkg' in package else bootstrap_script_in_pkg
     depends = package['depends'] \
         if 'depends' in package else depends
+    config_templates = package['config_templates'] \
+        if 'config_templates' in package else config_templates
+    overwrite = package['overwrite'] \
+        if 'overwrite' in package else overwrite
 
     if src_path == dst_path:
         lgr.error('source and destination paths must'
                   ' be different to avoid conflics!')
+    lgr.info('cleaning up before packaging...')
+    if overwrite:
+        rmdir(bootstrap_dir)
     if src_type:
         rmdir(dst_path)
         mkdir(dst_path)
+
+    lgr.info('generating package scripts and config files...')
+    if config_templates:
+        generate_configs(package)
     if bootstrap_script or bootstrap_script_in_pkg:
         if bootstrap_template and bootstrap_script:
             create_bootstrap_script(package, bootstrap_template,
@@ -252,10 +331,11 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
             create_bootstrap_script(package, bootstrap_template,
                                     bootstrap_script_in_pkg)
             if bootstrap_script_in_pkg:
-                lgr.info('granting execution permissions')
+                lgr.debug('granting execution permissions')
                 do('chmod +x {0}'.format(bootstrap_script_in_pkg))
-                lgr.info('copying bootstrap script to package directory')
+                lgr.debug('copying bootstrap script to package directory')
                 cp(bootstrap_script_in_pkg, src_path)
+    lgr.info('packing up component...')
     if src_type:
         lgr.info('packing {0}'.format(name))
         if is_dir(src_path):
@@ -296,7 +376,7 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
 
     if not is_dir(bootstrap_dir):
         mkdir(bootstrap_dir)
-    lgr.debug("isolating archives...")
+    lgr.info("isolating archives...")
     cp('{0}/*.{1}'.format(dst_path, dst_type), bootstrap_dir)
 
 
