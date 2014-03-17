@@ -127,14 +127,14 @@ def get_manager(download=False):
 
     _prepare(package)
     venv(package['package_dir'])
-    if download:
-        wget(
-            package['source_url'],
-            file='%s/%s.tar.gz' % (package['package_dir'],
-                                   package['name']))
-        untar(package['package_dir'],
-              '%s/%s.tar.gz' % (package['package_dir'],
-                                package['name']))
+    # if download:
+    wget(
+        package['source_url'],
+        file='%s/%s.tar.gz' % (package['package_dir'],
+                               package['name']))
+    untar(package['package_dir'],
+          '%s/%s.tar.gz' % (package['package_dir'],
+                            package['name']))
         # TODO: DELETE TAR FILE
     # else:
         # cp(local_manager_repo, package['package_dir'])
@@ -165,7 +165,8 @@ def get_curl():
     package = get_package_configuration('curl')
 
     _prepare(package)
-    apt_purge(package['name'])
+    for req in package['reqs']:
+        apt_purge(req)
     apt_download(
         package['name'],
         package['package_dir'])

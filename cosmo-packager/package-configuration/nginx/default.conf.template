@@ -17,7 +17,7 @@ server {
   access_log            /var/log/nginx/kibana.access.log;
 
   location / {
-    root  {{ config_templates.__params_nginx.run_dir }};
+    root  {{ config_templates.__params_nginx.kibana_run_dir }};
     index  index.html  index.htm;
   }
 
