@@ -94,10 +94,10 @@ PACKAGES = {
             },
             "__params_nginx": {
                 "kibana_run_dir": "/opt/kibana3",
-                "file_server_resources_path": "{0}/manager/resources".format(VIRTUALENVS_DIR),
                 "kibana_port": "3000",
                 "rest_port": "80",
                 "file_server_port": "53229",
+                "file_server_resources_path": "{0}/manager/resources".format(VIRTUALENVS_DIR),
             },
             "__params_rabbitmq": {
                 "port": "5672"
@@ -430,7 +430,8 @@ PACKAGES = {
         "name": "curl",
         "version": "0.0.1",
         "reqs": [
-            "curl"
+            "curl",
+            "libcurl3",
         ],
         "bootstrap_dir": "{0}/curl/".format(COMPONENTS_BOOTSTRAP_DIR),
         "package_dir": "{0}/curl".format(PACKAGES_DIR),
