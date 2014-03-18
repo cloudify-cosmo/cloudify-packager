@@ -12,6 +12,8 @@ export CELERY_WORK_DIR="{{ config_templates.__params_conf.work_dir }}"
 export IS_MANAGEMENT_NODE="True"
 export AGENT_IP="cloudify.management"
 export VIRTUALENV="${CELERY_BASE_DIR}"
+export MANAGER_FILE_SERVER_URL="http://IPSTRING:{{ config_templates.__params_conf.file_server_port }}"
+export MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL="${MANAGER_FILE_SERVER_URL}/blueprints"
 
 INCLUDES=plugin_installer.tasks,kv_store.tasks,worker_installer.tasks
 CELERYD_MULTI="${VIRTUALENV}/bin/celeryd-multi"
