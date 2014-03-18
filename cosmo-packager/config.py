@@ -97,7 +97,7 @@ PACKAGES = {
                 "kibana_port": "3000",
                 "rest_port": "80",
                 "file_server_port": "53229",
-                "file_server_resources_path": "{0}/manager/resources".format(VIRTUALENVS_DIR),
+                "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_DIR),
             },
             "__params_rabbitmq": {
                 "port": "5672"
@@ -131,7 +131,7 @@ PACKAGES = {
         ],
         "bootstrap_dir": "{0}/manager/".format(CODE_BOOTSTRAP_DIR),
         "package_dir": "{0}/manager".format(VIRTUALENVS_DIR),
-        "conf_dir": "{0}/manager".format(PACKAGER_CONF_DIR),
+        # "conf_dir": "{0}/manager".format(PACKAGER_CONF_DIR),
         "modules": ['{0}/manager/cosmo-manager-develop/manager-rest/'.format(VIRTUALENVS_DIR)],
         "resources_dir": "{0}/manager/cosmo-manager-develop/orchestrator/".format(VIRTUALENVS_DIR),
         "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_DIR),
@@ -173,11 +173,14 @@ PACKAGES = {
                 "config_dir": "config/conf",
                 # "dst_dir": "/opt/manager/config/conf",
             },
+            "__params_conf": {
+                "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_DIR),
+            },
             "__template_dir_init": {
                 "templates": "{0}/manager/init".format(PACKAGER_CONF_DIR),
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
-            }
+            },
         }
     },
     "celery": {
@@ -185,7 +188,7 @@ PACKAGES = {
         "version": "0.0.1",
         "bootstrap_dir": "{0}/celery/".format(CODE_BOOTSTRAP_DIR),
         "package_dir": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_DIR),
-        "conf_dir": "{0}/celery".format(PACKAGER_CONF_DIR),
+        # "conf_dir": "{0}/celery".format(PACKAGER_CONF_DIR),
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
@@ -205,6 +208,7 @@ PACKAGES = {
             },
             "__params_init": {
                 "defaults_file": "/etc/default/celeryd-cloudify.management",
+                "base_dir": "/opt/celery",
             },
             "__template_file_conf": {
                 "template": "{0}/celery/conf/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
@@ -214,6 +218,8 @@ PACKAGES = {
             },
             "__params_conf": {
                 "work_dir": "{0}/celery/cloudify.management__worker/work".format(VIRTUALENVS_DIR),
+                "base": "/opt/celery",
+                "rest_port": "8100",
             }
         }
     },
@@ -226,7 +232,7 @@ PACKAGES = {
         ],
         "bootstrap_dir": "{0}/cosmo-ui/".format(CODE_BOOTSTRAP_DIR),
         "package_dir": "{0}/cosmo-ui".format(PACKAGES_DIR),
-        "conf_dir": "{0}/cosmo-ui".format(PACKAGER_CONF_DIR),
+        # "conf_dir": "{0}/cosmo-ui".format(PACKAGER_CONF_DIR),
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "{0}/cosmo-ui-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
@@ -476,26 +482,47 @@ PACKAGES = {
         "package_dir": "{0}/workflow-gems".format(PACKAGES_DIR),
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "reqs": ['make'],
+        "reqs": [
+            'make'
+        ],
         "bootstrap_script": "{0}/workflow-gems-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         "bootstrap_template": "workflow-gems-bootstrap.template"
     },
     "agent-ubuntu": {
-        "name": "agent-ubuntu",
-        "version": "0.0.1",
-        "bootstrap_dir": "{0}/agent-ubuntu/".format(AGENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/agent-ubuntu/cloudify.management__worker/env".format(VIRTUALENVS_DIR),
-        "conf_dir": "{0}/agent-ubuntu".format(PACKAGER_CONF_DIR),
+        "name": "agent-Ubuntu",
+        "version": "3.0.0",
+        "bootstrap_dir": "{0}/agent-Ubuntu/".format(AGENTS_BOOTSTRAP_DIR),
+        "package_dir": "{0}/agent-Ubuntu/cloudify.management__worker/env".format(VIRTUALENVS_DIR),
+        # "conf_dir": "{0}/agent-ubuntu".format(PACKAGER_CONF_DIR),
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
-                    'https://github.com/CloudifySource/cosmo-plugin-kv-store/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-celery-common/archive/develop.tar.gz'
         ],
+        "package_location": "/packages/agents/Ubuntu/Ubuntu-agent.tar.gz",
         "src_package_type": "dir",
         "dst_package_type": "tar",
-        "bootstrap_script_in_pkg": "{0}/agent-ubuntu-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
-        "bootstrap_template": "agent-ubuntu-bootstrap.template"
+        "config_templates": {
+            "__template_file_init": {
+                "template": "{0}/agent-ubuntu/init/celeryd-cloudify.agent.template".format(PACKAGER_CONF_DIR),
+                "output_file": "celeryd-cloudify.agent",
+                "config_dir": "config/init",
+                "dst_dir": "/etc/init.d",
+            },
+            "__template_file_conf": {
+                "template": "{0}/agent-ubuntu/conf/celeryd-cloudify.agent.template".format(PACKAGER_CONF_DIR),
+                "output_file": "celeryd-cloudify.agent",
+                "config_dir": "config/conf",
+                "dst_dir": "/etc/default",
+            },
+            "__params_celery": {
+                "defaults_path": "/etc/default/celeryd-cloudify.management",
+                "init_path": "/etc/init.d/celeryd-cloudify.management",
+                "run_dir": "{0}/celery".format(VIRTUALENVS_DIR),
+            },
+        }
+        # "bootstrap_script_in_pkg": "{0}/agent-ubuntu-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        # "bootstrap_template": "agent-ubuntu-bootstrap.template"
     },
     "cli-ubuntu": {
         "name": "cli-ubuntu",

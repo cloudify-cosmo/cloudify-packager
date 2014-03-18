@@ -18,10 +18,13 @@
 # Short-Description: celery task worker daemon
 ### END INIT INFO
 
-# some commands work asyncronously, so we'll wait this many seconds
-export CELERY_WORK_DIR="{{ package_dir }}/cloudify.management__worker/work"
+
+
+
+export CELERY_WORK_DIR="{{ config_templates.__params_conf.work_dir }}"
 CELERY_DEFAULTS="{{ config_templates.__params_init.defaults_file }}"
 
+# some commands work asyncronously, so we'll wait this many seconds
 SLEEP_SECONDS=5
 
 DEFAULT_PID_FILE="/var/run/celery/%n.pid"

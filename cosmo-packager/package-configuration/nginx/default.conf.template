@@ -93,7 +93,7 @@ server {
 
   access_log    /var/log/nginx/cloudify-files.log;
   location / {
-    root              {{ config_templates.__params_nginx.file_server_resources_path }};
+    root              {{ config_templates.__params_nginx.file_server_dir }};
     autoindex on;
     allow             all;
     deny              all;

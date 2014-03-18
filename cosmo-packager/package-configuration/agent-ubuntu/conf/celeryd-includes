@@ -1,1 +1,0 @@
-INCLUDES=plugin_installer.tasks,kv_store.tasks,worker_installer.tasks

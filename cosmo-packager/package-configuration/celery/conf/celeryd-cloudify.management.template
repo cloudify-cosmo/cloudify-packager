@@ -1,12 +1,17 @@
+CELERY_BASE_DIR={{ package_dir }}
+
+
+
+
 export BROKER_URL="amqp://guest:guest@IPSTRING:5672//"
 export MANAGEMENT_USER="USERSTRING"
 export HOME="/home/USERSTRING"
-export MANAGER_REST_PORT="8100"
+export MANAGER_REST_PORT="{{ config_templates.__params_conf.rest_port }}"
 export MANAGEMENT_IP="IPSTRING"
 export CELERY_WORK_DIR="{{ config_templates.__params_conf.work_dir }}"
 export IS_MANAGEMENT_NODE="True"
 export AGENT_IP="cloudify.management"
-export VIRTUALENV="{{ package_dir }}"
+export VIRTUALENV="${CELERY_BASE_DIR}"
 
 INCLUDES=plugin_installer.tasks,kv_store.tasks,worker_installer.tasks
 CELERYD_MULTI="${VIRTUALENV}/bin/celeryd-multi"

@@ -19,9 +19,9 @@
 ### END INIT INFO
 
 WORKER_MODIFIER="{{ celery_agent.ubuntu.worker_modifer }}"
-HOME_DIR="/opt/celery"
+CELERY_BASE_DIR="{{ config_templates.__params_init.base_dir }}"
 ME=$(basename $0)
-export CELERY_WORK_DIR="${HOME_DIR}/cloudify.${WORKER_MODIFIER}/work"
+export CELERY_WORK_DIR="${CELERY_BASE_DIR}/cloudify.${WORKER_MODIFIER}/work"
 CELERY_DEFAULTS="/etc/default/${ME}"
 
 # some commands work asyncronously, so we'll wait this many seconds
@@ -33,38 +33,7 @@ DEFAULT_LOG_LEVEL="INFO"
 DEFAULT_NODES="celery"
 DEFAULT_CELERYD="-m celery.bin.celeryd_detach"
 
-# while getopts ":s:p:" o; do
-        #     case "${o}" in
-        #         s)
-        #             s=${OPTARG}
-        #             ((s == 45 || s == 90)) || usage
-        #             ;;
-        #         p)
-        #             p=${OPTARG}
-        #             ;;
-        #         *)
-        #             usage
-        #             ;;
-        #     esac
-        # done
-
-# while echo $2 | grep ^- > /dev/null; do
-#     eval $( echo $2 | sed 's/-//g' | tr -d '\012')=$3
-#     shift
-#     shift
-# done
-
 test -f "$CELERY_DEFAULTS" && . "$CELERY_DEFAULTS" 
-# \
-#     ${broker_url} \
-#     ${management_user} \
-#     ${home} \
-#     ${manager_rest_port} \
-#     ${management_ip} \
-#     ${celery_work_dir} \
-#     ${is_management_node} \
-#     ${agent_ip} \
-#     ${virtualenv}
 
 # Set CELERY_CREATE_DIRS to always create log/pid dirs.
 CELERY_CREATE_DIRS=${CELERY_CREATE_DIRS:-0}
