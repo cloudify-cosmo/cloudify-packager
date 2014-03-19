@@ -39,4 +39,4 @@ nosetests.xml
 
 .vagrant/
 debs/
-package-scripts/*
+cosmo-packager/package-scripts/*
