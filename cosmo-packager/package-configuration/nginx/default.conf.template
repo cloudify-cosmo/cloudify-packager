@@ -9,6 +9,9 @@
 # If you use this, you'll want to point config.js at http://FQDN:80/ instead of
 # http://FQDN:9200
 #
+
+types_hash_max_size 4096;
+
 server {
 
   listen                *:{{ config_templates.__params_nginx.kibana_port }};

@@ -339,6 +339,12 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
     if src_type:
         lgr.info('packing {0}'.format(name))
         if is_dir(src_path):
+            if bootstrap_script:
+                bootstrap_script = "{0}/{1}".format(os.getcwd(),
+                                                    bootstrap_script)
+            if bootstrap_script_in_pkg:
+                bootstrap_script_in_pkg = "{0}/{1}".format(os.getcwd(),
+                                                           bootstrap_script_in_pkg)  # NOQA
             with lcd(dst_path):
                 if bootstrap_script_in_pkg and dst_type == "tar":
                     x = _run_locally_with_retries(

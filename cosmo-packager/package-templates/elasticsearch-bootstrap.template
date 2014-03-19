@@ -135,7 +135,7 @@ done
 echo "deleting index if exists..."
 curl --retry 5 --retry-delay 3 -XDELETE http://localhost:9200/cloudify_storage
 echo "creating index..."
-curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage
+curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage -d '{"settings": {"analysis": {"analyzer": {"default": {"tokenizer": "whitespace"}}}}}'
 echo "creating blueprint mapping..."
 curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/blueprint/_mapping -d '{"blueprint": {"properties": {"plan": {"enabled": false}}}}'
 echo "creating deployment mapping..."

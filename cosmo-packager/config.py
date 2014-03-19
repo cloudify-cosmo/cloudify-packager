@@ -19,11 +19,11 @@ ENV = "develop"
 # base packager repo dir
 PACKAGER_BASE = "/vagrant/cosmo-packager"
 # directory for bootstrap/download/removal/package scripts - if applicable
-PACKAGER_SCRIPTS_DIR = "/vagrant/cosmo-packager/package-scripts"
+PACKAGER_SCRIPTS_DIR = "package-scripts"
 # package configurations directory
-PACKAGER_CONF_DIR = "/vagrant/cosmo-packager/package-configuration"
+PACKAGER_CONF_DIR = "package-configuration"
 # directory which contains configuration for all modules
-PACKAGER_TEMPLATE_DIR = "/vagrant/cosmo-packager/package-templates"
+PACKAGER_TEMPLATE_DIR = "package-templates"
 # temporary directory to which items are downloaded and packages are created.
 PACKAGES_DIR = "/packages"
 # final directory to put the created packages in.
@@ -220,6 +220,7 @@ PACKAGES = {
                 "work_dir": "{0}/celery/cloudify.management__worker/work".format(VIRTUALENVS_DIR),
                 "base": "/opt/celery",
                 "rest_port": "8100",
+                "file_server_port": "53229",
             }
         }
     },
@@ -502,25 +503,23 @@ PACKAGES = {
         "package_location": "/packages/agents/Ubuntu/Ubuntu-agent.tar.gz",
         "src_package_type": "dir",
         "dst_package_type": "tar",
-        "config_templates": {
-            "__template_file_init": {
-                "template": "{0}/agent-ubuntu/init/celeryd-cloudify.agent.template".format(PACKAGER_CONF_DIR),
-                "output_file": "celeryd-cloudify.agent",
-                "config_dir": "config/init",
-                "dst_dir": "/etc/init.d",
-            },
-            "__template_file_conf": {
-                "template": "{0}/agent-ubuntu/conf/celeryd-cloudify.agent.template".format(PACKAGER_CONF_DIR),
-                "output_file": "celeryd-cloudify.agent",
-                "config_dir": "config/conf",
-                "dst_dir": "/etc/default",
-            },
-            "__params_celery": {
-                "defaults_path": "/etc/default/celeryd-cloudify.management",
-                "init_path": "/etc/init.d/celeryd-cloudify.management",
-                "run_dir": "{0}/celery".format(VIRTUALENVS_DIR),
-            },
-        }
+        # "config_templates": {
+        #     "__template_file_init": {
+        #         "template": "{0}/agent-ubuntu/init/celeryd-cloudify.agent.template".format(PACKAGER_CONF_DIR),
+        #         "output_file": "celeryd-cloudify.agent",
+        #         "config_dir": "config/init",
+        #         "dst_dir": "/etc/init.d",
+        #     },
+        #     "__template_file_conf": {
+        #         "template": "{0}/agent-ubuntu/conf/celeryd-cloudify.agent.template".format(PACKAGER_CONF_DIR),
+        #         "output_file": "celeryd-cloudify.agent",
+        #         "config_dir": "config/conf",
+        #         "dst_dir": "/etc/default",
+        #     },
+        #     "__params_conf": {
+        #         "base_dir": "{0}/celery".format(VIRTUALENVS_DIR),
+        #     },
+        # }
         # "bootstrap_script_in_pkg": "{0}/agent-ubuntu-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
         # "bootstrap_template": "agent-ubuntu-bootstrap.template"
     },
@@ -582,7 +581,7 @@ PACKAGES = {
     # },
 }
 # logger configuration
-VERBOSE = False
+VERBOSE = True
 LOGGER = {
     "version": 1,
     "formatters": {

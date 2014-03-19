@@ -19,7 +19,7 @@
 ### END INIT INFO
 
 WORKER_MODIFIER="{{ celery_agent.ubuntu.worker_modifer }}"
-CELERY_BASE_DIR="{{ config_templates.__params_init.base_dir }}"
+CELERY_BASE_DIR="/opt/celery"
 ME=$(basename $0)
 export CELERY_WORK_DIR="${CELERY_BASE_DIR}/cloudify.${WORKER_MODIFIER}/work"
 CELERY_DEFAULTS="/etc/default/${ME}"

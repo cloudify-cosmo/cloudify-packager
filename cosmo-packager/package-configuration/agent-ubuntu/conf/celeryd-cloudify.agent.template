@@ -1,4 +1,5 @@
-CELERY_BASE_DIR="{{ config_templates.__params_conf.base_dir }}"
+. {{ celery_agent.ubuntu.includes_file_path }}
+CELERY_BASE_DIR="/opt/celery"
 
 # replaces management__worker
 WORKER_MODIFIER="{{ celery_agent.ubuntu.worker_modifier }}"
@@ -6,14 +7,13 @@ WORKER_MODIFIER="{{ celery_agent.ubuntu.worker_modifier }}"
 export BROKER_URL="{{ celery_agent.ubuntu.broker_url }}"
 export MANAGEMENT_USER="{{ celery_agent.ubuntu.management_user }}"
 export HOME={{ celery_agent.ubuntu.home_dir }}
-export MANAGER_REST_PORT="{{ config_templates.__params_conf.rest_port }}"
+export MANAGER_REST_PORT="8100"
 export MANAGEMENT_IP="{{ celery_agent.ubuntu.management_ip }}"
 export CELERY_WORK_DIR="${CELERY_BASE_DIR}/cloudify.${WORKER_MODIFIER}/work"
 export IS_MANAGEMENT_NODE="{{ celery_agent.ubuntu.is_management_node }}"
 export AGENT_IP="{{ celery_agent.ubuntu.agent_ip }}"
 export VIRTUALENV="${CELERY_BASE_DIR}/cloudify.${WORKER_MODIFIER}/env"
 
-INCLUDES=plugin_installer.tasks,kv_store.tasks,worker_installer.tasks
 CELERYD_MULTI="${VIRTUALENV}/bin/celeryd-multi"
 CELERYD_USER="{{ celery_agent.ubuntu.celery_user }}"
 CELERYD_GROUP="{{ celery_agent.ubuntu.celery_group }}"
