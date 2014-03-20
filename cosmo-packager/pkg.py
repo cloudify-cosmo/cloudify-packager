@@ -53,9 +53,7 @@ def pkg_cloudify3():
     """
 
     package = get_package_configuration('cloudify3')
-
-    rm('{0}/cloudify*'.format(package['package_dir']))
-    cp(package['conf_dir'], package['package_dir'])
+    # rm('{0}/cloudify*'.format(package['sources_path']))
     pack(package)
 
 
@@ -67,9 +65,7 @@ def pkg_cloudify3_components():
     """
 
     package = get_package_configuration('cloudify3-components')
-
-    rm('{0}/cloudify*'.format(package['package_dir']))
-    cp(package['conf_dir'], package['package_dir'])
+    # rm('{0}/cloudify*'.format(package['sources_path']))
     pack(package)
 
 
@@ -81,7 +77,7 @@ def pkg_agent_ubuntu():
     """
 
     package = get_package_configuration('agent-ubuntu')
-    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    # rm('{0}/archives/*.deb'.format(package['sources_path']))
     pack(package)
 
 
@@ -93,7 +89,7 @@ def pkg_graphite():
     """
 
     package = get_package_configuration('graphite')
-    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    # rm('{0}/archives/*.deb'.format(package['sources_path']))
     pack(package)
 
 
@@ -105,7 +101,7 @@ def pkg_virtualenv():
     """
 
     package = get_package_configuration('virtualenv')
-    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    # rm('{0}/archives/*.deb'.format(package['sources_path']))
     pack(package)
 
 
@@ -117,7 +113,7 @@ def pkg_celery():
     """
 
     package = get_package_configuration('celery')
-    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    # rm('{0}/archives/*.deb'.format(package['sources_path']))
     pack(package)
 
 
@@ -129,7 +125,7 @@ def pkg_manager():
     """
 
     package = get_package_configuration('manager')
-    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    # rm('{0}/archives/*.deb'.format(package['sources_path']))
     pack(package)
 
 
@@ -155,22 +151,6 @@ def pkg_make():
     pack(package)
 
 
-# @task
-# def pkg_gcc():
-#     """
-#     ACT:    packages gcc
-#     EXEC:   fab pkg_gcc
-#     """
-
-#     package = get_package_configuration('gcc')
-
-#     if not is_dir(package['bootstrap_dir']):
-#         mkdir(package['bootstrap_dir'])
-#     lgr.debug("isolating debs...")
-#     cp('%s/archives/*.deb' % package['package_dir'],
-    # package['bootstrap_dir'])
-
-
 @task
 def pkg_ruby():
     """
@@ -180,34 +160,6 @@ def pkg_ruby():
 
     package = get_package_configuration('ruby')
     pack(package)
-
-
-# @task
-# def pkg_zlib():
-#     """
-#     ACT:    packages zlib
-#     EXEC:   fab pkg_zlib
-#     """
-
-#     package = get_package_configuration('zlib')
-
-#     create_bootstrap_script(
-#         package, package['bootstrap_template'], package['bootstrap_script'])
-#     pack(
-#         package['src_package_type'],
-#         package['dst_package_type'],
-#         package['name'],
-#         package['package_dir'],
-#         '{0}/archives/'.format(package['package_dir']),
-#         package['version'],
-#         package['bootstrap_script'],
-#         package['depends'])
-
-#     if not is_dir(package['bootstrap_dir']):
-#         mkdir(package['bootstrap_dir'])
-#     lgr.debug("isolating debs...")
-#     cp('%s/archives/*.deb' % package['package_dir'],
-    # package['bootstrap_dir'])
 
 
 @task
@@ -229,7 +181,7 @@ def pkg_cosmo_ui():
     """
 
     package = get_package_configuration('cosmo-ui')
-    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    # rm('{0}/archives/*.deb'.format(package['sources_path']))
     pack(package)
 
 
@@ -310,7 +262,7 @@ def pkg_kibana():
     """
 
     package = get_package_configuration('kibana3')
-    rm('{0}/archives/*.deb'.format(package['package_dir']))
+    # rm('{0}/archives/*.deb'.format(package['sources_path']))
     pack(package)
 
 
@@ -334,6 +286,49 @@ def pkg_openjdk():
 
     package = get_package_configuration('openjdk-7-jdk')
     pack(package)
+
+
+# @task
+# def pkg_zlib():
+#     """
+#     ACT:    packages zlib
+#     EXEC:   fab pkg_zlib
+#     """
+
+#     package = get_package_configuration('zlib')
+
+#     create_bootstrap_script(
+#         package, package['bootstrap_template'], package['bootstrap_script'])
+#     pack(
+#         package['src_package_type'],
+#         package['dst_package_type'],
+#         package['name'],
+#         package['sources_path'],
+#         '{0}/archives/'.format(package['sources_path']),
+#         package['version'],
+#         package['bootstrap_script'],
+#         package['depends'])
+
+#     if not is_dir(package['package_path']):
+#         mkdir(package['package_path'])
+#     lgr.debug("isolating debs...")
+#     cp('%s/archives/*.deb' % package['sources_path'],
+    # package['package_path'])
+
+# @task
+# def pkg_gcc():
+#     """
+#     ACT:    packages gcc
+#     EXEC:   fab pkg_gcc
+#     """
+
+#     package = get_package_configuration('gcc')
+
+#     if not is_dir(package['package_path']):
+#         mkdir(package['package_path'])
+#     lgr.debug("isolating debs...")
+#     cp('%s/archives/*.deb' % package['sources_path'],
+    # package['package_path'])
 
 
 def main():

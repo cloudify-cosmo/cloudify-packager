@@ -19,20 +19,20 @@ ENV = "develop"
 # base packager repo dir
 PACKAGER_BASE = "/vagrant/cosmo-packager"
 # directory for bootstrap/download/removal/package scripts - if applicable
-PACKAGER_SCRIPTS_DIR = "package-scripts"
+PACKAGER_SCRIPTS_PATH = "package-scripts"
 # package configurations directory
-PACKAGER_CONF_DIR = "package-configuration"
+PACKAGER_CONFIG_PATH = "package-configuration"
 # directory which contains configuration for all modules
-PACKAGER_TEMPLATE_DIR = "package-templates"
+PACKAGER_TEMPLATE_PATH = "package-templates"
 # temporary directory to which items are downloaded and packages are created.
-PACKAGES_DIR = "/packages"
-# final directory to put the created packages in.
-COMPONENTS_BOOTSTRAP_DIR = "/cloudify3-components"
-CODE_BOOTSTRAP_DIR = "/cloudify3"
-AGENTS_BOOTSTRAP_DIR = "/agents"
+PACKAGES_PATH = "/packages"
 # directory for cosmo modules and virtual environments
-VIRTUALENVS_DIR = "/opt"
-# specific package configuration
+VIRTUALENVS_PATH = "/opt"
+# final directory to put the created packages in.
+COMPONENT_PACKAGES_PATH = "/cloudify3-components"
+CODE_PACKAGES_PATH = "/cloudify3"
+AGENT_PACKAGES_PATH = "/agents"
+# package specific configuration
 PACKAGES = {
     "cloudify3": {
         "name": "cloudify3",
@@ -40,12 +40,11 @@ PACKAGES = {
         "depends": [
             'cloudify3-components'
         ],
-        "bootstrap_dir": "/cloudify",
-        "package_dir": CODE_BOOTSTRAP_DIR,
-        "conf_dir": PACKAGER_CONF_DIR,
+        "package_path": "/cloudify",
+        "sources_path": CODE_PACKAGES_PATH,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script_in_pkg": "{0}/cloudify3-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script_in_pkg": "{0}/cloudify3-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "cloudify3-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
         "overwrite": False,
@@ -53,7 +52,7 @@ PACKAGES = {
             "__params_celery": {
                 "defaults_path": "/etc/default/celeryd-cloudify.management",
                 "init_path": "/etc/init.d/celeryd-cloudify.management",
-                "run_dir": "{0}/celery".format(VIRTUALENVS_DIR),
+                "run_dir": "{0}/celery".format(VIRTUALENVS_PATH),
             },
             "__params_manager": {
                 "port": "8100",
@@ -69,12 +68,11 @@ PACKAGES = {
     "cloudify3-components": {
         "name": "cloudify3-components",
         "version": "3.0.0",
-        "bootstrap_dir": "/cloudify",
-        "package_dir": COMPONENTS_BOOTSTRAP_DIR,
-        "conf_dir": PACKAGER_CONF_DIR,
+        "package_path": "/cloudify",
+        "sources_path": COMPONENT_PACKAGES_PATH,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script_in_pkg": "{0}/cloudify3-components-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script_in_pkg": "{0}/cloudify3-components-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "cloudify3-components-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
         "overwrite": False,
@@ -87,7 +85,7 @@ PACKAGES = {
         },
         "config_templates": {
             "__template_file_nginx": {
-                "template": "{0}/nginx/default.conf.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/nginx/default.conf.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "default.conf",
                 "config_dir": "config/nginx",
                 "dst_dir": "/etc/nginx/conf.d",
@@ -97,7 +95,7 @@ PACKAGES = {
                 "kibana_port": "3000",
                 "rest_port": "80",
                 "file_server_port": "53229",
-                "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_DIR),
+                "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
             },
             "__params_rabbitmq": {
                 "port": "5672"
@@ -109,7 +107,7 @@ PACKAGES = {
                 "port": "9200"
             },
             "__template_dir_riemann": {
-                "templates": "{0}/riemann".format(PACKAGER_CONF_DIR),
+                "templates": "{0}/riemann".format(PACKAGER_CONFIG_PATH),
                 "config_dir": "config/riemann",
                 "dst_dir": "/etc/riemann",
             },
@@ -129,15 +127,14 @@ PACKAGES = {
         "depends": [
             'ruby2.1'
         ],
-        "bootstrap_dir": "{0}/manager/".format(CODE_BOOTSTRAP_DIR),
-        "package_dir": "{0}/manager".format(VIRTUALENVS_DIR),
-        # "conf_dir": "{0}/manager".format(PACKAGER_CONF_DIR),
-        "modules": ['{0}/manager/cosmo-manager-develop/manager-rest/'.format(VIRTUALENVS_DIR)],
-        "resources_dir": "{0}/manager/cosmo-manager-develop/orchestrator/".format(VIRTUALENVS_DIR),
-        "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_DIR),
+        "package_path": "{0}/manager/".format(CODE_PACKAGES_PATH),
+        "sources_path": "{0}/manager".format(VIRTUALENVS_PATH),
+        "modules": ['{0}/manager/cosmo-manager-develop/manager-rest/'.format(VIRTUALENVS_PATH)],
+        "resources_dir": "{0}/manager/cosmo-manager-develop/orchestrator/".format(VIRTUALENVS_PATH),
+        "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "{0}/manager-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script": "{0}/manager-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "manager-bootstrap.template",
         "bootstrap_params": {
             "resources_dir_src": "cosmo-manager-*/orchestrator/src/main/resources/cloudify/",
@@ -147,37 +144,37 @@ PACKAGES = {
         },
         "config_templates": {
             "#__template_file_init_gunicorn": {
-                "template": "{0}/manager/init/manager.conf.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/manager/init/manager.conf.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "manager.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
             },
             "#__template_file_init_workflow": {
-                "template": "{0}/manager/init/workflow.conf.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/manager/init/workflow.conf.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "manager.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
             },
             "__params_init": {
-                "rest_server_path": "{0}/manager/cosmo-manager-develop/manager-rest/manager_rest/".format(VIRTUALENVS_DIR),
+                "rest_server_path": "{0}/manager/cosmo-manager-develop/manager-rest/manager_rest/".format(VIRTUALENVS_PATH),
                 "gunicorn_user": "root",
-                "gunicorn_conf_path": "{0}/manager/config/conf/guni.conf".format(VIRTUALENVS_DIR),
+                "gunicorn_conf_path": "{0}/manager/config/conf/guni.conf".format(VIRTUALENVS_PATH),
                 "unicorn_user": "root",
-                "ruby_path": "{0}/ruby".format(VIRTUALENVS_DIR),
-                "workflow_service_path": "{0}/manager/cosmo-manager-develop/workflow-service/".format(VIRTUALENVS_DIR),
+                "ruby_path": "{0}/ruby".format(VIRTUALENVS_PATH),
+                "workflow_service_path": "{0}/manager/cosmo-manager-develop/workflow-service/".format(VIRTUALENVS_PATH),
                 "workflow_service_logs_path": "/var/log/cosmo/blueprints",
             },
             "__template_file_conf": {
-                "template": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "guni.conf",
                 "config_dir": "config/conf",
                 # "dst_dir": "/opt/manager/config/conf",
             },
             "__params_conf": {
-                "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_DIR),
+                "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
             },
             "__template_dir_init": {
-                "templates": "{0}/manager/init".format(PACKAGER_CONF_DIR),
+                "templates": "{0}/manager/init".format(PACKAGER_CONFIG_PATH),
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
             },
@@ -186,9 +183,8 @@ PACKAGES = {
     "celery": {
         "name": "celery",
         "version": "0.0.1",
-        "bootstrap_dir": "{0}/celery/".format(CODE_BOOTSTRAP_DIR),
-        "package_dir": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_DIR),
-        # "conf_dir": "{0}/celery".format(PACKAGER_CONF_DIR),
+        "package_path": "{0}/celery/".format(CODE_PACKAGES_PATH),
+        "sources_path": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_PATH),
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
@@ -197,11 +193,11 @@ PACKAGES = {
         ],
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "{0}/celery-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script": "{0}/celery-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "celery-bootstrap.template",
         "config_templates": {
             "__template_file_init": {
-                "template": "{0}/celery/init/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/celery/init/celeryd-cloudify.management.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "celeryd-cloudify.management",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init.d",
@@ -211,13 +207,13 @@ PACKAGES = {
                 "base_dir": "/opt/celery",
             },
             "__template_file_conf": {
-                "template": "{0}/celery/conf/celeryd-cloudify.management.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/celery/conf/celeryd-cloudify.management.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "celeryd-cloudify.management",
                 "config_dir": "config/conf",
                 "dst_dir": "/etc/default",
             },
             "__params_conf": {
-                "work_dir": "{0}/celery/cloudify.management__worker/work".format(VIRTUALENVS_DIR),
+                "work_dir": "{0}/celery/cloudify.management__worker/work".format(VIRTUALENVS_PATH),
                 "base": "/opt/celery",
                 "rest_port": "8100",
                 "file_server_port": "53229",
@@ -231,16 +227,15 @@ PACKAGES = {
         "depends": [
             'nodejs'
         ],
-        "bootstrap_dir": "{0}/cosmo-ui/".format(CODE_BOOTSTRAP_DIR),
-        "package_dir": "{0}/cosmo-ui".format(PACKAGES_DIR),
-        # "conf_dir": "{0}/cosmo-ui".format(PACKAGER_CONF_DIR),
+        "package_path": "{0}/cosmo-ui/".format(CODE_PACKAGES_PATH),
+        "sources_path": "{0}/cosmo-ui".format(PACKAGES_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "{0}/cosmo-ui-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script": "{0}/cosmo-ui-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "cosmo-ui-bootstrap.template",
         "config_templates": {
             "__template_file_init": {
-                "template": "{0}/cosmo-ui/init/cosmo-ui.conf.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/cosmo-ui/init/cosmo-ui.conf.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "cosmo-ui.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
@@ -259,16 +254,15 @@ PACKAGES = {
         "depends": [
             'openjdk-7-jdk'
         ],
-        "bootstrap_dir": "{0}/logstash/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/logstash".format(PACKAGES_DIR),
-        "conf_dir": "{0}/logstash".format(PACKAGER_CONF_DIR),
+        "package_path": "{0}/logstash/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/logstash".format(PACKAGES_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "{0}/logstash-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script": "{0}/logstash-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "logstash-bootstrap.template",
         "config_templates": {
             "__template_file_init": {
-                "template": "{0}/logstash/init/logstash.conf.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/logstash/init/logstash.conf.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "logstash.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
@@ -281,7 +275,7 @@ PACKAGES = {
                 "user": "root",
             },
             "__template_file_conf": {
-                "template": "{0}/logstash/conf/logstash.conf.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/logstash/conf/logstash.conf.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "logstash.conf",
                 "config_dir": "config/conf",
                 "dst_dir": "/etc",
@@ -301,16 +295,15 @@ PACKAGES = {
         "depends": [
             'openjdk-7-jdk'
         ],
-        "bootstrap_dir": "{0}/elasticsearch/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/elasticsearch".format(PACKAGES_DIR),
-        "conf_dir": "{0}/elasticsearch".format(PACKAGER_CONF_DIR),
+        "package_path": "{0}/elasticsearch/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/elasticsearch".format(PACKAGES_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "{0}/elasticsearch-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script": "{0}/elasticsearch-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "elasticsearch-bootstrap.template",
         "config_templates": {
             "__template_file_init": {
-                "template": "{0}/elasticsearch/init/elasticsearch.conf.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/elasticsearch/init/elasticsearch.conf.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "elasticsearch.conf",
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
@@ -320,7 +313,7 @@ PACKAGES = {
                 "user": "root",
             },
             "__template_file_conf": {
-                "template": "{0}/elasticsearch/init/elasticsearch.conf.template".format(PACKAGER_CONF_DIR),
+                "template": "{0}/elasticsearch/init/elasticsearch.conf.template".format(PACKAGER_CONFIG_PATH),
                 "output_file": "elasticsearch.conf",
                 "config_dir": "config/conf",
                 "dst_dir": "/etc/init",
@@ -338,11 +331,11 @@ PACKAGES = {
             'logstash',
             'elasticsearch'
         ],
-        "bootstrap_dir": "{0}/kibana3/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/kibana3".format(PACKAGES_DIR),
+        "package_path": "{0}/kibana3/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/kibana3".format(PACKAGES_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "{0}/kibana-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script": "{0}/kibana-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "kibana-bootstrap.template",
     },
     "nginx": {
@@ -353,24 +346,23 @@ PACKAGES = {
         ],
         "source_repo": "http://nginx.org/packages/mainline/ubuntu/ precise nginx",
         "source_key": "http://nginx.org/keys/nginx_signing.key",
-        "key_file": "{0}/nginx/nginx_signing.key".format(PACKAGES_DIR),
-        "bootstrap_dir": "{0}/nginx/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/nginx".format(PACKAGES_DIR),
+        "key_file": "{0}/nginx/nginx_signing.key".format(PACKAGES_PATH),
+        "package_path": "{0}/nginx/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/nginx".format(PACKAGES_PATH),
         "dst_package_type": "deb",
-        "conf_dir": "{0}/nginx".format(PACKAGER_CONF_DIR),
     },
     "rabbitmq-server": {
         "name": "rabbitmq-server",
         "version": "0.0.1",
         "source_repo": "http://www.rabbitmq.com/debian/ testing main",
         "source_key": "http://www.rabbitmq.com/rabbitmq-signing-key-public.asc",
-        "key_file": "{0}/rabbitmq-server/rabbitmq-signing-key-public.asc".format(PACKAGES_DIR),
+        "key_file": "{0}/rabbitmq-server/rabbitmq-signing-key-public.asc".format(PACKAGES_PATH),
         "reqs": [
             "rabbitmq-server",
             "erlang-nox"
         ],
-        "bootstrap_dir": "{0}/rabbitmq-server/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/rabbitmq-server".format(PACKAGES_DIR),
+        "package_path": "{0}/rabbitmq-server/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/rabbitmq-server".format(PACKAGES_PATH),
         "dst_package_type": "deb"
     },
     "riemann": {
@@ -380,9 +372,8 @@ PACKAGES = {
         "depends": [
             'openjdk-7-jdk'
         ],
-        "bootstrap_dir": "{0}/riemann/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/riemann".format(PACKAGES_DIR),
-        "conf_dir": "{0}/riemann".format(PACKAGER_CONF_DIR),
+        "package_path": "{0}/riemann/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/riemann".format(PACKAGES_PATH),
         "dst_package_type": "deb"
     },
     "nodejs": {
@@ -392,8 +383,8 @@ PACKAGES = {
             "nodejs"
         ],
         "source_ppa": "ppa:chris-lea/node.js",
-        "bootstrap_dir": "{0}/nodejs/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/nodejs".format(PACKAGES_DIR),
+        "package_path": "{0}/nodejs/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/nodejs".format(PACKAGES_PATH),
         "dst_package_type": "deb",
         "prereqs": ['python-software-properties', 'g++', 'make', 'python']
     },
@@ -403,26 +394,26 @@ PACKAGES = {
         "reqs": [
             "openjdk-7-jdk"
         ],
-        "bootstrap_dir": "{0}/openjdk-7-jdk/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/openjdk-7-jdk".format(PACKAGES_DIR),
+        "package_path": "{0}/openjdk-7-jdk/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/openjdk-7-jdk".format(PACKAGES_PATH),
         "dst_package_type": "deb",
     },
     "virtualenv": {
         "name": "virtualenv",
         "version": "1.10.1",
-        "bootstrap_dir": "{0}/virtualenv/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/virtualenv".format(PACKAGES_DIR),
+        "package_path": "{0}/virtualenv/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/virtualenv".format(PACKAGES_PATH),
         "modules": ['virtualenv==1.10.1'],
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "{0}/virtualenv-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script": "{0}/virtualenv-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "virtualenv-bootstrap.template"
     },
     "graphite": {
         "name": "graphite",
         "version": "0.9.12",
-        "bootstrap_dir": "{0}/graphite/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/graphite".format(VIRTUALENVS_DIR),
+        "package_path": "{0}/graphite/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/graphite".format(VIRTUALENVS_PATH),
         "modules": [
             'carbon==0.9.10',
             'whisper==0.9.12',
@@ -430,7 +421,7 @@ PACKAGES = {
         ],
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script": "{0}/graphite-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script": "{0}/graphite-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "graphite-bootstrap.template"
     },
     "curl": {
@@ -440,8 +431,8 @@ PACKAGES = {
             "curl",
             "libcurl3",
         ],
-        "bootstrap_dir": "{0}/curl/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/curl".format(PACKAGES_DIR),
+        "package_path": "{0}/curl/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/curl".format(PACKAGES_PATH),
         "dst_package_type": "deb",
     },
     "make": {
@@ -450,11 +441,10 @@ PACKAGES = {
         "reqs": [
             "make"
         ],
-        "bootstrap_dir": "{0}/make/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/make".format(PACKAGES_DIR),
+        "package_path": "{0}/make/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/make".format(PACKAGES_PATH),
         "dst_package_type": "deb",
     },
-
     "ruby": {
         "name": "ruby2.1",
         "version": "2.1.0",
@@ -462,11 +452,11 @@ PACKAGES = {
             'make'
         ],
         # "source_url": "http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.0.tar.gz",
-        "bootstrap_dir": "{0}/ruby/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/ruby".format(VIRTUALENVS_DIR),
+        "package_path": "{0}/ruby/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/ruby".format(VIRTUALENVS_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        # "bootstrap_script": "%s/ruby-bootstrap.sh" % PACKAGER_SCRIPTS_DIR,
+        # "bootstrap_script": "%s/ruby-bootstrap.sh" % PACKAGER_SCRIPTS_PATH,
         # "bootstrap_template": "ruby-bootstrap.template",
         "ruby_build_dir": "/opt/ruby-build"
     },
@@ -477,24 +467,23 @@ PACKAGES = {
             'ruby2.1'
         ],
         "gemfile_source_url": "https://github.com/CloudifySource/cosmo-manager/archive/develop.tar.gz",
-        "gemfile_location": "{0}/workflow-gems/cosmo-manager-develop/workflow-service/Gemfile".format(PACKAGES_DIR),
-        "gemfile_base_dir": "{0}/workflow-gems/cosmo-manager-develop".format(PACKAGES_DIR),
-        "bootstrap_dir": "{0}/workflow-gems/".format(COMPONENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/workflow-gems".format(PACKAGES_DIR),
+        "gemfile_location": "{0}/workflow-gems/cosmo-manager-develop/workflow-service/Gemfile".format(PACKAGES_PATH),
+        "gemfile_base_dir": "{0}/workflow-gems/cosmo-manager-develop".format(PACKAGES_PATH),
+        "package_path": "{0}/workflow-gems/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/workflow-gems".format(PACKAGES_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "reqs": [
             'make'
         ],
-        "bootstrap_script": "{0}/workflow-gems-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        "bootstrap_script": "{0}/workflow-gems-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "workflow-gems-bootstrap.template"
     },
     "agent-ubuntu": {
         "name": "agent-Ubuntu",
         "version": "3.0.0",
-        "bootstrap_dir": "{0}/agent-Ubuntu/".format(AGENTS_BOOTSTRAP_DIR),
-        "package_dir": "{0}/agent-Ubuntu/cloudify.management__worker/env".format(VIRTUALENVS_DIR),
-        # "conf_dir": "{0}/agent-ubuntu".format(PACKAGER_CONF_DIR),
+        "package_path": "{0}/agent-Ubuntu/".format(AGENT_PACKAGES_PATH),
+        "sources_path": "{0}/agent-Ubuntu/cloudify.management__worker/env".format(VIRTUALENVS_PATH),
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
@@ -505,35 +494,24 @@ PACKAGES = {
         "dst_package_type": "tar",
         # "config_templates": {
         #     "__template_file_init": {
-        #         "template": "{0}/agent-ubuntu/init/celeryd-cloudify.agent.template".format(PACKAGER_CONF_DIR),
+        #         "template": "{0}/agent-ubuntu/init/celeryd-cloudify.agent.template".format(PACKAGER_CONFIG_PATH),
         #         "output_file": "celeryd-cloudify.agent",
         #         "config_dir": "config/init",
         #         "dst_dir": "/etc/init.d",
         #     },
         #     "__template_file_conf": {
-        #         "template": "{0}/agent-ubuntu/conf/celeryd-cloudify.agent.template".format(PACKAGER_CONF_DIR),
+        #         "template": "{0}/agent-ubuntu/conf/celeryd-cloudify.agent.template".format(PACKAGER_CONFIG_PATH),
         #         "output_file": "celeryd-cloudify.agent",
         #         "config_dir": "config/conf",
         #         "dst_dir": "/etc/default",
         #     },
         #     "__params_conf": {
-        #         "base_dir": "{0}/celery".format(VIRTUALENVS_DIR),
+        #         "base_dir": "{0}/celery".format(VIRTUALENVS_PATH),
         #     },
         # }
-        # "bootstrap_script_in_pkg": "{0}/agent-ubuntu-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+        # "bootstrap_script_in_pkg": "{0}/agent-ubuntu-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         # "bootstrap_template": "agent-ubuntu-bootstrap.template"
     },
-    "cli-ubuntu": {
-        "name": "cli-ubuntu",
-        "version": "0.0.1",
-        "bootstrap_dir": "{0}/cli-ubuntu/".format(CODE_BOOTSTRAP_DIR),
-        "package_dir": "{0}/cli-ubuntu".format(VIRTUALENVS_DIR),
-        "modules": [
-            'https://github.com/CloudifySource/cosmo-cli/archive/develop.zip'
-        ],
-        "src_package_type": "dir",
-        "dst_package_type": "deb",
-    }
         # "gcc": {
     #     "name": "gcc",
     #     "version": "0.0.1",
@@ -560,8 +538,8 @@ PACKAGES = {
     #         "libc-dev",
     #         "gcc"
     #     ],
-    #     "bootstrap_dir": "%s/gcc/" % COMPONENTS_BOOTSTRAP_DIR,
-    #     "package_dir": "%s/gcc" % PACKAGES_DIR
+    #     "package_path": "%s/gcc/" % COMPONENT_PACKAGES_PATH,
+    #     "sources_path": "%s/gcc" % PACKAGES_PATH
     # },
         # "zlib": {
     #     "name": "zlib",
@@ -572,11 +550,11 @@ PACKAGES = {
     #     ],
     #     "source_url": "http://zlib.net/zlib-1.2.8.tar.gz",
     #     "version": "0.0.1",
-    #     "bootstrap_dir": "{0}/zlib/".format(COMPONENTS_BOOTSTRAP_DIR),
-    #     "package_dir": "{0}/zlib".format(PACKAGES_DIR),
+    #     "package_path": "{0}/zlib/".format(COMPONENT_PACKAGES_PATH),
+    #     "sources_path": "{0}/zlib".format(PACKAGES_PATH),
     #     "src_package_type": "dir",
     #     "dst_package_type": "deb",
-    #     "bootstrap_script": "{0}/zlib-bootstrap.sh".format(PACKAGER_SCRIPTS_DIR),
+    #     "bootstrap_script": "{0}/zlib-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
     #     "bootstrap_template": "zlib-bootstrap.template"        
     # },
 }

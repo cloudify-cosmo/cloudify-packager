@@ -46,12 +46,12 @@ except ValueError:
 
 def _prepare(package):
 
-    rmdir(package['package_dir'])
-    make_package_dirs(
-        package['bootstrap_dir'],
-        package['package_dir'])
+    rmdir(package['sources_path'])
+    make_package_paths(
+        package['package_path'],
+        package['sources_path'])
     # if 'conf_dir' in package:
-        # cp('%s/*' % package['conf_dir'], package['package_dir'])
+        # cp('%s/*' % package['conf_dir'], package['sources_path'])
 
 
 @task
@@ -64,9 +64,9 @@ def get_agent_ubuntu():
     package = get_package_configuration('agent-ubuntu')
 
     _prepare(package)
-    venv(package['package_dir'])
+    venv(package['sources_path'])
     for module in package['modules']:
-        pip(module, '%s/bin' % package['package_dir'])
+        pip(module, '%s/bin' % package['sources_path'])
 
 
 @task
@@ -81,7 +81,7 @@ def get_python_modules(component):
 
     _prepare(package)
     for module in package['modules']:
-        get_python_module(module, package['package_dir'])
+        get_python_module(module, package['sources_path'])
 
 
 @task
@@ -94,9 +94,9 @@ def get_graphite():
     package = get_package_configuration('graphite')
 
     _prepare(package)
-    venv(package['package_dir'])
+    venv(package['sources_path'])
     for module in package['modules']:
-        pip(module, '%s/bin' % package['package_dir'])
+        pip(module, '%s/bin' % package['sources_path'])
 
 
 @task
@@ -109,10 +109,10 @@ def get_celery(download=False):
     package = get_package_configuration('celery')
 
     _prepare(package)
-    venv(package['package_dir'])
+    venv(package['sources_path'])
     if download:
         for module in package['modules']:
-            pip(module, '%s/bin' % package['package_dir'])
+            pip(module, '%s/bin' % package['sources_path'])
 
 
 @task
@@ -126,33 +126,33 @@ def get_manager(download=False):
     package = get_package_configuration('manager')
 
     _prepare(package)
-    venv(package['package_dir'])
+    venv(package['sources_path'])
     # if download:
     wget(
         package['source_url'],
-        file='%s/%s.tar.gz' % (package['package_dir'],
+        file='%s/%s.tar.gz' % (package['sources_path'],
                                package['name']))
-    untar(package['package_dir'],
-          '%s/%s.tar.gz' % (package['package_dir'],
+    untar(package['sources_path'],
+          '%s/%s.tar.gz' % (package['sources_path'],
                             package['name']))
         # TODO: DELETE TAR FILE
     # else:
-        # cp(local_manager_repo, package['package_dir'])
+        # cp(local_manager_repo, package['sources_path'])
 
     mkdir(package['file_server_dir'])
     import shutil
     shutil.copytree('%s/src/main/resources/cloudify' %
-                    package['resources_dir'],
+                    package['resources_path'],
                     '%s/cloudify' % package['file_server_dir'])
-    # cp('%s/src/main/resources/cloudify' % package['resources_dir'],
+    # cp('%s/src/main/resources/cloudify' % package['resources_path'],
     #    '%s/cloudify' % package['file_server_dir'])
     alias_mapping_resource = ('%s/src/main/resources/org/cloudifysource/cosmo/'
                               'dsl/alias-mappings.yaml' %
-                              package['resources_dir'])
+                              package['resources_path'])
     cp(alias_mapping_resource, '%s/cloudify/' % package['file_server_dir'])
     if download:
         for module in package['modules']:
-            pip(module, '%s/bin' % package['package_dir'])
+            pip(module, '%s/bin' % package['sources_path'])
 
 
 @task
@@ -169,7 +169,7 @@ def get_curl():
         apt_purge(req)
     apt_download(
         package['name'],
-        package['package_dir'])
+        package['sources_path'])
     apt_get([package['name']])
 
 
@@ -186,7 +186,7 @@ def get_make():
     apt_purge(package['name'])
     apt_download(
         package['name'],
-        package['package_dir'])
+        package['sources_path'])
     apt_get([package['name']])
 
 
@@ -203,14 +203,14 @@ def get_make():
 #         for req in package['reqs']:
 #             apt_purge(req)
 #             apt_autoremove(req)
-#             apt_download(req, package['package_dir'])
+#             apt_download(req, package['sources_path'])
 #     apt_download(
 #         package['name'],
-#         package['package_dir'])
+#         package['sources_path'])
 #     if package['reqs']:
 #             apt_get(package['reqs'])
 #     apt_get(['dpkg-dev'])
-    # dpkg_name('%s/archives' % package['package_dir'])
+    # dpkg_name('%s/archives' % package['sources_path'])
 
 
 @task
@@ -226,9 +226,9 @@ def get_ruby():
     # RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
     # wget(
         # package['source_url'],
-        # file='%s/ruby.tar.gz' % package['package_dir'])
+        # file='%s/ruby.tar.gz' % package['sources_path'])
     do('sudo /opt/ruby-build/bin/ruby-build -v %s %s' %
-        (package['version'], package['package_dir']))
+        (package['version'], package['sources_path']))
 
 
 # @task
@@ -242,7 +242,7 @@ def get_ruby():
 
 #     wget(
 #         package['source_url'],
-#         file='%s/zlib.tar.gz' % package['package_dir'])
+#         file='%s/zlib.tar.gz' % package['sources_path'])
 
 
 @task
@@ -259,27 +259,27 @@ def get_workflow_gems():
 
     # RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
     # do('sudo dpkg -i %s/archives/*.deb' %
-        # config.PACKAGES['ruby']['package_dir'])
+        # config.PACKAGES['ruby']['sources_path'])
     # do('sudo tar -C {0} -xzvf {0}/ruby.tar.gz'.format(
-        # config.PACKAGES['ruby']['package_dir']))
+        # config.PACKAGES['ruby']['sources_path']))
     # do('cd {0}/ruby-2.1.0 && sudo ./configure --prefix=/usr/local'.format(
-        # config.PACKAGES['ruby']['package_dir']))
+        # config.PACKAGES['ruby']['sources_path']))
     # do('cd {0}/ruby-2.1.0 && sudo make'.format(
-        # config.PACKAGES['ruby']['package_dir']))
+        # config.PACKAGES['ruby']['sources_path']))
     # do('cd {0}/ruby-2.1.0 && sudo make install'.format(
-        # config.PACKAGES['ruby']['package_dir']))
+        # config.PACKAGES['ruby']['sources_path']))
 
     wget(
         package['gemfile_source_url'],
-        package['package_dir'])
+        package['sources_path'])
     untar(
-        package['package_dir'],
-        '%s/%s' % (package['package_dir'], '*.tar.gz'))
-    rm('%s/%s' % (package['package_dir'], '*.tar.gz'))
+        package['sources_path'],
+        '%s/%s' % (package['sources_path'], '*.tar.gz'))
+    rm('%s/%s' % (package['sources_path'], '*.tar.gz'))
     do('sudo /opt/ruby/bin/gem install bundler')
     do('sudo /opt/ruby/bin/bundle --gemfile %s' % package['gemfile_location'])
     rmdir(package['gemfile_base_dir'])
-    cp('/opt/ruby/lib/ruby/gems/2.1.0/cache/*.gem', package['package_dir'])
+    cp('/opt/ruby/lib/ruby/gems/2.1.0/cache/*.gem', package['sources_path'])
 
 
 @task
@@ -295,7 +295,7 @@ def get_cosmo_ui(download=False):
     if download:
         wget(
             package['source_url'],
-            dir=package['package_dir'])
+            dir=package['sources_path'])
 
 
 @task
@@ -314,7 +314,7 @@ def get_nodejs():
     apt_update()
     apt_download(
         package['name'],
-        package['package_dir'])
+        package['sources_path'])
 
 
 @task
@@ -336,7 +336,7 @@ def get_riemann():
 
     wget(
         package['source_url'],
-        dir='{0}/archives'.format(package['package_dir']))
+        dir='{0}/archives'.format(package['sources_path']))
 
     # se(event_origin="cosmo-packager",
     #     event_type="packager.get.%s" % package['name'],
@@ -358,13 +358,13 @@ def get_rabbitmq():
     add_src_repo(package['source_repo'], 'deb')
     wget(
         package['source_key'],
-        package['package_dir'])
+        package['sources_path'])
     add_key(package['key_file'])
     apt_update()
-    apt_download_reqs(package['reqs'], package['package_dir'])
+    apt_download_reqs(package['reqs'], package['sources_path'])
     apt_download(
         package['name'],
-        package['package_dir'])
+        package['sources_path'])
 
 
 @task
@@ -379,7 +379,7 @@ def get_logstash():
     _prepare(package)
     wget(
         package['source_url'],
-        dir=package['package_dir'])
+        dir=package['sources_path'])
 
 
 @task
@@ -394,7 +394,7 @@ def get_elasticsearch():
     _prepare(package)
     wget(
         package['source_url'],
-        dir=package['package_dir'])
+        dir=package['sources_path'])
 
 
 @task
@@ -409,7 +409,7 @@ def get_kibana():
     _prepare(package)
     wget(
         package['source_url'],
-        dir=package['package_dir'])
+        dir=package['sources_path'])
 
 
 @task
@@ -424,12 +424,12 @@ def get_nginx():
     _prepare(package)
     add_src_repo(package['source_repo'], 'deb')
     add_src_repo(package['source_repo'], 'deb-src')
-    wget(package['source_key'], package['package_dir'])
+    wget(package['source_key'], package['sources_path'])
     add_key(package['key_file'])
     apt_update()
     apt_download(
         package['name'],
-        package['package_dir'])
+        package['sources_path'])
 
 
 @task
@@ -444,7 +444,7 @@ def get_openjdk():
     _prepare(package)
     apt_download(
         package['name'],
-        package['package_dir'])
+        package['sources_path'])
 
 
 def main():
