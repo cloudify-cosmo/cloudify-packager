@@ -1,4 +1,4 @@
-CELERY_BASE_DIR={{ package_dir }}
+CELERY_BASE_DIR={{ sources_path }}
 
 
 
