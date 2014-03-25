@@ -101,6 +101,9 @@ check_file "/etc/default/${CONF_FILE}"
 
 echo "granting celeryd exec permissions..."
 sudo chmod +x ${INIT_DIR}/${INIT_FILE}
+
+echo "adding to init.d..."
+sudo update-rc.d -f ${INIT_FILE} defaults
 # check_file permissions
 
 # echo "starting ${PKG_NAME}..."
