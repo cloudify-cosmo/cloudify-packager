@@ -38,5 +38,3 @@ nosetests.xml
 .pydevproject
 
 .vagrant/
-debs/
-cosmo-packager/package-scripts/*
