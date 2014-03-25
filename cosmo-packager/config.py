@@ -130,7 +130,7 @@ PACKAGES = {
         "package_path": "{0}/manager/".format(CODE_PACKAGES_PATH),
         "sources_path": "{0}/manager".format(VIRTUALENVS_PATH),
         "modules": ['{0}/manager/cosmo-manager-develop/manager-rest/'.format(VIRTUALENVS_PATH)],
-        "resources_dir": "{0}/manager/cosmo-manager-develop/orchestrator/".format(VIRTUALENVS_PATH),
+        "resources_path": "{0}/manager/cosmo-manager-develop/orchestrator/".format(VIRTUALENVS_PATH),
         "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
