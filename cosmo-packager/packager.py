@@ -501,7 +501,7 @@ def check_module_installed(name):
     """
 
     lgr.debug('checking to see that {0} is installed'.format(name))
-    x = do('pip freeze')
+    x = _run_locally_with_retries('pip freeze', capture=True)
     if re.search(r'{0}'.format(name), x.stdout):
         lgr.debug('module {0} is installed'.format(name))
         return True
