@@ -534,12 +534,14 @@ def wget(url, dir=False, file=False):
     wgets a url to a destination directory or file
     """
 
+    OPTIONS = '--timeout 30'
+
     lgr.debug('downloading {0} to {1}'.format(url, dir))
     try:
         if file:
-            x = do('sudo wget {0} -O {1}'.format(url, file))
+            x = do('sudo wget {0} {1} -O {2}'.format(url, OPTIONS, file))
         elif dir:
-            x = do('sudo wget {0} -P {1}'.format(url, dir))
+            x = do('sudo wget {0} {1} -P {2}'.format(url, OPTIONS, dir))
         elif dir and file:
             lgr.warning('please specify either a directory'
                         ' or file to download to, not both')
