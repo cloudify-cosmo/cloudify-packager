@@ -555,7 +555,7 @@ PACKAGES = {
     #     "src_package_type": "dir",
     #     "dst_package_type": "deb",
     #     "bootstrap_script": "{0}/zlib-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
-    #     "bootstrap_template": "zlib-bootstrap.template"        
+    #     "bootstrap_template": "zlib-bootstrap.template"
     # },
 }
 # logger configuration

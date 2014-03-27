@@ -22,7 +22,7 @@ function check_exec
     if which $1 >/dev/null; then
         echo "$1 is executable..." >> ${BOOTSTRAP_LOG}
     else
-        state_error "$1 is not executable, might not be installed...." 
+        state_error "$1 is not executable, might not be installed...."
     fi
 }
 
@@ -41,7 +41,7 @@ function check_port
     HOST=$4
 
     for i in {1..24}
-    do 
+    do
         echo -ne "checking whether ${APP} port ${PORT} is opened on ${HOST:-localhost}..." >> ${BOOTSTRAP_LOG}
         nc -z ${HOST:-localhost} ${PORT} >/dev/null
         if [ $? -eq 0 ]; then
@@ -182,6 +182,11 @@ else
 fi
 
 ################################################ INSTALL CLOUDIFY-COMPONENTS
+
+# if sudo grep -Fxq "$(hostname)" /etc/hosts
+# then
+sudo echo "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts >> ${BOOTSTRAP_LOG} 2>&1
+# fi
 
 echo -ne "checking whether openjdk-7-jdk is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s openjdk-7-jdk 2>&1 | grep Status: | grep installed; then
