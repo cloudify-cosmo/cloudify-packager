@@ -480,46 +480,41 @@ PACKAGES = {
         "bootstrap_script": "{0}/workflow-gems-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "workflow-gems-bootstrap.template"
     },
-    "agent-linux": {
-        "name": "agent-Ubuntu",
+    "linux-agent": {
+        "name": "linux-agent",
         "version": "3.0.0",
-        "package_path": "{0}/agent-linux/".format(AGENT_PACKAGES_PATH),
-        "sources_path": "{0}/agent-linux".format(AGENT_VIRTUALENVS_PATH),
+        "package_path": "{0}/linux-agent".format(AGENT_PACKAGES_PATH),
+        "sources_path": "/linux-agent/env",  # .format(AGENT_VIRTUALENVS_PATH),
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard',
                     'https://github.com/CloudifySource/cosmo-plugin-agent-installer/archive/develop.tar.gz',
                     'https://github.com/CloudifySource/cosmo-plugin-plugin-installer/archive/develop.tar.gz',
-                    'https://github.com/CloudifySource/cosmo-celery-common/archive/develop.tar.gz'
+                    'https://github.com/CloudifySource/cosmo-celery-common/archive/develop.tar.gz',
         ],
         "src_package_type": "dir",
-        "dst_package_type": "tar",
+        "dst_package_type": "tar.gz",
     },
-    "agent-ubuntu": {
-        "name": "agent-Ubuntu",
+    "ubuntu-agent": {
+        "name": "ubuntu-agent",
         "version": "3.0.0",
-        "package_path": "{0}/agent-Ubuntu/".format(AGENT_PACKAGES_PATH),
-        "sources_path": "{0}/agent-Ubuntu".format(AGENT_PACKAGES_PATH),
-        "package_location": "/packages/agents/Ubuntu/Ubuntu-agent.tar.gz",
+        "package_path": "{0}/Ubuntu-agent/".format(AGENT_PACKAGES_PATH),
+        "sources_path": "/agents/linux-agent",  # .format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        # "config_templates": {
-        #     "__template_file_init": {
-        #         "template": "{0}/agent-ubuntu/init/celeryd-cloudify.agent.template".format(PACKAGER_CONFIG_PATH),
-        #         "output_file": "celeryd-cloudify.agent",
-        #         "config_dir": "config/init",
-        #         "dst_dir": "/etc/init.d",
-        #     },
-        #     "__template_file_conf": {
-        #         "template": "{0}/agent-ubuntu/conf/celeryd-cloudify.agent.template".format(PACKAGER_CONFIG_PATH),
-        #         "output_file": "celeryd-cloudify.agent",
-        #         "config_dir": "config/conf",
-        #         "dst_dir": "/etc/default",
-        #     },
-        #     "__params_conf": {
-        #         "base_dir": "{0}/celery".format(VIRTUALENVS_PATH),
-        #     },
-        # }
-        "bootstrap_script_in_pkg": "{0}/agent-ubuntu-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
-        "bootstrap_template": "agent-ubuntu-bootstrap.template"
+        "bootstrap_script": "{0}/agent-ubuntu-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
+        "bootstrap_template": "agent-ubuntu-bootstrap.template",
+        "bootstrap_params": {
+            "file_server_path": "{0}/manager/resources".format(VIRTUALENVS_PATH),
+            "dst_agent_location": "packages/agents",
+            "dst_template_location": "packages/agents/templates",
+        },
+        # TODO: CREATE INIT AND DEFAULTS FILES FROM TEMPLATES!
+        "config_templates": {
+            "__config_dir": {
+                "files": "{0}/linux-agent".format(PACKAGER_CONFIG_PATH),
+                "config_dir": "config",
+                "dst_dir": "{0}/manager/resources/packages/agents/templates/".format(VIRTUALENVS_PATH),
+            },
+        },
     },
         # "gcc": {
     #     "name": "gcc",

@@ -244,7 +244,7 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
                 if bootstrap_script_in_pkg and dst_type == "tar":
                     x = do(
                         'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
-                        .format(src_type, dst_type, name, version, src_path))
+                        .format(src_type, "tar", name, version, src_path))
                 elif bootstrap_script and not depends:
                     x = do(
                         'sudo fpm -s {0} -t {1} --after-install {2} -n {3}'
@@ -262,9 +262,17 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
                                 name, version, src_path))
                 # else just create a package with default flags...
                 else:
-                    x = do(
-                        'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
-                        .format(src_type, dst_type, name, version, src_path))
+                    if dst_type.startswith("tar"):
+                        x = do(
+                            'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
+                            .format(src_type, "tar", name, version, src_path))
+                    else:
+                        x = do(
+                            'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
+                            .format(src_type, dst_type, name,
+                                    version, src_path))
+                    if dst_type == "tar.gz":
+                        do('sudo gzip {0}*'.format(name))
                 # and check if the packaging process succeeded.
                 # TODO: actually test the package itself.
                 if x.succeeded:
@@ -414,6 +422,12 @@ def generate_configs(component):
                                            output_path,
                                            template_file,
                                            template_dir)
+        elif key.startswith('__config_dir'):
+            config_dir = value['config_dir']
+            files_dir = value['files']
+            mkdir('{0}/{1}'.format(
+                component['sources_path'], config_dir))
+            cp(files_dir + '/*', component['sources_path'] + '/' + config_dir)
 
 
 def generate_from_template(component, output_file, template_file,
