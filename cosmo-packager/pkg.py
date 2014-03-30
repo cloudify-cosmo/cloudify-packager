@@ -70,13 +70,25 @@ def pkg_cloudify3_components():
 
 
 @task
-def pkg_agent_ubuntu():
+def pkg_ubuntu_agent():
     """
     ACT:    packages ubuntu agent
-    EXEC:   fab pkg_agent_ubuntu
+    EXEC:   fab pkg_ubuntu_agent
     """
 
-    package = get_package_configuration('agent-ubuntu')
+    package = get_package_configuration('ubuntu-agent')
+    # rm('{0}/archives/*.deb'.format(package['sources_path']))
+    pack(package)
+
+
+@task
+def pkg_linux_agent():
+    """
+    ACT:    packages linux agent
+    EXEC:   fab pkg_linux_agent
+    """
+
+    package = get_package_configuration('linux-agent')
     # rm('{0}/archives/*.deb'.format(package['sources_path']))
     pack(package)
 

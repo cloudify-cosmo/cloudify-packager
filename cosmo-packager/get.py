@@ -55,13 +55,13 @@ def _prepare(package):
 
 
 @task
-def get_agent_ubuntu():
+def get_linux_agent():
     """
-    ACT:    retrives ubuntu agent
-    EXEC:   fab get_agent_ubuntu
+    ACT:    retrives linux agent
+    EXEC:   fab get_linux_agent
     """
 
-    package = get_package_configuration('agent-ubuntu')
+    package = get_package_configuration('linux-agent')
 
     _prepare(package)
     venv(package['sources_path'])
