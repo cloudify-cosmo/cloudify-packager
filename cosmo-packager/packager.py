@@ -483,7 +483,8 @@ def pip(module, dir):
     """
 
     lgr.debug('installing module {0}'.format(module))
-    x = do('sudo {0}/pip --default-timeout=45 install {1}'.format(dir, module))
+    x = do('sudo {0}/pip --default-timeout=45 install {1}'
+           ' --process-dependency-links'.format(dir, module))
     if x.succeeded:
         lgr.debug('successfully installed python module {0} to {1}'
                   .format(module, dir))

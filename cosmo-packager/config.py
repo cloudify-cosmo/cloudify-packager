@@ -505,7 +505,7 @@ PACKAGES = {
         "bootstrap_params": {
             "file_server_path": "{0}/manager/resources".format(VIRTUALENVS_PATH),
             "dst_agent_location": "packages/agents",
-            "dst_template_location": "packages/agents/templates",
+            "dst_template_location": "packages/templates",
         },
         # TODO: CREATE INIT AND DEFAULTS FILES FROM TEMPLATES!
         "config_templates": {
