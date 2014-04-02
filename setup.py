@@ -44,8 +44,8 @@ setup(
     description='Cloudify3 Package Generator',
     package_data={'cosmo_cli': ['cosmo-config.example.json']},
     install_requires=[
-        "fabric",
-        "pika",
-        "jinja2",
+        "fabric==1.8.3",
+        "pika==0.9.13",
+        "jinja2==2.7.2",
     ],
 )

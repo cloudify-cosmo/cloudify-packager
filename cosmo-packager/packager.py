@@ -32,7 +32,12 @@ from jinja2 import Environment, FileSystemLoader
 
 
 def init_logger():
-    #initialize logger
+    """
+    Initialize a logger to be used throughout the packager
+
+    :param config:
+    """
+
     log_dir = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
     if os.path.isfile(log_dir):
         sys.exit('file {0} exists - log directory cannot be created '
