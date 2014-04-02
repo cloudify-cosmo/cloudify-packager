@@ -1,3 +1,4 @@
+
 ########
 # Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
 #
@@ -29,7 +30,7 @@ def read(*filenames, **kwargs):
             buf.append(f.read())
     return sep.join(buf)
 
-long_description = read('README.txt')
+long_description = read('README.md')
 
 setup(
     name='cloudify-packager',

@@ -26,7 +26,6 @@ from fabric.api import *  # NOQA
 import sys
 import re
 from time import sleep
-# from templgen import template_formatter, make_file
 from jinja2 import Environment, FileSystemLoader
 
 # __all__ = ['list']

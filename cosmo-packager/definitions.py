@@ -5,7 +5,7 @@ PACKAGER_SCRIPTS_PATH = "package-scripts"  # directory for bootstrap/download/re
 PACKAGER_CONFIG_PATH = "package-configuration"  # package configurations directory
 PACKAGER_TEMPLATE_PATH = "package-templates"  # directory which contains configuration for all modules
 
-# packager base params (REQUIRED)
+# packager base config params (REQUIRED)
 PARAM_NAME = 'name'  # 'string' representing the package's name
 PARAM_VERSION = 'version'  # 'string' representing the package's version
 PARAM_SOURCE_URL = 'source_url'  # 'string' representing the sources to download # TOOD: REPLACE WIT [LIST]!
@@ -27,7 +27,7 @@ PARAM_SOURCE_KEY = 'source_key'  # 'string' representing an apt-key to download
 PARAM_KEY_FILE = 'key_file'  # 'string' representing an apt-get to deploy
 PARAM_PREREQS = 'prereqs'  # [list] of prerequirements to install from apt before retrieving the sources or packgaging
 
-# packager config params (REQUIRED)
+# packager config config params (REQUIRED)
 PARAM_CONFIG_TEMPLATE_DIR = '__tepmlate_dir'
 PARAM_CONFIG_TEMPLATE_FILE = '__tepmlate_file'
 PARAM_CONFIG_CONFIG_DIR = '__config_dir'
