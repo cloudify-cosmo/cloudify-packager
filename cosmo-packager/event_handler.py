@@ -1,28 +1,10 @@
 #!/usr/bin/env python
-import logging
-import logging.config
-
+from packager import init_logger
 import config
-# import os
-# run_env = os.environ['RUN_ENV']
-# config = __import__(run_env)
 
 import pika
-import sys
-import os
 
-try:
-    d = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
-    if not os.path.exists(d):
-        os.makedirs(d)
-    logging.config.dictConfig(config.LOGGER)
-    lgr = logging.getLogger('main')
-    lgr.setLevel(logging.INFO)
-except ValueError:
-    sys.exit('could not initialize logger.'
-             ' verify your logger config'
-             ' and permissions to write to {0}'
-             .format(config.LOGGER['handlers']['file']['filename']))
+lgr = init_logger()
 
 
 def build_event_body(**kwargs):

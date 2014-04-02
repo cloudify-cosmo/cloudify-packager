@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ########
 # Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
 #
@@ -17,20 +18,16 @@
 DOCUMENTATION LINK:
 https://github.com/CloudifySource/cosmo-packager
 """
+from packager import init_logger
 
 from fabric.api import *  # NOQA
 from fabric.contrib.files import exists
 from packager import *  # NOQA
 from get import *  # NOQA
 from pkg import *  # NOQA
-# import os
+from templgen import *  # NOQA
 
-# run_env = os.environ['RUN_ENV']
-# config = __import__(run_env)
-
-#env.user = ''
-#env.password = ''
-#env.port = ''
+lgr = init_logger()
 
 env.warn_only = 0
 env.abort_on_prompts = False
@@ -42,8 +39,6 @@ env.skip_bad_hosts = False
 env.timeout = 10
 env.forward_agent = True
 env.status = False
-#env.use_ssh_config = True
-#env.key_filename = ["~/.ssh/id_rsa.pub"]
 
 
 #TASKS
@@ -66,7 +61,7 @@ def get_cosmo_components():
     get_python_modules('virtualenv')
     get_make()
     get_ruby()
-    get_workflow_gems()
+    # get_workflow_gems()
 
 
 @task
@@ -101,7 +96,7 @@ def pkg_cosmo_components():
     pkg_virtualenv()
     pkg_make()
     pkg_ruby()
-    pkg_workflow_gems()
+    # pkg_workflow_gems()
 
 
 @task

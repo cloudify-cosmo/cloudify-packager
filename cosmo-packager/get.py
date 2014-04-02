@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ########
 # Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
 #
@@ -13,45 +14,29 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
-#!/usr/bin/env python
+from packager import init_logger
+from packager import get_package_configuration as get_conf
+from packager import FileAndDirectoryHandler
+from packager import PythonHandler
+from packager import DownloadsHandler
+from packager import AptHandler
 
-import logging
-import logging.config
-import config
-# run_env = os.environ['RUN_ENV']
-# config = __import__(run_env)
-
-# from event_handler import send_event as se
-# import uuid
-import sys
-import os
 from fabric.api import *  # NOQA
 from packager import *  # NOQA
 
-# __all__ = ['list']
+lgr = init_logger()
 
-try:
-    d = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
-    if not os.path.exists(d):
-        os.makedirs(d)
-    logging.config.dictConfig(config.LOGGER)
-    lgr = logging.getLogger('main')
-    lgr.setLevel(logging.DEBUG)
-except ValueError:
-    sys.exit('could not initialize logger.'
-             ' verify your logger config'
-             ' and permissions to write to {0}'
-             .format(config.LOGGER['handlers']['file']['filename']))
+# __all__ = ['list']
 
 
 def _prepare(package):
 
-    rmdir(package['sources_path'])
-    make_package_paths(
+    f_handler = FileAndDirectoryHandler()
+    f_handler.rmdir(package['sources_path'])
+    # DEPRACATE!
+    f_handler.make_package_paths(
         package['package_path'],
         package['sources_path'])
-    # if 'conf_dir' in package:
-        # cp('%s/*' % package['conf_dir'], package['sources_path'])
 
 
 @task
@@ -61,12 +46,13 @@ def get_linux_agent():
     EXEC:   fab get_linux_agent
     """
 
-    package = get_package_configuration('linux-agent')
+    package = get_conf('linux-agent')
 
+    py_handler = PythonHandler()
     _prepare(package)
-    venv(package['sources_path'])
+    py_handler.venv(package['sources_path'])
     for module in package['modules']:
-        pip(module, '%s/bin' % package['sources_path'])
+        py_handler.pip(module, '%s/bin' % package['sources_path'])
 
 
 @task
@@ -77,11 +63,12 @@ def get_python_modules(component):
     EXEC:   fab get_python_modules:component
     """
 
-    package = get_package_configuration(component)
+    package = get_conf(component)
 
+    py_handler = PythonHandler()
     _prepare(package)
     for module in package['modules']:
-        get_python_module(module, package['sources_path'])
+        py_handler.get_python_module(module, package['sources_path'])
 
 
 @task
@@ -91,12 +78,13 @@ def get_graphite():
     EXEC:   fab get_graphite
     """
 
-    package = get_package_configuration('graphite')
+    package = get_conf('graphite')
 
+    py_handler = PythonHandler()
     _prepare(package)
-    venv(package['sources_path'])
+    py_handler.venv(package['sources_path'])
     for module in package['modules']:
-        pip(module, '%s/bin' % package['sources_path'])
+        py_handler.pip(module, '%s/bin' % package['sources_path'])
 
 
 @task
@@ -106,13 +94,14 @@ def get_celery(download=False):
     EXEC:   fab get_celery
     """
 
-    package = get_package_configuration('celery')
+    package = get_conf('celery')
 
+    py_handler = PythonHandler()
     _prepare(package)
-    venv(package['sources_path'])
+    py_handler.venv(package['sources_path'])
     if download:
         for module in package['modules']:
-            pip(module, '%s/bin' % package['sources_path'])
+            py_handler.pip(module, '%s/bin' % package['sources_path'])
 
 
 @task
@@ -123,36 +112,34 @@ def get_manager(download=False):
     EXEC:   fab get_manager
     """
 
-    package = get_package_configuration('manager')
+    package = get_conf('manager')
 
+    dl_handler = DownloadsHandler()
+    f_handler = FileAndDirectoryHandler()
+    py_handler = PythonHandler()
     _prepare(package)
-    venv(package['sources_path'])
+    py_handler.venv(package['sources_path'])
     # if download:
-    wget(
+    dl_handler.wget(
         package['source_url'],
         file='%s/%s.tar.gz' % (package['sources_path'],
                                package['name']))
-    untar(package['sources_path'],
-          '%s/%s.tar.gz' % (package['sources_path'],
-                            package['name']))
-        # TODO: DELETE TAR FILE
-    # else:
-        # cp(local_manager_repo, package['sources_path'])
-
-    mkdir(package['file_server_dir'])
+    f_handler.untar(package['sources_path'],
+                    '%s/%s.tar.gz' % (package['sources_path'],
+                                      package['name']))
+    f_handler.mkdir(package['file_server_dir'])
     import shutil
     shutil.copytree('%s/src/main/resources/cloudify' %
                     package['resources_path'],
                     '%s/cloudify' % package['file_server_dir'])
-    # cp('%s/src/main/resources/cloudify' % package['resources_path'],
-    #    '%s/cloudify' % package['file_server_dir'])
     alias_mapping_resource = ('%s/src/main/resources/org/cloudifysource/cosmo/'
                               'dsl/alias-mappings.yaml' %
                               package['resources_path'])
-    cp(alias_mapping_resource, '%s/cloudify/' % package['file_server_dir'])
+    f_handler.cp(alias_mapping_resource, '%s/cloudify/' %
+                 package['file_server_dir'])
     if download:
         for module in package['modules']:
-            pip(module, '%s/bin' % package['sources_path'])
+            py_handler.pip(module, '%s/bin' % package['sources_path'])
 
 
 @task
@@ -162,15 +149,16 @@ def get_curl():
     EXEC:   fab get_curl
     """
 
-    package = get_package_configuration('curl')
+    package = get_conf('curl')
 
+    apt_handler = AptHandler()
     _prepare(package)
     for req in package['reqs']:
-        apt_purge(req)
-    apt_download(
+        apt_handler.apt_purge(req)
+    apt_handler.apt_download(
         package['name'],
         package['sources_path'])
-    apt_get([package['name']])
+    apt_handler.apt_get([package['name']])
 
 
 @task
@@ -180,14 +168,15 @@ def get_make():
     EXEC:   fab get_make
     """
 
-    package = get_package_configuration('make')
+    package = get_conf('make')
 
+    apt_handler = AptHandler()
     _prepare(package)
-    apt_purge(package['name'])
-    apt_download(
+    apt_handler.apt_purge(package['name'])
+    apt_handler.apt_download(
         package['name'],
         package['sources_path'])
-    apt_get([package['name']])
+    apt_handler.apt_get([package['name']])
 
 
 # @task
@@ -197,7 +186,7 @@ def get_make():
 #     EXEC:   fab get_gcc
 #     """
 
-#     package = get_package_configuration('gcc')
+#     package = get_conf('gcc')
 
 #     if package['reqs']:
 #         for req in package['reqs']:
@@ -220,7 +209,7 @@ def get_ruby():
     EXEC:   fab get_ruby
     """
 
-    package = get_package_configuration('ruby')
+    package = get_conf('ruby')
 
     _prepare(package)
     # RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
@@ -238,7 +227,7 @@ def get_ruby():
 #     EXEC:   fab get_zlib
 #     """
 
-#     package = get_package_configuration('zlib')
+#     package = get_conf('zlib')
 
 #     wget(
 #         package['source_url'],
@@ -252,10 +241,13 @@ def get_workflow_gems():
     EXEC:   fab get_workflow_gems
     """
 
-    package = get_package_configuration('workflow-gems')
+    package = get_conf('workflow-gems')
 
+    apt_handler = AptHandler()
+    f_handler = FileAndDirectoryHandler()
+    dl_handler = DownloadsHandler()
     _prepare(package)
-    apt_get(package['reqs'])
+    apt_handler.apt_get(package['reqs'])
 
     # RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
     # do('sudo dpkg -i %s/archives/*.deb' %
@@ -269,17 +261,19 @@ def get_workflow_gems():
     # do('cd {0}/ruby-2.1.0 && sudo make install'.format(
         # config.PACKAGES['ruby']['sources_path']))
 
-    wget(
-        package['gemfile_source_url'],
+    dl_handler.wget(
+        package['source_url'],
         package['sources_path'])
-    untar(
+    f_handler.untar(
         package['sources_path'],
-        '%s/%s' % (package['sources_path'], '*.tar.gz'))
-    rm('%s/%s' % (package['sources_path'], '*.tar.gz'))
+        '{0}/{1}'.format(package['sources_path'], '*.tar.gz'))
+    f_handler.rm('{0}/{1}'.format(package['sources_path'], '*.tar.gz'))
     do('sudo /opt/ruby/bin/gem install bundler')
-    do('sudo /opt/ruby/bin/bundle --gemfile %s' % package['gemfile_location'])
-    rmdir(package['gemfile_base_dir'])
-    cp('/opt/ruby/lib/ruby/gems/2.1.0/cache/*.gem', package['sources_path'])
+    do('sudo /opt/ruby/bin/bundle --gemfile {0}'
+       .format(package['gemfile_location']))
+    f_handler.rmdir(package['gemfile_base_dir'])
+    f_handler.cp('/opt/ruby/lib/ruby/gems/2.1.0/cache/*.gem',
+                 package['sources_path'])
 
 
 @task
@@ -289,11 +283,12 @@ def get_cosmo_ui(download=False):
     EXEC:   fab get_cosmo_ui
     """
 
-    package = get_package_configuration('cosmo-ui')
+    package = get_conf('cosmo-ui')
 
+    dl_handler = DownloadsHandler()
     _prepare(package)
     if download:
-        wget(
+        dl_handler.wget(
             package['source_url'],
             dir=package['sources_path'])
 
@@ -305,14 +300,15 @@ def get_nodejs():
     EXEC:   fab get_nodejs
     """
 
-    package = get_package_configuration('nodejs')
+    package = get_conf('nodejs')
 
+    apt_handler = AptHandler()
     _prepare(package)
-    apt_get(package['prereqs'])
+    apt_handler.apt_get(package['prereqs'])
     lgr.debug("adding package repo to src repo...")
-    add_ppa_repo(package['source_ppa'])
-    apt_update()
-    apt_download(
+    apt_handler.add_ppa_repo(package['source_ppa'])
+    apt_handler.apt_update()
+    apt_handler.apt_download(
         package['name'],
         package['sources_path'])
 
@@ -324,8 +320,9 @@ def get_riemann():
     EXEC:   fab get_riemann
     """
 
-    package = get_package_configuration('riemann')
+    package = get_conf('riemann')
 
+    dl_handler = DownloadsHandler()
     _prepare(package)
     # stream_id = str(uuid.uuid1())
     # se(event_origin="cosmo-packager",
@@ -334,7 +331,7 @@ def get_riemann():
     #     event_description='started downloading %s' % package['name'],
     #     event_stream_id=stream_id)
 
-    wget(
+    dl_handler.wget(
         package['source_url'],
         dir='{0}/archives'.format(package['sources_path']))
 
@@ -352,17 +349,19 @@ def get_rabbitmq():
     EXEC:   fab get_rabbitmq
     """
 
-    package = get_package_configuration('rabbitmq-server')
+    package = get_conf('rabbitmq-server')
 
+    dl_handler = DownloadsHandler()
+    apt_handler = AptHandler()
     _prepare(package)
-    add_src_repo(package['source_repo'], 'deb')
-    wget(
+    apt_handler.add_src_repo(package['source_repo'], 'deb')
+    dl_handler.wget(
         package['source_key'],
         package['sources_path'])
-    add_key(package['key_file'])
-    apt_update()
-    apt_download_reqs(package['reqs'], package['sources_path'])
-    apt_download(
+    apt_handler.add_key(package['key_file'])
+    apt_handler.apt_update()
+    apt_handler.apt_download_reqs(package['reqs'], package['sources_path'])
+    apt_handler.apt_download(
         package['name'],
         package['sources_path'])
 
@@ -374,10 +373,11 @@ def get_logstash():
     EXEC:   fab get_logstash
     """
 
-    package = get_package_configuration('logstash')
+    package = get_conf('logstash')
 
+    dl_handler = DownloadsHandler()
     _prepare(package)
-    wget(
+    dl_handler.wget(
         package['source_url'],
         dir=package['sources_path'])
 
@@ -389,10 +389,11 @@ def get_elasticsearch():
     EXEC:   fab get_elasticsearch
     """
 
-    package = get_package_configuration('elasticsearch')
+    package = get_conf('elasticsearch')
 
+    dl_handler = DownloadsHandler()
     _prepare(package)
-    wget(
+    dl_handler.wget(
         package['source_url'],
         dir=package['sources_path'])
 
@@ -404,10 +405,11 @@ def get_kibana():
     EXEC:   fab get_kibana
     """
 
-    package = get_package_configuration('kibana3')
+    package = get_conf('kibana3')
 
+    dl_handler = DownloadsHandler()
     _prepare(package)
-    wget(
+    dl_handler.wget(
         package['source_url'],
         dir=package['sources_path'])
 
@@ -419,15 +421,17 @@ def get_nginx():
     EXEC:   fab get_nginx
     """
 
-    package = get_package_configuration('nginx')
+    package = get_conf('nginx')
 
+    apt_handler = AptHandler()
+    dl_handler = DownloadsHandler()
     _prepare(package)
-    add_src_repo(package['source_repo'], 'deb')
-    add_src_repo(package['source_repo'], 'deb-src')
-    wget(package['source_key'], package['sources_path'])
-    add_key(package['key_file'])
-    apt_update()
-    apt_download(
+    apt_handler.add_src_repo(package['source_repo'], 'deb')
+    apt_handler.add_src_repo(package['source_repo'], 'deb-src')
+    dl_handler.wget(package['source_key'], package['sources_path'])
+    apt_handler.add_key(package['key_file'])
+    apt_handler.apt_update()
+    apt_handler.apt_download(
         package['name'],
         package['sources_path'])
 
@@ -439,10 +443,11 @@ def get_openjdk():
     EXEC:   fab get_openjdk
     """
 
-    package = get_package_configuration('openjdk-7-jdk')
+    package = get_conf('openjdk-7-jdk')
 
+    apt_handler = AptHandler()
     _prepare(package)
-    apt_download(
+    apt_handler.apt_download(
         package['name'],
         package['sources_path'])
 

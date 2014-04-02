@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ########
 # Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
 #
@@ -13,36 +14,15 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
-#!/usr/bin/env python
+from packager import init_logger
 
-import logging
-import logging.config
-import config
-# run_env = os.environ['RUN_ENV']
-# config = __import__(run_env)
-
-# from event_handler import send_event as se
-# import uuid
-import sys
-import os
 from fabric.api import *  # NOQA
-from packager import *  # NOQA
-from templgen import *  # NOQA
+from packager import pack
+from packager import get_package_configuration as get_conf
+
+lgr = init_logger()
 
 # __all__ = ['list']
-
-try:
-    d = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
-    if not os.path.exists(d):
-        os.makedirs(d)
-    logging.config.dictConfig(config.LOGGER)
-    lgr = logging.getLogger('main')
-    lgr.setLevel(logging.DEBUG)
-except ValueError:
-    sys.exit('could not initialize logger.'
-             ' verify your logger config'
-             ' and permissions to write to {0}'
-             .format(config.LOGGER['handlers']['file']['filename']))
 
 
 @task
@@ -52,8 +32,7 @@ def pkg_cloudify3():
     EXEC:   fab pkg_cloudify3
     """
 
-    package = get_package_configuration('cloudify3')
-    # rm('{0}/cloudify*'.format(package['sources_path']))
+    package = get_conf('cloudify3')
     pack(package)
 
 
@@ -64,8 +43,7 @@ def pkg_cloudify3_components():
     EXEC:   fab pkg_cloudify3_components
     """
 
-    package = get_package_configuration('cloudify3-components')
-    # rm('{0}/cloudify*'.format(package['sources_path']))
+    package = get_conf('cloudify3-components')
     pack(package)
 
 
@@ -76,8 +54,7 @@ def pkg_ubuntu_agent():
     EXEC:   fab pkg_ubuntu_agent
     """
 
-    package = get_package_configuration('ubuntu-agent')
-    # rm('{0}/archives/*.deb'.format(package['sources_path']))
+    package = get_conf('ubuntu-agent')
     pack(package)
 
 
@@ -88,8 +65,7 @@ def pkg_linux_agent():
     EXEC:   fab pkg_linux_agent
     """
 
-    package = get_package_configuration('linux-agent')
-    # rm('{0}/archives/*.deb'.format(package['sources_path']))
+    package = get_conf('linux-agent')
     pack(package)
 
 
@@ -100,8 +76,7 @@ def pkg_graphite():
     EXEC:   fab pkg_graphite
     """
 
-    package = get_package_configuration('graphite')
-    # rm('{0}/archives/*.deb'.format(package['sources_path']))
+    package = get_conf('graphite')
     pack(package)
 
 
@@ -112,8 +87,7 @@ def pkg_virtualenv():
     EXEC:   fab pkg_virtualenv
     """
 
-    package = get_package_configuration('virtualenv')
-    # rm('{0}/archives/*.deb'.format(package['sources_path']))
+    package = get_conf('virtualenv')
     pack(package)
 
 
@@ -124,8 +98,7 @@ def pkg_celery():
     EXEC:   fab pkg_celery
     """
 
-    package = get_package_configuration('celery')
-    # rm('{0}/archives/*.deb'.format(package['sources_path']))
+    package = get_conf('celery')
     pack(package)
 
 
@@ -136,8 +109,7 @@ def pkg_manager():
     EXEC:   fab pkg_manager
     """
 
-    package = get_package_configuration('manager')
-    # rm('{0}/archives/*.deb'.format(package['sources_path']))
+    package = get_conf('manager')
     pack(package)
 
 
@@ -148,7 +120,7 @@ def pkg_curl():
     EXEC:   fab pkg_curl
     """
 
-    package = get_package_configuration('curl')
+    package = get_conf('curl')
     pack(package)
 
 
@@ -159,7 +131,7 @@ def pkg_make():
     EXEC:   fab pkg_make
     """
 
-    package = get_package_configuration('make')
+    package = get_conf('make')
     pack(package)
 
 
@@ -170,7 +142,7 @@ def pkg_ruby():
     EXEC:   fab pkg_ruby
     """
 
-    package = get_package_configuration('ruby')
+    package = get_conf('ruby')
     pack(package)
 
 
@@ -181,7 +153,7 @@ def pkg_workflow_gems():
     EXEC:   fab pkg_workflow_gems
     """
 
-    package = get_package_configuration('workflow-gems')
+    package = get_conf('workflow-gems')
     pack(package)
 
 
@@ -192,8 +164,7 @@ def pkg_cosmo_ui():
     EXEC:   fab pkg_cosmo_ui
     """
 
-    package = get_package_configuration('cosmo-ui')
-    # rm('{0}/archives/*.deb'.format(package['sources_path']))
+    package = get_conf('cosmo-ui')
     pack(package)
 
 
@@ -204,7 +175,7 @@ def pkg_nodejs():
     EXEC:   fab pkg_nodejs
     """
 
-    package = get_package_configuration('nodejs')
+    package = get_conf('nodejs')
     pack(package)
 
 
@@ -215,7 +186,7 @@ def pkg_riemann():
     EXEC:   fab pkg_riemann
     """
 
-    package = get_package_configuration('riemann')
+    package = get_conf('riemann')
 
     # stream_id = str(uuid.uuid1())
     # se(event_origin="cosmo-packager",
@@ -240,7 +211,7 @@ def pkg_rabbitmq():
     EXEC:   fab pkg_rabbitmq
     """
 
-    package = get_package_configuration('rabbitmq-server')
+    package = get_conf('rabbitmq-server')
     pack(package)
 
 
@@ -251,7 +222,7 @@ def pkg_logstash():
     EXEC:   fab pkg_logstash
     """
 
-    package = get_package_configuration('logstash')
+    package = get_conf('logstash')
     pack(package)
 
 
@@ -262,7 +233,7 @@ def pkg_elasticsearch():
     EXEC:   fab pkg_elasticsearch
     """
 
-    package = get_package_configuration('elasticsearch')
+    package = get_conf('elasticsearch')
     pack(package)
 
 
@@ -273,8 +244,7 @@ def pkg_kibana():
     EXEC:   fab pkg_kibana
     """
 
-    package = get_package_configuration('kibana3')
-    # rm('{0}/archives/*.deb'.format(package['sources_path']))
+    package = get_conf('kibana3')
     pack(package)
 
 
@@ -285,7 +255,7 @@ def pkg_nginx():
     EXEC:   fab pkg_nginx
     """
 
-    package = get_package_configuration('nginx')
+    package = get_conf('nginx')
     pack(package)
 
 
@@ -296,7 +266,7 @@ def pkg_openjdk():
     EXEC:   fab pkg_openjdk
     """
 
-    package = get_package_configuration('openjdk-7-jdk')
+    package = get_conf('openjdk-7-jdk')
     pack(package)
 
 
@@ -307,7 +277,7 @@ def pkg_openjdk():
 #     EXEC:   fab pkg_zlib
 #     """
 
-#     package = get_package_configuration('zlib')
+#     package = get_conf('zlib')
 
 #     create_bootstrap_script(
 #         package, package['bootstrap_template'], package['bootstrap_script'])
@@ -334,7 +304,7 @@ def pkg_openjdk():
 #     EXEC:   fab pkg_gcc
 #     """
 
-#     package = get_package_configuration('gcc')
+#     package = get_conf('gcc')
 
 #     if not is_dir(package['package_path']):
 #         mkdir(package['package_path'])
