@@ -334,10 +334,11 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
     lgr.info("isolating archives...")
     # and then copy the final package over..
     common.cp('{0}/*.{1}'.format(dst_path, dst_type), package_path)
+    lgr.info('package creation completed successfully!')
 
 
 def do(command, sudo=False, retries=2,
-       some=3, capture=False):
+       some=3, capture=False, combine_stderr=False):
     """
     runs a fab local() with retries
     """
@@ -385,6 +386,18 @@ class CommonHandler():
             return True
         else:
             lgr.debug('{0} does not exist'.format(dir))
+            return False
+
+    def is_file(self, file):
+        """
+        checks if a file exists
+        """
+        lgr.debug('checking if {0} exists'.format(file))
+        if os.path.isfile(file):
+            lgr.debug('{0} exists'.format(file))
+            return True
+        else:
+            lgr.debug('{0} does not exist'.format(file))
             return False
 
     def mkdir(self, dir):
@@ -610,7 +623,7 @@ class DownloadsHandler(CommonHandler):
 
 
 class TemplateHandler(CommonHandler):
-    # TODO: replace this with generated from template..
+    # TODO: replace this with method generate_from_template()..
     def create_bootstrap_script(self, component, template_file, script_file):
         """
         creates a script file from a template file
@@ -700,21 +713,29 @@ class TemplateHandler(CommonHandler):
         receives a template and returns a formatted version of it
         according to a provided variable dictionary
         """
-        env = Environment(loader=FileSystemLoader(template_dir))
-        template = env.get_template(template_file)
+        env, template = None, None
+        env = Environment(loader=FileSystemLoader(template_dir)) \
+            if self.is_dir(template_dir) else lgr.error('template dir missing')
+        template = env.get_template(template_file) \
+            if self.is_file(template_dir + '/' + template_file) \
+            else lgr.error('template file missing')
 
-        lgr.debug('generating template from {0}/{1}'.format(
-                  template_dir, template_file))
-        return(template.render(var_dict))
+        if env is not None and template is not None:
+            lgr.debug('generating template from {0}/{1}'.format(
+                      template_dir, template_file))
+            return(template.render(var_dict))
+        else:
+            lgr.error('could not generate template')
+            sys.exit(1)
 
-    def make_file(self, output_file, content):
+    def make_file(self, output_path, content):
         """
         creates a file from content
         """
         if config.PRINT_TEMPLATES:
             lgr.debug('creating file: {0} with content: \n{1}'.format(
-                      output_file, content))
-        with open('{0}'.format(output_file), 'w+') as f:
+                      output_path, content))
+        with open('{0}'.format(output_path), 'w+') as f:
             f.write(content)
 
 
