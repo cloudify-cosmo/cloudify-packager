@@ -75,6 +75,9 @@ def handle(func):
 def get_package_configuration(component):
     """
     retrieves a package's configuration from packages.PACKAGES
+
+    :param string component: component name to retrieve config for.
+    :rtype: component dict
     """
     lgr.debug('retrieving configuration for {0}'.format(component))
     try:
