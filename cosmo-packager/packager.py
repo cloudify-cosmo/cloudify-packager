@@ -481,7 +481,7 @@ class PythonHandler(CommonHandler):
         """
         checks to see that a module is installed
         """
-        lgr.debug('checking to see that {0} is installed'.format(name))
+        lgr.debug('checking whether {0} is installed'.format(name))
         x = do('pip freeze', capture=True)
         if re.search(r'{0}'.format(name), x.stdout):
             lgr.debug('module {0} is installed'.format(name))
@@ -490,6 +490,8 @@ class PythonHandler(CommonHandler):
             lgr.debug('module {0} is not installed'.format(name))
             return False
 
+    # TODO: support virtualenv --relocate
+    # TODO: support whack http://mike.zwobble.org/2013/09/relocatable-python-virtualenvs-using-whack/ # NOQA
     def venv(self, root_dir, name=False):
         """
         creates a virtualenv
@@ -526,7 +528,7 @@ class AptHandler(CommonHandler):
         lgr.debug('renaming deb files...')
         do('dpkg-name {0}/*.deb'.format(dir))
 
-    # NOTE: THIS IS CURRENTLY BROKEN (it should dig a bit deeper)
+    # TODO: fix this... (it should dig a bit deeper)
     def check_if_package_is_installed(self, package):
         """
         checks if a package is installed
