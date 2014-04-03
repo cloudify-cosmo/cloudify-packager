@@ -21,6 +21,7 @@ from packager import PythonHandler
 from packager import DownloadsHandler
 from packager import AptHandler
 
+# import shutil
 from fabric.api import *  # NOQA
 from packager import *  # NOQA
 
@@ -48,11 +49,19 @@ def get_linux_agent():
 
     package = get_conf('linux-agent')
 
+    dl_handler = DownloadsHandler()
+    f_handler = FileAndDirectoryHandler()
     py_handler = PythonHandler()
     _prepare(package)
     py_handler.venv(package['sources_path'])
+    tar_file = '{0}/{1}.tar.gz'.format(
+        package['sources_path'], package['name'])
+    dl_handler.wget(package['source_url'], file=tar_file)
+    f_handler.untar(package['sources_path'], tar_file)
+    py_handler.venv(package['sources_path'])
     for module in package['modules']:
         py_handler.pip(module, '%s/bin' % package['sources_path'])
+    # TODO: remove redundant data after module installation
 
 
 @task
@@ -96,12 +105,19 @@ def get_celery(download=False):
 
     package = get_conf('celery')
 
+    dl_handler = DownloadsHandler()
+    f_handler = FileAndDirectoryHandler()
     py_handler = PythonHandler()
     _prepare(package)
     py_handler.venv(package['sources_path'])
+    tar_file = '{0}/{1}.tar.gz'.format(
+        package['sources_path'], package['name'])
+    dl_handler.wget(package['source_url'], file=tar_file)
+    f_handler.untar(package['sources_path'], tar_file)
     if download:
         for module in package['modules']:
-            py_handler.pip(module, '%s/bin' % package['sources_path'])
+            py_handler.pip(module, '{0}/bin'.format(package['sources_path']))
+    # TODO: remove redundant data after module installation
 
 
 @task
@@ -120,26 +136,26 @@ def get_manager(download=False):
     _prepare(package)
     py_handler.venv(package['sources_path'])
     # if download:
-    dl_handler.wget(
-        package['source_url'],
-        file='%s/%s.tar.gz' % (package['sources_path'],
-                               package['name']))
-    f_handler.untar(package['sources_path'],
-                    '%s/%s.tar.gz' % (package['sources_path'],
-                                      package['name']))
+    tar_file = '{0}/{1}.tar.gz'.format(
+        package['sources_path'], package['name'])
+    dl_handler.wget(package['source_url'], file=tar_file)
+    f_handler.untar(package['sources_path'], tar_file)
+
     f_handler.mkdir(package['file_server_dir'])
-    import shutil
-    shutil.copytree('%s/src/main/resources/cloudify' %
-                    package['resources_path'],
-                    '%s/cloudify' % package['file_server_dir'])
-    alias_mapping_resource = ('%s/src/main/resources/org/cloudifysource/cosmo/'
-                              'dsl/alias-mappings.yaml' %
-                              package['resources_path'])
-    f_handler.cp(alias_mapping_resource, '%s/cloudify/' %
-                 package['file_server_dir'])
+    f_handler.cp(package['resources_path'], package['file_server_dir'])
+    # DEPRACATED!
+    # shutil.copytree('%s/src/main/resources/cloudify' %
+    #                 package['resources_path'],
+    #                 '%s/cloudify' % package['file_server_dir'])
+    # alias_mapping_resource = ('%s/src/main/resources/org/cloudifysource/cosmo/'  # NOQA
+    #                           'dsl/alias-mappings.yaml' %
+    #                           package['resources_path'])
+    # f_handler.cp(alias_mapping_resource, '%s/cloudify/' %
+    #              package['file_server_dir'])
     if download:
         for module in package['modules']:
-            py_handler.pip(module, '%s/bin' % package['sources_path'])
+            py_handler.pip(module, '{0}/bin'.format(package['sources_path']))
+    # TODO: remove redundant data after module installation
 
 
 @task

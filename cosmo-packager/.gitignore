@@ -1,2 +1,4 @@
 *.pyc
 *.deb
+.vagrant/
+debs/

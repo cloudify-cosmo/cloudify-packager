@@ -16,6 +16,7 @@
 
 # logger configuration
 VERBOSE = True
+PRINT_TEMPLATES = False
 LOGGER = {
     "version": 1,
     "formatters": {

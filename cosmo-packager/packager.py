@@ -37,7 +37,6 @@ def init_logger():
 
     :param config:
     """
-
     log_dir = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
     if os.path.isfile(log_dir):
         sys.exit('file {0} exists - log directory cannot be created '
@@ -64,11 +63,23 @@ def init_logger():
 lgr = init_logger()
 
 
+def handle(func):
+    """
+    handles errors triggered by fabric
+    """
+    def execution_handler(*args, **kwargs):
+        response = func(*args, **kwargs)
+        return True and lgr.debug('successfully ran command!') \
+            if response.succeeded \
+            else False and lgr.error('failed - {0} ({1})'.format(
+                response.stderr, response.return_code))
+    return execution_handler
+
+
 def get_package_configuration(component):
     """
     retrieves a package's configuration from packages.PACKAGES
     """
-
     lgr.debug('retrieving configuration for {0}'.format(component))
     try:
         package_config = packages.PACKAGES[component]
@@ -277,11 +288,11 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
                 # and there are dependencies for the package, run fpm with
                 # the relevant flags.
                 if bootstrap_script_in_pkg and dst_type == "tar":
-                    x = do(
+                    do(
                         'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
                         .format(src_type, "tar", name, version, src_path))
                 elif bootstrap_script and not depends:
-                    x = do(
+                    do(
                         'sudo fpm -s {0} -t {1} --after-install {2} -n {3}'
                         ' -v {4} -f {5}'
                         .format(src_type, dst_type, os.getcwd() + '/'
@@ -290,7 +301,7 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
                     lgr.debug('package dependencies are: {0}'.format(", "
                               .join(depends)))
                     dep_str = "-d " + " -d ".join(depends)
-                    x = do(
+                    do(
                         'sudo fpm -s {0} -t {1} --after-install {2} {3} -n {4}'
                         ' -v {5} -f {6}'
                         .format(src_type, dst_type, os.getcwd() + '/'
@@ -299,11 +310,11 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
                 # else just create a package with default flags...
                 else:
                     if dst_type.startswith("tar"):
-                        x = do(
+                        do(
                             'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
                             .format(src_type, "tar", name, version, src_path))
                     else:
-                        x = do(
+                        do(
                             'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
                             .format(src_type, dst_type, name,
                                     version, src_path))
@@ -311,12 +322,6 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
                         do('sudo gzip {0}*'.format(name))
                 # and check if the packaging process succeeded.
                 # TODO: actually test the package itself.
-                if x.succeeded:
-                    lgr.info('successfully packed {0}:{1}'
-                             .format(name, version))
-                else:
-                    lgr.error('unsuccessfully packed {0}:{1}'
-                              .format(name, version))
         # apparently, the src for creation the package doesn't exist...
         # what can you do?
         else:
@@ -333,18 +338,8 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
     f_handler.cp('{0}/*.{1}'.format(dst_path, dst_type), package_path)
 
 
-def do(command, sudo=False, capture=False):
-    """
-    runs a command
-    """
-
-    # no.. this isn't a trick. just shortenning up the method's name
-    r = _run_locally_with_retries(command)
-    return r
-
-
-def _run_locally_with_retries(command, sudo=False, retries=5,
-                              sleeper=3, capture=False):
+def do(command, sudo=False, retries=5,
+       some=3, capture=False):
     """
     runs a fab local() with retries
     """
@@ -352,15 +347,15 @@ def _run_locally_with_retries(command, sudo=False, retries=5,
         for execution in range(retries):
             try:
                 if sudo:
-                    r = local('sudo {0}'.format(command, capture))
+                    local('sudo {0}'.format(command, capture))
                 else:
-                    r = local(command, capture)
-                # lgr.debug('ran command: {0}'.format(command))
-                return r
+                    local(command, capture)
+                lgr.debug('successfully executed: ' + command)
+                return
             except:
                 lgr.warning('failed to run command: {0} -retrying ({1}/{2})'
-                            .format(command, execution, retries))
-                sleep(sleeper)
+                            .format(command, execution + 1, retries))
+                sleep(some)
         lgr.error('failed to run command: {0} even after {1} retries'
                   .format(command, execution))
         sys.exit(1)
@@ -378,41 +373,25 @@ class PythonHandler():
         """
         pip installs a module
         """
-
         lgr.debug('installing module {0}'.format(module))
-        x = do('sudo {0}/pip --default-timeout=45 install {1}'
-               ' --process-dependency-links'.format(dir, module))
-        if x.succeeded:
-            lgr.debug('successfully installed python module {0} to {1}'
-                      .format(module, dir))
-        else:
-            lgr.error('unsuccessfully installed python module {0}'
-                      .format(module))
+        do('sudo {0}/pip --default-timeout=45 install {1}'
+           ' --process-dependency-links'.format(dir, module))
 
     def get_python_module(self, module, dir):
         """
         downloads a python module
         """
-
         lgr.debug('downloading module {0}'.format(module))
-        x = do(
-            'sudo /usr/local/bin/pip install --no-use-wheel \
-            --process-dependency-links --download "{0}/" {1}'
-            .format(dir, module))
-        if x.succeeded:
-            lgr.debug('successfully downloaded python module {0} to {1}'
-                      .format(module, dir))
-        else:
-            lgr.error('unsuccessfully downloaded python module {0}'
-                      .format(module))
+        do('sudo /usr/local/bin/pip install --no-use-wheel \
+           --process-dependency-links --download "{0}/" {1}'
+           .format(dir, module))
 
     def check_module_installed(self, name):
         """
         checks to see that a module is installed
         """
-
         lgr.debug('checking to see that {0} is installed'.format(name))
-        x = _run_locally_with_retries('pip freeze', capture=True)
+        x = do('pip freeze', capture=True)
         if re.search(r'{0}'.format(name), x.stdout):
             lgr.debug('module {0} is installed'.format(name))
             return True
@@ -424,16 +403,9 @@ class PythonHandler():
         """
         creates a virtualenv
         """
-
         lgr.debug('creating virtualenv in {0}'.format(root_dir))
         if self.check_module_installed('virtualenv'):
-            x = do('virtualenv {0}'.format(root_dir))
-            if x.succeeded:
-                lgr.debug('successfully created virtualenv in {0}'
-                          .format(root_dir))
-            else:
-                lgr.error('unsuccessfully created virtualenv in {0}'
-                          .format(root_dir))
+            do('virtualenv {0}'.format(root_dir))
         else:
             lgr.error('virtualenv is not installed. terminating')
             sys.exit()
@@ -441,21 +413,18 @@ class PythonHandler():
 
 class FileAndDirectoryHandler():
     def find_in_dir(self, dir, pattern):
-
+        """
+        finds a string/file pattern in a dir
+        """
         lgr.debug('looking for {0} in {1}'.format(pattern, dir))
         x = do('find {0} -iname "{1}" -exec echo {} \;'
                .format(dir, pattern), capture=True)
-        if x.succeeded:
-            return x.stdout
-            lgr.debug('successfully found {0} in {1}'.format(pattern, dir))
-        else:
-            lgr.error('unsuccessfully found {0} in {1}'.format(pattern, dir))
+        return x.stdout if x.succeeded else None
 
     def is_dir(self, dir):
         """
         checks if a directory exists
         """
-
         lgr.debug('checking if {0} exists'.format(dir))
         if os.path.isdir(dir):
             lgr.debug('{0} exists'.format(dir))
@@ -468,14 +437,9 @@ class FileAndDirectoryHandler():
         """
         creates (recursively) a directory
         """
-
         lgr.debug('creating directory {0}'.format(dir))
         if not os.path.isdir(dir):
-            x = do('sudo mkdir -p {0}'.format(dir))
-            if x.succeeded:
-                lgr.debug('successfully created directory {0}'.format(dir))
-            else:
-                lgr.error('unsuccessfully created directory {0}'.format(dir))
+            do('sudo mkdir -p {0}'.format(dir))
         else:
             lgr.debug('directory already exists, skipping.')
 
@@ -483,42 +447,32 @@ class FileAndDirectoryHandler():
         """
         deletes a directory
         """
-
         lgr.debug('attempting to remove directory {0}'.format(dir))
-        try:
-            if os.path.isdir(dir):
-                do('sudo rm -rf {0}'.format(dir))
-            lgr.debug('successfully removed directory {0}'.format(dir))
-        except:
-            lgr.error('unsuccessfully removed directory {0}'.format(dir))
+        print dir
+        if os.path.isdir(dir):
+            do('sudo rm -rf {0}'.format(dir))
+        else:
+            lgr.warning('dir doesn\'t exist')
 
     def rm(self, file):
         """
         deletes a file or a set of files
         """
-
         lgr.info('removing files {0}'.format(file))
-        try:
-            if os.path.isfile(file):
-                do('sudo rm {0}'.format(file))
-            lgr.info('successfully removed file {0}'.format(file))
-        except:
-            lgr.error('unsuccessfully removed file {0}'.format(file))
+        if os.path.isfile(file):
+            do('sudo rm {0}'.format(file))
+        else:
+            lgr.warning('file(s) do(es)n\'t exist')
 
     def cp(self, src, dst, recurse=True):
         """
         copies (recuresively or not) files or directories
         """
-
         lgr.debug('copying {0} to {1}'.format(src, dst))
         if recurse:
-            x = do('sudo cp -R {0} {1}'.format(src, dst))
+            do('sudo cp -R {0} {1}'.format(src, dst))
         else:
-            x = do('sudo cp {0} {1}'.format(src, dst))
-        if x.succeeded:
-            lgr.debug('successfully copied {0} to {1}'.format(src, dst))
-        else:
-            lgr.error('unsuccessfully copied {0} to {1}'.format(src, dst))
+            do('sudo cp {0} {1}'.format(src, dst))
 
     # TODO: depracate this useless thing...
     def make_package_paths(self, pkg_dir, tmp_dir):
@@ -526,7 +480,6 @@ class FileAndDirectoryHandler():
         DEPRACATED!
         creates directories for managing packages
         """
-
         # this is stupid... remove it soon...
         lgr.debug('creating package directories')
         self.mkdir('%s/archives' % tmp_dir)
@@ -536,26 +489,16 @@ class FileAndDirectoryHandler():
         """
         tars an input file or directory
         """
-
         lgr.debug('tar-ing {0}'.format(output_file))
-        x = do('sudo tar -C {0} -czvf {1} {2}'.format(chdir, output_file,
-                                                      input))
-        if x.succeeded:
-            lgr.debug('successfully tar-ed {0}'.format(output_file))
-        else:
-            lgr.error('unsuccessfully tar-ed {0}'.format(output_file))
+        do('sudo tar -C {0} -czvf {1} {2}'.format(chdir, output_file,
+                                                  input))
 
     def untar(self, chdir, input_file):
         """
         untars a dir
         """
-
         lgr.debug('tar-ing {0}'.format(input_file))
-        x = do('sudo tar -C {0} -xzvf {1}'.format(chdir, input_file))
-        if x.succeeded:
-            lgr.debug('successfully untar-ed {0}'.format(input_file))
-        else:
-            lgr.error('unsuccessfully untar-ed {0}'.format(input_file))
+        do('sudo tar -C {0} -xzvf {1}'.format(chdir, input_file))
 
 
 class RubyHandler():
@@ -564,21 +507,13 @@ class RubyHandler():
         """
         downloads a ruby gem
         """
-
         lgr.debug('downloading gem {0}'.format(gem))
         try:
-            x = do(
-                'sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install'
-                ' --no-ri --no-rdoc --install-dir {0} {1}'.format(dir, gem))
+            do('sudo /home/vagrant/.rvm/rubies/ruby-2.1.0/bin/gem install'
+               ' --no-ri --no-rdoc --install-dir {0} {1}'.format(dir, gem))
         except:
-            x = do(
-                'sudo /usr/local/rvm/rubies/ruby-2.1.0/bin/gem install'
-                ' --no-ri --no-rdoc --install-dir {0} {1}'.format(dir, gem))
-        if x.succeeded:
-            lgr.debug('successfully downloaded ruby gem {0} to {1}'
-                      .format(gem, dir))
-        else:
-            lgr.error('unsuccessfully downloaded ruby gem {0}'.format(gem))
+            do('sudo /usr/local/rvm/rubies/ruby-2.1.0/bin/gem install'
+               ' --no-ri --no-rdoc --install-dir {0} {1}'.format(dir, gem))
 
 
 class AptHandler():
@@ -598,7 +533,7 @@ class AptHandler():
 
         lgr.debug('checking if {0} is installed'.format(package))
         try:
-            _run_locally_with_retries('sudo dpkg -s {0}'.format(package))
+            do('sudo dpkg -s {0}'.format(package))
             lgr.debug('{0} is installed'.format(package))
             return True
         except:
@@ -614,7 +549,6 @@ class AptHandler():
         """
         autoremoves package dependencies
         """
-
         lgr.debug('removing unnecessary dependencies...')
         do('sudo apt-get -y autoremove {0}'.formaT(pkg))
 
@@ -622,82 +556,52 @@ class AptHandler():
         """
         uses apt to download package debs from ubuntu's repo
         """
-
         lgr.debug('downloading {0} to {1}'.format(pkg, dir))
-        x = do('sudo apt-get -y install {0} -d -o=dir::cache={1}'
-               .format(pkg, dir))
-        if x.succeeded:
-            lgr.debug('successfully downloaded {0} to {1}'.format(pkg, dir))
-        else:
-            lgr.error('unsuccessfully downloaded {0} to {1}'.format(pkg, dir))
+        do('sudo apt-get -y install {0} -d -o=dir::cache={1}'.format(pkg, dir))
 
     def add_src_repo(self, url, mark):
-
+        """
+        adds a source repo to the apt repo
+        """
         lgr.debug('adding source repository {0} mark {1}'.format(url, mark))
-        x = do('sudo sed -i "2i {0} {1}" /etc/apt/sources.list'
-               .format(mark, url))
-        if x.succeeded:
-            lgr.debug('successfully added repo {0}'.format(url))
-        else:
-            lgr.error('unsuccessfully added repo {0}'.format(url))
+        do('sudo sed -i "2i {0} {1}" /etc/apt/sources.list'.format(mark, url))
 
     def add_ppa_repo(self, url):
-
+        """
+        adds a ppa repo to the apt repo
+        """
         lgr.debug('adding ppa repository {0}'.format(url))
-        x = do('add-apt-repository -y {0}'.format(url))
-        if x.succeeded:
-            lgr.debug('successfully added repo {0}'.format(url))
-        else:
-            lgr.error('unsuccessfully added repo {0}'.format(url))
+        do('add-apt-repository -y {0}'.format(url))
 
     def add_key(self, key_file):
         """
         adds a key to the local repo
         """
-
         lgr.debug('adding key {0}'.format(key_file))
-        x = do('sudo apt-key add {0}'.format(key_file))
-        if x.succeeded:
-            lgr.debug('successfully added key {0}'.format(key_file))
-        else:
-            lgr.error('unsuccessfully added key {0}'.format(key_file))
+        do('sudo apt-key add {0}'.format(key_file))
 
     @staticmethod
     def apt_update():
         """
         runs apt-get update
         """
-
         lgr.debug('updating local apt repo')
-        x = do('sudo apt-get update')
-        if x.succeeded:
-            lgr.debug('successfully ran apt-get update')
-        else:
-            lgr.error('unsuccessfully ran apt-get update')
+        do('sudo apt-get update')
 
     def apt_get(self, list):
         """
         apt-get installs a package
         """
-
         for package in list:
             lgr.debug('installing {0}'.format(package))
-            x = do('sudo apt-get -y install {0}'.format(package))
-            if x.succeeded:
-                lgr.debug('successfully installed {0}'.format(package))
-            else:
-                lgr.error('unsuccessfully installed {0}'.format(package))
+            do('sudo apt-get -y install {0}'.format(package))
 
     def apt_purge(self, package):
         """
         completely purges a package from the local repo
         """
-
-        x = do('sudo apt-get -y purge {0}'.format(package))
-        if x.succeeded:
-            lgr.debug('successfully purged {0}'.format(package))
-        else:
-            lgr.error('unsuccessfully purged {0}'.format(package))
+        lgr.debug('attemping to purge {0}'.format(package))
+        do('sudo apt-get -y purge {0}'.format(package))
 
 
 class DownloadsHandler():
@@ -705,7 +609,6 @@ class DownloadsHandler():
         """
         wgets a url to a destination directory or file
         """
-
         lgr.debug('downloading {0} to {1}'.format(url, dir))
         try:
             if file:
@@ -749,7 +652,6 @@ class TemplateHandler():
         """
         creates a script file from a template file
         """
-
         lgr.debug('creating bootstrap script...')
         formatted_text = self.template_formatter(
             definitions.PACKAGER_TEMPLATE_PATH, template_file, component)
@@ -759,7 +661,6 @@ class TemplateHandler():
         """
         generates configuration files from templates
         """
-
         # iterate over the config_templates dict in the package's config
         for key, value in component['config_templates'].iteritems():
             # we'll make some assumptions regarding the structure of the config
@@ -826,7 +727,6 @@ class TemplateHandler():
         generates configuration files from templates using jinja2
         http://jinja.pocoo.org/docs/
         """
-
         lgr.debug('generating config file...')
         formatted_text = self.template_formatter(
             templates, template_file, component)
@@ -837,7 +737,6 @@ class TemplateHandler():
         receives a template and returns a formatted version of it
         according to a provided variable dictionary
         """
-
         env = Environment(loader=FileSystemLoader(template_dir))
         template = env.get_template(template_file)
 
@@ -849,16 +748,17 @@ class TemplateHandler():
         """
         creates a file from content
         """
-
-        lgr.debug('creating file: {0} with content: \n{1}'.format(
-                  output_file, content))
+        if config.PRINT_TEMPLATES:
+            lgr.debug('creating file: {0} with content: \n{1}'.format(
+                      output_file, content))
         with open('{0}'.format(output_file), 'w+') as f:
             f.write(content)
 
 
 def main():
 
-    lgr.debug('VALIDATED!')
+    lgr.debug('running in main...')
+    # f = FileAndDirectoryHandler()
 
 
 if __name__ == '__main__':

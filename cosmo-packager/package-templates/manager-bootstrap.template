@@ -78,20 +78,20 @@ LOG_DIR="/var/log/cosmo"
 
 PKG_INIT_DIR="${PKG_DIR}/{{ config_templates.__template_dir_init.config_dir }}"
 INIT_DIR="{{ config_templates.__template_dir_init.dst_dir }}"
-# INIT_FILE="{{ config_templates.__template_dir_init.output_file }}"
+INIT_FILE="{{ config_templates.__template_dir_init.output_file }}"
 
 PKG_CONF_DIR="${PKG_DIR}/{{ config_templates.__template_file_conf.config_dir }}"
 CONF_DIR="{{ config_templates.__template_file_conf.dst_dir }}"
 CONF_FILE="{{ config_templates.__template_file_conf.output_file }}"
 
 
-echo "creating file server dir..."
-sudo mkdir -p ${PKG_DIR}/filesrv
-check_dir "${PKG_DIR}/filesrv"
+# echo "creating virtualenv dir..."
+# sudo mkdir -p ${PKG_DIR}
+# check_dir "${PKG_DIR}"
 
-echo "copying some stuff..."
-sudo cp -R ${PKG_DIR}/{{ bootstrap_params.resources_dir_src }} ${PKG_DIR}/{{ bootstrap_params.resources_dir_dst }}/
-sudo cp ${PKG_DIR}/{{ bootstrap_params.alias_file_src }} ${PKG_DIR}/{{ bootstrap_params.alias_file_dst }}/
+# echo "copying some stuff..."
+# sudo cp -R ${PKG_DIR}/{{ bootstrap_params.resources_dir_src }} ${PKG_DIR}/{{ bootstrap_params.resources_dir_dst }}/
+# sudo cp ${PKG_DIR}/{{ bootstrap_params.alias_file_src }} ${PKG_DIR}/{{ bootstrap_params.alias_file_dst }}/
 
 # echo "running gunicorn..."
 # sudo ${PKG_DIR}/bin/gunicorn -w 1 -b 0.0.0.0:8100 --timeout 300 ${PKG_DIR}/cosmo-manager-develop/manager-rest/manager_rest/server.py:app
@@ -103,7 +103,11 @@ sudo cp ${PKG_DIR}/{{ bootstrap_params.alias_file_src }} ${PKG_DIR}/{{ bootstrap
 # cd /opt/manager/cosmo-manager-develop/manager-rest/manager_rest
 # sudo /opt/manager/bin/gunicorn -w 1 -b 0.0.0.0:8100 --timeout 300 server:app
 
-echo "creating workflow log dir..."
+echo "creating virtualenv..."
+sudo virtualenv ${HOME_DIR}
+check_dir "${HOME_DIR}"
+
+echo "creating log dir..."
 sudo mkdir -p ${LOG_DIR}
 check_dir "${LOG_DIR}"
 
@@ -118,14 +122,11 @@ check_file "${INIT_DIR}/workflow.conf"
 sudo ln -sf ${HOME_DIR}/cosmo-manager-*/ ${HOME_DIR}/${PKG_NAME}
 # check_dir "${BASE_DIR}/${PKG_NAME}"
 
-sudo virtualenv ${HOME_DIR}
-check_dir "${HOME_DIR}/${PKG_NAME}"
-
 echo "starting manager..."
 sudo start manager
 check_upstart "manager"
 
-# todo: check if riemann is running 
+# todo: check if riemann is running
 echo "starting workflow-service..."
 sudo start workflow
 check_upstart "workflow"
