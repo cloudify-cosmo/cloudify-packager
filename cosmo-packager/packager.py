@@ -34,8 +34,6 @@ from jinja2 import Environment, FileSystemLoader
 def init_logger():
     """
     Initialize a logger to be used throughout the packager
-
-    :param config:
     """
     log_dir = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
     if os.path.isfile(log_dir):
@@ -175,15 +173,38 @@ def get(package=False, version=False, source_repo=False, source_ppa=False,
             ruby_handler.get_ruby_gem(gem, dst_path)
 
 
-def pack(package=False, src_type=False, dst_type=False, name=False,
+def pack(package, name=False, src_type=False, dst_type=False,
          src_path=False, dst_path=False, version=False, package_path=False,
          bootstrap_script=False, bootstrap_template=False, depends=False,
          bootstrap_script_in_pkg=False, config_templates=False,
          overwrite=True, config_dir=False):
     """
-    uses fpm (https://github.com/jordansissel/fpm/wiki)
-    to create packages
-    logic documentation is in-line
+    creates a package according to the provided package configuration
+     in packages.py
+    uses fpm (https://github.com/jordansissel/fpm/wiki) to create packages.
+
+
+    .. note:: by default, the params are defined by packages.py
+     they can be overriden explicitly by sending them to the pack
+     function.
+
+    .. note:: param names in packages.py can be overriden by editing
+     definitions.py
+
+    :param dict package: dict representing package config
+     as configured in packages.py
+    :param string name: package's name
+     will be appended to the filename and to the package
+     depending on its type
+    :param string src_type: package source type (as supported by fpm)
+    :param string dst_type: package destination type (as supported by fpm)
+    :param string src_path: path from which package will be created
+    :param string dst_path: path where temp package is placed
+    :param string version: version to append to package
+    :param string package_path: path where final package is placed
+    :param string bootstrap_script: path to place generated script
+    :param string bootstrap_script_in_pkg:
+
     """
 
     # get the cwd since fpm will later change it.

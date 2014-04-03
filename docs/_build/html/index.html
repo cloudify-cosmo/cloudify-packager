@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to cosmo-packager’s documentation! &mdash; cosmo-packager  documentation</title>
+    <title>Welcome to packman’s documentation! &mdash; packman 0.1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '',
+        VERSION:     '0.1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,8 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="cosmo-packager  documentation" href="#" />
-    <link rel="next" title="cosmo-packager package" href="cosmo-packager.html" /> 
+    <link rel="top" title="packman 0.1.0 documentation" href="#" /> 
   </head>
   <body>
     <div class="related">
@@ -34,9 +33,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo-packager.html" title="cosmo-packager package"
-             accesskey="N">next</a> |</li>
-        <li><a href="#">cosmo-packager  documentation</a> &raquo;</li> 
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">packman 0.1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -45,27 +44,556 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="welcome-to-cosmo-packager-s-documentation">
-<h1>Welcome to cosmo-packager&#8217;s documentation!<a class="headerlink" href="#welcome-to-cosmo-packager-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="welcome-to-packman-s-documentation">
+<h1>Welcome to packman&#8217;s documentation!<a class="headerlink" href="#welcome-to-packman-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="cosmo-packager.html">cosmo-packager package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#cosmo-packager-config-module">cosmo-packager.config module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#cosmo-packager-definitions-module">cosmo-packager.definitions module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#cosmo-packager-event-handler-module">cosmo-packager.event_handler module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#cosmo-packager-fabfile-module">cosmo-packager.fabfile module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#cosmo-packager-get-module">cosmo-packager.get module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#cosmo-packager-packager-module">cosmo-packager.packager module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#cosmo-packager-packages-module">cosmo-packager.packages module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#cosmo-packager-pkg-module">cosmo-packager.pkg module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#cosmo-packager-templgen-module">cosmo-packager.templgen module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cosmo-packager.html#module-contents">Module contents</a></li>
-</ul>
-</li>
+<ul class="simple">
 </ul>
 </div>
+<span class="target" id="module-packager"></span><dl class="class">
+<dt id="packager.AptHandler">
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">AptHandler</tt><a class="headerlink" href="#packager.AptHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dl class="method">
+<dt id="packager.AptHandler.add_key">
+<tt class="descname">add_key</tt><big>(</big><em>key_file</em><big>)</big><a class="headerlink" href="#packager.AptHandler.add_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds a key to the local repo</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.AptHandler.add_ppa_repo">
+<tt class="descname">add_ppa_repo</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#packager.AptHandler.add_ppa_repo" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds a ppa repo to the apt repo</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.AptHandler.add_src_repo">
+<tt class="descname">add_src_repo</tt><big>(</big><em>url</em>, <em>mark</em><big>)</big><a class="headerlink" href="#packager.AptHandler.add_src_repo" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds a source repo to the apt repo</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.AptHandler.apt_autoremove">
+<tt class="descname">apt_autoremove</tt><big>(</big><em>pkg</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_autoremove" title="Permalink to this definition">¶</a></dt>
+<dd><p>autoremoves package dependencies</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.AptHandler.apt_download">
+<tt class="descname">apt_download</tt><big>(</big><em>pkg</em>, <em>dir</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_download" title="Permalink to this definition">¶</a></dt>
+<dd><p>uses apt to download package debs from ubuntu&#8217;s repo</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.AptHandler.apt_download_reqs">
+<tt class="descname">apt_download_reqs</tt><big>(</big><em>req_list</em>, <em>sources_path</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_download_reqs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="packager.AptHandler.apt_get">
+<tt class="descname">apt_get</tt><big>(</big><em>list</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>apt-get installs a package</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.AptHandler.apt_purge">
+<tt class="descname">apt_purge</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>completely purges a package from the local repo</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="packager.AptHandler.apt_update">
+<em class="property">static </em><tt class="descname">apt_update</tt><big>(</big><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs apt-get update</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.AptHandler.check_if_package_is_installed">
+<tt class="descname">check_if_package_is_installed</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#packager.AptHandler.check_if_package_is_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks if a package is installed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.AptHandler.dpkg_name">
+<tt class="descname">dpkg_name</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.AptHandler.dpkg_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>renames deb files to conventional names</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="packager.CommonHandler">
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">CommonHandler</tt><a class="headerlink" href="#packager.CommonHandler" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="packager.CommonHandler.cp">
+<tt class="descname">cp</tt><big>(</big><em>src</em>, <em>dst</em>, <em>recurse=True</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.cp" title="Permalink to this definition">¶</a></dt>
+<dd><p>copies (recuresively or not) files or directories</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.CommonHandler.find_in_dir">
+<tt class="descname">find_in_dir</tt><big>(</big><em>dir</em>, <em>pattern</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.find_in_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>finds a string/file pattern in a dir</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.CommonHandler.is_dir">
+<tt class="descname">is_dir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.is_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks if a directory exists</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.CommonHandler.is_file">
+<tt class="descname">is_file</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.is_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks if a file exists</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.CommonHandler.make_package_paths">
+<tt class="descname">make_package_paths</tt><big>(</big><em>pkg_dir</em>, <em>tmp_dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.make_package_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRACATED!
+creates directories for managing packages</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.CommonHandler.mkdir">
+<tt class="descname">mkdir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates (recursively) a directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.CommonHandler.rm">
+<tt class="descname">rm</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.rm" title="Permalink to this definition">¶</a></dt>
+<dd><p>deletes a file or a set of files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.CommonHandler.rmdir">
+<tt class="descname">rmdir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.rmdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>deletes a directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.CommonHandler.tar">
+<tt class="descname">tar</tt><big>(</big><em>chdir</em>, <em>output_file</em>, <em>input</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.tar" title="Permalink to this definition">¶</a></dt>
+<dd><p>tars an input file or directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.CommonHandler.untar">
+<tt class="descname">untar</tt><big>(</big><em>chdir</em>, <em>input_file</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.untar" title="Permalink to this definition">¶</a></dt>
+<dd><p>untars a dir</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="packager.DownloadsHandler">
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">DownloadsHandler</tt><a class="headerlink" href="#packager.DownloadsHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dl class="method">
+<dt id="packager.DownloadsHandler.wget">
+<tt class="descname">wget</tt><big>(</big><em>url</em>, <em>dir=False</em>, <em>file=False</em><big>)</big><a class="headerlink" href="#packager.DownloadsHandler.wget" title="Permalink to this definition">¶</a></dt>
+<dd><p>wgets a url to a destination directory or file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="packager.PackagerError">
+<em class="property">exception </em><tt class="descclassname">packager.</tt><tt class="descname">PackagerError</tt><a class="headerlink" href="#packager.PackagerError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="packager.PythonHandler">
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">PythonHandler</tt><a class="headerlink" href="#packager.PythonHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dl class="method">
+<dt id="packager.PythonHandler.check_module_installed">
+<tt class="descname">check_module_installed</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.check_module_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks to see that a module is installed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.PythonHandler.get_python_module">
+<tt class="descname">get_python_module</tt><big>(</big><em>module</em>, <em>dir</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.get_python_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>downloads a python module</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.PythonHandler.pip">
+<tt class="descname">pip</tt><big>(</big><em>module</em>, <em>dir</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.pip" title="Permalink to this definition">¶</a></dt>
+<dd><p>pip installs a module</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.PythonHandler.venv">
+<tt class="descname">venv</tt><big>(</big><em>root_dir</em>, <em>name=False</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.venv" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a virtualenv</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="packager.RubyHandler">
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">RubyHandler</tt><a class="headerlink" href="#packager.RubyHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dl class="method">
+<dt id="packager.RubyHandler.get_ruby_gem">
+<tt class="descname">get_ruby_gem</tt><big>(</big><em>gem</em>, <em>dir</em><big>)</big><a class="headerlink" href="#packager.RubyHandler.get_ruby_gem" title="Permalink to this definition">¶</a></dt>
+<dd><p>downloads a ruby gem</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="packager.TemplateHandler">
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">TemplateHandler</tt><a class="headerlink" href="#packager.TemplateHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dl class="method">
+<dt id="packager.TemplateHandler.create_bootstrap_script">
+<tt class="descname">create_bootstrap_script</tt><big>(</big><em>component</em>, <em>template_file</em>, <em>script_file</em><big>)</big><a class="headerlink" href="#packager.TemplateHandler.create_bootstrap_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a script file from a template file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.TemplateHandler.generate_configs">
+<tt class="descname">generate_configs</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packager.TemplateHandler.generate_configs" title="Permalink to this definition">¶</a></dt>
+<dd><p>generates configuration files from templates</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.TemplateHandler.generate_from_template">
+<tt class="descname">generate_from_template</tt><big>(</big><em>component</em>, <em>output_file</em>, <em>template_file</em>, <em>templates='package-templates'</em><big>)</big><a class="headerlink" href="#packager.TemplateHandler.generate_from_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>generates configuration files from templates using jinja2
+<a class="reference external" href="http://jinja.pocoo.org/docs/">http://jinja.pocoo.org/docs/</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.TemplateHandler.make_file">
+<tt class="descname">make_file</tt><big>(</big><em>output_path</em>, <em>content</em><big>)</big><a class="headerlink" href="#packager.TemplateHandler.make_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a file from content</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="packager.TemplateHandler.template_formatter">
+<tt class="descname">template_formatter</tt><big>(</big><em>template_dir</em>, <em>template_file</em>, <em>var_dict</em><big>)</big><a class="headerlink" href="#packager.TemplateHandler.template_formatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>receives a template and returns a formatted version of it
+according to a provided variable dictionary</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="packager.do">
+<tt class="descclassname">packager.</tt><tt class="descname">do</tt><big>(</big><em>command</em>, <em>sudo=False</em>, <em>retries=2</em>, <em>some=3</em>, <em>capture=False</em>, <em>combine_stderr=False</em><big>)</big><a class="headerlink" href="#packager.do" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs a fab local() with retries</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="packager.get">
+<tt class="descclassname">packager.</tt><tt class="descname">get</tt><big>(</big><em>package=False</em>, <em>version=False</em>, <em>source_repo=False</em>, <em>source_ppa=False</em>, <em>source_key=False</em>, <em>source_url=False</em>, <em>key_file=False</em>, <em>reqs=False</em>, <em>dst_path=False</em>, <em>name=False</em>, <em>package_path=False</em>, <em>modules=False</em>, <em>gems=False</em>, <em>overwrite=True</em><big>)</big><a class="headerlink" href="#packager.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves resources for packaging</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="packager.get_package_configuration">
+<tt class="descclassname">packager.</tt><tt class="descname">get_package_configuration</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packager.get_package_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves a package&#8217;s configuration from packages.PACKAGES</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="packager.handle">
+<tt class="descclassname">packager.</tt><tt class="descname">handle</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#packager.handle" title="Permalink to this definition">¶</a></dt>
+<dd><p>handles errors triggered by fabric</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="packager.init_logger">
+<tt class="descclassname">packager.</tt><tt class="descname">init_logger</tt><big>(</big><big>)</big><a class="headerlink" href="#packager.init_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a logger to be used throughout the packager</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="packager.main">
+<tt class="descclassname">packager.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="headerlink" href="#packager.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="packager.pack">
+<tt class="descclassname">packager.</tt><tt class="descname">pack</tt><big>(</big><em>package</em>, <em>name=False</em>, <em>src_type=False</em>, <em>dst_type=False</em>, <em>src_path=False</em>, <em>dst_path=False</em>, <em>version=False</em>, <em>package_path=False</em>, <em>bootstrap_script=False</em>, <em>bootstrap_template=False</em>, <em>depends=False</em>, <em>bootstrap_script_in_pkg=False</em>, <em>config_templates=False</em>, <em>overwrite=True</em>, <em>config_dir=False</em><big>)</big><a class="headerlink" href="#packager.pack" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>creates a package according to the provided package configuration</dt>
+<dd>in packages.py</dd>
+</dl>
+<p>uses fpm (<a class="reference external" href="https://github.com/jordansissel/fpm/wiki">https://github.com/jordansissel/fpm/wiki</a>) to create packages.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by default, the params are defined by packages.py
+they can be overriden explicitly by sending them to the pack
+function.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">param names in packages.py can be overriden by editing
+definitions.py</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>package</strong> (<em>dict</em>) &#8211; dict representing package config
+as configured in packages.py</li>
+<li><strong>name</strong> (<em>string</em>) &#8211; package&#8217;s name
+will be appended to the filename and to the package
+depending on its type</li>
+<li><strong>src_type</strong> (<em>string</em>) &#8211; package source type (as supported by fpm)</li>
+<li><strong>dst_type</strong> (<em>string</em>) &#8211; package destination type (as supported by fpm)</li>
+<li><strong>src_path</strong> (<em>string</em>) &#8211; path from which package will be created</li>
+<li><strong>dst_path</strong> (<em>string</em>) &#8211; path where temp package is placed</li>
+<li><strong>version</strong> (<em>string</em>) &#8211; version to append to package</li>
+<li><strong>package_path</strong> (<em>string</em>) &#8211; path where final package is placed</li>
+<li><strong>bootstrap_script</strong> (<em>string</em>) &#8211; path to place generated script</li>
+<li><strong>bootstrap_script_in_pkg</strong> (<em>string</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">CommonHandler</tt></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">cp</tt><big>(</big><em>src</em>, <em>dst</em>, <em>recurse=True</em><big>)</big></dt>
+<dd><p>copies (recuresively or not) files or directories</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">find_in_dir</tt><big>(</big><em>dir</em>, <em>pattern</em><big>)</big></dt>
+<dd><p>finds a string/file pattern in a dir</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">is_dir</tt><big>(</big><em>dir</em><big>)</big></dt>
+<dd><p>checks if a directory exists</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">is_file</tt><big>(</big><em>file</em><big>)</big></dt>
+<dd><p>checks if a file exists</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">make_package_paths</tt><big>(</big><em>pkg_dir</em>, <em>tmp_dir</em><big>)</big></dt>
+<dd><p>DEPRACATED!
+creates directories for managing packages</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">mkdir</tt><big>(</big><em>dir</em><big>)</big></dt>
+<dd><p>creates (recursively) a directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">rm</tt><big>(</big><em>file</em><big>)</big></dt>
+<dd><p>deletes a file or a set of files</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">rmdir</tt><big>(</big><em>dir</em><big>)</big></dt>
+<dd><p>deletes a directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">tar</tt><big>(</big><em>chdir</em>, <em>output_file</em>, <em>input</em><big>)</big></dt>
+<dd><p>tars an input file or directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">untar</tt><big>(</big><em>chdir</em>, <em>input_file</em><big>)</big></dt>
+<dd><p>untars a dir</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">AptHandler</tt></dt>
+<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dl class="method">
+<dt>
+<tt class="descname">add_key</tt><big>(</big><em>key_file</em><big>)</big></dt>
+<dd><p>adds a key to the local repo</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">add_ppa_repo</tt><big>(</big><em>url</em><big>)</big></dt>
+<dd><p>adds a ppa repo to the apt repo</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">add_src_repo</tt><big>(</big><em>url</em>, <em>mark</em><big>)</big></dt>
+<dd><p>adds a source repo to the apt repo</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">apt_autoremove</tt><big>(</big><em>pkg</em><big>)</big></dt>
+<dd><p>autoremoves package dependencies</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">apt_download</tt><big>(</big><em>pkg</em>, <em>dir</em><big>)</big></dt>
+<dd><p>uses apt to download package debs from ubuntu&#8217;s repo</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">apt_download_reqs</tt><big>(</big><em>req_list</em>, <em>sources_path</em><big>)</big></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">apt_get</tt><big>(</big><em>list</em><big>)</big></dt>
+<dd><p>apt-get installs a package</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">apt_purge</tt><big>(</big><em>package</em><big>)</big></dt>
+<dd><p>completely purges a package from the local repo</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><tt class="descname">apt_update</tt><big>(</big><big>)</big></dt>
+<dd><p>runs apt-get update</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">check_if_package_is_installed</tt><big>(</big><em>package</em><big>)</big></dt>
+<dd><p>checks if a package is installed</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">dpkg_name</tt><big>(</big><em>dir</em><big>)</big></dt>
+<dd><p>renames deb files to conventional names</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">DownloadsHandler</tt></dt>
+<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dl class="method">
+<dt>
+<tt class="descname">wget</tt><big>(</big><em>url</em>, <em>dir=False</em>, <em>file=False</em><big>)</big></dt>
+<dd><p>wgets a url to a destination directory or file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">RubyHandler</tt></dt>
+<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dl class="method">
+<dt>
+<tt class="descname">get_ruby_gem</tt><big>(</big><em>gem</em>, <em>dir</em><big>)</big></dt>
+<dd><p>downloads a ruby gem</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">PythonHandler</tt></dt>
+<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dl class="method">
+<dt>
+<tt class="descname">check_module_installed</tt><big>(</big><em>name</em><big>)</big></dt>
+<dd><p>checks to see that a module is installed</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">get_python_module</tt><big>(</big><em>module</em>, <em>dir</em><big>)</big></dt>
+<dd><p>downloads a python module</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">pip</tt><big>(</big><em>module</em>, <em>dir</em><big>)</big></dt>
+<dd><p>pip installs a module</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">venv</tt><big>(</big><em>root_dir</em>, <em>name=False</em><big>)</big></dt>
+<dd><p>creates a virtualenv</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">TemplateHandler</tt></dt>
+<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dl class="method">
+<dt>
+<tt class="descname">create_bootstrap_script</tt><big>(</big><em>component</em>, <em>template_file</em>, <em>script_file</em><big>)</big></dt>
+<dd><p>creates a script file from a template file</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">generate_configs</tt><big>(</big><em>component</em><big>)</big></dt>
+<dd><p>generates configuration files from templates</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">generate_from_template</tt><big>(</big><em>component</em>, <em>output_file</em>, <em>template_file</em>, <em>templates='package-templates'</em><big>)</big></dt>
+<dd><p>generates configuration files from templates using jinja2
+<a class="reference external" href="http://jinja.pocoo.org/docs/">http://jinja.pocoo.org/docs/</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">make_file</tt><big>(</big><em>output_path</em>, <em>content</em><big>)</big></dt>
+<dd><p>creates a file from content</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">template_formatter</tt><big>(</big><em>template_dir</em>, <em>template_file</em>, <em>var_dict</em><big>)</big></dt>
+<dd><p>receives a template and returns a formatted version of it
+according to a provided variable dictionary</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
@@ -84,13 +612,10 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to cosmo-packager&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#">Welcome to packman&#8217;s documentation!</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
-  <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo-packager.html"
-                        title="next chapter">cosmo-packager package</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -120,13 +645,13 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo-packager.html" title="cosmo-packager package"
-             >next</a> |</li>
-        <li><a href="#">cosmo-packager  documentation</a> &raquo;</li> 
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">packman 0.1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2014, Author.
+        &copy; Copyright 2014, nir0s.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>

@@ -15,7 +15,7 @@
 #    * limitations under the License.
 
 from __future__ import print_function
-from setuptools import setup
+from setuptools import setup, find_packages
 import io
 
 version = '0.1.0'
@@ -38,11 +38,13 @@ setup(
     url='https://github.com/CloudifySource/cosmo-packager',
     author='nir0s',
     author_email='nirc@gigaspaces.com',
-    packages=['cosmo-packager'],
+    # packages=['cosmo-packager'],
     license='LICENSE',
     platforms='Ubuntu',
     description='Cloudify3 Package Generator',
-    package_data={'cosmo_cli': ['cosmo-config.example.json']},
+    # package_data={'cosmo_cli': ['cosmo-config.example.json']},
+    packages=find_packages(),
+    include_package_data=True,
     install_requires=[
         "fabric==1.8.3",
         "pika==0.9.13",
