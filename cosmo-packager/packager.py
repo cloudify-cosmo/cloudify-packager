@@ -364,7 +364,8 @@ def pack(package, name=False, src_type=False, dst_type=False,
 def do(command, sudo=False, retries=2,
        some=3, capture=False, combine_stderr=False):
     """
-    runs a fab local() with retries
+    executes a command locally with retries on failure
+    :type resource: :class:`sandman.model.Model` or None
     """
     def _execute():
         for execution in xrange(retries):
