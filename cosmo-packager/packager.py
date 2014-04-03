@@ -177,7 +177,7 @@ def pack(package, name=False, src_type=False, dst_type=False,
          src_path=False, dst_path=False, version=False, package_path=False,
          bootstrap_script=False, bootstrap_template=False, depends=False,
          bootstrap_script_in_pkg=False, config_templates=False,
-         overwrite=True, config_dir=False):
+         overwrite=True):
     """
     creates a package according to the provided package configuration
      in packages.py
@@ -204,7 +204,10 @@ def pack(package, name=False, src_type=False, dst_type=False,
     :param string package_path: path where final package is placed
     :param string bootstrap_script: path to place generated script
     :param string bootstrap_script_in_pkg:
-
+    :param dict config_templates: configuration dict for the package's
+     config files
+    :param bool overwrite: indicated whether the destination directory be
+     erased before creating a new package
     """
 
     # get the cwd since fpm will later change it.

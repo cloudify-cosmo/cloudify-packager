@@ -323,7 +323,7 @@ according to a provided variable dictionary</p>
 
 <dl class="function">
 <dt id="packager.pack">
-<tt class="descclassname">packager.</tt><tt class="descname">pack</tt><big>(</big><em>package</em>, <em>name=False</em>, <em>src_type=False</em>, <em>dst_type=False</em>, <em>src_path=False</em>, <em>dst_path=False</em>, <em>version=False</em>, <em>package_path=False</em>, <em>bootstrap_script=False</em>, <em>bootstrap_template=False</em>, <em>depends=False</em>, <em>bootstrap_script_in_pkg=False</em>, <em>config_templates=False</em>, <em>overwrite=True</em>, <em>config_dir=False</em><big>)</big><a class="headerlink" href="#packager.pack" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">packager.</tt><tt class="descname">pack</tt><big>(</big><em>package</em>, <em>name=False</em>, <em>src_type=False</em>, <em>dst_type=False</em>, <em>src_path=False</em>, <em>dst_path=False</em>, <em>version=False</em>, <em>package_path=False</em>, <em>bootstrap_script=False</em>, <em>bootstrap_template=False</em>, <em>depends=False</em>, <em>bootstrap_script_in_pkg=False</em>, <em>config_templates=False</em>, <em>overwrite=True</em><big>)</big><a class="headerlink" href="#packager.pack" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>creates a package according to the provided package configuration</dt>
 <dd>in packages.py</dd>
@@ -358,6 +358,10 @@ depending on its type</li>
 <li><strong>package_path</strong> (<em>string</em>) &#8211; path where final package is placed</li>
 <li><strong>bootstrap_script</strong> (<em>string</em>) &#8211; path to place generated script</li>
 <li><strong>bootstrap_script_in_pkg</strong> (<em>string</em>) &#8211; </li>
+<li><strong>config_templates</strong> (<em>dict</em>) &#8211; configuration dict for the package&#8217;s
+config files</li>
+<li><strong>overwrite</strong> (<em>bool</em>) &#8211; indicated whether the destination directory be
+erased before creating a new package</li>
 </ul>
 </td>
 </tr>
