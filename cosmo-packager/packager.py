@@ -49,10 +49,8 @@ def init_logger():
             os.makedirs(d)
         logging.config.dictConfig(config.LOGGER)
         lgr = logging.getLogger('user')
-        if not config.VERBOSE:
-            lgr.setLevel(logging.INFO)
-        else:
-            lgr.setLevel(logging.DEBUG)
+        lgr.setLevel(logging.INFO) if not config.VERBOSE \
+            else lgr.setLevel(logging.DEBUG)
         return lgr
     except ValueError:
         sys.exit('could not initialize logger.'
@@ -344,9 +342,10 @@ def do(command, sudo=False, retries=2,
     runs a fab local() with retries
     """
     def _execute():
-        for execution in range(retries):
+        for execution in xrange(retries):
             with settings(warn_only=True):
-                x = local(command, capture=capture, sudo=sudo)
+                x = local('sudo {0}'.format(command), capture) if sudo \
+                    else local(command, capture)
                 if x.succeeded:
                     lgr.debug('successfully executed: ' + command)
                     return x
@@ -393,41 +392,32 @@ class CommonHandler():
         creates (recursively) a directory
         """
         lgr.debug('creating directory {0}'.format(dir))
-        if not os.path.isdir(dir):
-            do('sudo mkdir -p {0}'.format(dir))
-        else:
-            lgr.debug('directory already exists, skipping.')
+        return do('sudo mkdir -p {0}'.format(dir)) if not os.path.isdir(dir) \
+            else lgr.debug('directory already exists, skipping.')
 
     def rmdir(self, dir):
         """
         deletes a directory
         """
         lgr.debug('attempting to remove directory {0}'.format(dir))
-        print dir
-        if os.path.isdir(dir):
-            do('sudo rm -rf {0}'.format(dir))
-        else:
-            lgr.warning('dir doesn\'t exist')
+        return do('sudo rm -rf {0}'.format(dir)) \
+            if os.path.isdir(dir) else lgr.warning('dir doesn\'t exist')
 
     def rm(self, file):
         """
         deletes a file or a set of files
         """
         lgr.info('removing files {0}'.format(file))
-        if os.path.isfile(file):
-            do('sudo rm {0}'.format(file))
-        else:
-            lgr.warning('file(s) do(es)n\'t exist')
+        return do('sudo rm {0}'.format(file)) if os.path.isfile(file) \
+            else lgr.warning('file(s) do(es)n\'t exist')
 
     def cp(self, src, dst, recurse=True):
         """
         copies (recuresively or not) files or directories
         """
         lgr.debug('copying {0} to {1}'.format(src, dst))
-        if recurse:
-            do('sudo cp -R {0} {1}'.format(src, dst))
-        else:
-            do('sudo cp {0} {1}'.format(src, dst))
+        return do('sudo cp -R {0} {1}'.format(src, dst)) if recurse \
+            else do('sudo cp {0} {1}'.format(src, dst))
 
     # TODO: depracate this useless thing...
     def make_package_paths(self, pkg_dir, tmp_dir):
@@ -609,37 +599,12 @@ class DownloadsHandler(CommonHandler):
         """
         lgr.debug('downloading {0} to {1}'.format(url, dir))
         try:
-            if file:
-                x = do('sudo wget {0} -O {1}'.format(url, file))
-            elif dir:
-                x = do('sudo wget {0} -P {1}'.format(url, dir))
-            elif dir and file:
+            if (file and dir) or (not file and not dir):
                 lgr.warning('please specify either a directory'
-                            ' or file to download to, not both')
-                sys.exit()
-            else:
-                lgr.warning('please specify at least one of dir or file.')
-                sys.exit()
-            if x.succeeded:
-                if file:
-                    lgr.debug('successfully downloaded {0} to {1}'
-                              .format(url, file))
-                elif dir:
-                    lgr.debug('successfully downloaded {0} to {1}'
-                              .format(url, dir))
-                elif not dir and not file:
-                    lgr.debug('successfully downloaded {0} to local directory'
-                              .format(url))
-            else:
-                if file:
-                    lgr.error('unsuccessfully downloaded {0} to {1}'
-                              .format(url, file))
-                elif dir:
-                    lgr.error('unsuccessfully downloaded {0} to {1}'
-                              .format(url, dir))
-                elif not dir and not file:
-                    lgr.debug('failed to download {0} to local directory'
-                              .format(url))
+                            ' or file to download to.')
+                sys.exit(1)
+            do('sudo wget {0} -O {1}'.format(url, file)) if file \
+                else do('sudo wget {0} -P {1}'.format(url, dir))
         except:
             lgr.error('failed downloading {0}'.format(url))
 
@@ -760,8 +725,9 @@ class PackagerError(Exception):
 def main():
 
     lgr.debug('running in main...')
-    # f = CommonHandler()
-
+    f = CommonHandler()
+    f.mkdir('/home/nir0s/abc')
+    f.rmdir('/home/nir0s/abc')
 
 if __name__ == '__main__':
     main()
