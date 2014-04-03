@@ -288,8 +288,26 @@ according to a provided variable dictionary</p>
 
 <dl class="function">
 <dt id="packager.do">
-<tt class="descclassname">packager.</tt><tt class="descname">do</tt><big>(</big><em>command</em>, <em>sudo=False</em>, <em>retries=2</em>, <em>some=3</em>, <em>capture=False</em>, <em>combine_stderr=False</em><big>)</big><a class="headerlink" href="#packager.do" title="Permalink to this definition">¶</a></dt>
-<dd><p>runs a fab local() with retries</p>
+<tt class="descclassname">packager.</tt><tt class="descname">do</tt><big>(</big><em>command</em>, <em>retries=2</em>, <em>sleeper=3</em>, <em>capture=False</em>, <em>combine_stderr=False</em><big>)</big><a class="headerlink" href="#packager.do" title="Permalink to this definition">¶</a></dt>
+<dd><p>executes a command locally with retries on failure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>command</strong> (<em>string</em>) &#8211; shell command to be executed</li>
+<li><strong>retries</strong> (<em>int</em>) &#8211; number of retries to perform on failure</li>
+<li><strong>sleeper</strong> (<em>int</em>) &#8211; sleeptime between retries</li>
+<li><strong>capture</strong> (<em>bool</em>) &#8211; should the output be captured for parsing?</li>
+<li><strong>combine_stderr</strong> (<em>bool</em>) &#8211; combine stdout and stderr</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">responseObject</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">

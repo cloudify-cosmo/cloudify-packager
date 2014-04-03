@@ -361,11 +361,17 @@ def pack(package, name=False, src_type=False, dst_type=False,
     lgr.info('package creation completed successfully!')
 
 
-def do(command, sudo=False, retries=2,
-       some=3, capture=False, combine_stderr=False):
+def do(command, retries=2,
+       sleeper=3, capture=False, combine_stderr=False):
     """
-    executes a command locally with retries on failure
-    :type resource: :class:`sandman.model.Model` or None
+    executes a command locally with retries on failure.
+
+    :param string command: shell command to be executed
+    :param int retries: number of retries to perform on failure
+    :param int sleeper: sleeptime between retries
+    :param bool capture: should the output be captured for parsing?
+    :param bool combine_stderr: combine stdout and stderr
+    :rtype: fabric ``responseObject``
     """
     def _execute():
         for execution in xrange(retries):
@@ -377,7 +383,7 @@ def do(command, sudo=False, retries=2,
                     return x
                 lgr.warning('failed to run command: {0} -retrying ({1}/{2})'
                             .format(command, execution + 1, retries))
-                sleep(some)
+                sleep(sleeper)
         lgr.error('failed to run command: {0} even after {1} retries'
                   ' with output: {2}'
                   .format(command, execution, x.stdout))
