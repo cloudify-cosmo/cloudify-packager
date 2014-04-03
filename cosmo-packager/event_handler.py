@@ -11,7 +11,6 @@ def build_event_body(**kwargs):
     """
     receives an iterable and returns a dict
     """
-
     body = {}
     for field, value in kwargs.items():
         body.update({field: value})
@@ -23,7 +22,6 @@ def send_event(**kwargs):
     """
     connects to an AMQP broker and registers an event
     """
-
     body = build_event_body(**kwargs)
 
     try:

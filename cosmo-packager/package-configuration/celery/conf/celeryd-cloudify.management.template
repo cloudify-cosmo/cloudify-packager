@@ -15,7 +15,7 @@ export VIRTUALENV="${CELERY_BASE_DIR}"
 export MANAGER_FILE_SERVER_URL="http://IPSTRING:{{ config_templates.__params_conf.file_server_port }}"
 export MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL="${MANAGER_FILE_SERVER_URL}/blueprints"
 
-INCLUDES=plugin_installer.tasks,kv_store.tasks,worker_installer.tasks
+INCLUDES=plugin_installer.tasks,worker_installer.tasks
 CELERYD_MULTI="${VIRTUALENV}/bin/celeryd-multi"
 CELERYD_USER="USERSTRING"
 CELERYD_GROUP="USERSTRING"

@@ -16,7 +16,7 @@
 
 from packager import init_logger
 from packager import get_package_configuration as get_conf
-from packager import FileAndDirectoryHandler
+from packager import CommonHandler
 from packager import PythonHandler
 from packager import DownloadsHandler
 from packager import AptHandler
@@ -32,10 +32,10 @@ lgr = init_logger()
 
 def _prepare(package):
 
-    f_handler = FileAndDirectoryHandler()
-    f_handler.rmdir(package['sources_path'])
+    common = CommonHandler()
+    common.rmdir(package['sources_path'])
     # DEPRACATE!
-    f_handler.make_package_paths(
+    common.make_package_paths(
         package['package_path'],
         package['sources_path'])
 
@@ -50,14 +50,14 @@ def get_linux_agent():
     package = get_conf('linux-agent')
 
     dl_handler = DownloadsHandler()
-    f_handler = FileAndDirectoryHandler()
+    common = CommonHandler()
     py_handler = PythonHandler()
     _prepare(package)
     py_handler.venv(package['sources_path'])
     tar_file = '{0}/{1}.tar.gz'.format(
         package['sources_path'], package['name'])
     dl_handler.wget(package['source_url'], file=tar_file)
-    f_handler.untar(package['sources_path'], tar_file)
+    common.untar(package['sources_path'], tar_file)
     py_handler.venv(package['sources_path'])
     for module in package['modules']:
         py_handler.pip(module, '%s/bin' % package['sources_path'])
@@ -106,14 +106,14 @@ def get_celery(download=False):
     package = get_conf('celery')
 
     dl_handler = DownloadsHandler()
-    f_handler = FileAndDirectoryHandler()
+    common = CommonHandler()
     py_handler = PythonHandler()
     _prepare(package)
     py_handler.venv(package['sources_path'])
     tar_file = '{0}/{1}.tar.gz'.format(
         package['sources_path'], package['name'])
     dl_handler.wget(package['source_url'], file=tar_file)
-    f_handler.untar(package['sources_path'], tar_file)
+    common.untar(package['sources_path'], tar_file)
     if download:
         for module in package['modules']:
             py_handler.pip(module, '{0}/bin'.format(package['sources_path']))
@@ -131,7 +131,7 @@ def get_manager(download=False):
     package = get_conf('manager')
 
     dl_handler = DownloadsHandler()
-    f_handler = FileAndDirectoryHandler()
+    common = CommonHandler()
     py_handler = PythonHandler()
     _prepare(package)
     py_handler.venv(package['sources_path'])
@@ -139,10 +139,10 @@ def get_manager(download=False):
     tar_file = '{0}/{1}.tar.gz'.format(
         package['sources_path'], package['name'])
     dl_handler.wget(package['source_url'], file=tar_file)
-    f_handler.untar(package['sources_path'], tar_file)
+    common.untar(package['sources_path'], tar_file)
 
-    f_handler.mkdir(package['file_server_dir'])
-    f_handler.cp(package['resources_path'], package['file_server_dir'])
+    common.mkdir(package['file_server_dir'])
+    common.cp(package['resources_path'], package['file_server_dir'])
     # DEPRACATED!
     # shutil.copytree('%s/src/main/resources/cloudify' %
     #                 package['resources_path'],
@@ -150,7 +150,7 @@ def get_manager(download=False):
     # alias_mapping_resource = ('%s/src/main/resources/org/cloudifysource/cosmo/'  # NOQA
     #                           'dsl/alias-mappings.yaml' %
     #                           package['resources_path'])
-    # f_handler.cp(alias_mapping_resource, '%s/cloudify/' %
+    # common.cp(alias_mapping_resource, '%s/cloudify/' %
     #              package['file_server_dir'])
     if download:
         for module in package['modules']:
@@ -260,7 +260,7 @@ def get_workflow_gems():
     package = get_conf('workflow-gems')
 
     apt_handler = AptHandler()
-    f_handler = FileAndDirectoryHandler()
+    common = CommonHandler()
     dl_handler = DownloadsHandler()
     _prepare(package)
     apt_handler.apt_get(package['reqs'])
@@ -280,16 +280,16 @@ def get_workflow_gems():
     dl_handler.wget(
         package['source_url'],
         package['sources_path'])
-    f_handler.untar(
+    common.untar(
         package['sources_path'],
         '{0}/{1}'.format(package['sources_path'], '*.tar.gz'))
-    f_handler.rm('{0}/{1}'.format(package['sources_path'], '*.tar.gz'))
+    common.rm('{0}/{1}'.format(package['sources_path'], '*.tar.gz'))
     do('sudo /opt/ruby/bin/gem install bundler')
     do('sudo /opt/ruby/bin/bundle --gemfile {0}'
        .format(package['gemfile_location']))
-    f_handler.rmdir(package['gemfile_base_dir'])
-    f_handler.cp('/opt/ruby/lib/ruby/gems/2.1.0/cache/*.gem',
-                 package['sources_path'])
+    common.rmdir(package['gemfile_base_dir'])
+    common.cp('/opt/ruby/lib/ruby/gems/2.1.0/cache/*.gem',
+              package['sources_path'])
 
 
 @task

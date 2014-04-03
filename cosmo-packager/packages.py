@@ -281,7 +281,7 @@ PACKAGES = {
         "package_path": "{0}/logstash/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/logstash".format(PACKAGES_PATH),
         "src_package_type": "dir",
-        "dst_package_type": "deb",
+        "dst_package_type": "debs",
         "bootstrap_script": "{0}/logstash-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "logstash-bootstrap.template",
         "config_templates": {

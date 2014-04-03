@@ -128,7 +128,7 @@ def get(package=False, version=False, source_repo=False, source_ppa=False,
     overwrite = package['overwrite'] \
         if not overwrite else overwrite
 
-    f_handler = FileAndDirectoryHandler()
+    common = CommonHandler()
     apt_handler = AptHandler()
     dl_handler = DownloadsHandler()
     py_handler = PythonHandler()
@@ -136,15 +136,15 @@ def get(package=False, version=False, source_repo=False, source_ppa=False,
     # should the source dir be removed before retrieving package contents?
     if overwrite:
         lgr.info('overwrite enabled. removing directory before retrieval')
-        f_handler.rmdir(dst_path)
+        common.rmdir(dst_path)
     else:
         if os.path.isdir(dst_path):
             lgr.error('the destination directory for this package already '
                       'exists and overwrite is disabled.')
     # create the directories required for package creation...
     # TODO: remove make_package_paths and create the relevant dirs manually.
-    f_handler.mkdir(package_path + '/archives')
-    f_handler.mkdir(dst_path)
+    common.mkdir(package_path + '/archives')
+    common.mkdir(dst_path)
     # if there's a source repo to add... add it.
     # TODO: SEND LIST OF REPOS WITh MARKS
     if source_repo:
@@ -234,7 +234,7 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
         if definitions.PARAM_OVERWRITE_OUTPUT_PACKAGE in package \
         else overwrite
 
-    f_handler = FileAndDirectoryHandler()
+    common = CommonHandler()
     tmp_handler = TemplateHandler()
 
     # can't use src_path == dst_path for the package... duh!
@@ -246,16 +246,16 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
     # should the packaging process overwrite the previous packages?
     if overwrite:
         lgr.info('overwrite enabled. removing directory before packaging')
-        f_handler.rmdir(package_path)
+        common.rmdir(package_path)
     # if the package is ...
     if src_type:
-        f_handler.rmdir(dst_path)
-        f_handler.mkdir(dst_path)
+        common.rmdir(dst_path)
+        common.mkdir(dst_path)
 
     lgr.info('generating package scripts and config files...')
     # if there are configuration templates to generate configs from...
     if config_templates:
-        tmp_handler.generate_configs(package, f_handler)
+        tmp_handler.generate_configs(package)
     # if bootstrap scripts are required, generate them.
     if bootstrap_script or bootstrap_script_in_pkg:
         # TODO: handle cases where a bootstrap script is not a template.
@@ -273,13 +273,13 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
                 lgr.debug('granting execution permissions')
                 do('chmod +x {0}'.format(bootstrap_script_in_pkg))
                 lgr.debug('copying bootstrap script to package directory')
-                f_handler.cp(bootstrap_script_in_pkg, src_path)
+                common.cp(bootstrap_script_in_pkg, src_path)
     lgr.info('packing up component...')
     # if a package needs to be created (not just files copied)...
     if src_type:
         lgr.info('packing {0}'.format(name))
         # if the source dir for the package exists
-        if f_handler.is_dir(src_path):
+        if common.is_dir(src_path):
             # change the path to the destination path, since fpm doesn't accept
             # (for now) a dst dir, but rather creates the package in the cwd.
             with lcd(dst_path):
@@ -331,33 +331,31 @@ def pack(package=False, src_type=False, dst_type=False, name=False,
             sys.exit(1)
 
     # make sure the final destination for the package exists..
-    if not f_handler.is_dir(package_path):
-        f_handler.mkdir(package_path)
+    if not common.is_dir(package_path):
+        common.mkdir(package_path)
     lgr.info("isolating archives...")
     # and then copy the final package over..
-    f_handler.cp('{0}/*.{1}'.format(dst_path, dst_type), package_path)
+    common.cp('{0}/*.{1}'.format(dst_path, dst_type), package_path)
 
 
-def do(command, sudo=False, retries=5,
+def do(command, sudo=False, retries=2,
        some=3, capture=False):
     """
     runs a fab local() with retries
     """
     def _execute():
         for execution in range(retries):
-            try:
-                if sudo:
-                    local('sudo {0}'.format(command, capture))
-                else:
-                    local(command, capture)
-                lgr.debug('successfully executed: ' + command)
-                return
-            except:
+            with settings(warn_only=True):
+                x = local(command, capture=capture, sudo=sudo)
+                if x.succeeded:
+                    lgr.debug('successfully executed: ' + command)
+                    return x
                 lgr.warning('failed to run command: {0} -retrying ({1}/{2})'
                             .format(command, execution + 1, retries))
                 sleep(some)
         lgr.error('failed to run command: {0} even after {1} retries'
-                  .format(command, execution))
+                  ' with output: {2}'
+                  .format(command, execution, x.stdout))
         sys.exit(1)
 
     # lgr.info('running command: {0}'.format(command))
@@ -368,50 +366,7 @@ def do(command, sudo=False, retries=5,
             return _execute()
 
 
-class PythonHandler():
-    def pip(self, module, dir):
-        """
-        pip installs a module
-        """
-        lgr.debug('installing module {0}'.format(module))
-        do('sudo {0}/pip --default-timeout=45 install {1}'
-           ' --process-dependency-links'.format(dir, module))
-
-    def get_python_module(self, module, dir):
-        """
-        downloads a python module
-        """
-        lgr.debug('downloading module {0}'.format(module))
-        do('sudo /usr/local/bin/pip install --no-use-wheel \
-           --process-dependency-links --download "{0}/" {1}'
-           .format(dir, module))
-
-    def check_module_installed(self, name):
-        """
-        checks to see that a module is installed
-        """
-        lgr.debug('checking to see that {0} is installed'.format(name))
-        x = do('pip freeze', capture=True)
-        if re.search(r'{0}'.format(name), x.stdout):
-            lgr.debug('module {0} is installed'.format(name))
-            return True
-        else:
-            lgr.debug('module {0} is not installed'.format(name))
-            return False
-
-    def venv(self, root_dir, name=False):
-        """
-        creates a virtualenv
-        """
-        lgr.debug('creating virtualenv in {0}'.format(root_dir))
-        if self.check_module_installed('virtualenv'):
-            do('virtualenv {0}'.format(root_dir))
-        else:
-            lgr.error('virtualenv is not installed. terminating')
-            sys.exit()
-
-
-class FileAndDirectoryHandler():
+class CommonHandler():
     def find_in_dir(self, dir, pattern):
         """
         finds a string/file pattern in a dir
@@ -501,7 +456,50 @@ class FileAndDirectoryHandler():
         do('sudo tar -C {0} -xzvf {1}'.format(chdir, input_file))
 
 
-class RubyHandler():
+class PythonHandler(CommonHandler):
+    def pip(self, module, dir):
+        """
+        pip installs a module
+        """
+        lgr.debug('installing module {0}'.format(module))
+        do('sudo {0}/pip --default-timeout=45 install {1}'
+           ' --process-dependency-links'.format(dir, module))
+
+    def get_python_module(self, module, dir):
+        """
+        downloads a python module
+        """
+        lgr.debug('downloading module {0}'.format(module))
+        do('sudo /usr/local/bin/pip install --no-use-wheel \
+           --process-dependency-links --download "{0}/" {1}'
+           .format(dir, module))
+
+    def check_module_installed(self, name):
+        """
+        checks to see that a module is installed
+        """
+        lgr.debug('checking to see that {0} is installed'.format(name))
+        x = do('pip freeze', capture=True)
+        if re.search(r'{0}'.format(name), x.stdout):
+            lgr.debug('module {0} is installed'.format(name))
+            return True
+        else:
+            lgr.debug('module {0} is not installed'.format(name))
+            return False
+
+    def venv(self, root_dir, name=False):
+        """
+        creates a virtualenv
+        """
+        lgr.debug('creating virtualenv in {0}'.format(root_dir))
+        if self.check_module_installed('virtualenv'):
+            do('virtualenv {0}'.format(root_dir))
+        else:
+            lgr.error('virtualenv is not installed. terminating')
+            sys.exit()
+
+
+class RubyHandler(CommonHandler):
     # TODO: remove static paths for ruby installations..
     def get_ruby_gem(self, gem, dir):
         """
@@ -516,7 +514,7 @@ class RubyHandler():
                ' --no-ri --no-rdoc --install-dir {0} {1}'.format(dir, gem))
 
 
-class AptHandler():
+class AptHandler(CommonHandler):
     def dpkg_name(self, dir):
         """
         renames deb files to conventional names
@@ -604,7 +602,7 @@ class AptHandler():
         do('sudo apt-get -y purge {0}'.format(package))
 
 
-class DownloadsHandler():
+class DownloadsHandler(CommonHandler):
     def wget(self, url, dir=False, file=False):
         """
         wgets a url to a destination directory or file
@@ -646,7 +644,7 @@ class DownloadsHandler():
             lgr.error('failed downloading {0}'.format(url))
 
 
-class TemplateHandler():
+class TemplateHandler(CommonHandler):
     # TODO: replace this with generated from template..
     def create_bootstrap_script(self, component, template_file, script_file):
         """
@@ -657,7 +655,7 @@ class TemplateHandler():
             definitions.PACKAGER_TEMPLATE_PATH, template_file, component)
         self.make_file(script_file, formatted_text)
 
-    def generate_configs(self, component, f_handler):
+    def generate_configs(self, component):
         """
         generates configuration files from templates
         """
@@ -684,8 +682,8 @@ class TemplateHandler():
                 output_path = '{0}/{1}/{2}'.format(
                     component['sources_path'], config_dir, output_file)
                 # create the directory to put the config in after it's
-                # generated
-                f_handler.mkdir('{0}/{1}'.format(
+                # genserated
+                self.mkdir('{0}/{1}'.format(
                     component['sources_path'], config_dir))
                 # and then generate the config file. WOOHOO!
                 self.generate_from_template(component,
@@ -707,7 +705,7 @@ class TemplateHandler():
                         output_path = '{0}/{1}/{2}'.format(
                             component['sources_path'], config_dir, output_file)
 
-                        f_handler.mkdir('{0}/{1}'.format(
+                        self.mkdir('{0}/{1}'.format(
                             component['sources_path'], config_dir))
                         self.generate_from_template(component,
                                                     output_path,
@@ -716,10 +714,10 @@ class TemplateHandler():
             elif key.startswith('__config_dir'):
                 config_dir = value['config_dir']
                 files_dir = value['files']
-                f_handler.mkdir('{0}/{1}'.format(
+                self.mkdir('{0}/{1}'.format(
                     component['sources_path'], config_dir))
-                f_handler.cp(files_dir + '/*', component['sources_path'] + '/'
-                             + config_dir)
+                self.cp(files_dir + '/*', component['sources_path'] + '/'
+                        + config_dir)
 
     def generate_from_template(self, component, output_file, template_file,
                                templates=definitions.PACKAGER_TEMPLATE_PATH):
@@ -755,10 +753,14 @@ class TemplateHandler():
             f.write(content)
 
 
+class PackagerError(Exception):
+    pass
+
+
 def main():
 
     lgr.debug('running in main...')
-    # f = FileAndDirectoryHandler()
+    # f = CommonHandler()
 
 
 if __name__ == '__main__':
