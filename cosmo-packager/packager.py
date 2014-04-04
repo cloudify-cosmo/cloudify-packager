@@ -31,7 +31,7 @@ from jinja2 import Environment, FileSystemLoader
 # __all__ = ['list']
 
 
-def init_logger():
+def _init_logger():
     """
     Initialize a logger to be used throughout the packager
     """
@@ -56,10 +56,10 @@ def init_logger():
                  ' and permissions to write to {0}'
                  .format(logfile))
 
-lgr = init_logger()
+lgr = _init_logger()
 
 
-def handle(func):
+def _handle(func):
     """
     handles errors triggered by fabric
     """
@@ -77,7 +77,7 @@ def get_package_configuration(component):
     retrieves a package's configuration from packages.PACKAGES
 
     :param string component: component name to retrieve config for.
-    :rtype: component dict
+    :rtype: ``dict``
     """
     lgr.debug('retrieving configuration for {0}'.format(component))
     try:
@@ -90,12 +90,39 @@ def get_package_configuration(component):
         sys.exit(1)
 
 
-def get(package=False, version=False, source_repo=False, source_ppa=False,
-        source_key=False, source_url=False, key_file=False, reqs=False,
-        dst_path=False, name=False, package_path=False, modules=False,
+def get(package=False, name=False, version=False, source_url=False,
+        source_repo=False, source_ppa=False, source_key=False, key_file=False,
+        reqs=False, dst_path=False, package_path=False, modules=False,
         gems=False, overwrite=True):
     """
     retrieves resources for packaging
+
+    .. note:: by default, the params are defined by packages.py
+     they can be overriden explicitly by sending them to the pack
+     function.
+
+    .. note:: param names in packages.py can be overriden by editing
+     definitions.py
+
+    :param dict package: dict representing package config
+     as configured in packages.py
+    :param string name: package's name
+     will be appended to the filename and to the package
+     depending on its type
+    :param string version: version to append to package
+    :param string source_url: source url to download
+    :param string source_repo: source repo to add for package retrieval
+    :param string source_ppa: source ppa to add for package retrieval
+    :param string source_key: source key to download
+    :param string key_file: key file path
+    :param list reqs: list of apt requirements
+    :param string dst_path: path where downloaded source are placed
+    :param string package_path: path where final package is placed
+    :param list modules: list of python modules to download
+    :param list gems: list of ruby gems to download
+    :param bool overwrite: indicated whether the sources directory be
+     erased before creating a new package
+    :rtype: ``None``
     """
 
     # TODO: source_url should become source_urls list
@@ -211,6 +238,7 @@ def pack(package, name=False, src_type=False, dst_type=False,
      config files
     :param bool overwrite: indicated whether the destination directory be
      erased before creating a new package
+    :rtype: ``None``
     """
 
     # get the cwd since fpm will later change it.
@@ -364,8 +392,8 @@ def pack(package, name=False, src_type=False, dst_type=False,
     lgr.info('package creation completed successfully!')
 
 
-def do(command, retries=2,
-       sleeper=3, capture=False, combine_stderr=False):
+def do(command, retries=2, sleeper=3,
+       capture=False, combine_stderr=False):
     """
     executes a command locally with retries on failure.
 
@@ -374,7 +402,7 @@ def do(command, retries=2,
     :param int sleeper: sleeptime between retries
     :param bool capture: should the output be captured for parsing?
     :param bool combine_stderr: combine stdout and stderr
-    :rtype: fabric ``responseObject``
+    :rtype: ``responseObject`` (for fabric operation)
     """
     def _execute():
         for execution in xrange(retries):
@@ -401,9 +429,16 @@ def do(command, retries=2,
 
 
 class CommonHandler():
+    """
+    common class to handle files and directories
+    """
     def find_in_dir(self, dir, pattern):
         """
         finds a string/file pattern in a dir
+
+        :param string dir: directory to look in
+        :param string patten: what to look for
+        :rtype: ``stdout`` if found, else ``None``
         """
         lgr.debug('looking for {0} in {1}'.format(pattern, dir))
         x = do('find {0} -iname "{1}" -exec echo {} \;'
@@ -413,6 +448,8 @@ class CommonHandler():
     def is_dir(self, dir):
         """
         checks if a directory exists
+
+        :param
         """
         lgr.debug('checking if {0} exists'.format(dir))
         if os.path.isdir(dir):
@@ -494,6 +531,9 @@ class CommonHandler():
 
 
 class PythonHandler(CommonHandler):
+    """
+    python operations handler
+    """
     def pip(self, module, dir):
         """
         pip installs a module

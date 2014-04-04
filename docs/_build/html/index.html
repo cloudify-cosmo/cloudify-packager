@@ -125,7 +125,8 @@
 <dl class="class">
 <dt id="packager.CommonHandler">
 <em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">CommonHandler</tt><a class="headerlink" href="#packager.CommonHandler" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>common class to handle files and directories</p>
+<dl class="method">
 <dt id="packager.CommonHandler.cp">
 <tt class="descname">cp</tt><big>(</big><em>src</em>, <em>dst</em>, <em>recurse=True</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.cp" title="Permalink to this definition">¶</a></dt>
 <dd><p>copies (recuresively or not) files or directories</p>
@@ -135,12 +136,28 @@
 <dt id="packager.CommonHandler.find_in_dir">
 <tt class="descname">find_in_dir</tt><big>(</big><em>dir</em>, <em>pattern</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.find_in_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>finds a string/file pattern in a dir</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dir</strong> (<em>string</em>) &#8211; directory to look in</li>
+<li><strong>patten</strong> (<em>string</em>) &#8211; what to look for</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">stdout</span></tt> if found, else <tt class="docutils literal"><span class="pre">None</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.CommonHandler.is_dir">
 <tt class="descname">is_dir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.is_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks if a directory exists</p>
+<p>:param</p>
 </dd></dl>
 
 <dl class="method">
@@ -210,6 +227,7 @@ creates directories for managing packages</p>
 <dt id="packager.PythonHandler">
 <em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">PythonHandler</tt><a class="headerlink" href="#packager.PythonHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<p>python operations handler</p>
 <dl class="method">
 <dt id="packager.PythonHandler.check_module_installed">
 <tt class="descname">check_module_installed</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.check_module_installed" title="Permalink to this definition">¶</a></dt>
@@ -303,7 +321,7 @@ according to a provided variable dictionary</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">responseObject</span></tt></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">responseObject</span></tt> (for fabric operation)</p>
 </td>
 </tr>
 </tbody>
@@ -312,26 +330,66 @@ according to a provided variable dictionary</p>
 
 <dl class="function">
 <dt id="packager.get">
-<tt class="descclassname">packager.</tt><tt class="descname">get</tt><big>(</big><em>package=False</em>, <em>version=False</em>, <em>source_repo=False</em>, <em>source_ppa=False</em>, <em>source_key=False</em>, <em>source_url=False</em>, <em>key_file=False</em>, <em>reqs=False</em>, <em>dst_path=False</em>, <em>name=False</em>, <em>package_path=False</em>, <em>modules=False</em>, <em>gems=False</em>, <em>overwrite=True</em><big>)</big><a class="headerlink" href="#packager.get" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">packager.</tt><tt class="descname">get</tt><big>(</big><em>package=False</em>, <em>name=False</em>, <em>version=False</em>, <em>source_url=False</em>, <em>source_repo=False</em>, <em>source_ppa=False</em>, <em>source_key=False</em>, <em>key_file=False</em>, <em>reqs=False</em>, <em>dst_path=False</em>, <em>package_path=False</em>, <em>modules=False</em>, <em>gems=False</em>, <em>overwrite=True</em><big>)</big><a class="headerlink" href="#packager.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves resources for packaging</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by default, the params are defined by packages.py
+they can be overriden explicitly by sending them to the pack
+function.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">param names in packages.py can be overriden by editing
+definitions.py</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>package</strong> (<em>dict</em>) &#8211; dict representing package config
+as configured in packages.py</li>
+<li><strong>name</strong> (<em>string</em>) &#8211; package&#8217;s name
+will be appended to the filename and to the package
+depending on its type</li>
+<li><strong>version</strong> (<em>string</em>) &#8211; version to append to package</li>
+<li><strong>source_url</strong> (<em>string</em>) &#8211; source url to download</li>
+<li><strong>source_repo</strong> (<em>string</em>) &#8211; source repo to add for package retrieval</li>
+<li><strong>source_ppa</strong> (<em>string</em>) &#8211; source ppa to add for package retrieval</li>
+<li><strong>source_key</strong> (<em>string</em>) &#8211; source key to download</li>
+<li><strong>key_file</strong> (<em>string</em>) &#8211; key file path</li>
+<li><strong>reqs</strong> (<em>list</em>) &#8211; list of apt requirements</li>
+<li><strong>dst_path</strong> (<em>string</em>) &#8211; path where downloaded source are placed</li>
+<li><strong>package_path</strong> (<em>string</em>) &#8211; path where final package is placed</li>
+<li><strong>modules</strong> (<em>list</em>) &#8211; list of python modules to download</li>
+<li><strong>gems</strong> (<em>list</em>) &#8211; list of ruby gems to download</li>
+<li><strong>overwrite</strong> (<em>bool</em>) &#8211; indicated whether the sources directory be
+erased before creating a new package</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">None</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="packager.get_package_configuration">
 <tt class="descclassname">packager.</tt><tt class="descname">get_package_configuration</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packager.get_package_configuration" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves a package&#8217;s configuration from packages.PACKAGES</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="packager.handle">
-<tt class="descclassname">packager.</tt><tt class="descname">handle</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#packager.handle" title="Permalink to this definition">¶</a></dt>
-<dd><p>handles errors triggered by fabric</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="packager.init_logger">
-<tt class="descclassname">packager.</tt><tt class="descname">init_logger</tt><big>(</big><big>)</big><a class="headerlink" href="#packager.init_logger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize a logger to be used throughout the packager</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>component</strong> (<em>string</em>) &#8211; component name to retrieve config for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="docutils literal"><span class="pre">dict</span></tt></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -362,7 +420,7 @@ definitions.py</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>package</strong> (<em>dict</em>) &#8211; dict representing package config
 as configured in packages.py</li>
 <li><strong>name</strong> (<em>string</em>) &#8211; package&#8217;s name
@@ -383,6 +441,9 @@ erased before creating a new package</li>
 </ul>
 </td>
 </tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">None</span></tt></p>
+</td>
+</tr>
 </tbody>
 </table>
 </dd></dl>
@@ -390,7 +451,8 @@ erased before creating a new package</li>
 <dl class="class">
 <dt>
 <em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">CommonHandler</tt></dt>
-<dd><dl class="method">
+<dd><p>common class to handle files and directories</p>
+<dl class="method">
 <dt>
 <tt class="descname">cp</tt><big>(</big><em>src</em>, <em>dst</em>, <em>recurse=True</em><big>)</big></dt>
 <dd><p>copies (recuresively or not) files or directories</p>
@@ -400,12 +462,28 @@ erased before creating a new package</li>
 <dt>
 <tt class="descname">find_in_dir</tt><big>(</big><em>dir</em>, <em>pattern</em><big>)</big></dt>
 <dd><p>finds a string/file pattern in a dir</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dir</strong> (<em>string</em>) &#8211; directory to look in</li>
+<li><strong>patten</strong> (<em>string</em>) &#8211; what to look for</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">stdout</span></tt> if found, else <tt class="docutils literal"><span class="pre">None</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">is_dir</tt><big>(</big><em>dir</em><big>)</big></dt>
 <dd><p>checks if a directory exists</p>
+<p>:param</p>
 </dd></dl>
 
 <dl class="method">
@@ -552,6 +630,7 @@ creates directories for managing packages</p>
 <dt>
 <em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">PythonHandler</tt></dt>
 <dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<p>python operations handler</p>
 <dl class="method">
 <dt>
 <tt class="descname">check_module_installed</tt><big>(</big><em>name</em><big>)</big></dt>
