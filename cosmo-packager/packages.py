@@ -30,7 +30,7 @@ PACKAGES = {
         "bootstrap_script_in_pkg": "{0}/cloudify3-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "cloudify3-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
-        "overwrite": False,
+        "overwrite_package": False,
         "config_templates": {
             "__params_celery": {
                 "defaults_path": "/etc/default/celeryd-cloudify.management",
@@ -58,7 +58,7 @@ PACKAGES = {
         "bootstrap_script_in_pkg": "{0}/cloudify3-components-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "cloudify3-components-bootstrap.template",
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
-        "overwrite": False,
+        "overwrite_package": False,
         "bootstrap_params": {
             "req_free_mem": "10000",
             "req_free_disk": "5",

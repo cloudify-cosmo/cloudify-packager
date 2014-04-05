@@ -59,47 +59,124 @@
 <dt id="packager.AptHandler.add_key">
 <tt class="descname">add_key</tt><big>(</big><em>key_file</em><big>)</big><a class="headerlink" href="#packager.AptHandler.add_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>adds a key to the local repo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key_file</strong> (<em>string</em>) &#8211; key file path</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.AptHandler.add_ppa_repo">
 <tt class="descname">add_ppa_repo</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#packager.AptHandler.add_ppa_repo" title="Permalink to this definition">¶</a></dt>
 <dd><p>adds a ppa repo to the apt repo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> (<em>string</em>) &#8211; ppa url to add</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.AptHandler.add_src_repo">
 <tt class="descname">add_src_repo</tt><big>(</big><em>url</em>, <em>mark</em><big>)</big><a class="headerlink" href="#packager.AptHandler.add_src_repo" title="Permalink to this definition">¶</a></dt>
 <dd><p>adds a source repo to the apt repo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>url</strong> (<em>string</em>) &#8211; url to add to sources list</li>
+<li><strong>mark</strong> (<em>string</em>) &#8211; package mark (stable, etc...)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.AptHandler.apt_autoremove">
 <tt class="descname">apt_autoremove</tt><big>(</big><em>pkg</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_autoremove" title="Permalink to this definition">¶</a></dt>
 <dd><p>autoremoves package dependencies</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pkg</strong> (<em>string</em>) &#8211; package to remove</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.AptHandler.apt_download">
 <tt class="descname">apt_download</tt><big>(</big><em>pkg</em>, <em>dir</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_download" title="Permalink to this definition">¶</a></dt>
 <dd><p>uses apt to download package debs from ubuntu&#8217;s repo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pkg</strong> (<em>string</em>) &#8211; package to download</li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; dir to download to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.AptHandler.apt_download_reqs">
-<tt class="descname">apt_download_reqs</tt><big>(</big><em>req_list</em>, <em>sources_path</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_download_reqs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">apt_download_reqs</tt><big>(</big><em>reqs</em>, <em>sources_path</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_download_reqs" title="Permalink to this definition">¶</a></dt>
+<dd><p>downloads component requirements</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>reqs</strong> (<em>list</em>) &#8211; list of requirements to download</li>
+<li><strong>sources_path</strong> &#8211; path to download requirements to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="packager.AptHandler.apt_get">
-<tt class="descname">apt_get</tt><big>(</big><em>list</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_get" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">apt_get</tt><big>(</big><em>packages</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>apt-get installs a package</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>packages</strong> (<em>list</em>) &#8211; packages to install</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.AptHandler.apt_purge">
 <tt class="descname">apt_purge</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_purge" title="Permalink to this definition">¶</a></dt>
 <dd><p>completely purges a package from the local repo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> (<em>string</em>) &#8211; package name to purge</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -112,12 +189,30 @@
 <dt id="packager.AptHandler.check_if_package_is_installed">
 <tt class="descname">check_if_package_is_installed</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#packager.AptHandler.check_if_package_is_installed" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks if a package is installed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> (<em>string</em>) &#8211; package name to check</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool representing whether package is installed or not</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.AptHandler.dpkg_name">
 <tt class="descname">dpkg_name</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.AptHandler.dpkg_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>renames deb files to conventional names</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dir</strong> (<em>string</em>) &#8211; dir to review</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -130,6 +225,19 @@
 <dt id="packager.CommonHandler.cp">
 <tt class="descname">cp</tt><big>(</big><em>src</em>, <em>dst</em>, <em>recurse=True</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.cp" title="Permalink to this definition">¶</a></dt>
 <dd><p>copies (recuresively or not) files or directories</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>src</strong> (<em>string</em>) &#8211; source to copy</li>
+<li><strong>dst</strong> (<em>string</em>) &#8211; destination to copy to</li>
+<li><strong>recurse</strong> (<em>bool</em>) &#8211; should the copying process be recursive?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -157,13 +265,28 @@
 <dt id="packager.CommonHandler.is_dir">
 <tt class="descname">is_dir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.is_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks if a directory exists</p>
-<p>:param</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dir</strong> (<em>string</em>) &#8211; directory to check</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.CommonHandler.is_file">
 <tt class="descname">is_file</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.is_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks if a file exists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file</strong> (<em>string</em>) &#8211; file to check</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -177,30 +300,79 @@ creates directories for managing packages</p>
 <dt id="packager.CommonHandler.mkdir">
 <tt class="descname">mkdir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.mkdir" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates (recursively) a directory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dir</strong> (<em>string</em>) &#8211; directory to create</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.CommonHandler.rm">
 <tt class="descname">rm</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.rm" title="Permalink to this definition">¶</a></dt>
 <dd><p>deletes a file or a set of files</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file(s)</strong> (<em>string</em>) &#8211; file(s) to remove</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.CommonHandler.rmdir">
 <tt class="descname">rmdir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.rmdir" title="Permalink to this definition">¶</a></dt>
 <dd><p>deletes a directory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dir</strong> (<em>string</em>) &#8211; directory to remove</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.CommonHandler.tar">
-<tt class="descname">tar</tt><big>(</big><em>chdir</em>, <em>output_file</em>, <em>input</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.tar" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">tar</tt><big>(</big><em>chdir</em>, <em>output_file</em>, <em>input_path</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.tar" title="Permalink to this definition">¶</a></dt>
 <dd><p>tars an input file or directory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>chdir</strong> (<em>string</em>) &#8211; change to this dir before archiving</li>
+<li><strong>output_file</strong> (<em>string</em>) &#8211; tar output file path</li>
+<li><strong>input</strong> (<em>string</em>) &#8211; input path to create tar from</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.CommonHandler.untar">
 <tt class="descname">untar</tt><big>(</big><em>chdir</em>, <em>input_file</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.untar" title="Permalink to this definition">¶</a></dt>
 <dd><p>untars a dir</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>chdir</strong> (<em>string</em>) &#8211; change to this dir before extracting</li>
+<li><strong>input_file</strong> (<em>string</em>) &#8211; file to untar</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -213,6 +385,19 @@ creates directories for managing packages</p>
 <dt id="packager.DownloadsHandler.wget">
 <tt class="descname">wget</tt><big>(</big><em>url</em>, <em>dir=False</em>, <em>file=False</em><big>)</big><a class="headerlink" href="#packager.DownloadsHandler.wget" title="Permalink to this definition">¶</a></dt>
 <dd><p>wgets a url to a destination directory or file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>url</strong> (<em>string</em>) &#8211; url to wget?</li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; download to dir....</li>
+<li><strong>file</strong> (<em>string</em>) &#8211; download to file...</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -230,26 +415,73 @@ creates directories for managing packages</p>
 <p>python operations handler</p>
 <dl class="method">
 <dt id="packager.PythonHandler.check_module_installed">
-<tt class="descname">check_module_installed</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.check_module_installed" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">check_module_installed</tt><big>(</big><em>name</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.check_module_installed" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks to see that a module is installed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; module to check for</li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; (optional) if ommited, will use system python
+else, will use <cite>dir</cite> (for virtualenvs and such)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.PythonHandler.get_python_module">
-<tt class="descname">get_python_module</tt><big>(</big><em>module</em>, <em>dir</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.get_python_module" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_python_module</tt><big>(</big><em>module</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.get_python_module" title="Permalink to this definition">¶</a></dt>
 <dd><p>downloads a python module</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>module</strong> (<em>string</em>) &#8211; python module to download</li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; (optional) if ommited, will use system python
+else, will use <cite>dir</cite> (for virtualenvs and such)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.PythonHandler.pip">
-<tt class="descname">pip</tt><big>(</big><em>module</em>, <em>dir</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.pip" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pip</tt><big>(</big><em>module</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.pip" title="Permalink to this definition">¶</a></dt>
 <dd><p>pip installs a module</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>module</strong> (<em>string</em>) &#8211; python module to <tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span></tt></li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; (optional) if ommited, will use system python
+else, will use <cite>dir</cite> (for virtualenvs and such)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="packager.PythonHandler.venv">
-<tt class="descname">venv</tt><big>(</big><em>root_dir</em>, <em>name=False</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.venv" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">venv</tt><big>(</big><em>venv_dir</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.venv" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates a virtualenv</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>venv_dir</strong> (<em>string</em>) &#8211; venv path to create</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -260,8 +492,20 @@ creates directories for managing packages</p>
 <dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
 <dl class="method">
 <dt id="packager.RubyHandler.get_ruby_gem">
-<tt class="descname">get_ruby_gem</tt><big>(</big><em>gem</em>, <em>dir</em><big>)</big><a class="headerlink" href="#packager.RubyHandler.get_ruby_gem" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_ruby_gem</tt><big>(</big><em>gem</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packager.RubyHandler.get_ruby_gem" title="Permalink to this definition">¶</a></dt>
 <dd><p>downloads a ruby gem</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>gem</strong> (<em>string</em>) &#8211; gem to download</li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; directory to download gem to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -330,13 +574,11 @@ according to a provided variable dictionary</p>
 
 <dl class="function">
 <dt id="packager.get">
-<tt class="descclassname">packager.</tt><tt class="descname">get</tt><big>(</big><em>package=False</em>, <em>name=False</em>, <em>version=False</em>, <em>source_url=False</em>, <em>source_repo=False</em>, <em>source_ppa=False</em>, <em>source_key=False</em>, <em>key_file=False</em>, <em>reqs=False</em>, <em>dst_path=False</em>, <em>package_path=False</em>, <em>modules=False</em>, <em>gems=False</em>, <em>overwrite=True</em><big>)</big><a class="headerlink" href="#packager.get" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">packager.</tt><tt class="descname">get</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packager.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves resources for packaging</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">by default, the params are defined by packages.py
-they can be overriden explicitly by sending them to the pack
-function.</p>
+<p class="last">component params are defined in packages.py</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -393,13 +635,19 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="function">
+<dt id="packager.init_logger">
+<tt class="descclassname">packager.</tt><tt class="descname">init_logger</tt><big>(</big><big>)</big><a class="headerlink" href="#packager.init_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a logger to be used throughout the packager</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="packager.main">
 <tt class="descclassname">packager.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="headerlink" href="#packager.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="packager.pack">
-<tt class="descclassname">packager.</tt><tt class="descname">pack</tt><big>(</big><em>package</em>, <em>name=False</em>, <em>src_type=False</em>, <em>dst_type=False</em>, <em>src_path=False</em>, <em>dst_path=False</em>, <em>version=False</em>, <em>package_path=False</em>, <em>bootstrap_script=False</em>, <em>bootstrap_template=False</em>, <em>depends=False</em>, <em>bootstrap_script_in_pkg=False</em>, <em>config_templates=False</em>, <em>overwrite=True</em><big>)</big><a class="headerlink" href="#packager.pack" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">packager.</tt><tt class="descname">pack</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packager.pack" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>creates a package according to the provided package configuration</dt>
 <dd>in packages.py</dd>
@@ -407,9 +655,7 @@ erased before creating a new package</li>
 <p>uses fpm (<a class="reference external" href="https://github.com/jordansissel/fpm/wiki">https://github.com/jordansissel/fpm/wiki</a>) to create packages.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">by default, the params are defined by packages.py
-they can be overriden explicitly by sending them to the pack
-function.</p>
+<p class="last">component params are defined in packages.py</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -421,16 +667,17 @@ definitions.py</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>package</strong> (<em>dict</em>) &#8211; dict representing package config
+<li><strong>component</strong> (<em>string</em>) &#8211; string representing component name
 as configured in packages.py</li>
 <li><strong>name</strong> (<em>string</em>) &#8211; package&#8217;s name
 will be appended to the filename and to the package
 depending on its type</li>
-<li><strong>src_type</strong> (<em>string</em>) &#8211; package source type (as supported by fpm)</li>
-<li><strong>dst_type</strong> (<em>string</em>) &#8211; package destination type (as supported by fpm)</li>
-<li><strong>src_path</strong> (<em>string</em>) &#8211; path from which package will be created</li>
-<li><strong>dst_path</strong> (<em>string</em>) &#8211; path where temp package is placed</li>
 <li><strong>version</strong> (<em>string</em>) &#8211; version to append to package</li>
+<li><strong>src_pkg_type</strong> (<em>string</em>) &#8211; package source type (as supported by fpm)</li>
+<li><strong>dst_pkg_type</strong> (<em>string</em>) &#8211; package destination type (as supported by fpm)</li>
+<li><strong>src_path</strong> (<em>string</em>) &#8211; path containing sources
+from which package will be created</li>
+<li><strong>tmp_pkg_path</strong> (<em>string</em>) &#8211; path where temp package is placed</li>
 <li><strong>package_path</strong> (<em>string</em>) &#8211; path where final package is placed</li>
 <li><strong>bootstrap_script</strong> (<em>string</em>) &#8211; path to place generated script</li>
 <li><strong>bootstrap_script_in_pkg</strong> (<em>string</em>) &#8211; </li>
@@ -456,6 +703,19 @@ erased before creating a new package</li>
 <dt>
 <tt class="descname">cp</tt><big>(</big><em>src</em>, <em>dst</em>, <em>recurse=True</em><big>)</big></dt>
 <dd><p>copies (recuresively or not) files or directories</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>src</strong> (<em>string</em>) &#8211; source to copy</li>
+<li><strong>dst</strong> (<em>string</em>) &#8211; destination to copy to</li>
+<li><strong>recurse</strong> (<em>bool</em>) &#8211; should the copying process be recursive?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -483,13 +743,28 @@ erased before creating a new package</li>
 <dt>
 <tt class="descname">is_dir</tt><big>(</big><em>dir</em><big>)</big></dt>
 <dd><p>checks if a directory exists</p>
-<p>:param</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dir</strong> (<em>string</em>) &#8211; directory to check</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">is_file</tt><big>(</big><em>file</em><big>)</big></dt>
 <dd><p>checks if a file exists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file</strong> (<em>string</em>) &#8211; file to check</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -503,30 +778,79 @@ creates directories for managing packages</p>
 <dt>
 <tt class="descname">mkdir</tt><big>(</big><em>dir</em><big>)</big></dt>
 <dd><p>creates (recursively) a directory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dir</strong> (<em>string</em>) &#8211; directory to create</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">rm</tt><big>(</big><em>file</em><big>)</big></dt>
 <dd><p>deletes a file or a set of files</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file(s)</strong> (<em>string</em>) &#8211; file(s) to remove</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">rmdir</tt><big>(</big><em>dir</em><big>)</big></dt>
 <dd><p>deletes a directory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dir</strong> (<em>string</em>) &#8211; directory to remove</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
-<tt class="descname">tar</tt><big>(</big><em>chdir</em>, <em>output_file</em>, <em>input</em><big>)</big></dt>
+<tt class="descname">tar</tt><big>(</big><em>chdir</em>, <em>output_file</em>, <em>input_path</em><big>)</big></dt>
 <dd><p>tars an input file or directory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>chdir</strong> (<em>string</em>) &#8211; change to this dir before archiving</li>
+<li><strong>output_file</strong> (<em>string</em>) &#8211; tar output file path</li>
+<li><strong>input</strong> (<em>string</em>) &#8211; input path to create tar from</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">untar</tt><big>(</big><em>chdir</em>, <em>input_file</em><big>)</big></dt>
 <dd><p>untars a dir</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>chdir</strong> (<em>string</em>) &#8211; change to this dir before extracting</li>
+<li><strong>input_file</strong> (<em>string</em>) &#8211; file to untar</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -539,47 +863,124 @@ creates directories for managing packages</p>
 <dt>
 <tt class="descname">add_key</tt><big>(</big><em>key_file</em><big>)</big></dt>
 <dd><p>adds a key to the local repo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key_file</strong> (<em>string</em>) &#8211; key file path</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">add_ppa_repo</tt><big>(</big><em>url</em><big>)</big></dt>
 <dd><p>adds a ppa repo to the apt repo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> (<em>string</em>) &#8211; ppa url to add</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">add_src_repo</tt><big>(</big><em>url</em>, <em>mark</em><big>)</big></dt>
 <dd><p>adds a source repo to the apt repo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>url</strong> (<em>string</em>) &#8211; url to add to sources list</li>
+<li><strong>mark</strong> (<em>string</em>) &#8211; package mark (stable, etc...)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">apt_autoremove</tt><big>(</big><em>pkg</em><big>)</big></dt>
 <dd><p>autoremoves package dependencies</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pkg</strong> (<em>string</em>) &#8211; package to remove</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">apt_download</tt><big>(</big><em>pkg</em>, <em>dir</em><big>)</big></dt>
 <dd><p>uses apt to download package debs from ubuntu&#8217;s repo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pkg</strong> (<em>string</em>) &#8211; package to download</li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; dir to download to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
-<tt class="descname">apt_download_reqs</tt><big>(</big><em>req_list</em>, <em>sources_path</em><big>)</big></dt>
-<dd></dd></dl>
+<tt class="descname">apt_download_reqs</tt><big>(</big><em>reqs</em>, <em>sources_path</em><big>)</big></dt>
+<dd><p>downloads component requirements</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>reqs</strong> (<em>list</em>) &#8211; list of requirements to download</li>
+<li><strong>sources_path</strong> &#8211; path to download requirements to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt>
-<tt class="descname">apt_get</tt><big>(</big><em>list</em><big>)</big></dt>
+<tt class="descname">apt_get</tt><big>(</big><em>packages</em><big>)</big></dt>
 <dd><p>apt-get installs a package</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>packages</strong> (<em>list</em>) &#8211; packages to install</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">apt_purge</tt><big>(</big><em>package</em><big>)</big></dt>
 <dd><p>completely purges a package from the local repo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> (<em>string</em>) &#8211; package name to purge</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -592,12 +993,30 @@ creates directories for managing packages</p>
 <dt>
 <tt class="descname">check_if_package_is_installed</tt><big>(</big><em>package</em><big>)</big></dt>
 <dd><p>checks if a package is installed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> (<em>string</em>) &#8211; package name to check</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool representing whether package is installed or not</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
 <tt class="descname">dpkg_name</tt><big>(</big><em>dir</em><big>)</big></dt>
 <dd><p>renames deb files to conventional names</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dir</strong> (<em>string</em>) &#8211; dir to review</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -610,6 +1029,19 @@ creates directories for managing packages</p>
 <dt>
 <tt class="descname">wget</tt><big>(</big><em>url</em>, <em>dir=False</em>, <em>file=False</em><big>)</big></dt>
 <dd><p>wgets a url to a destination directory or file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>url</strong> (<em>string</em>) &#8211; url to wget?</li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; download to dir....</li>
+<li><strong>file</strong> (<em>string</em>) &#8211; download to file...</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -620,8 +1052,20 @@ creates directories for managing packages</p>
 <dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
 <dl class="method">
 <dt>
-<tt class="descname">get_ruby_gem</tt><big>(</big><em>gem</em>, <em>dir</em><big>)</big></dt>
+<tt class="descname">get_ruby_gem</tt><big>(</big><em>gem</em>, <em>dir=False</em><big>)</big></dt>
 <dd><p>downloads a ruby gem</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>gem</strong> (<em>string</em>) &#8211; gem to download</li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; directory to download gem to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -633,26 +1077,73 @@ creates directories for managing packages</p>
 <p>python operations handler</p>
 <dl class="method">
 <dt>
-<tt class="descname">check_module_installed</tt><big>(</big><em>name</em><big>)</big></dt>
+<tt class="descname">check_module_installed</tt><big>(</big><em>name</em>, <em>dir=False</em><big>)</big></dt>
 <dd><p>checks to see that a module is installed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; module to check for</li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; (optional) if ommited, will use system python
+else, will use <cite>dir</cite> (for virtualenvs and such)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
-<tt class="descname">get_python_module</tt><big>(</big><em>module</em>, <em>dir</em><big>)</big></dt>
+<tt class="descname">get_python_module</tt><big>(</big><em>module</em>, <em>dir=False</em><big>)</big></dt>
 <dd><p>downloads a python module</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>module</strong> (<em>string</em>) &#8211; python module to download</li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; (optional) if ommited, will use system python
+else, will use <cite>dir</cite> (for virtualenvs and such)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
-<tt class="descname">pip</tt><big>(</big><em>module</em>, <em>dir</em><big>)</big></dt>
+<tt class="descname">pip</tt><big>(</big><em>module</em>, <em>dir=False</em><big>)</big></dt>
 <dd><p>pip installs a module</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>module</strong> (<em>string</em>) &#8211; python module to <tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span></tt></li>
+<li><strong>dir</strong> (<em>string</em>) &#8211; (optional) if ommited, will use system python
+else, will use <cite>dir</cite> (for virtualenvs and such)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt>
-<tt class="descname">venv</tt><big>(</big><em>root_dir</em>, <em>name=False</em><big>)</big></dt>
+<tt class="descname">venv</tt><big>(</big><em>venv_dir</em><big>)</big></dt>
 <dd><p>creates a virtualenv</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>venv_dir</strong> (<em>string</em>) &#8211; venv path to create</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

@@ -25,7 +25,6 @@ from fabric.contrib.files import exists
 from packager import *  # NOQA
 from get import *  # NOQA
 from pkg import *  # NOQA
-from templgen import *  # NOQA
 
 lgr = init_logger()
 
