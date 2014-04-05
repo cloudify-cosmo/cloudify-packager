@@ -90,10 +90,7 @@ def get_package_configuration(component):
         sys.exit(1)
 
 
-def get(package=False, name=False, version=False, source_url=False,
-        source_repo=False, source_ppa=False, source_key=False, key_file=False,
-        reqs=False, dst_path=False, package_path=False, modules=False,
-        gems=False, overwrite=True):
+def get(package, *args, **kwargs):
     """
     retrieves resources for packaging
 
@@ -127,24 +124,20 @@ def get(package=False, name=False, version=False, source_url=False,
 
     # TODO: source_url should become source_urls list
     # define params for packaging
-    version = package['version'] \
-        if not version else version
     source_repo = package['source_repo'] \
         if not source_repo else source_repo
     source_ppa = package['source_ppa'] \
         if not source_ppa else source_ppa
     source_key = package['source_key'] \
         if not source_key else source_key
-    source_url = package['source_url'] \
-        if not source_url else source_url
+    source_urls = package['source_urls'] \
+        if not definitions.SOURCE_URLS else source_urls
     key_file = package['key_file'] \
         if not key_file else key_file
     reqs = package['reqs'] \
         if not reqs else reqs
     dst_path = package['sources_path'] \
         if not dst_path else dst_path
-    name = package['name'] \
-        if not name else name
     package_path = package['package_path'] \
         if not package_path else package_path
     modules = package['modules'] \
@@ -182,10 +175,9 @@ def get(package=False, name=False, version=False, source_url=False,
     if source_key:
         dl_handler.wget(source_key, dst_path)
     # retrieve the source for the package
-    if source_url:
-        wget(
-            source_url,
-            dst_path)
+    if source_urls:
+        for url in source_urls:
+            dl_handler.wget(url, dst_path)
     # add the repo key
     if key_file:
         apt_handler.add_key(key_file)
@@ -203,11 +195,7 @@ def get(package=False, name=False, version=False, source_url=False,
             ruby_handler.get_ruby_gem(gem, dst_path)
 
 
-def pack(package, name=False, src_type=False, dst_type=False,
-         src_path=False, dst_path=False, version=False, package_path=False,
-         bootstrap_script=False, bootstrap_template=False, depends=False,
-         bootstrap_script_in_pkg=False, config_templates=False,
-         overwrite=True):
+def pack(component, *args, **kwargs):
     """
     creates a package according to the provided package configuration
      in packages.py
@@ -221,16 +209,17 @@ def pack(package, name=False, src_type=False, dst_type=False,
     .. note:: param names in packages.py can be overriden by editing
      definitions.py
 
-    :param dict package: dict representing package config
+    :param string component: string representing component name
      as configured in packages.py
     :param string name: package's name
      will be appended to the filename and to the package
      depending on its type
-    :param string src_type: package source type (as supported by fpm)
-    :param string dst_type: package destination type (as supported by fpm)
-    :param string src_path: path from which package will be created
-    :param string dst_path: path where temp package is placed
     :param string version: version to append to package
+    :param string src_pkg_type: package source type (as supported by fpm)
+    :param string dst_pkg_type: package destination type (as supported by fpm)
+    :param string src_path: path containing sources
+     from which package will be created
+    :param string tmp_pkg_path: path where temp package is placed
     :param string package_path: path where final package is placed
     :param string bootstrap_script: path to place generated script
     :param string bootstrap_script_in_pkg:
@@ -244,54 +233,55 @@ def pack(package, name=False, src_type=False, dst_type=False,
     # get the cwd since fpm will later change it.
     cwd = os.getcwd()
 
+    c = get_package_configuration(component)
     # define params for packaging
-    bootstrap_template = package[definitions.PARAM_BOOTSTRAP_TEMPLATE_PATH] \
-        if definitions.PARAM_BOOTSTRAP_TEMPLATE_PATH in package \
+    bootstrap_template = c[definitions.PARAM_BOOTSTRAP_TEMPLATE_PATH] \
+        if definitions.PARAM_BOOTSTRAP_TEMPLATE_PATH in c \
         else bootstrap_template
-    bootstrap_script = package[definitions.PARAM_BOOTSTRAP_SCRIPT_PATH] \
-        if definitions.PARAM_BOOTSTRAP_SCRIPT_PATH in package \
+    bootstrap_script = c[definitions.PARAM_BOOTSTRAP_SCRIPT_PATH] \
+        if definitions.PARAM_BOOTSTRAP_SCRIPT_PATH in c \
         else bootstrap_script
     bootstrap_script_in_pkg = cwd + '/' + \
-        package[definitions.PARAM_BOOTSTRAP_SCRIPT_IN_PACKAGE_PATH] \
-        if definitions.PARAM_BOOTSTRAP_SCRIPT_IN_PACKAGE_PATH in package \
+        c[definitions.PARAM_BOOTSTRAP_SCRIPT_IN_PACKAGE_PATH] \
+        if definitions.PARAM_BOOTSTRAP_SCRIPT_IN_PACKAGE_PATH in c \
         else bootstrap_script_in_pkg
-    src_type = package[definitions.PARAM_SOURCE_PACKAGE_TYPE] \
-        if definitions.PARAM_SOURCE_PACKAGE_TYPE in package \
-        else src_type
-    dst_type = package[definitions.PARAM_DESTINATION_PACKAGE_TYPE] \
-        if definitions.PARAM_DESTINATION_PACKAGE_TYPE in package \
-        else dst_type
-    name = package[definitions.PARAM_NAME] \
-        if definitions.PARAM_NAME in package \
+    src_pkg_type = c[definitions.PARAM_SOURCE_PACKAGE_TYPE] \
+        if definitions.PARAM_SOURCE_PACKAGE_TYPE in c \
+        else src_pkg_type
+    dst_pkg_type = c[definitions.PARAM_DESTINATION_PACKAGE_TYPE] \
+        if definitions.PARAM_DESTINATION_PACKAGE_TYPE in c \
+        else dst_pkg_type
+    name = c[definitions.PARAM_NAME] \
+        if definitions.PARAM_NAME in c \
         else name
-    src_path = package[definitions.PARAM_SOURCES_PATH] \
-        if definitions.PARAM_SOURCES_PATH in package else src_path
+    sources_path = c[definitions.PARAM_SOURCES_PATH] \
+        if definitions.PARAM_SOURCES_PATH in c else sources_path
     # TODO: JEEZ... this archives thing is dumb...
     # replace it with a normal destination path
-    dst_path = '{0}/archives'.format(package[definitions.PARAM_SOURCES_PATH]) \
-        if not dst_path \
-        else dst_path
-    version = package[definitions.PARAM_VERSION] \
-        if definitions.PARAM_VERSION in package \
+    tmp_pkg_path = '{0}/archives'.format(c[definitions.PARAM_SOURCES_PATH]) \
+        if not tmp_pkg_path \
+        else tmp_pkg_path
+    version = c[definitions.PARAM_VERSION] \
+        if definitions.PARAM_VERSION in c \
         else version
-    package_path = package[definitions.PARAM_PACKAGE_PATH] \
-        if definitions.PARAM_PACKAGE_PATH in package \
+    package_path = c[definitions.PARAM_PACKAGE_PATH] \
+        if definitions.PARAM_PACKAGE_PATH in c \
         else package_path
-    depends = package[definitions.PARAM_DEPENDS] \
-        if definitions.PARAM_DEPENDS in package \
+    depends = c[definitions.PARAM_DEPENDS] \
+        if definitions.PARAM_DEPENDS in c \
         else depends
-    config_templates = package[definitions.PARAM_CONFIG_TEMPLATE_CONFIG] \
-        if definitions.PARAM_CONFIG_TEMPLATE_CONFIG in package \
+    config_templates = c[definitions.PARAM_CONFIG_TEMPLATE_CONFIG] \
+        if definitions.PARAM_CONFIG_TEMPLATE_CONFIG in c \
         else config_templates
-    overwrite = package[definitions.PARAM_OVERWRITE_OUTPUT_PACKAGE] \
-        if definitions.PARAM_OVERWRITE_OUTPUT_PACKAGE in package \
+    overwrite = c[definitions.PARAM_OVERWRITE_OUTPUT_PACKAGE] \
+        if definitions.PARAM_OVERWRITE_OUTPUT_PACKAGE in c \
         else overwrite
 
     common = CommonHandler()
     tmp_handler = TemplateHandler()
 
-    # can't use src_path == dst_path for the package... duh!
-    if src_path == dst_path:
+    # can't use sources_path == tmp_pkg_path for the package... duh!
+    if sources_path == tmp_pkg_path:
         lgr.error('source and destination paths must'
                   ' be different to avoid conflicts!')
     lgr.info('cleaning up before packaging...')
@@ -301,24 +291,24 @@ def pack(package, name=False, src_type=False, dst_type=False,
         lgr.info('overwrite enabled. removing directory before packaging')
         common.rmdir(package_path)
     # if the package is ...
-    if src_type:
-        common.rmdir(dst_path)
-        common.mkdir(dst_path)
+    if src_pkg_type:
+        common.rmdir(tmp_pkg_path)
+        common.mkdir(tmp_pkg_path)
 
     lgr.info('generating package scripts and config files...')
     # if there are configuration templates to generate configs from...
     if config_templates:
-        tmp_handler.generate_configs(package)
+        tmp_handler.generate_configs(c)
     # if bootstrap scripts are required, generate them.
     if bootstrap_script or bootstrap_script_in_pkg:
         # TODO: handle cases where a bootstrap script is not a template.
         # bootstrap_script - a bootstrap script to be attached to the package
         # bootstrap_script_in_pkg - same but for putting inside the package
         if bootstrap_template and bootstrap_script:
-            tmp_handler.create_bootstrap_script(package, bootstrap_template,
+            tmp_handler.create_bootstrap_script(c, bootstrap_template,
                                                 bootstrap_script)
         if bootstrap_template and bootstrap_script_in_pkg:
-            tmp_handler.create_bootstrap_script(package, bootstrap_template,
+            tmp_handler.create_bootstrap_script(c, bootstrap_template,
                                                 bootstrap_script_in_pkg)
             # if it's in_pkg, grant it exec permissions and copy it to the
             # package's path.
@@ -326,30 +316,32 @@ def pack(package, name=False, src_type=False, dst_type=False,
                 lgr.debug('granting execution permissions')
                 do('chmod +x {0}'.format(bootstrap_script_in_pkg))
                 lgr.debug('copying bootstrap script to package directory')
-                common.cp(bootstrap_script_in_pkg, src_path)
+                common.cp(bootstrap_script_in_pkg, sources_path)
     lgr.info('packing up component...')
     # if a package needs to be created (not just files copied)...
-    if src_type:
+    if src_pkg_type:
         lgr.info('packing {0}'.format(name))
         # if the source dir for the package exists
-        if common.is_dir(src_path):
+        if common.is_dir(sources_path):
             # change the path to the destination path, since fpm doesn't accept
             # (for now) a dst dir, but rather creates the package in the cwd.
-            with lcd(dst_path):
+            with lcd(tmp_pkg_path):
                 # these will handle the different packages cases based on
                 # the requirement. for instance, if a bootstrap script exists,
                 # and there are dependencies for the package, run fpm with
                 # the relevant flags.
-                if bootstrap_script_in_pkg and dst_type == "tar":
+                if bootstrap_script_in_pkg and dst_pkg_type == "tar":
                     do(
                         'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
-                        .format(src_type, "tar", name, version, src_path))
+                        .format(src_pkg_type, "tar", name, version,
+                                sources_path))
                 elif bootstrap_script and not depends:
                     do(
                         'sudo fpm -s {0} -t {1} --after-install {2} -n {3}'
                         ' -v {4} -f {5}'
-                        .format(src_type, dst_type, os.getcwd() + '/'
-                                + bootstrap_script, name, version, src_path))
+                        .format(src_pkg_type, dst_pkg_type, os.getcwd() + '/'
+                                + bootstrap_script, name, version,
+                                sources_path))
                 elif bootstrap_script and depends:
                     lgr.debug('package dependencies are: {0}'.format(", "
                               .join(depends)))
@@ -357,21 +349,22 @@ def pack(package, name=False, src_type=False, dst_type=False,
                     do(
                         'sudo fpm -s {0} -t {1} --after-install {2} {3} -n {4}'
                         ' -v {5} -f {6}'
-                        .format(src_type, dst_type, os.getcwd() + '/'
+                        .format(src_pkg_type, dst_pkg_type, os.getcwd() + '/'
                                 + bootstrap_script, dep_str,
-                                name, version, src_path))
+                                name, version, sources_path))
                 # else just create a package with default flags...
                 else:
-                    if dst_type.startswith("tar"):
+                    if dst_pkg_type.startswith("tar"):
                         do(
                             'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
-                            .format(src_type, "tar", name, version, src_path))
+                            .format(src_pkg_type, "tar", name, version,
+                                    sources_path))
                     else:
                         do(
                             'sudo fpm -s {0} -t {1} -n {2} -v {3} -f {4}'
-                            .format(src_type, dst_type, name,
-                                    version, src_path))
-                    if dst_type == "tar.gz":
+                            .format(src_pkg_type, dst_pkg_type, name,
+                                    version, sources_path))
+                    if dst_pkg_type == "tar.gz":
                         do('sudo gzip {0}*'.format(name))
                 # and check if the packaging process succeeded.
                 # TODO: actually test the package itself.
@@ -379,7 +372,7 @@ def pack(package, name=False, src_type=False, dst_type=False,
         # what can you do?
         else:
             lgr.error('package dir {0} does\'nt exist, termintating...'
-                      .format(src_path))
+                      .format(sources_path))
             # maybe bluntly exit since this is all irrelevant??
             sys.exit(1)
 
@@ -388,7 +381,7 @@ def pack(package, name=False, src_type=False, dst_type=False,
         common.mkdir(package_path)
     lgr.info("isolating archives...")
     # and then copy the final package over..
-    common.cp('{0}/*.{1}'.format(dst_path, dst_type), package_path)
+    common.cp('{0}/*.{1}'.format(tmp_pkg_path, dst_pkg_type), package_path)
     lgr.info('package creation completed successfully!')
 
 

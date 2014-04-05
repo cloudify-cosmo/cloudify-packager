@@ -56,7 +56,8 @@ def get_linux_agent():
     py_handler.venv(package['sources_path'])
     tar_file = '{0}/{1}.tar.gz'.format(
         package['sources_path'], package['name'])
-    dl_handler.wget(package['source_url'], file=tar_file)
+    for url in package['source_urls']:
+        dl_handler.wget(url, file=tar_file)
     common.untar(package['sources_path'], tar_file)
     py_handler.venv(package['sources_path'])
     for module in package['modules']:
@@ -112,7 +113,8 @@ def get_celery(download=False):
     py_handler.venv(package['sources_path'])
     tar_file = '{0}/{1}.tar.gz'.format(
         package['sources_path'], package['name'])
-    dl_handler.wget(package['source_url'], file=tar_file)
+    for url in package['source_urls']:
+        dl_handler.wget(url, file=tar_file)
     common.untar(package['sources_path'], tar_file)
     if download:
         for module in package['modules']:
@@ -138,7 +140,8 @@ def get_manager(download=False):
     # if download:
     tar_file = '{0}/{1}.tar.gz'.format(
         package['sources_path'], package['name'])
-    dl_handler.wget(package['source_url'], file=tar_file)
+    for url in package['source_urls']:
+        dl_handler.wget(url, file=tar_file)
     common.untar(package['sources_path'], tar_file)
 
     common.mkdir(package['file_server_dir'])
@@ -277,9 +280,8 @@ def get_workflow_gems():
     # do('cd {0}/ruby-2.1.0 && sudo make install'.format(
         # config.PACKAGES['ruby']['sources_path']))
 
-    dl_handler.wget(
-        package['source_url'],
-        package['sources_path'])
+    for url in package['source_urls']:
+        dl_handler.wget(url, package['sources_path'])
     common.untar(
         package['sources_path'],
         '{0}/{1}'.format(package['sources_path'], '*.tar.gz'))
@@ -304,9 +306,8 @@ def get_cosmo_ui(download=False):
     dl_handler = DownloadsHandler()
     _prepare(package)
     if download:
-        dl_handler.wget(
-            package['source_url'],
-            dir=package['sources_path'])
+        for url in package['source_urls']:
+            dl_handler.wget(url, dir=package['sources_path'])
 
 
 @task
@@ -347,9 +348,10 @@ def get_riemann():
     #     event_description='started downloading %s' % package['name'],
     #     event_stream_id=stream_id)
 
-    dl_handler.wget(
-        package['source_url'],
-        dir='{0}/archives'.format(package['sources_path']))
+    for url in package['source_urls']:
+        dl_handler.wget(
+            url,
+            dir='{0}/archives'.format(package['sources_path']))
 
     # se(event_origin="cosmo-packager",
     #     event_type="packager.get.%s" % package['name'],
@@ -371,9 +373,8 @@ def get_rabbitmq():
     apt_handler = AptHandler()
     _prepare(package)
     apt_handler.add_src_repo(package['source_repo'], 'deb')
-    dl_handler.wget(
-        package['source_key'],
-        package['sources_path'])
+    for url in package['source_urls']:
+        dl_handler.wget(url, package['sources_path'])
     apt_handler.add_key(package['key_file'])
     apt_handler.apt_update()
     apt_handler.apt_download_reqs(package['reqs'], package['sources_path'])
@@ -393,9 +394,8 @@ def get_logstash():
 
     dl_handler = DownloadsHandler()
     _prepare(package)
-    dl_handler.wget(
-        package['source_url'],
-        dir=package['sources_path'])
+    for url in package['source_urls']:
+        dl_handler.wget(url, dir=package['sources_path'])
 
 
 @task
@@ -409,9 +409,8 @@ def get_elasticsearch():
 
     dl_handler = DownloadsHandler()
     _prepare(package)
-    dl_handler.wget(
-        package['source_url'],
-        dir=package['sources_path'])
+    for url in package['source_urls']:
+        dl_handler.wget(url, dir=package['sources_path'])
 
 
 @task
@@ -425,9 +424,8 @@ def get_kibana():
 
     dl_handler = DownloadsHandler()
     _prepare(package)
-    dl_handler.wget(
-        package['source_url'],
-        dir=package['sources_path'])
+    for url in package['source_urls']:
+        dl_handler.wget(url, dir=package['sources_path'])
 
 
 @task

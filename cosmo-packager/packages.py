@@ -106,7 +106,9 @@ PACKAGES = {
     "manager": {
         "name": "manager",
         "version": "3.0.0",
-        "source_url": "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+        "source_urls": [
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+        ],
         "depends": [
             'ruby2.1'
         ],
@@ -170,7 +172,9 @@ PACKAGES = {
     "celery": {
         "name": "celery",
         "version": "0.0.1",
-        "source_url": "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+        "source_urls": [
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+        ],
         "package_path": "{0}/celery/".format(CODE_PACKAGES_PATH),
         "sources_path": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_PATH),
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
@@ -210,7 +214,9 @@ PACKAGES = {
     "cosmo-ui": {
         "name": "cosmo-ui",
         "version": "1.0.0",
-        "source_url": "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
+        "source_urls": [
+            "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
+        ],
         "depends": [
             'nodejs'
         ],
@@ -237,7 +243,9 @@ PACKAGES = {
     "linux-agent": {
         "name": "linux-agent",
         "version": "3.0.0",
-        "source_url": "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+        "source_urls": [
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+        ],
         "package_path": "{0}/linux-agent".format(AGENT_PACKAGES_PATH),
         "sources_path": "/linux-agent/env",
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
@@ -274,7 +282,9 @@ PACKAGES = {
     "logstash": {
         "name": "logstash",
         "version": "1.3.2",
-        "source_url": "https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar",
+        "source_urls": [
+            "https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar",
+        ],
         "depends": [
             'openjdk-7-jdk'
         ],
@@ -315,7 +325,9 @@ PACKAGES = {
     "elasticsearch": {
         "name": "elasticsearch",
         "version": "1.0.1",
-        "source_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
+        "source_urls": [
+            "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
+        ],
         "depends": [
             'openjdk-7-jdk'
         ],
@@ -349,7 +361,9 @@ PACKAGES = {
     "kibana3": {
         "name": "kibana3",
         "version": "3.0.0milestone4",
-        "source_url": "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
+        "source_urls": [
+            "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
+        ],
         "depends": [
             'openjdk-7-jdk',
             'logstash',
@@ -392,7 +406,9 @@ PACKAGES = {
     "riemann": {
         "name": "riemann",
         "version": "0.2.2",
-        "source_url": "http://aphyr.com/riemann/riemann_0.2.2_all.deb",
+        "source_urls": [
+            "http://aphyr.com/riemann/riemann_0.2.2_all.deb",
+        ],
         "depends": [
             'openjdk-7-jdk'
         ],
@@ -475,7 +491,9 @@ PACKAGES = {
         "depends": [
             'make'
         ],
-        # "source_url": "http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.0.tar.gz",
+        # "source_urls": [
+        #     "http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.0.tar.gz",
+        # ],
         "package_path": "{0}/ruby/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/ruby".format(VIRTUALENVS_PATH),
         "src_package_type": "dir",
@@ -487,7 +505,9 @@ PACKAGES = {
     "workflow-gems": {
         "name": "workflow-gems",
         "version": "0.0.1",
-        "source_url": "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+        "source_urls": [
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+        ],
         "depends": [
             'ruby2.1'
         ],

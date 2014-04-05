@@ -18,7 +18,6 @@ from packager import init_logger
 
 from fabric.api import *  # NOQA
 from packager import pack
-from packager import get_package_configuration as get_conf
 
 lgr = init_logger()
 
@@ -32,8 +31,7 @@ def pkg_cloudify3():
     EXEC:   fab pkg_cloudify3
     """
 
-    package = get_conf('cloudify3')
-    pack(package)
+    pack('cloudify3')
 
 
 @task
@@ -43,8 +41,7 @@ def pkg_cloudify3_components():
     EXEC:   fab pkg_cloudify3_components
     """
 
-    package = get_conf('cloudify3-components')
-    pack(package)
+    pack('cloudify3-components')
 
 
 @task
@@ -54,8 +51,7 @@ def pkg_ubuntu_agent():
     EXEC:   fab pkg_ubuntu_agent
     """
 
-    package = get_conf('ubuntu-agent')
-    pack(package)
+    pack('ubuntu-agent')
 
 
 @task
@@ -65,8 +61,7 @@ def pkg_linux_agent():
     EXEC:   fab pkg_linux_agent
     """
 
-    package = get_conf('linux-agent')
-    pack(package)
+    pack('linux-agent')
 
 
 @task
@@ -76,8 +71,7 @@ def pkg_graphite():
     EXEC:   fab pkg_graphite
     """
 
-    package = get_conf('graphite')
-    pack(package)
+    pack('graphite')
 
 
 @task
@@ -87,8 +81,7 @@ def pkg_virtualenv():
     EXEC:   fab pkg_virtualenv
     """
 
-    package = get_conf('virtualenv')
-    pack(package)
+    pack('virtualenv')
 
 
 @task
@@ -98,8 +91,7 @@ def pkg_celery():
     EXEC:   fab pkg_celery
     """
 
-    package = get_conf('celery')
-    pack(package)
+    pack('celery')
 
 
 @task
@@ -109,8 +101,7 @@ def pkg_manager():
     EXEC:   fab pkg_manager
     """
 
-    package = get_conf('manager')
-    pack(package)
+    pack('manager')
 
 
 @task
@@ -120,8 +111,7 @@ def pkg_curl():
     EXEC:   fab pkg_curl
     """
 
-    package = get_conf('curl')
-    pack(package)
+    pack('curl')
 
 
 @task
@@ -131,8 +121,7 @@ def pkg_make():
     EXEC:   fab pkg_make
     """
 
-    package = get_conf('make')
-    pack(package)
+    pack('make')
 
 
 @task
@@ -142,8 +131,7 @@ def pkg_ruby():
     EXEC:   fab pkg_ruby
     """
 
-    package = get_conf('ruby')
-    pack(package)
+    pack('ruby')
 
 
 @task
@@ -153,8 +141,7 @@ def pkg_workflow_gems():
     EXEC:   fab pkg_workflow_gems
     """
 
-    package = get_conf('workflow-gems')
-    pack(package)
+    pack('workflow-gems')
 
 
 @task
@@ -164,8 +151,7 @@ def pkg_cosmo_ui():
     EXEC:   fab pkg_cosmo_ui
     """
 
-    package = get_conf('cosmo-ui')
-    pack(package)
+    pack('cosmo-ui')
 
 
 @task
@@ -175,8 +161,7 @@ def pkg_nodejs():
     EXEC:   fab pkg_nodejs
     """
 
-    package = get_conf('nodejs')
-    pack(package)
+    pack('nodejs')
 
 
 @task
@@ -186,16 +171,13 @@ def pkg_riemann():
     EXEC:   fab pkg_riemann
     """
 
-    package = get_conf('riemann')
-
+    pack('riemann')
     # stream_id = str(uuid.uuid1())
     # se(event_origin="cosmo-packager",
     #     event_type="packager.pkg.%s" % package['name'],
     #     event_subtype="started",
     #     event_description='started packaging %s' % package['name'],
     #     event_stream_id=stream_id)
-
-    pack(package)
 
     # se(event_origin="cosmo-packager",
     #     event_type="packager.pkg.%s" % package['name'],
@@ -211,8 +193,7 @@ def pkg_rabbitmq():
     EXEC:   fab pkg_rabbitmq
     """
 
-    package = get_conf('rabbitmq-server')
-    pack(package)
+    pack('rabbitmq-server')
 
 
 @task
@@ -222,8 +203,7 @@ def pkg_logstash():
     EXEC:   fab pkg_logstash
     """
 
-    package = get_conf('logstash')
-    pack(package)
+    pack('logstash')
 
 
 @task
@@ -233,8 +213,7 @@ def pkg_elasticsearch():
     EXEC:   fab pkg_elasticsearch
     """
 
-    package = get_conf('elasticsearch')
-    pack(package)
+    pack('elasticsearch')
 
 
 @task
@@ -244,8 +223,7 @@ def pkg_kibana():
     EXEC:   fab pkg_kibana
     """
 
-    package = get_conf('kibana3')
-    pack(package)
+    pack('kibana3')
 
 
 @task
@@ -255,8 +233,7 @@ def pkg_nginx():
     EXEC:   fab pkg_nginx
     """
 
-    package = get_conf('nginx')
-    pack(package)
+    pack('nginx')
 
 
 @task
@@ -266,8 +243,7 @@ def pkg_openjdk():
     EXEC:   fab pkg_openjdk
     """
 
-    package = get_conf('openjdk-7-jdk')
-    pack(package)
+    pack('openjdk-7-jdk')
 
 
 # @task
@@ -276,8 +252,6 @@ def pkg_openjdk():
 #     ACT:    packages zlib
 #     EXEC:   fab pkg_zlib
 #     """
-
-#     package = get_conf('zlib')
 
 #     create_bootstrap_script(
 #         package, package['bootstrap_template'], package['bootstrap_script'])
@@ -303,8 +277,6 @@ def pkg_openjdk():
 #     ACT:    packages gcc
 #     EXEC:   fab pkg_gcc
 #     """
-
-#     package = get_conf('gcc')
 
 #     if not is_dir(package['package_path']):
 #         mkdir(package['package_path'])

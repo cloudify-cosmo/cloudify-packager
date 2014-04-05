@@ -8,7 +8,7 @@ PACKAGER_TEMPLATE_PATH = "package-templates"  # directory which contains configu
 # packager base config params (REQUIRED)
 PARAM_NAME = 'name'  # 'string' representing the package's name
 PARAM_VERSION = 'version'  # 'string' representing the package's version
-PARAM_SOURCE_URL = 'source_url'  # 'string' representing the sources to download # TOOD: REPLACE WIT [LIST]!
+PARAM_SOURCE_URL = 'source_urls'  # 'string' representing the sources to download # TOOD: REPLACE WIT [LIST]!
 PARAM_DEPENDS = 'depends'  # [list] of the dependencies of the package
 PARAM_REQUIRES = 'reqs'  # [list] of the requirements to download
 PARAM_PACKAGE_PATH = 'package_path'  # 'string' representing the destination path to be used in the packaging process
