@@ -59,6 +59,17 @@ def init_logger():
 lgr = init_logger()
 
 
+def _todo(type, task, todo_file='TODO.md', doc_file='todo.rst'):
+    """
+    writes to todo files
+    """
+
+    with open('../' + todo_file, '+a') as f:
+        f.write(type + ': ' + task)
+    # with open('../docs/' + doc_file, '+a') as f:
+    #     f.write(type + ': ' + task)
+
+
 def _handle(func):
     """
     handles errors triggered by fabric
