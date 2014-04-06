@@ -31,13 +31,15 @@ from jinja2 import Environment, FileSystemLoader
 # __all__ = ['list']
 
 
-def init_logger():
+def init_logger(base_level=logging.INFO, verbose_level=logging.DEBUG):
     """
     initialize a logger to be used throughout packman.
 
     you can use this to init a logger in any of your files.
     this will use config.py's LOGGER param and dictConfig to configure
     the logger for you.
+
+    :rtype: `python logger`
     """
     log_dir = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
     if os.path.isfile(log_dir):
@@ -51,8 +53,8 @@ def init_logger():
             os.makedirs(d)
         logging.config.dictConfig(config.LOGGER)
         lgr = logging.getLogger('user')
-        lgr.setLevel(logging.INFO) if not config.VERBOSE \
-            else lgr.setLevel(logging.DEBUG)
+        lgr.setLevel(base_level) if not config.VERBOSE \
+            else lgr.setLevel(verbose_level)
         return lgr
     except ValueError:
         sys.exit('could not initialize logger.'

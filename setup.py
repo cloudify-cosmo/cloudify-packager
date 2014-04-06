@@ -42,11 +42,9 @@ setup(
     url='https://github.com/cloudify-cosmo/cloudify-packager',
     author='nir0s',
     author_email='nirc@gigaspaces.com',
-    # packages=['cosmo-packager'],
     license='LICENSE',
     platforms='Ubuntu',
     description='Gigaspaces Package Generator',
-    # package_data={'cosmo_cli': ['cosmo-config.example.json']},
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
