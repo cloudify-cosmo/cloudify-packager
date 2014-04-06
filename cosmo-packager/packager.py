@@ -33,7 +33,11 @@ from jinja2 import Environment, FileSystemLoader
 
 def init_logger():
     """
-    Initialize a logger to be used throughout the packager
+    initialize a logger to be used throughout the packager.
+
+    you can use this to init a logger in any of your files.
+    this will use config.py's LOGGER param and dictConfig to configure
+    the logger for you.
     """
     log_dir = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
     if os.path.isfile(log_dir):
@@ -88,7 +92,7 @@ def get_package_configuration(component):
     retrieves a package's configuration from packages.PACKAGES
 
     :param string component: component name to retrieve config for.
-    :rtype: ``dict``
+    :rtype: `dict` representing package configuration
     """
     lgr.debug('retrieving configuration for {0}'.format(component))
     try:
@@ -128,7 +132,7 @@ def get(component):
     :param list gems: list of ruby gems to download
     :param bool overwrite: indicated whether the sources directory be
      erased before creating a new package
-    :rtype: ``None``
+    :rtype: `None`
     """
 
     c = get_package_configuration(component)
@@ -212,7 +216,7 @@ def get(component):
 def pack(component):
     """
     creates a package according to the provided package configuration
-     in packages.py
+    in packages.py
     uses fpm (https://github.com/jordansissel/fpm/wiki) to create packages.
 
     .. note:: component params are defined in packages.py
@@ -238,7 +242,7 @@ def pack(component):
      config files
     :param bool overwrite: indicated whether the destination directory be
      erased before creating a new package
-    :rtype: ``None``
+    :rtype: `None`
     """
 
     # get the cwd since fpm will later change it.
@@ -401,7 +405,7 @@ def do(command, retries=2, sleeper=3,
     :param int sleeper: sleeptime between retries
     :param bool capture: should the output be captured for parsing?
     :param bool combine_stderr: combine stdout and stderr
-    :rtype: ``responseObject`` (for fabric operation)
+    :rtype: `responseObject` (for fabric operation)
     """
     def _execute():
         for execution in xrange(retries):
@@ -437,7 +441,7 @@ class CommonHandler():
 
         :param string dir: directory to look in
         :param string patten: what to look for
-        :rtype: ``stdout`` if found, else ``None``
+        :rtype: ``stdout`` `string` if found, else `None`
         """
         lgr.debug('looking for {0} in {1}'.format(pattern, dir))
         x = do('find {0} -iname "{1}" -exec echo {} \;'
@@ -449,6 +453,7 @@ class CommonHandler():
         checks if a directory exists
 
         :param string dir: directory to check
+        :rtype: `bool`
         """
         lgr.debug('checking if {0} exists'.format(dir))
         if os.path.isdir(dir):
@@ -463,6 +468,7 @@ class CommonHandler():
         checks if a file exists
 
         :param string file: file to check
+        :rtype: `bool`
         """
         lgr.debug('checking if {0} exists'.format(file))
         if os.path.isfile(file):
@@ -649,7 +655,7 @@ class AptHandler(CommonHandler):
         checks if a package is installed
 
         :param string package: package name to check
-        :rtype: bool representing whether package is installed or not
+        :rtype: `bool` representing whether package is installed or not
         """
 
         lgr.debug('checking if {0} is installed'.format(package))
@@ -772,15 +778,24 @@ class TemplateHandler(CommonHandler):
     def create_bootstrap_script(self, component, template_file, script_file):
         """
         creates a script file from a template file
+
+        ..note: DEPRACTE - this should be merged with `generate_from_template`
+
+        :param dict component: contains the params to use in the template
+        :param string template_file: template file path
+        :param string script_file: output path for generated script
         """
         lgr.debug('creating bootstrap script...')
-        formatted_text = self.template_formatter(
+        formatted_text = self._template_formatter(
             defs.PACKAGER_TEMPLATE_PATH, template_file, component)
-        self.make_file(script_file, formatted_text)
+        self._make_file(script_file, formatted_text)
 
     def generate_configs(self, component):
         """
         generates configuration files from templates
+
+        # TODO: document configuration file creation method
+        :param dict component: contains the params to use in the template
         """
         # iterate over the config_templates dict in the package's config
         for key, value in component['config_templates'].iteritems():
@@ -847,13 +862,18 @@ class TemplateHandler(CommonHandler):
         """
         generates configuration files from templates using jinja2
         http://jinja.pocoo.org/docs/
+
+        :param dict component: contains the params to use in the template
+        :param string output_file: output file path
+        :param string template_file: template file name
+        :param string templates: template files directory
         """
         lgr.debug('generating config file...')
-        formatted_text = self.template_formatter(
+        formatted_text = self._template_formatter(
             templates, template_file, component)
-        self.make_file(output_file, formatted_text)
+        self._make_file(output_file, formatted_text)
 
-    def template_formatter(self, template_dir, template_file, var_dict):
+    def _template_formatter(self, template_dir, template_file, var_dict):
         """
         receives a template and returns a formatted version of it
         according to a provided variable dictionary
@@ -873,7 +893,7 @@ class TemplateHandler(CommonHandler):
             lgr.error('could not generate template')
             sys.exit(1)
 
-    def make_file(self, output_path, content):
+    def _make_file(self, output_path, content):
         """
         creates a file from content
         """

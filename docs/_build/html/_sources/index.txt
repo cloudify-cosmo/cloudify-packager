@@ -15,36 +15,7 @@ Contents:
    :members:
    :undoc-members:
    :show-inheritance:
-
-.. autoclass:: packager.CommonHandler
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: packager.AptHandler
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: packager.DownloadsHandler
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: packager.RubyHandler
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: packager.PythonHandler
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: packager.TemplateHandler
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   :exclude-members: main, PackagerError
 
 
 Indices and tables
