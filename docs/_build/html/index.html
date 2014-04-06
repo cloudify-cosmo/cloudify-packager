@@ -51,18 +51,18 @@
 <ul class="simple">
 </ul>
 </div>
-<span class="target" id="module-packager"></span><dl class="function">
-<dt id="packager.init_logger">
-<tt class="descclassname">packager.</tt><tt class="descname">init_logger</tt><big>(</big><big>)</big><a class="headerlink" href="#packager.init_logger" title="Permalink to this definition">¶</a></dt>
-<dd><p>initialize a logger to be used throughout the packager.</p>
+<span class="target" id="module-packman"></span><dl class="function">
+<dt id="packman.init_logger">
+<tt class="descclassname">packman.</tt><tt class="descname">init_logger</tt><big>(</big><big>)</big><a class="headerlink" href="#packman.init_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>initialize a logger to be used throughout packman.</p>
 <p>you can use this to init a logger in any of your files.
 this will use config.py&#8217;s LOGGER param and dictConfig to configure
 the logger for you.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="packager.get_package_configuration">
-<tt class="descclassname">packager.</tt><tt class="descname">get_package_configuration</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packager.get_package_configuration" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.get_package_configuration">
+<tt class="descclassname">packman.</tt><tt class="descname">get_package_configuration</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packman.get_package_configuration" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves a package&#8217;s configuration from packages.PACKAGES</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -77,8 +77,8 @@ the logger for you.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="packager.get">
-<tt class="descclassname">packager.</tt><tt class="descname">get</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packager.get" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.get">
+<tt class="descclassname">packman.</tt><tt class="descname">get</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packman.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves resources for packaging</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -123,8 +123,8 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="packager.pack">
-<tt class="descclassname">packager.</tt><tt class="descname">pack</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packager.pack" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.pack">
+<tt class="descclassname">packman.</tt><tt class="descname">pack</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packman.pack" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates a package according to the provided package configuration
 in packages.py
 uses fpm (<a class="reference external" href="https://github.com/jordansissel/fpm/wiki">https://github.com/jordansissel/fpm/wiki</a>) to create packages.</p>
@@ -171,8 +171,8 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="packager.do">
-<tt class="descclassname">packager.</tt><tt class="descname">do</tt><big>(</big><em>command</em>, <em>retries=2</em>, <em>sleeper=3</em>, <em>capture=False</em>, <em>combine_stderr=False</em><big>)</big><a class="headerlink" href="#packager.do" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.do">
+<tt class="descclassname">packman.</tt><tt class="descname">do</tt><big>(</big><em>command</em>, <em>retries=2</em>, <em>sleeper=3</em>, <em>capture=False</em>, <em>combine_stderr=False</em><big>)</big><a class="headerlink" href="#packman.do" title="Permalink to this definition">¶</a></dt>
 <dd><p>executes a command locally with retries on failure.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -195,12 +195,12 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="class">
-<dt id="packager.CommonHandler">
-<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">CommonHandler</tt><a class="headerlink" href="#packager.CommonHandler" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler">
+<em class="property">class </em><tt class="descclassname">packman.</tt><tt class="descname">CommonHandler</tt><a class="headerlink" href="#packman.CommonHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>common class to handle files and directories</p>
 <dl class="method">
-<dt id="packager.CommonHandler.find_in_dir">
-<tt class="descname">find_in_dir</tt><big>(</big><em>dir</em>, <em>pattern</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.find_in_dir" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler.find_in_dir">
+<tt class="descname">find_in_dir</tt><big>(</big><em>dir</em>, <em>pattern</em><big>)</big><a class="headerlink" href="#packman.CommonHandler.find_in_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>finds a string/file pattern in a dir</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -220,8 +220,8 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.CommonHandler.is_dir">
-<tt class="descname">is_dir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.is_dir" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler.is_dir">
+<tt class="descname">is_dir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packman.CommonHandler.is_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks if a directory exists</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -236,8 +236,8 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.CommonHandler.is_file">
-<tt class="descname">is_file</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.is_file" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler.is_file">
+<tt class="descname">is_file</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#packman.CommonHandler.is_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks if a file exists</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -252,8 +252,8 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.CommonHandler.mkdir">
-<tt class="descname">mkdir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.mkdir" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler.mkdir">
+<tt class="descname">mkdir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packman.CommonHandler.mkdir" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates (recursively) a directory</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -266,8 +266,8 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.CommonHandler.rmdir">
-<tt class="descname">rmdir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.rmdir" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler.rmdir">
+<tt class="descname">rmdir</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packman.CommonHandler.rmdir" title="Permalink to this definition">¶</a></dt>
 <dd><p>deletes a directory</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -280,8 +280,8 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.CommonHandler.rm">
-<tt class="descname">rm</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.rm" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler.rm">
+<tt class="descname">rm</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#packman.CommonHandler.rm" title="Permalink to this definition">¶</a></dt>
 <dd><p>deletes a file or a set of files</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -294,8 +294,8 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.CommonHandler.cp">
-<tt class="descname">cp</tt><big>(</big><em>src</em>, <em>dst</em>, <em>recurse=True</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.cp" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler.cp">
+<tt class="descname">cp</tt><big>(</big><em>src</em>, <em>dst</em>, <em>recurse=True</em><big>)</big><a class="headerlink" href="#packman.CommonHandler.cp" title="Permalink to this definition">¶</a></dt>
 <dd><p>copies (recuresively or not) files or directories</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -313,15 +313,15 @@ erased before creating a new package</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.CommonHandler.make_package_paths">
-<tt class="descname">make_package_paths</tt><big>(</big><em>pkg_dir</em>, <em>tmp_dir</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.make_package_paths" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler.make_package_paths">
+<tt class="descname">make_package_paths</tt><big>(</big><em>pkg_dir</em>, <em>tmp_dir</em><big>)</big><a class="headerlink" href="#packman.CommonHandler.make_package_paths" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEPRACATED!
 creates directories for managing packages</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.CommonHandler.tar">
-<tt class="descname">tar</tt><big>(</big><em>chdir</em>, <em>output_file</em>, <em>input_path</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.tar" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler.tar">
+<tt class="descname">tar</tt><big>(</big><em>chdir</em>, <em>output_file</em>, <em>input_path</em><big>)</big><a class="headerlink" href="#packman.CommonHandler.tar" title="Permalink to this definition">¶</a></dt>
 <dd><p>tars an input file or directory</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -339,8 +339,8 @@ creates directories for managing packages</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.CommonHandler.untar">
-<tt class="descname">untar</tt><big>(</big><em>chdir</em>, <em>input_file</em><big>)</big><a class="headerlink" href="#packager.CommonHandler.untar" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.CommonHandler.untar">
+<tt class="descname">untar</tt><big>(</big><em>chdir</em>, <em>input_file</em><big>)</big><a class="headerlink" href="#packman.CommonHandler.untar" title="Permalink to this definition">¶</a></dt>
 <dd><p>untars a dir</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -359,13 +359,13 @@ creates directories for managing packages</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="packager.PythonHandler">
-<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">PythonHandler</tt><a class="headerlink" href="#packager.PythonHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dt id="packman.PythonHandler">
+<em class="property">class </em><tt class="descclassname">packman.</tt><tt class="descname">PythonHandler</tt><a class="headerlink" href="#packman.PythonHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#packman.CommonHandler" title="packman.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packman.CommonHandler</span></tt></a></p>
 <p>python operations handler</p>
 <dl class="method">
-<dt id="packager.PythonHandler.pip">
-<tt class="descname">pip</tt><big>(</big><em>module</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.pip" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.PythonHandler.pip">
+<tt class="descname">pip</tt><big>(</big><em>module</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packman.PythonHandler.pip" title="Permalink to this definition">¶</a></dt>
 <dd><p>pip installs a module</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -383,8 +383,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.PythonHandler.get_python_module">
-<tt class="descname">get_python_module</tt><big>(</big><em>module</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.get_python_module" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.PythonHandler.get_python_module">
+<tt class="descname">get_python_module</tt><big>(</big><em>module</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packman.PythonHandler.get_python_module" title="Permalink to this definition">¶</a></dt>
 <dd><p>downloads a python module</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -402,8 +402,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.PythonHandler.check_module_installed">
-<tt class="descname">check_module_installed</tt><big>(</big><em>name</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.check_module_installed" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.PythonHandler.check_module_installed">
+<tt class="descname">check_module_installed</tt><big>(</big><em>name</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packman.PythonHandler.check_module_installed" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks to see that a module is installed</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -421,8 +421,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.PythonHandler.venv">
-<tt class="descname">venv</tt><big>(</big><em>venv_dir</em><big>)</big><a class="headerlink" href="#packager.PythonHandler.venv" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.PythonHandler.venv">
+<tt class="descname">venv</tt><big>(</big><em>venv_dir</em><big>)</big><a class="headerlink" href="#packman.PythonHandler.venv" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates a virtualenv</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -437,12 +437,12 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="class">
-<dt id="packager.RubyHandler">
-<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">RubyHandler</tt><a class="headerlink" href="#packager.RubyHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dt id="packman.RubyHandler">
+<em class="property">class </em><tt class="descclassname">packman.</tt><tt class="descname">RubyHandler</tt><a class="headerlink" href="#packman.RubyHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#packman.CommonHandler" title="packman.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packman.CommonHandler</span></tt></a></p>
 <dl class="method">
-<dt id="packager.RubyHandler.get_ruby_gem">
-<tt class="descname">get_ruby_gem</tt><big>(</big><em>gem</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packager.RubyHandler.get_ruby_gem" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.RubyHandler.get_ruby_gem">
+<tt class="descname">get_ruby_gem</tt><big>(</big><em>gem</em>, <em>dir=False</em><big>)</big><a class="headerlink" href="#packman.RubyHandler.get_ruby_gem" title="Permalink to this definition">¶</a></dt>
 <dd><p>downloads a ruby gem</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -461,12 +461,12 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="class">
-<dt id="packager.AptHandler">
-<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">AptHandler</tt><a class="headerlink" href="#packager.AptHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dt id="packman.AptHandler">
+<em class="property">class </em><tt class="descclassname">packman.</tt><tt class="descname">AptHandler</tt><a class="headerlink" href="#packman.AptHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#packman.CommonHandler" title="packman.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packman.CommonHandler</span></tt></a></p>
 <dl class="method">
-<dt id="packager.AptHandler.dpkg_name">
-<tt class="descname">dpkg_name</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packager.AptHandler.dpkg_name" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.dpkg_name">
+<tt class="descname">dpkg_name</tt><big>(</big><em>dir</em><big>)</big><a class="headerlink" href="#packman.AptHandler.dpkg_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>renames deb files to conventional names</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -479,8 +479,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.AptHandler.check_if_package_is_installed">
-<tt class="descname">check_if_package_is_installed</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#packager.AptHandler.check_if_package_is_installed" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.check_if_package_is_installed">
+<tt class="descname">check_if_package_is_installed</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#packman.AptHandler.check_if_package_is_installed" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks if a package is installed</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -495,8 +495,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.AptHandler.apt_download_reqs">
-<tt class="descname">apt_download_reqs</tt><big>(</big><em>reqs</em>, <em>sources_path</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_download_reqs" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.apt_download_reqs">
+<tt class="descname">apt_download_reqs</tt><big>(</big><em>reqs</em>, <em>sources_path</em><big>)</big><a class="headerlink" href="#packman.AptHandler.apt_download_reqs" title="Permalink to this definition">¶</a></dt>
 <dd><p>downloads component requirements</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -513,8 +513,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.AptHandler.apt_autoremove">
-<tt class="descname">apt_autoremove</tt><big>(</big><em>pkg</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_autoremove" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.apt_autoremove">
+<tt class="descname">apt_autoremove</tt><big>(</big><em>pkg</em><big>)</big><a class="headerlink" href="#packman.AptHandler.apt_autoremove" title="Permalink to this definition">¶</a></dt>
 <dd><p>autoremoves package dependencies</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -527,8 +527,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.AptHandler.apt_download">
-<tt class="descname">apt_download</tt><big>(</big><em>pkg</em>, <em>dir</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_download" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.apt_download">
+<tt class="descname">apt_download</tt><big>(</big><em>pkg</em>, <em>dir</em><big>)</big><a class="headerlink" href="#packman.AptHandler.apt_download" title="Permalink to this definition">¶</a></dt>
 <dd><p>uses apt to download package debs from ubuntu&#8217;s repo</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -545,8 +545,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.AptHandler.add_src_repo">
-<tt class="descname">add_src_repo</tt><big>(</big><em>url</em>, <em>mark</em><big>)</big><a class="headerlink" href="#packager.AptHandler.add_src_repo" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.add_src_repo">
+<tt class="descname">add_src_repo</tt><big>(</big><em>url</em>, <em>mark</em><big>)</big><a class="headerlink" href="#packman.AptHandler.add_src_repo" title="Permalink to this definition">¶</a></dt>
 <dd><p>adds a source repo to the apt repo</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -563,8 +563,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.AptHandler.add_ppa_repo">
-<tt class="descname">add_ppa_repo</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#packager.AptHandler.add_ppa_repo" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.add_ppa_repo">
+<tt class="descname">add_ppa_repo</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#packman.AptHandler.add_ppa_repo" title="Permalink to this definition">¶</a></dt>
 <dd><p>adds a ppa repo to the apt repo</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -577,8 +577,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.AptHandler.add_key">
-<tt class="descname">add_key</tt><big>(</big><em>key_file</em><big>)</big><a class="headerlink" href="#packager.AptHandler.add_key" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.add_key">
+<tt class="descname">add_key</tt><big>(</big><em>key_file</em><big>)</big><a class="headerlink" href="#packman.AptHandler.add_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>adds a key to the local repo</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -591,14 +591,14 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="staticmethod">
-<dt id="packager.AptHandler.apt_update">
-<em class="property">static </em><tt class="descname">apt_update</tt><big>(</big><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_update" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.apt_update">
+<em class="property">static </em><tt class="descname">apt_update</tt><big>(</big><big>)</big><a class="headerlink" href="#packman.AptHandler.apt_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>runs apt-get update</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.AptHandler.apt_get">
-<tt class="descname">apt_get</tt><big>(</big><em>packages</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_get" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.apt_get">
+<tt class="descname">apt_get</tt><big>(</big><em>packages</em><big>)</big><a class="headerlink" href="#packman.AptHandler.apt_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>apt-get installs a package</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -611,8 +611,8 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.AptHandler.apt_purge">
-<tt class="descname">apt_purge</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#packager.AptHandler.apt_purge" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.AptHandler.apt_purge">
+<tt class="descname">apt_purge</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#packman.AptHandler.apt_purge" title="Permalink to this definition">¶</a></dt>
 <dd><p>completely purges a package from the local repo</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -627,12 +627,12 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="class">
-<dt id="packager.DownloadsHandler">
-<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">DownloadsHandler</tt><a class="headerlink" href="#packager.DownloadsHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dt id="packman.DownloadsHandler">
+<em class="property">class </em><tt class="descclassname">packman.</tt><tt class="descname">DownloadsHandler</tt><a class="headerlink" href="#packman.DownloadsHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#packman.CommonHandler" title="packman.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packman.CommonHandler</span></tt></a></p>
 <dl class="method">
-<dt id="packager.DownloadsHandler.wget">
-<tt class="descname">wget</tt><big>(</big><em>url</em>, <em>dir=False</em>, <em>file=False</em><big>)</big><a class="headerlink" href="#packager.DownloadsHandler.wget" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.DownloadsHandler.wget">
+<tt class="descname">wget</tt><big>(</big><em>url</em>, <em>dir=False</em>, <em>file=False</em><big>)</big><a class="headerlink" href="#packman.DownloadsHandler.wget" title="Permalink to this definition">¶</a></dt>
 <dd><p>wgets a url to a destination directory or file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -652,12 +652,12 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="class">
-<dt id="packager.TemplateHandler">
-<em class="property">class </em><tt class="descclassname">packager.</tt><tt class="descname">TemplateHandler</tt><a class="headerlink" href="#packager.TemplateHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#packager.CommonHandler" title="packager.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packager.CommonHandler</span></tt></a></p>
+<dt id="packman.TemplateHandler">
+<em class="property">class </em><tt class="descclassname">packman.</tt><tt class="descname">TemplateHandler</tt><a class="headerlink" href="#packman.TemplateHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#packman.CommonHandler" title="packman.CommonHandler"><tt class="xref py py-class docutils literal"><span class="pre">packman.CommonHandler</span></tt></a></p>
 <dl class="method">
-<dt id="packager.TemplateHandler.create_bootstrap_script">
-<tt class="descname">create_bootstrap_script</tt><big>(</big><em>component</em>, <em>template_file</em>, <em>script_file</em><big>)</big><a class="headerlink" href="#packager.TemplateHandler.create_bootstrap_script" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.TemplateHandler.create_bootstrap_script">
+<tt class="descname">create_bootstrap_script</tt><big>(</big><em>component</em>, <em>template_file</em>, <em>script_file</em><big>)</big><a class="headerlink" href="#packman.TemplateHandler.create_bootstrap_script" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates a script file from a template file</p>
 <p>..note: DEPRACTE - this should be merged with <cite>generate_from_template</cite></p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -676,16 +676,16 @@ else, will use <cite>dir</cite> (for virtualenvs and such)</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.TemplateHandler.generate_configs">
-<tt class="descname">generate_configs</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packager.TemplateHandler.generate_configs" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.TemplateHandler.generate_configs">
+<tt class="descname">generate_configs</tt><big>(</big><em>component</em><big>)</big><a class="headerlink" href="#packman.TemplateHandler.generate_configs" title="Permalink to this definition">¶</a></dt>
 <dd><p>generates configuration files from templates</p>
 <p># TODO: document configuration file creation method
 :param dict component: contains the params to use in the template</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="packager.TemplateHandler.generate_from_template">
-<tt class="descname">generate_from_template</tt><big>(</big><em>component</em>, <em>output_file</em>, <em>template_file</em>, <em>templates='package-templates'</em><big>)</big><a class="headerlink" href="#packager.TemplateHandler.generate_from_template" title="Permalink to this definition">¶</a></dt>
+<dt id="packman.TemplateHandler.generate_from_template">
+<tt class="descname">generate_from_template</tt><big>(</big><em>component</em>, <em>output_file</em>, <em>template_file</em>, <em>templates='package-templates'</em><big>)</big><a class="headerlink" href="#packman.TemplateHandler.generate_from_template" title="Permalink to this definition">¶</a></dt>
 <dd><p>generates configuration files from templates using jinja2
 <a class="reference external" href="http://jinja.pocoo.org/docs/">http://jinja.pocoo.org/docs/</a></p>
 <table class="docutils field-list" frame="void" rules="none">

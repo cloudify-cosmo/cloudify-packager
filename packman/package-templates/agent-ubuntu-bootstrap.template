@@ -76,12 +76,16 @@ HOME_DIR="${BASE_DIR}/${PKG_NAME}/cloudify.${WORKER_MODIFIER}/env"
 FILE_SERVER_PATH={{ bootstrap_params.file_server_path }}
 DST_AGENT_LOCATION={{ bootstrap_params.dst_agent_location }}
 DST_TEMPLATE_LOCATION={{ bootstrap_params.dst_template_location }}
+DST_SCRIPT_LOCATION={{ bootstrap_params.dst_script_location }}
 
 sudo mkdir -p ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}
-${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}
 sudo mkdir -p ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION}
-check_dir ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION}
+sudo mkdir -p ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION}
 
-# TELL IDAN TO VERIFY MKDIR -P THE DESTINATION LOCATIONS AS WELL
+check_dir ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}
+check_dir ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION}
+check_dir ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION}
+
 sudo cp -R ${PKG_DIR}/*.tar.gz ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}
 sudo cp -R ${PKG_DIR}/config/*.template ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION}
+sudo cp -R ${PKG_DIR}/config/linux-agent-disable-require-tty.sh ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION}

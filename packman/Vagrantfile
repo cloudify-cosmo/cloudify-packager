@@ -22,18 +22,18 @@ BASE_BOX_URI = 'http://files.vagrantup.com/precise64.box'
 
 Vagrant.configure('2') do |config|
 
-  config.vm.define :packager do |packager|
+  config.vm.define :packman do |packman|
 
-    packager_ip = '10.0.0.2'
+    packman_ip = '10.0.0.2'
 
-    packager.vm.provider :virtualbox do |vb|
+    packman.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', '1024']
       vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     end
-    packager.vm.box = BASE_BOX_NAME
-    packager.vm.box_url = BASE_BOX_URI
-    packager.vm.network :private_network, ip: packager_ip
-    packager.vm.hostname = 'packager'
+    packman.vm.box = BASE_BOX_NAME
+    packman.vm.box_url = BASE_BOX_URI
+    packman.vm.network :private_network, ip: packman_ip
+    packman.vm.hostname = 'packman'
 
     command = "
       echo bootstrapping...
@@ -56,9 +56,9 @@ Vagrant.configure('2') do |config|
       # configure gem and bundler
       echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc --no-ri' >> ~/.gemrc
 
-      # create packager logfile
-      sudo mkdir -p /var/log/packager &&
-      sudo touch /var/log/packager/packager.log &&
+      # create packman logfile
+      sudo mkdir -p /var/log/packman &&
+      sudo touch /var/log/packman/packman.log &&
 
       # add fabric bash completion
       cd /vagrant &&
@@ -73,10 +73,10 @@ Vagrant.configure('2') do |config|
       # sudo fab make &&
 
       echo bootstrap done
-      echo NOTE: currently, using some of the packager's features requires that they're run as sudo.
+      echo NOTE: currently, using some of the packman's features requires that they're run as sudo.
       "
 
-    packager.vm.provision :shell, :inline => command
+    packman.vm.provision :shell, :inline => command
   end
 
   config.vm.define :tester do |tester|

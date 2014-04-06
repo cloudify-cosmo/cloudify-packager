@@ -16,13 +16,13 @@
 
 """
 DOCUMENTATION LINK:
-https://github.com/CloudifySource/cosmo-packager
+https://github.com/cloudify-cosmo/cloudify-packager
 """
-from packager import init_logger
+from packman import init_logger
 
 from fabric.api import *  # NOQA
 from fabric.contrib.files import exists
-from packager import *  # NOQA
+from packman import *  # NOQA
 from get import *  # NOQA
 from pkg import *  # NOQA
 

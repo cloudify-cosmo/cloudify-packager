@@ -33,7 +33,7 @@ from jinja2 import Environment, FileSystemLoader
 
 def init_logger():
     """
-    initialize a logger to be used throughout the packager.
+    initialize a logger to be used throughout packman.
 
     you can use this to init a logger in any of your files.
     this will use config.py's LOGGER param and dictConfig to configure

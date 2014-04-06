@@ -14,10 +14,10 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
-from packager import init_logger
+from packman import init_logger
 
 from fabric.api import *  # NOQA
-from packager import pack
+from packman import pack
 
 lgr = init_logger()
 
@@ -173,14 +173,14 @@ def pkg_riemann():
 
     pack('riemann')
     # stream_id = str(uuid.uuid1())
-    # se(event_origin="cosmo-packager",
-    #     event_type="packager.pkg.%s" % package['name'],
+    # se(event_origin="cosmo-packman",
+    #     event_type="packman.pkg.%s" % package['name'],
     #     event_subtype="started",
     #     event_description='started packaging %s' % package['name'],
     #     event_stream_id=stream_id)
 
-    # se(event_origin="cosmo-packager",
-    #     event_type="packager.pkg.%s" % package['name'],
+    # se(event_origin="cosmo-packman",
+    #     event_type="packman.pkg.%s" % package['name'],
     #     event_subtype="success",
     #     event_description='finished packaging %s' % package['name'],
     #     event_stream_id=stream_id)

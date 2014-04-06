@@ -55,6 +55,6 @@ RABBITMQ_HOST = '10.0.0.3'
 # queue name for packager events
 RABBITMQ_QUEUE = 'hello'
 # routing key..
-RABBITMQ_ROUTING_KEY = 'packager'
+RABBITMQ_ROUTING_KEY = 'packman'
 # broker exchange
 RABBITMQ_EXCHANGE = ''

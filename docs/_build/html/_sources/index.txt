@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-.. automodule:: packager
+.. automodule:: packman
    :members:
    :undoc-members:
    :show-inheritance:

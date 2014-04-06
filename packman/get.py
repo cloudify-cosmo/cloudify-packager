@@ -14,16 +14,16 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
-from packager import init_logger
-from packager import get_package_configuration as get_conf
-from packager import CommonHandler
-from packager import PythonHandler
-from packager import DownloadsHandler
-from packager import AptHandler
+from packman import init_logger
+from packman import get_package_configuration as get_conf
+from packman import CommonHandler
+from packman import PythonHandler
+from packman import DownloadsHandler
+from packman import AptHandler
 
 # import shutil
 from fabric.api import *  # NOQA
-from packager import *  # NOQA
+from packman import *  # NOQA
 
 lgr = init_logger()
 
@@ -342,8 +342,8 @@ def get_riemann():
     dl_handler = DownloadsHandler()
     _prepare(package)
     # stream_id = str(uuid.uuid1())
-    # se(event_origin="cosmo-packager",
-    #     event_type="packager.get.%s" % package['name'],
+    # se(event_origin="cosmo-packman",
+    #     event_type="packman.get.%s" % package['name'],
     #     event_subtype="started",
     #     event_description='started downloading %s' % package['name'],
     #     event_stream_id=stream_id)
@@ -353,8 +353,8 @@ def get_riemann():
             url,
             dir='{0}/archives'.format(package['sources_path']))
 
-    # se(event_origin="cosmo-packager",
-    #     event_type="packager.get.%s" % package['name'],
+    # se(event_origin="cosmo-packman",
+    #     event_type="packman.get.%s" % package['name'],
     #     event_subtype="success",
     #     event_description='finished downloading %s' % package['name'],
     #     event_stream_id=stream_id)
