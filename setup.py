@@ -1,3 +1,4 @@
+
 ########
 # Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
 #
@@ -14,37 +15,52 @@
 #    * limitations under the License.
 
 from __future__ import print_function
-from setuptools import setup
-import io
+from setuptools import setup, find_packages
+import re
+import os
+import codecs
 
-version = '0.1.0'
+here = os.path.abspath(os.path.dirname(__file__))
 
 
-def read(*filenames, **kwargs):
-    encoding = kwargs.get('encoding', 'utf-8')
-    sep = kwargs.get('sep', '\n')
-    buf = []
-    for filename in filenames:
-        with io.open(filename, encoding=encoding) as f:
-            buf.append(f.read())
-    return sep.join(buf)
+def read(*parts):
+    # intentionally *not* adding an encoding option to open
+    return codecs.open(os.path.join(here, *parts), 'r').read()
 
-long_description = read('README.txt')
+
+def find_version(*file_paths):
+    version_file = read(*file_paths)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
 
 setup(
-    name='cloudify-packager',
-    version=version,
-    url='https://github.com/CloudifySource/cosmo-packager',
+    name='packman',
+    version=find_version('packman', '__init__.py'),
+    url='https://github.com/cloudify-cosmo/cloudify-packager',
     author='nir0s',
     author_email='nirc@gigaspaces.com',
-    packages=['cosmo-packager'],
     license='LICENSE',
     platforms='Ubuntu',
-    description='Cloudify3 Package Generator',
-    package_data={'cosmo_cli': ['cosmo-config.example.json']},
+    description='Gigaspaces Package Generator',
+    packages=find_packages(),
+    include_package_data=True,
     install_requires=[
-        "fabric",
-        "pika",
-        "jinja2",
+        "fabric==1.8.3",
+        "pika==0.9.13",
+        "jinja2==2.7.2",
+    ],
+    classifiers=[
+        'Programming Language :: Python',
+        'Development Status :: 3 - Alpha',
+        'Natural Language :: English',
+        'Environment :: Shell Environment',
+        'Intended Audience :: System Admins',
+        'License :: Apache Software License',
+        'Operating System :: Ubuntu/Debian',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: System Administration :: Utility :: Package Creation',
     ],
 )
