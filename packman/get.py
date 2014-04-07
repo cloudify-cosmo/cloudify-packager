@@ -40,7 +40,7 @@ def _prepare(package):
 
 
 @task
-def get_linux_agent():
+def get_linux_agent(download=False):
     """
     ACT:    retrives linux agent
     EXEC:   fab get_linux_agent
@@ -58,9 +58,9 @@ def get_linux_agent():
     for url in package['source_urls']:
         dl_handler.wget(url, file=tar_file)
     common.untar(package['sources_path'], tar_file)
-    py_handler.venv(package['sources_path'])
-    for module in package['modules']:
-        py_handler.pip(module, '%s/bin' % package['sources_path'])
+    if download:
+        for module in package['modules']:
+            py_handler.pip(module, '%s/bin' % package['sources_path'])
     # TODO: remove redundant data after module installation
 
 
