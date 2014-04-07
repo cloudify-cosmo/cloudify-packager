@@ -88,4 +88,4 @@ check_dir ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION}
 
 sudo cp -R ${PKG_DIR}/*.tar.gz ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}
 sudo cp -R ${PKG_DIR}/config/*.template ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION}
-sudo cp -R ${PKG_DIR}/config/linux-agent-disable-require-tty.sh ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION}
+sudo cp -R ${PKG_DIR}/config/linux-agent-disable-requiretty.sh ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION}
