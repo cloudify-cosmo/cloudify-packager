@@ -39,6 +39,8 @@ def init_logger(base_level=logging.INFO, verbose_level=logging.DEBUG):
     this will use config.py's LOGGER param and dictConfig to configure
     the logger for you.
 
+    :param int|logging.LEVEL base_level: desired base logging level
+    :param int|logging.LEVEL verbose_level: desired verbose logging level
     :rtype: `python logger`
     """
     log_dir = os.path.dirname(config.LOGGER['handlers']['file']['filename'])
@@ -636,8 +638,6 @@ class RubyHandler(CommonHandler):
         lgr.debug('downloading gem {0}'.format(gem))
         return do('sudo gem install --no-ri --no-rdoc'
                   ' --install-dir {0} {1}'.format(dir, gem))
-            # if not dir else do('sudo {0}/gem install --no-ri --no-rdoc'
-            #                    ' --install-dir {0} {1}'.format(dir, gem))
 
 
 class AptHandler(CommonHandler):

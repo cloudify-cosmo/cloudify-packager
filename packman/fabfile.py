@@ -40,7 +40,7 @@ env.forward_agent = True
 env.status = False
 
 
-#TASKS
+# TASKS
 @task
 def get_cosmo_components():
     """

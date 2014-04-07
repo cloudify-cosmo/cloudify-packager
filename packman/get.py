@@ -21,7 +21,6 @@ from packman import PythonHandler
 from packman import DownloadsHandler
 from packman import AptHandler
 
-# import shutil
 from fabric.api import *  # NOQA
 from packman import *  # NOQA
 
@@ -146,15 +145,6 @@ def get_manager(download=False):
 
     common.mkdir(package['file_server_dir'])
     common.cp(package['resources_path'], package['file_server_dir'])
-    # DEPRACATED!
-    # shutil.copytree('%s/src/main/resources/cloudify' %
-    #                 package['resources_path'],
-    #                 '%s/cloudify' % package['file_server_dir'])
-    # alias_mapping_resource = ('%s/src/main/resources/org/cloudifysource/cosmo/'  # NOQA
-    #                           'dsl/alias-mappings.yaml' %
-    #                           package['resources_path'])
-    # common.cp(alias_mapping_resource, '%s/cloudify/' %
-    #              package['file_server_dir'])
     if download:
         for module in package['modules']:
             py_handler.pip(module, '{0}/bin'.format(package['sources_path']))
@@ -198,29 +188,6 @@ def get_make():
     apt_handler.apt_get([package['name']])
 
 
-# @task
-# def get_gcc():
-#     """
-#     ACT:    retrives gcc
-#     EXEC:   fab get_gcc
-#     """
-
-#     package = get_conf('gcc')
-
-#     if package['reqs']:
-#         for req in package['reqs']:
-#             apt_purge(req)
-#             apt_autoremove(req)
-#             apt_download(req, package['sources_path'])
-#     apt_download(
-#         package['name'],
-#         package['sources_path'])
-#     if package['reqs']:
-#             apt_get(package['reqs'])
-#     apt_get(['dpkg-dev'])
-    # dpkg_name('%s/archives' % package['sources_path'])
-
-
 @task
 def get_ruby():
     """
@@ -231,26 +198,8 @@ def get_ruby():
     package = get_conf('ruby')
 
     _prepare(package)
-    # RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
-    # wget(
-        # package['source_url'],
-        # file='%s/ruby.tar.gz' % package['sources_path'])
     do('sudo /opt/ruby-build/bin/ruby-build -v %s %s' %
         (package['version'], package['sources_path']))
-
-
-# @task
-# def get_zlib():
-#     """
-#     ACT:    retrives zlib
-#     EXEC:   fab get_zlib
-#     """
-
-#     package = get_conf('zlib')
-
-#     wget(
-#         package['source_url'],
-#         file='%s/zlib.tar.gz' % package['sources_path'])
 
 
 @task
@@ -267,18 +216,6 @@ def get_workflow_gems():
     dl_handler = DownloadsHandler()
     _prepare(package)
     apt_handler.apt_get(package['reqs'])
-
-    # RELEVANT IF COMPILING RUBY IN PLACE - CURRENTLY NOT USED
-    # do('sudo dpkg -i %s/archives/*.deb' %
-        # config.PACKAGES['ruby']['sources_path'])
-    # do('sudo tar -C {0} -xzvf {0}/ruby.tar.gz'.format(
-        # config.PACKAGES['ruby']['sources_path']))
-    # do('cd {0}/ruby-2.1.0 && sudo ./configure --prefix=/usr/local'.format(
-        # config.PACKAGES['ruby']['sources_path']))
-    # do('cd {0}/ruby-2.1.0 && sudo make'.format(
-        # config.PACKAGES['ruby']['sources_path']))
-    # do('cd {0}/ruby-2.1.0 && sudo make install'.format(
-        # config.PACKAGES['ruby']['sources_path']))
 
     for url in package['source_urls']:
         dl_handler.wget(url, package['sources_path'])

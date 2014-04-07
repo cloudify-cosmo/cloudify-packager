@@ -1,3 +1,4 @@
+# flake8: NOQA
 # -*- coding: utf-8 -*-
 #
 # packman documentation build configuration file, created by
@@ -30,6 +31,10 @@ sys.path.insert(0, os.path.abspath('../packman'))
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.coverage',
+    'sphinx.ext.ifconfig',
+    'sphinx.ext.viewcode'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
