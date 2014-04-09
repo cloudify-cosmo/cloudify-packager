@@ -22,9 +22,24 @@ function check_user
 
 function check_port
 {
-	echo "checking to see if port $1 is opened..."
-	nc -z $1 $2 || state_error "port $2 is closed"
-	echo "port $2 on $1 is opened"
+    APP=$1
+    PORT=$2
+    TIMER=$3
+    HOST=$4
+
+    for i in {1..24}
+    do
+        echo -ne "checking whether ${APP} port ${PORT} is opened on ${HOST:-localhost}..." >> ${BOOTSTRAP_LOG}
+        nc -z ${HOST:-localhost} ${PORT} >/dev/null
+        if [ $? -eq 0 ]; then
+            echo "${APP} port ${PORT} is opened" >> ${BOOTSTRAP_LOG}
+            return
+        else
+            echo "WARNING: ${APP} port ${PORT} is closed, retrying in ${TIMER:-5} seconds ($i)" >> ${BOOTSTRAP_LOG}
+            sleep ${TIMER:-5}
+        fi
+    done
+    state_error "${APP} port ${PORT} is closed!"
 }
 
 function check_dir
