@@ -25,23 +25,33 @@ lgr = init_logger()
 
 
 @task
-def pkg_cloudify3():
+def pkg_cloudify_core():
     """
-    ACT:    packages cloudify3
-    EXEC:   fab pkg_cloudify3
+    ACT:    packages cloudify-core
+    EXEC:   fab pkg_cloudify_core
     """
 
-    pack('cloudify3')
+    pack('cloudify-core')
 
 
 @task
-def pkg_cloudify3_components():
+def pkg_cloudify_components():
     """
-    ACT:    packages cloudify3-components
-    EXEC:   fab pkg_cloudify3_components
+    ACT:    packages cloudify-components
+    EXEC:   fab pkg_cloudify_components
     """
 
-    pack('cloudify3-components')
+    pack('cloudify-components')
+
+
+@task
+def pkg_cloudify_ui():
+    """
+    ACT:    packages cloudify ui
+    EXEC:   fab pkg_cloudify_ui
+    """
+
+    pack('cloudify-ui')
 
 
 @task
@@ -142,16 +152,6 @@ def pkg_workflow_gems():
     """
 
     pack('workflow-gems')
-
-
-@task
-def pkg_cosmo_ui():
-    """
-    ACT:    packages cosmo ui
-    EXEC:   fab pkg_cosmo_ui
-    """
-
-    pack('cosmo-ui')
 
 
 @task
