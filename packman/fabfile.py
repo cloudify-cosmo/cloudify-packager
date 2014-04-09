@@ -119,8 +119,8 @@ def make(more=False, extra=False):
     if more:
         pkg_cosmo_components()
         pkg_cosmo()
-    pkg_cloudify3_components()
-    pkg_cloudify3()
+    pkg_cloudify_components()
+    pkg_cloudify()
     cp('/cloudify/*.deb', '/vagrant/debs')
 
 

@@ -232,13 +232,13 @@ def get_workflow_gems():
 
 
 @task
-def get_cosmo_ui(download=False):
+def get_cloudify_ui(download=False):
     """
-    ACT:    retrives cosmo_ui
-    EXEC:   fab get_cosmo_ui
+    ACT:    retrives cloudify_ui
+    EXEC:   fab get_cloudify_ui
     """
 
-    package = get_conf('cosmo-ui')
+    package = get_conf('cloudify-ui')
 
     dl_handler = DownloadsHandler()
     _prepare(package)

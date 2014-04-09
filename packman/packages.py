@@ -17,19 +17,19 @@
 from definitions import *
 
 PACKAGES = {
-    "cloudify3": {
-        "name": "cloudify3",
+    "cloudify-core": {
+        "name": "cloudify-core",
         "version": "3.0.0",
         "depends": [
-            'cloudify3-components'
+            'cloudify-components'
         ],
-        "package_path": "/cloudify",
+        "package_path": "/cloudify-core",
         "sources_path": CODE_PACKAGES_PATH,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script_in_pkg": "{0}/cloudify3-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
-        "bootstrap_template": "cloudify3-bootstrap.template",
-        "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+        "bootstrap_script_in_pkg": "{0}/cloudify-core-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
+        "bootstrap_template": "cloudify-core-bootstrap.template",
+        "bootstrap_log": "/var/log/cloudify-core-bootstrap.log",
         "overwrite_package": False,
         "config_templates": {
             "__params_celery": {
@@ -43,21 +43,18 @@ PACKAGES = {
             "__params_workflow": {
                 "port": "8101",
             },
-            "__params_ui": {
-                "port": "9001",
-            },
         }
     },
-    "cloudify3-components": {
-        "name": "cloudify3-components",
+    "cloudify-components": {
+        "name": "cloudify-components",
         "version": "3.0.0",
         "package_path": "/cloudify",
         "sources_path": COMPONENT_PACKAGES_PATH,
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        "bootstrap_script_in_pkg": "{0}/cloudify3-components-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
-        "bootstrap_template": "cloudify3-components-bootstrap.template",
-        "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+        "bootstrap_script_in_pkg": "{0}/cloudify-components-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
+        "bootstrap_template": "cloudify-components-bootstrap.template",
+        "bootstrap_log": "/var/log/cloudify-bootstrap.log",
         "overwrite_package": False,
         "bootstrap_params": {
             "req_free_mem": "10000",
@@ -100,6 +97,39 @@ PACKAGES = {
             },
             "__params_ruby": {
                 "run_dir": "/opt/ruby",
+            },
+        }
+    },
+    "cloudify-ui": {
+        "name": "cloudify-ui",
+        "version": "1.0.0",
+        "source_urls": [
+            "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
+        ],
+        "depends": [
+            'nodejs'
+        ],
+        "package_path": "{0}/cloudify-ui/".format(CODE_PACKAGES_PATH),
+        "sources_path": "{0}/cloudify-ui".format(PACKAGES_PATH),
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "{0}/cloudify-ui-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
+        "bootstrap_template": "cloudify-ui-bootstrap.template",
+        "bootstrap_log": "/var/log/cloudify-bootstrap.log",
+        "config_templates": {
+            "__template_file_init": {
+                "template": "{0}/cloudify-ui/init/cloudify-ui.conf.template".format(PACKAGER_CONFIG_PATH),
+                "output_file": "cloudify-ui.conf",
+                "config_dir": "config/init",
+                "dst_dir": "/etc/init",
+            },
+            "__params_init": {
+                "log_file": "/var/log/cloudify-ui/cosmo-ui.log",
+                "user": "root",
+                "run_dir": "/opt/cloudify-ui",
+            },
+            "__params_ui": {
+                "port": "9001",
             },
         }
     },
@@ -208,35 +238,6 @@ PACKAGES = {
                 "base": "/opt/celery",
                 "rest_port": "8100",
                 "file_server_port": "53229",
-            }
-        }
-    },
-    "cosmo-ui": {
-        "name": "cosmo-ui",
-        "version": "1.0.0",
-        "source_urls": [
-            "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
-        ],
-        "depends": [
-            'nodejs'
-        ],
-        "package_path": "{0}/cosmo-ui/".format(CODE_PACKAGES_PATH),
-        "sources_path": "{0}/cosmo-ui".format(PACKAGES_PATH),
-        "src_package_type": "dir",
-        "dst_package_type": "deb",
-        "bootstrap_script": "{0}/cosmo-ui-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
-        "bootstrap_template": "cosmo-ui-bootstrap.template",
-        "config_templates": {
-            "__template_file_init": {
-                "template": "{0}/cosmo-ui/init/cosmo-ui.conf.template".format(PACKAGER_CONFIG_PATH),
-                "output_file": "cosmo-ui.conf",
-                "config_dir": "config/init",
-                "dst_dir": "/etc/init",
-            },
-            "__params_init": {
-                "log_file": "/var/log/cosmo-ui/cosmo-ui.log",
-                "user": "root",
-                "run_dir": "/opt/cosmo-ui",
             }
         }
     },
