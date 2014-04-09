@@ -143,23 +143,12 @@ else
         echo -e "manager is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
-# echo -ne "checking whether cosmo-ui is installed..." | tee -a ${BOOTSTRAP_LOG}
-# if ! dpkg -s cosmo-ui 2>&1 | grep Status: | grep installed; then
-#         echo -e "cosmo-ui is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-#         sudo dpkg -i ${PKG_DIR}/cosmo-ui/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-#         check_pkg "cosmo-ui"
-# else
-#         echo -e "cosmo-ui is already installed, skipping (this may take several minutes)..." | tee -a ${BOOTSTRAP_LOG}
-# fi
-
 ################################################ PORT INSTALLATION TESTS
 
 echo -e "\nperforming post installation tests..." | tee -a ${BOOTSTRAP_LOG}
 check_port "manager-rest" "{{ config_templates.__params_manager.port }}"
 sleep 1
 check_port "workflow-service" "{{ config_templates.__params_workflow.port }}"
-sleep 1
-check_port "UI" "{{ config_templates.__params_ui.port }}"
 echo  -e "post installation tests completed successfully.\n"
 
 echo -e "${PKG_NAME} ${VERSION} installation completed successfully!\n" | tee -a ${BOOTSTRAP_LOG}

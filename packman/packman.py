@@ -299,7 +299,7 @@ def pack(component):
         # should the packaging process overwrite the previous packages?
         if overwrite:
             lgr.info('overwrite enabled. removing directory before packaging')
-            common.rmdir(package_path)
+            common.rm('{0}/{1}*'.format(package_path, name))
         # if the package is ...
         if src_pkg_type:
             common.rmdir(tmp_pkg_path)
@@ -425,7 +425,7 @@ def do(command, retries=2, sleeper=3,
         lgr.error('failed to run command: {0} even after {1} retries'
                   ' with output: {2}'
                   .format(command, execution, x.stdout))
-        sys.exit(1)
+        return x
 
     # lgr.info('running command: {0}'.format(command))
     if config.VERBOSE:
@@ -509,8 +509,9 @@ class CommonHandler():
         :param string file(s): file(s) to remove
         """
         lgr.info('removing files {0}'.format(file))
-        return do('sudo rm {0}'.format(file)) if os.path.isfile(file) \
-            else lgr.warning('file(s) do(es)n\'t exist')
+        return do('sudo rm {0}'.format(file))
+        # if os.path.exists(file) \
+        # else lgr.warning('file(s) do(es)n\'t exist')
 
     def cp(self, src, dst, recurse=True):
         """
@@ -576,7 +577,7 @@ class PythonHandler(CommonHandler):
             if dir else do('sudo pip --default-timeout=45 install {1}'
                            ' --process-dependency-links'.format(dir, module))
 
-    def get_python_module(self, module, dir=False):
+    def get_python_module(self, module, dir=False, venv=False):
         """
         downloads a python module
 
@@ -586,11 +587,11 @@ class PythonHandler(CommonHandler):
         """
         lgr.debug('downloading module {0}'.format(module))
         return do('sudo {0}/pip install --no-use-wheel'
-                  ' --process-dependency-links --download "{0}/" {1}'
-                  .format(dir, module)) \
-            if dir else do('sudo /usr/local/bin/pip install --no-use-wheel'
-                           ' --process-dependency-links --download "{0}/" {1}'
-                           .format(dir, module))
+                  ' --process-dependency-links --download "{1}/" {2}'
+                  .format(venv, dir, module)) \
+            if venv else do('sudo /usr/local/bin/pip install --no-use-wheel'
+                            ' --process-dependency-links --download "{0}/" {1}'
+                            .format(dir, module))
 
     def check_module_installed(self, name, dir=False):
         """

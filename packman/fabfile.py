@@ -60,11 +60,11 @@ def get_cosmo_components():
     get_python_modules('virtualenv')
     get_make()
     get_ruby()
-    # get_workflow_gems()
+    get_workflow_gems()
 
 
 @task
-def get_cosmo():
+def get_cosmo_core():
     """
     ACT:    retrieves cosmo code
     EXEC:   fab get_cosmo_base
@@ -73,7 +73,7 @@ def get_cosmo():
     do('sudo apt-get install -y python-dev')
     get_celery(download=True)
     get_manager(download=True)
-    get_cosmo_ui(download=True)
+    get_cloudify_ui(download=True)
 
 
 @task
@@ -95,19 +95,18 @@ def pkg_cosmo_components():
     pkg_virtualenv()
     pkg_make()
     pkg_ruby()
-    # pkg_workflow_gems()
+    pkg_workflow_gems()
 
 
 @task
-def pkg_cosmo():
+def pkg_cosmo_core():
     """
-    ACT:    packages cosmo code
-    EXEC:   fab pkg_comso_base
+    ACT:    packages cosmo core
+    EXEC:   fab pkg_comso_core
     """
 
     pkg_celery()
     pkg_manager()
-    pkg_cosmo_ui()
 
 
 @task

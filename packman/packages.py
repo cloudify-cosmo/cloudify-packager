@@ -23,8 +23,8 @@ PACKAGES = {
         "depends": [
             'cloudify-components'
         ],
-        "package_path": "/cloudify-core",
-        "sources_path": CODE_PACKAGES_PATH,
+        "package_path": "/cloudify",
+        "sources_path": CORE_PACKAGES_PATH,
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script_in_pkg": "{0}/cloudify-core-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
@@ -73,7 +73,7 @@ PACKAGES = {
             "__params_nginx": {
                 "kibana_run_dir": "/opt/kibana3",
                 "kibana_port": "3000",
-                "rest_port": "80",
+                "rest_and_ui_port": "80",
                 "file_server_port": "53229",
                 "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
             },
@@ -109,7 +109,7 @@ PACKAGES = {
         "depends": [
             'nodejs'
         ],
-        "package_path": "{0}/cloudify-ui/".format(CODE_PACKAGES_PATH),
+        "package_path": "/cloudify",
         "sources_path": "{0}/cloudify-ui".format(PACKAGES_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -142,7 +142,7 @@ PACKAGES = {
         "depends": [
             'ruby2.1'
         ],
-        "package_path": "{0}/manager/".format(CODE_PACKAGES_PATH),
+        "package_path": "{0}/manager/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/manager".format(VIRTUALENVS_PATH),
         "modules": [
             '{0}/manager/cloudify-manager-develop/rest-service/'.format(VIRTUALENVS_PATH),
@@ -205,7 +205,7 @@ PACKAGES = {
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
         ],
-        "package_path": "{0}/celery/".format(CODE_PACKAGES_PATH),
+        "package_path": "{0}/celery/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_PATH),
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
                     '{0}/manager/cloudify-manager-develop/plugins/agent-installer/'.format(VIRTUALENVS_PATH),
@@ -260,7 +260,7 @@ PACKAGES = {
     "ubuntu-agent": {
         "name": "ubuntu-agent",
         "version": "3.0.0",
-        "package_path": "{0}/Ubuntu-agent/".format(AGENT_PACKAGES_PATH),
+        "package_path": "/cloudify",
         "sources_path": "/agents/linux-agent",  # .format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -272,6 +272,7 @@ PACKAGES = {
             "dst_template_location": "packages/templates",
             "dst_script_location": "packages/scripts"
         },
+        "overwrite": True,
         # TODO: CREATE INIT AND DEFAULTS FILES FROM TEMPLATES!
         "config_templates": {
             "__config_dir": {
@@ -445,7 +446,9 @@ PACKAGES = {
         "version": "1.11.4",
         "package_path": "{0}/virtualenv/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/virtualenv".format(PACKAGES_PATH),
-        "modules": ['virtualenv==1.11.4'],
+        "modules": [
+            'virtualenv==1.11.4'
+        ],
         "src_package_type": "dir",
         "dst_package_type": "deb",
         "bootstrap_script": "{0}/virtualenv-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),

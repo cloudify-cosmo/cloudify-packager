@@ -45,7 +45,7 @@ Vagrant.configure('2') do |config|
       sudo apt-get install -y vim make git &&
       sudo apt-get install -y python-setuptools python-dev &&
       sudo apt-get install -y rubygems &&
-      sudo gem install fpm &&
+      sudo gem install fpm --no-ri --no-rdoc &&
       sudo apt-get purge pip
       sudo easy_install -U pip &&
       sudo wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | sudo python &&

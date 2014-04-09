@@ -310,8 +310,7 @@ def get_rabbitmq():
     apt_handler = AptHandler()
     _prepare(package)
     apt_handler.add_src_repo(package['source_repo'], 'deb')
-    for url in package['source_urls']:
-        dl_handler.wget(url, package['sources_path'])
+    dl_handler.wget(package['source_key'], package['sources_path'])
     apt_handler.add_key(package['key_file'])
     apt_handler.apt_update()
     apt_handler.apt_download_reqs(package['reqs'], package['sources_path'])
