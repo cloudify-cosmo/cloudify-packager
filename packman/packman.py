@@ -764,14 +764,16 @@ class DownloadsHandler(CommonHandler):
         :param string dir: download to dir....
         :param string file: download to file...
         """
+        
+        options = '--timeout=30'
         lgr.debug('downloading {0} to {1}'.format(url, dir))
         try:
             if (file and dir) or (not file and not dir):
                 lgr.warning('please specify either a directory'
                             ' or file to download to.')
                 sys.exit(1)
-            do('sudo wget {0} -O {1}'.format(url, file)) if file \
-                else do('sudo wget {0} -P {1}'.format(url, dir))
+            do('sudo wget {0} {1} -O {2}'.format(url, options, file)) if file \
+                else do('sudo wget {0} {1} -P {2}'.format(url, options, dir))
         except:
             lgr.error('failed downloading {0}'.format(url))
 
