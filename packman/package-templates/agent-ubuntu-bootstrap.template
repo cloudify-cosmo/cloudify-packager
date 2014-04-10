@@ -68,7 +68,8 @@ function check_service
 
 PKG_NAME="{{ name }}"
 PKG_DIR="{{ sources_path }}"
-BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
+BOOTSTRAP_LOG="{{ bootstrap_log }}"
+VERSION="{{ version }}"
 
 BASE_DIR="/env"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}/cloudify.${WORKER_MODIFIER}/env"
@@ -78,14 +79,18 @@ DST_AGENT_LOCATION={{ bootstrap_params.dst_agent_location }}
 DST_TEMPLATE_LOCATION={{ bootstrap_params.dst_template_location }}
 DST_SCRIPT_LOCATION={{ bootstrap_params.dst_script_location }}
 
-sudo mkdir -p ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}
-sudo mkdir -p ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION}
-sudo mkdir -p ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION}
+echo -e "\nInstalling ${PKG_NAME} version ${VERSION}...\n" | tee -a ${BOOTSTRAP_LOG}
 
-check_dir ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}
-check_dir ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION}
-check_dir ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION}
+sudo mkdir -p ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+sudo mkdir -p ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+sudo mkdir -p ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 
-sudo cp -R ${PKG_DIR}/*.tar.gz ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}
-sudo cp -R ${PKG_DIR}/config/*.template ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION}
-sudo cp -R ${PKG_DIR}/config/linux-agent-disable-requiretty.sh ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION}
+check_dir ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+check_dir ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+check_dir ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+
+sudo cp -R ${PKG_DIR}/*.tar.gz ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+sudo cp -R ${PKG_DIR}/config/*.template ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+sudo cp -R ${PKG_DIR}/config/linux-agent-disable-requiretty.sh ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+
+echo -e "${PKG_NAME} ${VERSION} installation completed successfully!\n" | tee -a ${BOOTSTRAP_LOG}
