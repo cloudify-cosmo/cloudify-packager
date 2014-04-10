@@ -133,6 +133,47 @@ PACKAGES = {
             },
         }
     },
+    "ubuntu-agent": {
+        "name": "ubuntu-agent",
+        "version": "3.0.0",
+        "package_path": "/cloudify",
+        "sources_path": "/agents/linux-agent",  # .format(AGENT_PACKAGES_PATH),
+        "src_package_type": "dir",
+        "dst_package_type": "deb",
+        "bootstrap_script": "{0}/agent-ubuntu-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
+        "bootstrap_template": "agent-ubuntu-bootstrap.template",
+        "bootstrap_params": {
+            "file_server_path": "{0}/manager/resources".format(VIRTUALENVS_PATH),
+            "dst_agent_location": "packages/agents",
+            "dst_template_location": "packages/templates",
+            "dst_script_location": "packages/scripts"
+        },
+        "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+        # TODO: CREATE INIT AND DEFAULTS FILES FROM TEMPLATES!
+        "config_templates": {
+            "__config_dir": {
+                "files": "{0}/linux-agent".format(PACKAGER_CONFIG_PATH),
+                "config_dir": "config",
+                "dst_dir": "{0}/manager/resources/packages/agents/templates/".format(VIRTUALENVS_PATH),
+            },
+        },
+    },
+    "linux-agent": {
+        "name": "linux-agent",
+        "version": "3.0.0",
+        "source_urls": [
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+        ],
+        "package_path": "{0}/linux-agent".format(AGENT_PACKAGES_PATH),
+        "sources_path": "/linux-agent/env",
+        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
+                    '{0}/manager/cloudify-manager-develop/plugins/agent-installer/'.format(VIRTUALENVS_PATH),
+                    '{0}/manager/cloudify-manager-develop/plugins/plugin-installer/'.format(VIRTUALENVS_PATH),
+                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/develop.tar.gz',
+        ],
+        "src_package_type": "dir",
+        "dst_package_type": "tar.gz",
+    },
     "manager": {
         "name": "manager",
         "version": "3.0.0",
@@ -240,47 +281,6 @@ PACKAGES = {
                 "file_server_port": "53229",
             }
         }
-    },
-    "linux-agent": {
-        "name": "linux-agent",
-        "version": "3.0.0",
-        "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
-        ],
-        "package_path": "{0}/linux-agent".format(AGENT_PACKAGES_PATH),
-        "sources_path": "/linux-agent/env",
-        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
-                    '{0}/manager/cloudify-manager-develop/plugins/agent-installer/'.format(VIRTUALENVS_PATH),
-                    '{0}/manager/cloudify-manager-develop/plugins/plugin-installer/'.format(VIRTUALENVS_PATH),
-                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/develop.tar.gz',
-        ],
-        "src_package_type": "dir",
-        "dst_package_type": "tar.gz",
-    },
-    "ubuntu-agent": {
-        "name": "ubuntu-agent",
-        "version": "3.0.0",
-        "package_path": "/cloudify",
-        "sources_path": "/agents/linux-agent",  # .format(AGENT_PACKAGES_PATH),
-        "src_package_type": "dir",
-        "dst_package_type": "deb",
-        "bootstrap_script": "{0}/agent-ubuntu-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
-        "bootstrap_template": "agent-ubuntu-bootstrap.template",
-        "bootstrap_params": {
-            "file_server_path": "{0}/manager/resources".format(VIRTUALENVS_PATH),
-            "dst_agent_location": "packages/agents",
-            "dst_template_location": "packages/templates",
-            "dst_script_location": "packages/scripts"
-        },
-        "overwrite": True,
-        # TODO: CREATE INIT AND DEFAULTS FILES FROM TEMPLATES!
-        "config_templates": {
-            "__config_dir": {
-                "files": "{0}/linux-agent".format(PACKAGER_CONFIG_PATH),
-                "config_dir": "config",
-                "dst_dir": "{0}/manager/resources/packages/agents/templates/".format(VIRTUALENVS_PATH),
-            },
-        },
     },
     "logstash": {
         "name": "logstash",
