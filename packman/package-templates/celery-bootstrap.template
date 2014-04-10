@@ -80,10 +80,6 @@ PKG_INIT_DIR="${PKG_DIR}/{{ config_templates.__template_file_init.config_dir }}"
 INIT_DIR="{{ config_templates.__template_file_init.dst_dir }}"
 INIT_FILE="{{ config_templates.__template_file_init.output_file }}"
 
-PKG_CONF_DIR="${PKG_DIR}/{{ config_templates.__template_file_conf.config_dir }}"
-CONF_DIR="{{ config_templates.__template_file_conf.dst_dir }}"
-CONF_FILE="{{ config_templates.__template_file_conf.output_file }}"
-
 
 sudo virtualenv ${HOME_DIR}
 
@@ -94,16 +90,7 @@ check_dir "${WORK_DIR}"
 echo "moving some stuff around..."
 sudo cp ${PKG_INIT_DIR}/${INIT_FILE} ${INIT_DIR}
 check_file "${INIT_DIR}/${INIT_FILE}"
-sudo cp ${PKG_CONF_DIR}/${CONF_FILE} ${CONF_DIR}
-check_file "/etc/default/${CONF_FILE}"
-# sudo cp ${PKG_CONF_DIR}/celeryd-includes ${WORK_DIR}
-# check_file "${WORK_DIR}/celeryd-includes"
 
-echo "granting celeryd exec permissions..."
-sudo chmod +x ${INIT_DIR}/${INIT_FILE}
-
-echo "adding to init.d..."
-sudo update-rc.d -f ${INIT_FILE} defaults
 # check_file permissions
 
 # echo "starting ${PKG_NAME}..."

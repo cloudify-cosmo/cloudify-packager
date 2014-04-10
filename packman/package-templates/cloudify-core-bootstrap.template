@@ -123,13 +123,13 @@ if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
         check_pkg "celery"
 
         echo "placing ip: ${MANAGEMENT_IP} in celery defaults file..." >> ${BOOTSTRAP_LOG}
-        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g {{ config_templates.__params_celery.defaults_path }} >> ${BOOTSTRAP_LOG} || state_error "could not place ip"
+        sudo sed -i.bak s/IPSTRING/${MANAGEMENT_IP}/g {{ config_templates.__params_celery.init_path }} >> ${BOOTSTRAP_LOG} || state_error "could not place ip"
         echo "placing user: ${CELERY_USER} in celery defaults file..." >> ${BOOTSTRAP_LOG}
-        sudo sed -i.bak s/USERSTRING/${CELERY_USER}/g {{ config_templates.__params_celery.defaults_path }} >> ${BOOTSTRAP_LOG} || state_error "could not place user"
+        sudo sed -i.bak s/USERSTRING/${CELERY_USER}/g {{ config_templates.__params_celery.init_path }} >> ${BOOTSTRAP_LOG} || state_error "could not place user"
         echo "owning celery by user: ${CELERY_USER}" >> ${BOOTSTRAP_LOG}
         sudo chown -R ${CELERY_USER}:${CELERY_USER} {{ config_templates.__params_celery.run_dir }} >> ${BOOTSTRAP_LOG} || state_error "cloud not change celery dir owner"
-        echo "restart celery service..." >> ${BOOTSTRAP_LOG}
-        {{ config_templates.__params_celery.init_path }} restart >> ${BOOTSTRAP_LOG} || state_error "could not restart celery"
+        echo "start celery service..." >> ${BOOTSTRAP_LOG}
+        sudo start celeryd-cloudify-management >> ${BOOTSTRAP_LOG} || state_error "could not restart celery"
 else
         echo -e "celery is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi

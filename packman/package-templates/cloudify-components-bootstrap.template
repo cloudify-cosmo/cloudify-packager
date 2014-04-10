@@ -240,12 +240,11 @@ if ! dpkg -s riemann 2>&1 | grep Status: | grep installed; then
 
         echo -e "applying riemann config..." >> ${BOOTSTRAP_LOG}
         sudo cp ${PKG_DIR}/{{ config_templates.__template_dir_riemann.config_dir }}/* {{ config_templates.__template_dir_riemann.dst_dir }} >> ${BOOTSTRAP_LOG} 2>&1
+        sudo cp ${PKG_DIR}/{{ config_templates.__template_file_riemann.config_dir }}/* {{ config_templates.__template_file_riemann.dst_dir }} >> ${BOOTSTRAP_LOG} 2>&1
         sudo cp ${PKG_DIR}/package-configuration/riemann/* /etc/riemann >> ${BOOTSTRAP_LOG} 2>&1
-        echo -e "installing init.d scripts..." >> ${BOOTSTRAP_LOG}
-        sudo update-rc.d riemann defaults >> ${BOOTSTRAP_LOG}
-        echo -e "restarting riemann..." >> ${BOOTSTRAP_LOG}
-        sudo /etc/init.d/riemann start
-
+        echo -e "starting riemann..." >> ${BOOTSTRAP_LOG}
+        sudo start riemann  >> ${BOOTSTRAP_LOG} 2>&1
+        check_upstart "riemann"
         check_pkg "riemann"
 else
         echo -e "riemann is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
@@ -256,13 +255,16 @@ if ! dpkg -s rabbitmq-server 2>&1 | grep Status: | grep installed; then
         echo -e "rabbitmq-server is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
         sudo dpkg -i ${PKG_DIR}/rabbitmq-server/*.deb >> ${BOOTSTRAP_LOG} 2>&1
 
+        echo -e "adding upstart job..." >> ${BOOTSTRAP_LOG}
+        sudo cp ${PKG_DIR}/{{ config_templates.__template_file_rabbitmq.config_dir }}/* {{ config_templates.__template_file_rabbitmq.dst_dir }} >> ${BOOTSTRAP_LOG} 2>&1
         echo -e "enabling rabbitmq management plugin..." >> ${BOOTSTRAP_LOG}
         sudo rabbitmq-plugins enable rabbitmq_management >> ${BOOTSTRAP_LOG} 2>&1
         echo -e "enabling rabbitmq tracing plugin..." >> ${BOOTSTRAP_LOG}
         sudo rabbitmq-plugins enable rabbitmq_tracing >> ${BOOTSTRAP_LOG} 2>&1
         echo -e "restarting rabbitmq..." >> ${BOOTSTRAP_LOG}
-        sudo service rabbitmq-server restart >> ${BOOTSTRAP_LOG} 2>&1
-        check_service "rabbitmq-server"
+        sudo /usr/sbin/rabbitmqctl stop >> ${BOOTSTRAP_LOG} 2>&1
+        sudo start rabbitmq-server >> ${BOOTSTRAP_LOG} 2>&1
+        check_upstart "rabbitmq-server"
         echo -e "running rabbitmq trace..." >> ${BOOTSTRAP_LOG}
         sudo rabbitmqctl trace_on >> ${BOOTSTRAP_LOG} 2>&1
 
