@@ -74,6 +74,7 @@ def get_cosmo_core():
     get_celery(download=True)
     get_manager(download=True)
     get_cloudify_ui(download=True)
+    get_linux_agent(download=True)
 
 
 @task
@@ -114,12 +115,15 @@ def make(more=False, extra=False):
 
     if extra:
         get_cosmo_components()
-        get_cosmo()
+        get_cosmo_core()
     if more:
         pkg_cosmo_components()
-        pkg_cosmo()
+        pkg_cosmo_core()
     pkg_cloudify_components()
-    pkg_cloudify()
+    pkg_cloudify_core()
+    pkg_linux_agent()
+    pkg_ubuntu_agent()
+    pkg_cloudify_ui()
     cp('/cloudify/*.deb', '/vagrant/debs')
 
 
