@@ -124,7 +124,8 @@ def make(more=False, extra=False):
     pkg_linux_agent()
     pkg_ubuntu_agent()
     pkg_cloudify_ui()
-    cp('/cloudify/*.deb', '/vagrant/debs')
+    client = CommonHandler()
+    client.cp('/cloudify/*.deb', '/vagrant/debs')
 
 
 @task
