@@ -764,7 +764,6 @@ class DownloadsHandler(CommonHandler):
         :param string dir: download to dir....
         :param string file: download to file...
         """
-        
         options = '--timeout=30'
         lgr.debug('downloading {0} to {1}'.format(url, dir))
         try:
