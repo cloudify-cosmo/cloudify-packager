@@ -33,8 +33,7 @@ PACKAGES = {
         "overwrite_package": False,
         "config_templates": {
             "__params_celery": {
-                "defaults_path": "/etc/default/celeryd-cloudify.management",
-                "init_path": "/etc/init.d/celeryd-cloudify.management",
+                "init_path": "/etc/init/celeryd-cloudify-management.conf",
                 "run_dir": "{0}/celery".format(VIRTUALENVS_PATH),
             },
             "__params_manager": {
@@ -87,16 +86,26 @@ PACKAGES = {
                 "port": "9200"
             },
             "__template_dir_riemann": {
-                "templates": "{0}/riemann".format(PACKAGER_CONFIG_PATH),
-                "config_dir": "config/riemann",
+                "templates": "{0}/riemann/conf".format(PACKAGER_CONFIG_PATH),
+                "config_dir": "config/riemann/conf",
                 "dst_dir": "/etc/riemann",
             },
             "__params_riemann": {
                 "ws_port": "5556",
                 "tcp_port": "5555",
             },
+            "__template_file_riemann": {
+                "template": "{0}/riemann/init/riemann.conf.template".format(PACKAGER_CONFIG_PATH),
+                "config_dir": "config/riemann/init",
+                "dst_dir": "/etc/init/riemann.conf",
+            },
             "__params_ruby": {
                 "run_dir": "/opt/ruby",
+            },
+            "__template_file_rabbitmq": {
+                "template": "{0}/rabbitmq/init/rabbitmq-server.conf.template".format(PACKAGER_CONFIG_PATH),
+                "config_dir": "config/rabbitmq",
+                "dst_dir": "/etc/init/rabbitmq-server.conf",
             },
         }
     },
@@ -259,27 +268,17 @@ PACKAGES = {
         "bootstrap_template": "celery-bootstrap.template",
         "config_templates": {
             "__template_file_init": {
-                "template": "{0}/celery/init/celeryd-cloudify.management.template".format(PACKAGER_CONFIG_PATH),
-                "output_file": "celeryd-cloudify.management",
+                "template": "{0}/celery/init/celeryd-cloudify-management.conf.template".format(PACKAGER_CONFIG_PATH),
+                "output_file": "celeryd-cloudify-management.conf",
                 "config_dir": "config/init",
-                "dst_dir": "/etc/init.d",
+                "dst_dir": "/etc/init",
             },
             "__params_init": {
-                "defaults_file": "/etc/default/celeryd-cloudify.management",
-                "base_dir": "/opt/celery",
-            },
-            "__template_file_conf": {
-                "template": "{0}/celery/conf/celeryd-cloudify.management.template".format(PACKAGER_CONFIG_PATH),
-                "output_file": "celeryd-cloudify.management",
-                "config_dir": "config/conf",
-                "dst_dir": "/etc/default",
-            },
-            "__params_conf": {
-                "work_dir": "{0}/celery/cloudify.management__worker/work".format(VIRTUALENVS_PATH),
+                "work_dir": "{0}/celery/cloudify.management__worker".format(VIRTUALENVS_PATH),
                 "base": "/opt/celery",
                 "rest_port": "8100",
                 "file_server_port": "53229",
-            }
+            },
         }
     },
     "logstash": {
