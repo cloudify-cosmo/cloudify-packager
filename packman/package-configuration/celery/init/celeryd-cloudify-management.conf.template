@@ -1,4 +1,4 @@
-description "Celery Managment Worker"
+description "Celery Management Worker"
 
 start on runlevel [2345]
 stop on runlevel [016]
@@ -7,8 +7,8 @@ kill timeout 60
 respawn
 respawn limit 10 5
 
-setuid ubuntu
-setgid ubuntu
+setuid USERSTRING
+setgid USERSTRING
 
 env BROKER_URL="amqp://guest:guest@IPSTRING:5672//"
 env MANAGEMENT_USER="USERSTRING"
