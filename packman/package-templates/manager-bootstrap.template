@@ -124,7 +124,7 @@ sudo ln -sf ${HOME_DIR}/cosmo-manager-*/ ${HOME_DIR}/${PKG_NAME}
 
 #python-dbus module
 sudo ln -sf /usr/share/pyshared/dbus ${HOME_DIR}/lib/python2.7/site-packages/dbus
-sudo ln /usr/lib/python2.7/dist-packages/_dbus_*.so ${HOME_DIR}/lib/python2.7/site-packages
+sudo ln -sf /usr/lib/python2.7/dist-packages/_dbus_*.so ${HOME_DIR}/lib/python2.7/site-packages
 
 echo "starting manager..."
 sudo start manager
