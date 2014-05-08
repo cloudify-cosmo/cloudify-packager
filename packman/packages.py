@@ -232,6 +232,7 @@ PACKAGES = {
                 "ruby_path": "{0}/ruby".format(VIRTUALENVS_PATH),
                 "workflow_service_path": "{0}/manager/cloudify-manager-develop/workflow-service/".format(VIRTUALENVS_PATH),
                 "workflow_service_logs_path": "/var/log/cosmo/blueprints",
+                "ruote_storage_dir_path": "/var/ruotefs",
             },
             "__template_file_conf": {
                 "template": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONFIG_PATH),
