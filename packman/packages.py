@@ -16,6 +16,7 @@
 
 from definitions import *
 
+MAIN_BRANCH = 'master'
 PACKAGES = {
     "cloudify-core": {
         "name": "cloudify-core",
@@ -171,14 +172,14 @@ PACKAGES = {
         "name": "linux-agent",
         "version": "3.0.0",
         "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
         ],
         "package_path": "{0}/linux-agent".format(AGENT_PACKAGES_PATH),
         "sources_path": "/linux-agent/env",
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
-                    '/linux-agent/env/cloudify-manager-develop/plugins/agent-installer/',
-                    '/linux-agent/env/cloudify-manager-develop/plugins/plugin-installer/',
-                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/develop.tar.gz',
+                    '/linux-agent/env/cloudify-manager-{0}/plugins/agent-installer/'.format(MAIN_BRANCH),
+                    '/linux-agent/env/cloudify-manager-{0}/plugins/plugin-installer/'.format(MAIN_BRANCH),
+                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(MAIN_BRANCH),
         ],
         "src_package_type": "dir",
         "dst_package_type": "tar.gz",
@@ -187,7 +188,7 @@ PACKAGES = {
         "name": "manager",
         "version": "3.0.0",
         "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
         ],
         "depends": [
             'ruby2.1'
@@ -195,11 +196,11 @@ PACKAGES = {
         "package_path": "{0}/manager/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/manager".format(VIRTUALENVS_PATH),
         "modules": [
-            '{0}/manager/cloudify-manager-develop/rest-service/'.format(VIRTUALENVS_PATH),
-            '{0}/manager/cloudify-manager-develop/plugins/agent-installer/'.format(VIRTUALENVS_PATH),
-            '{0}/manager/cloudify-manager-develop/plugins/plugin-installer/'.format(VIRTUALENVS_PATH),
+            '{0}/manager/cloudify-manager-{1}/rest-service/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
+            '{0}/manager/cloudify-manager-{1}/plugins/agent-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
+            '{0}/manager/cloudify-manager-{1}/plugins/plugin-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
         ],
-        "resources_path": "{0}/manager/cloudify-manager-develop/resources/rest-service/cloudify/".format(VIRTUALENVS_PATH),
+        "resources_path": "{0}/manager/cloudify-manager-{1}/resources/rest-service/cloudify/".format(VIRTUALENVS_PATH, MAIN_BRANCH),
         "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -225,12 +226,12 @@ PACKAGES = {
                 "dst_dir": "/etc/init",
             },
             "__params_init": {
-                "rest_server_path": "{0}/manager/cloudify-manager-develop/rest-service/manager_rest/".format(VIRTUALENVS_PATH),
+                "rest_server_path": "{0}/manager/cloudify-manager-{1}/rest-service/manager_rest/".format(VIRTUALENVS_PATH, MAIN_BRANCH),
                 "gunicorn_user": "root",
                 "gunicorn_conf_path": "{0}/manager/config/conf/guni.conf".format(VIRTUALENVS_PATH),
                 "unicorn_user": "root",
                 "ruby_path": "{0}/ruby".format(VIRTUALENVS_PATH),
-                "workflow_service_path": "{0}/manager/cloudify-manager-develop/workflow-service/".format(VIRTUALENVS_PATH),
+                "workflow_service_path": "{0}/manager/cloudify-manager-{1}/workflow-service/".format(VIRTUALENVS_PATH, MAIN_BRANCH),
                 "workflow_service_logs_path": "/var/log/cosmo/blueprints",
                 "ruote_storage_dir_path": "/var/ruotefs",
             },
@@ -254,14 +255,14 @@ PACKAGES = {
         "name": "celery",
         "version": "0.0.1",
         "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
         ],
         "package_path": "{0}/celery/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_PATH),
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
-                    '{0}/celery/cloudify.management__worker/env/cloudify-manager-develop/plugins/agent-installer/'.format(VIRTUALENVS_PATH),
-                    '{0}/celery/cloudify.management__worker/env/cloudify-manager-develop/plugins/plugin-installer/'.format(VIRTUALENVS_PATH),
-                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/develop.tar.gz',
+                    '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/agent-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
+                    '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/plugin-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
+                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(MAIN_BRANCH),
         ],
         "src_package_type": "dir",
         "dst_package_type": "deb",
@@ -496,28 +497,23 @@ PACKAGES = {
         "depends": [
             'make'
         ],
-        # "source_urls": [
-        #     "http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.0.tar.gz",
-        # ],
         "package_path": "{0}/ruby/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/ruby".format(VIRTUALENVS_PATH),
         "src_package_type": "dir",
         "dst_package_type": "deb",
-        # "bootstrap_script": "%s/ruby-bootstrap.sh" % PACKAGER_SCRIPTS_PATH,
-        # "bootstrap_template": "ruby-bootstrap.template",
         "ruby_build_dir": "/opt/ruby-build"
     },
     "workflow-gems": {
         "name": "workflow-gems",
         "version": "0.0.1",
         "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/develop.tar.gz",
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
         ],
         "depends": [
             'ruby2.1'
         ],
-        "gemfile_location": "{0}/workflow-gems/cloudify-manager-develop/workflow-service/Gemfile".format(PACKAGES_PATH),
-        "gemfile_base_dir": "{0}/workflow-gems/cloudify-manager-develop".format(PACKAGES_PATH),
+        "gemfile_location": "{0}/workflow-gems/cloudify-manager-{1}/workflow-service/Gemfile".format(PACKAGES_PATH, MAIN_BRANCH),
+        "gemfile_base_dir": "{0}/workflow-gems/cloudify-manager-{1}".format(PACKAGES_PATH, MAIN_BRANCH),
         "package_path": "{0}/workflow-gems/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/workflow-gems".format(PACKAGES_PATH),
         "src_package_type": "dir",
@@ -527,50 +523,5 @@ PACKAGES = {
         ],
         "bootstrap_script": "{0}/workflow-gems-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
         "bootstrap_template": "workflow-gems-bootstrap.template"
-    },
-        # "gcc": {
-    #     "name": "gcc",
-    #     "version": "0.0.1",
-    #     "reqs": [
-    #         "libc6",
-    #         "libc-bin",
-    #         "zlib1g-dev",
-    #         "libmpc2",
-    #         "libgomp1",
-    #         "binutils",
-    #         "cpp",
-    #         "gcc-4.6",
-    #         "gcc-multilib",
-    #         "make",
-    #         "manpages-dev",
-    #         "autoconf",
-    #         "automake1.9",
-    #         "libtool",
-    #         "flex",
-    #         "bison",
-    #         "gdb",
-    #         "gcc-doc",
-    #         "libc6-dev",
-    #         "libc-dev",
-    #         "gcc"
-    #     ],
-    #     "package_path": "%s/gcc/" % COMPONENT_PACKAGES_PATH,
-    #     "sources_path": "%s/gcc" % PACKAGES_PATH
-    # },
-        # "zlib": {
-    #     "name": "zlib",
-    #     "version": "1.2.8",
-    #     "depends": [
-    #         'make',
-    #         'gcc'
-    #     ],
-    #     "source_url": "http://zlib.net/zlib-1.2.8.tar.gz",
-    #     "version": "0.0.1",
-    #     "package_path": "{0}/zlib/".format(COMPONENT_PACKAGES_PATH),
-    #     "sources_path": "{0}/zlib".format(PACKAGES_PATH),
-    #     "src_package_type": "dir",
-    #     "dst_package_type": "deb",
-    #     "bootstrap_script": "{0}/zlib-bootstrap.sh".format(PACKAGER_SCRIPTS_PATH),
-    #     "bootstrap_template": "zlib-bootstrap.template"
-    # },
+    }
 }
