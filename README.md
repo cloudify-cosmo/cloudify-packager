@@ -63,8 +63,8 @@ Lets take an example of a component's creation cycle - from retrieval to dpkg-i-
 - "name" is the component's name (DUH!). it's used to create named directories mostly.
 - "version", when applicable, is used to apply a version to the component's package name (in the future, it might dictate the component's version to download.)
 - "source_url" is where you would download the component from (can be a repo or a url)
-- "bootstrap_dir" (will be changed in the near future) is the dir where the component's package will be stored after the packaging process is complete for that same component.
-- "package_dir" (will be changed in the near future) is the dir where the component's parts (files, configs, etc..) will be stored before the component's package is created.
+- "package_path" (will be changed in the near future) is the dir where the component's package will be stored after the packaging process is complete for that same component.
+- "sources_path" (will be changed in the near future) is the dir where the component's parts (files, configs, etc..) will be stored before the component's package is created.
 
 #### Component retrieval:
 (running *fab get_riemann*)
@@ -72,13 +72,13 @@ Lets take an example of a component's creation cycle - from retrieval to dpkg-i-
 ```python
 package = get_package_configuration('riemann')
 
-rmdir(package['package_dir'])
-make_package_dirs(
+rmdir(package['sources_path'])
+make_sources_paths(
     package['bootstrap_dir'],
-    package['package_dir'])
+    package['sources_path'])
 wget(
     package['source_url'],
-    package['package_dir'])
+    package['sources_path'])
 ```
 
 ###### Explanation:
@@ -123,7 +123,7 @@ Other examples (check pkg.py) like logstash, for instance, contain a more comple
 Here's an example of a template bootstrap script (for virtualenv, since riemann doesn't require one):
 	
 	PKG_NAME="{{ name }}"
-	PKG_DIR="{{ package_dir }}"
+	PKG_DIR="{{ sources_path }}"
 	
 	echo "extracting ${PKG_NAME}..."
 	sudo tar -C ${PKG_DIR} -xvf ${PKG_DIR}/*.tar.gz

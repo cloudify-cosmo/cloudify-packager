@@ -1,0 +1,15 @@
+description "manager gunicorn"
+
+start on (filesystem)
+stop on runlevel [016]
+
+respawn
+console log
+# setuid nobody
+# setgid nogroup
+chdir {{ config_templates.__params_init.rest_server_path }}
+
+script
+	export MANAGER_REST_CONFIG_PATH={{ config_templates.__params_init.gunicorn_conf_path }}
+	exec sudo -u {{ config_templates.__params_init.gunicorn_user }} -E {{ sources_path }}/bin/gunicorn  -w 1 -b 0.0.0.0:8100 --timeout 300 server:app
+end script

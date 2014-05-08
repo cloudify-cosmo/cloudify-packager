@@ -1,0 +1,18 @@
+description "workflow-service agent"
+
+start on (local-filesystems and net-device-up IFACE=eth0)
+stop on shutdown
+
+respawn
+respawn limit 5 60
+
+env RACK_ENV=development
+env WF_SERVICE_LOGS_PATH={{ config_templates.__params_init.workflow_service_logs_path }}
+chdir {{ config_templates.__params_init.workflow_service_path }}
+
+script
+        export RUOTE_STORAGE_DIR_PATH={{ config_templates.__params_init.ruote_storage_dir_path }}
+        sudo rm -rf ${RUOTE_STORAGE_DIR_PATH}/*
+        sudo mkdir -p ${RUOTE_STORAGE_DIR_PATH}
+        exec sudo -E -u {{ config_templates.__params_init.unicorn_user }} {{ config_templates.__params_init.ruby_path }}/bin/ruby -S {{ config_templates.__params_init.ruby_path }}/bin/unicorn -l 0.0.0.0:8101
+end script

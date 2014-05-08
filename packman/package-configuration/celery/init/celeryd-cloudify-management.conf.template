@@ -1,0 +1,37 @@
+description "Celery Management Worker"
+
+start on runlevel [2345]
+stop on runlevel [016]
+
+kill timeout 60
+respawn
+respawn limit 10 5
+
+setuid USERSTRING
+setgid USERSTRING
+
+env BROKER_URL="amqp://guest:guest@IPSTRING:5672//"
+env MANAGEMENT_USER="USERSTRING"
+env MANAGER_REST_PORT="{{ config_templates.__params_init.rest_port }}"
+env MANAGEMENT_IP="IPSTRING"
+env CELERY_WORK_DIR="{{ config_templates.__params_init.work_dir }}/work"
+env IS_MANAGEMENT_NODE="True"
+env AGENT_IP="cloudify.management"
+env VIRTUALENV="${CELERY_BASE_DIR}"
+env MANAGER_FILE_SERVER_URL="http://IPSTRING:{{ config_templates.__params_init.file_server_port }}"
+env MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL="${MANAGER_FILE_SERVER_URL}/blueprints"
+env CELERY_TASK_SERIALIZER="json"
+env CELERY_RESULT_SERIALIZER="json"
+env CELERY_RESULT_BACKEND="amqp://"
+
+
+exec {{ config_templates.__params_init.work_dir }}/env/bin/python -m celery.bin.celeryd \
+--include=plugin_installer.tasks,worker_installer.tasks \
+--broker=amqp:// \
+-n celery.cloudify.management \
+--events \
+--app=cloudify \
+--loglevel=debug \
+-Q cloudify.management \
+--logfile={{ config_templates.__params_init.work_dir }}/work/cloudify.management_worker.log \
+--pidfile={{ config_templates.__params_init.work_dir }}/work/cloudify.management_worker.pid

@@ -38,4 +38,3 @@ nosetests.xml
 .pydevproject
 
 .vagrant/
-debs/
