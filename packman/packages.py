@@ -16,7 +16,7 @@
 
 from definitions import *
 
-MAIN_BRANCH = 'master'
+MAIN_BRANCH = '3.0'
 PACKAGES = {
     "cloudify-core": {
         "name": "cloudify-core",
