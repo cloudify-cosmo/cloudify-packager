@@ -3,5 +3,6 @@
     file_server_base_uri: 'http://localhost:53229',
     file_server_root: '{{ config_templates.__params_conf.file_server_dir }}',
     file_server_blueprints_folder: 'blueprints',
+    file_server_uploaded_blueprints_folder: 'uploaded-blueprints',
     workflow_service_base_uri: 'http://localhost:8101'
 }
