@@ -277,7 +277,7 @@ PACKAGES = {
             "__params_init": {
                 "work_dir": "{0}/celery/cloudify.management__worker".format(VIRTUALENVS_PATH),
                 "base": "/opt/celery",
-                "rest_port": "8100",
+                "rest_port": "80",
                 "file_server_port": "53229",
             },
         }
