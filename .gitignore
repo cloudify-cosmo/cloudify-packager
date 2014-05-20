@@ -8,6 +8,8 @@
 *.egg
 *.egg-info
 *.deb
+*.iml
+.idea
 dist
 build
 eggs
