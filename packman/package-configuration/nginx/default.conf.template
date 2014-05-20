@@ -60,6 +60,10 @@ upstream cloudify-rest {
   server 127.0.0.1:8100;
 }
 
+upstream cloudify-resources {
+  server 127.0.0.1:{{ config_templates.__params_nginx.file_server_port }};
+}
+
 server {
 
   listen		          *:{{ config_templates.__params_nginx.rest_and_ui_port }};
@@ -79,11 +83,21 @@ server {
     proxy_set_header   Host             $http_host;
   }
 
-  location ~ ^/blueprints {
+  location ~ ^/(blueprints|executions|deployments|nodes|events|search|status|provider|api|node-instances) {
     proxy_pass         http://cloudify-rest;
     proxy_redirect     off;
 
     proxy_set_header   Host             $host;
+    proxy_set_header   X-Real-IP        $remote_addr;
+    proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+  }
+
+  location ~ ^/resources {
+    rewrite            /resources/(.*) /$1 break;
+    proxy_pass         http://cloudify-resources;
+    proxy_redirect     off;
+
+    proxy_set_header   Host             $http_host;
     proxy_set_header   X-Real-IP        $remote_addr;
     proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
   }

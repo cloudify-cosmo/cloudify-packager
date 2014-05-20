@@ -12,7 +12,7 @@ setgid USERSTRING
 
 env BROKER_URL="amqp://guest:guest@IPSTRING:5672//"
 env MANAGEMENT_USER="USERSTRING"
-env MANAGER_REST_PORT="{{ config_templates.__params_init.rest_port }}"
+env MANAGER_REST_PORT="{{ config_templates.__params_nginx.rest_and_ui_port }}"
 env MANAGEMENT_IP="IPSTRING"
 env CELERY_WORK_DIR="{{ config_templates.__params_init.work_dir }}/work"
 env IS_MANAGEMENT_NODE="True"
