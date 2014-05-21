@@ -338,7 +338,7 @@ check_port "rabbitmq-server" "{{ config_templates.__params_rabbitmq.port }}"
 sleep 1
 check_port "nginx (kibana)" "{{ config_templates.__params_nginx.kibana_port }}"
 sleep 1
-check_port "nginx (manager)" "{{ config_templates.__params_nginx.rest_port }}"
+check_port "nginx (manager)" "{{ config_templates.__params_nginx.rest_and_ui_port }}"
 sleep 1
 check_port "nginx (file-server)" "{{ config_templates.__params_nginx.file_server_port }}"
 sleep 1
