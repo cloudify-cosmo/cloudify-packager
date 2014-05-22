@@ -223,13 +223,14 @@ def pack(component):
     in packages.py
     uses fpm (https://github.com/jordansissel/fpm/wiki) to create packages.
 
-    .. note:: component params are defined in packages.py
+    .. note:: component params are defined in packages.py but can be passed
+     directly to the pack function as a dict.
 
     .. note:: param names in packages.py can be overriden by editing
      definitions.py
 
     :param string component: string representing component name
-     as configured in packages.py
+     as configured in packages.py or a dict containing component config.
     :param string name: package's name
      will be appended to the filename and to the package
      depending on its type
@@ -252,7 +253,8 @@ def pack(component):
     # get the cwd since fpm will later change it.
     cwd = os.getcwd()
 
-    c = get_package_configuration(component)
+    c = component if type(component) is dict \
+        else get_package_configuration(component)
     # define params for packaging
     auto_pack = c[defs.PARAM_AUTO_PACK] \
         if defs.PARAM_AUTO_PACK in c else True

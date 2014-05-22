@@ -229,9 +229,11 @@ PACKAGES = {
                 "gunicorn_user": "root",
                 "gunicorn_conf_path": "{0}/manager/config/conf/guni.conf".format(VIRTUALENVS_PATH),
                 "unicorn_user": "root",
+                "rest_port": "8100",
                 "ruby_path": "{0}/ruby".format(VIRTUALENVS_PATH),
                 "workflow_service_path": "{0}/manager/cloudify-manager-develop/workflow-service/".format(VIRTUALENVS_PATH),
                 "workflow_service_logs_path": "/var/log/cosmo/blueprints",
+                "ruote_storage_dir_path": "/var/ruotefs",
             },
             "__template_file_conf": {
                 "template": "{0}/manager/conf/guni.conf.template".format(PACKAGER_CONFIG_PATH),
@@ -276,7 +278,7 @@ PACKAGES = {
             "__params_init": {
                 "work_dir": "{0}/celery/cloudify.management__worker".format(VIRTUALENVS_PATH),
                 "base": "/opt/celery",
-                "rest_port": "8100",
+                "rest_port": "80",
                 "file_server_port": "53229",
             },
         }
