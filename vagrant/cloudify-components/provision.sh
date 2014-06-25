@@ -34,7 +34,8 @@ sudo pip install https://github.com/cloudify-cosmo/packman/archive/develop.tar.g
 
 # create cloudify components package
 cd /cloudify-packager/ &&
-sudo pkm make -c logstash,elasticsearch,kibana3,nginx,rabbitmq-server,riemann,nodejs,openjdk-7-jdk,virtualenv,curl,make,ruby,workflow_gems -v &&
+# sudo pkm make -c logstash,elasticsearch,kibana3,nginx,rabbitmq-server,riemann,nodejs,openjdk-7-jdk,virtualenv,curl,make,ruby,workflow_gems -v &&
+sudo pkm make -x cloudify-components,cloudify-ui,cloudify-core,manager,celery,cloudify-ubuntu-agent,Ubuntu-agent
 sudo pkm pack -c cloudify-components
 sudo mkdir /cloudify-packager/output-packages
 sudo mv /cloudify/* /cloudify-packager/output-packages
