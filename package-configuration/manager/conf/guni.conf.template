@@ -4,6 +4,5 @@
     file_server_root: '{{ config_templates.__params_conf.file_server_dir }}',
     file_server_blueprints_folder: 'blueprints',
     file_server_uploaded_blueprints_folder: 'uploaded-blueprints',
-    file_server_resources_uri: '/resources',
-    workflow_service_base_uri: 'http://localhost:8101'
+    file_server_resources_uri: '/resources'
 }

@@ -307,15 +307,6 @@ else
         echo -e "make is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
-echo -ne "checking whether ruby2.1 is installed..." | tee -a ${BOOTSTRAP_LOG}
-if ! dpkg -s ruby2.1 2>&1 | grep Status: | grep installed; then
-        echo -e "ruby2.1 is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        sudo dpkg -i ${PKG_DIR}/ruby/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        check_pkg "ruby2.1"
-else
-        echo -e "ruby2.1 is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
-fi
-
 echo -ne "checking whether nodejs is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s nodejs 2>&1 | grep Status: | grep installed; then
         echo -e "nodejs is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
@@ -331,8 +322,6 @@ echo -e "\nperforming post installation tests..." | tee -a ${BOOTSTRAP_LOG}
 check_exec "java"
 sleep 1
 check_exec "node"
-sleep 1
-check_exec "{{ config_templates.__params_ruby.run_dir }}/bin/ruby"
 sleep 1
 check_port "rabbitmq-server" "{{ config_templates.__params_rabbitmq.port }}"
 sleep 1
