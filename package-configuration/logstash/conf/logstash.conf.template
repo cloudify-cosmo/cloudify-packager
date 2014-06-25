@@ -1,0 +1,96 @@
+input {
+    rabbitmq {
+        queue => "{{ config_templates.__params_conf.logs_queue}}"
+        host => "localhost"
+        durable => "true"
+        auto_delete => "true"
+        exclusive => "false"
+        # key => "{{ config_templates.__params_conf.logs_queue}}"
+        # exchange => "test_exchange" # This matches the exchange declared above
+    }
+
+    rabbitmq {
+        queue => "{{ config_templates.__params_conf.events_queue}}"
+        host => "localhost"
+        durable => "true"
+        auto_delete => "true"
+        exclusive => "false"
+        # key => "{{ config_templates.__params_conf.events_queue}}"
+        # exchange => "test_exchange" # This matches the exchange declared above
+    }
+
+    # stdin {
+    # }
+
+    # file {
+        # path => "/var/log/packager/packager.log"
+        # start_position => "end"
+        # stat_interval => "1"
+    # }
+ 
+    tcp {
+        port => {{ config_templates.__params_conf.test_tcp_port }}
+    }
+}
+
+filter {
+    # json {
+       # source => "message"
+    # }
+
+    # multiline {
+        # pattern => "^\d\d\d\d-\d\d"
+        # negate => "true"
+        # what => "previous"
+    # }
+
+    #   grep {
+        #   match => [ "@message", "ERROR" ]
+    #   }
+
+    # grok {
+        # pattern => 2013-02-09 12:39:57,154 [http-bio-8443-exec-7] ERROR - deactivateUser for userid |+380937621759| deviceId |78E7D17FDA8B000|
+        # pattern => "(?m)%{TIMESTAMP_ISO8601:timestamp},%{NUMBER} %{GREEDYDATA:whatIsThis} %{LOGLEVEL:severity} %{GREEDYDATA:data}"
+    # }
+ 
+    # mutate {
+        # remove => "whatIsThis"
+        # replace => [ "@message", "%{timestamp} - %{whatIsThis} %{data}" ]
+    # }
+}
+
+output {
+    elasticsearch_http {
+        host => "localhost"
+        index => "{{ config_templates.__params_conf.events_index}}"
+    }
+
+    # riemann {
+        # host => ... # string (optional), default: "localhost"
+        # port => ... # number (optional), default: 5555
+        # protocol => ... # string, one of ["tcp", "udp"] (optional), default: "tcp"
+        # riemann_event => ... # hash (optional)
+        # sender => ... # string (optional), default: "%{host}"
+        # workers => ... # number (optional), default: 1
+    # }
+
+    # graphite {
+        # host => ... # string (optional), default: "localhost"
+        # include_metrics => ... # array (optional), default: [".*"]
+        # port => ... # number (optional), default: 2003
+        # workers => ... # number (optional), default: 1
+    # }
+
+    # statsd {
+        # host => "localhost"
+        # port => 8125
+        # namespace => "cloudify"
+        # timing => [ "apache.%{sitename}.servetime", "%{reqmusecst}" ]
+        # increment => "apache.%{sitename}.response.%{response}"
+        # count => [ "apache.%{sitename}.bytes", "%{bytes}" ]
+    # }
+
+    # stdout {
+        # debug => true
+    # }
+}

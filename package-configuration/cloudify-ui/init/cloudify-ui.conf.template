@@ -1,0 +1,12 @@
+description "cloudify-ui agent"
+
+start on (local-filesystems and net-device-up IFACE=eth0)
+stop on shutdown
+
+respawn
+respawn limit 5 60
+
+script
+        chdir {{ config_templates.__params_init.run_dir }}/node_modules/cosmo-ui
+        exec su -s /bin/sh -c "NODE_ENV=production /usr/bin/node {{ config_templates.__params_init.run_dir }}/node_modules/cosmo-ui/cosmoui.js localhost >> {{ config_templates.__params_init.log_file }} 2>&1" {{ config_templates.__params_init.user }}
+end script
