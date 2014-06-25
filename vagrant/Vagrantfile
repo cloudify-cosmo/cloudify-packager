@@ -17,7 +17,6 @@
 # vi: set ft=ruby :
 
 
-
 BASE_BOX_NAME = 'precise64'
 BASE_BOX_URI = 'http://files.vagrantup.com/precise64.box'
 
@@ -37,33 +36,6 @@ Vagrant.configure('2') do |config|
     packman.vm.hostname = 'packman'
     packman.vm.synced_folder "../", "/home/vagrant/cloudify-packager", create: true
     packman.vm.provision "shell", path: "provision.sh", privileged: true
-  end
-
-  config.vm.define :tester do |tester|
-
-    tester_ip = '10.0.0.10'
-
-    tester.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', '2048']
-    end
-    tester.vm.box = BASE_BOX_NAME
-    tester.vm.box_url = BASE_BOX_URI
-    tester.vm.network :private_network, ip: tester_ip
-    tester.vm.hostname = 'tester'
-    tester.vm.synced_folder "../", "/home/vagrant/cloudify-packager", create: true
-    command = "
-      echo bootstrapping... &&
-
-      # update - (optional) if you want to install additional packages on the testing server.
-      # sudo apt-get -y update &&
-
-      # install prereqs
-      # sudo apt-get install -y vim
-
-      echo bootstrap done
-      "
-
-    tester.vm.provision :shell, :inline => command
   end
 
 end

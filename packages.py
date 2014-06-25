@@ -445,21 +445,6 @@ PACKAGES = {
         "bootstrap_script": "{0}/virtualenv-bootstrap.sh".format(SCRIPTS_PATH),
         "bootstrap_template": "virtualenv-bootstrap.template"
     },
-    "graphite": {
-        "name": "graphite",
-        "version": "0.9.12",
-        "package_path": "{0}/graphite/".format(COMPONENT_PACKAGES_PATH),
-        "sources_path": "{0}/graphite".format(VIRTUALENVS_PATH),
-        "modules": [
-            'carbon==0.9.10',
-            'whisper==0.9.12',
-            'graphite-web==0.9.12'
-        ],
-        "src_package_type": "dir",
-        "dst_package_type": ["deb"],
-        "bootstrap_script": "{0}/graphite-bootstrap.sh".format(SCRIPTS_PATH),
-        "bootstrap_template": "graphite-bootstrap.template"
-    },
     "curl": {
         "name": "curl",
         "version": "0.0.1",

@@ -36,7 +36,7 @@ def _prepare(package):
 
 
 def get_ubuntu_agent(download=False):
-    package = get_conf('ubuntu-agent')
+    package = get_conf('Ubuntu-agent')
 
     dl_handler = WgetHandler()
     common = CommonHandler()
@@ -48,9 +48,9 @@ def get_ubuntu_agent(download=False):
     for url in package['source_urls']:
         dl_handler.download(url, file=tar_file)
     common.untar(package['sources_path'], tar_file)
-    # if download:
-    for module in package['modules']:
-        py_handler.pip(module, package['sources_path'])
+    if download:
+        for module in package['modules']:
+            py_handler.pip(module, package['sources_path'])
     # TODO: remove redundant data after module installation
 
 
