@@ -147,8 +147,6 @@ fi
 
 echo -e "\nperforming post installation tests..." | tee -a ${BOOTSTRAP_LOG}
 check_port "manager-rest" "{{ config_templates.__params_manager.port }}"
-sleep 1
-check_port "workflow-service" "{{ config_templates.__params_workflow.port }}"
-echo  -e "post installation tests completed successfully.\n"
+echo -e "post installation tests completed successfully.\n"
 
 echo -e "${PKG_NAME} ${VERSION} installation completed successfully!\n" | tee -a ${BOOTSTRAP_LOG}

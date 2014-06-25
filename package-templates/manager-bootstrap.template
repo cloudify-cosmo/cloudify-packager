@@ -116,7 +116,6 @@ sudo cp ${PKG_INIT_DIR}/*.conf ${INIT_DIR}
 # sudo cp ${PKG_CONF_DIR}/guni.conf ${PKG_DIR}
 
 check_file "${INIT_DIR}/manager.conf"
-check_file "${INIT_DIR}/workflow.conf"
 
 # sudo mv ${PKG_DIR}/${PKG_NAME} ${BASE_DIR}
 sudo ln -sf ${HOME_DIR}/cosmo-manager-*/ ${HOME_DIR}/${PKG_NAME}
@@ -127,6 +126,3 @@ sudo start manager
 check_upstart "manager"
 
 # todo: check if riemann is running
-echo "starting workflow-service..."
-sudo start workflow
-check_upstart "workflow"

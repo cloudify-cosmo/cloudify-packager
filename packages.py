@@ -40,9 +40,6 @@ PACKAGES = {
             "__params_manager": {
                 "port": "8100",
             },
-            "__params_workflow": {
-                "port": "8101",
-            },
         }
     },
     "cloudify-components": {
@@ -99,9 +96,6 @@ PACKAGES = {
                 "template": "{0}/riemann/init/riemann.conf.template".format(CONFIGS_PATH),
                 "config_dir": "config/riemann/init",
                 "dst_dir": "/etc/init/riemann.conf",
-            },
-            "__params_ruby": {
-                "run_dir": "/opt/ruby",
             },
             "__template_file_rabbitmq": {
                 "template": "{0}/rabbitmq/init/rabbitmq-server.conf.template".format(CONFIGS_PATH),
@@ -191,9 +185,6 @@ PACKAGES = {
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
         ],
-        "depends": [
-            'ruby2.1'
-        ],
         "package_path": "{0}/manager/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/manager".format(VIRTUALENVS_PATH),
         "modules": [
@@ -220,22 +211,12 @@ PACKAGES = {
                 "config_dir": "config/init",
                 "dst_dir": "/etc/init",
             },
-            "#__template_file_init_workflow": {
-                "template": "{0}/manager/init/workflow.conf.template".format(CONFIGS_PATH),
-                "output_file": "manager.conf",
-                "config_dir": "config/init",
-                "dst_dir": "/etc/init",
-            },
             "__params_init": {
                 "rest_server_path": "{0}/manager/cloudify-manager-{1}/rest-service/manager_rest/".format(VIRTUALENVS_PATH, MAIN_BRANCH),
                 "gunicorn_user": "root",
                 "gunicorn_conf_path": "{0}/manager/config/conf/guni.conf".format(VIRTUALENVS_PATH),
                 "unicorn_user": "root",
                 "rest_port": "8100",
-                "ruby_path": "{0}/ruby".format(VIRTUALENVS_PATH),
-                "workflow_service_path": "{0}/manager/cloudify-manager-{1}/workflow-service/".format(VIRTUALENVS_PATH, MAIN_BRANCH),
-                "workflow_service_logs_path": "/var/log/cosmo/blueprints",
-                "ruote_storage_dir_path": "/var/ruotefs",
             },
             "__template_file_conf": {
                 "template": "{0}/manager/conf/guni.conf.template".format(CONFIGS_PATH),
@@ -484,39 +465,5 @@ PACKAGES = {
         "package_path": "{0}/make/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/make".format(PACKAGES_PATH),
         "dst_package_type": ["deb"],
-    },
-    "ruby": {
-        "name": "ruby2.1",
-        "version": "2.1.0",
-        "package_path": "{0}/ruby/".format(COMPONENT_PACKAGES_PATH),
-        "sources_path": "{0}/ruby".format(VIRTUALENVS_PATH),
-        "src_package_type": "dir",
-        "dst_package_type": ["deb"],
-        "prereqs": [
-            'make',
-            'git',
-        ],
-        "ruby_build_dir": "/opt/ruby-build"
-    },
-    "workflow_gems": {
-        "name": "workflow-gems",
-        "version": "0.0.1",
-        "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
-        ],
-        "depends": [
-            'ruby2.1'
-        ],
-        "gemfile_location": "{0}/workflow-gems/cloudify-manager-{1}/workflow-service/Gemfile".format(PACKAGES_PATH, MAIN_BRANCH),
-        "gemfile_base_dir": "{0}/workflow-gems/cloudify-manager-{1}".format(PACKAGES_PATH, MAIN_BRANCH),
-        "package_path": "{0}/workflow-gems/".format(COMPONENT_PACKAGES_PATH),
-        "sources_path": "{0}/workflow-gems".format(PACKAGES_PATH),
-        "src_package_type": "dir",
-        "dst_package_type": ["deb"],
-        "prereqs": [
-            'make'
-        ],
-        "bootstrap_script": "{0}/workflow-gems-bootstrap.sh".format(SCRIPTS_PATH),
-        "bootstrap_template": "workflow-gems-bootstrap.template"
     },
 }
