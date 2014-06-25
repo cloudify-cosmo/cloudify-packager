@@ -22,7 +22,7 @@ sudo pip install https://github.com/cloudify-cosmo/packman/archive/develop.tar.g
 
 # create cloudify components package
 cd /home/vagrant/cloudify-packager/ &&
-sudo pkm make -c logstash,elasticsearch,kibana3,nginx,rabbitmq-server,riemann,nodejs,openjdk-7-jdk,virtualenv,curl,make,ruby,workflow_gems -v &&
+sudo pkm make -c logstash,elasticsearch,kibana3,nginx,rabbitmq-server,riemann,nodejs,openjdk-7-jdk,virtualenv,curl,make -v &&
 sudo pkm pack -c cloudify-components
 sudo mkdir /home/vagrant/cloudify-packager/output-packages
 sudo mv /cloudify/* /home/vagrant/cloudify-packager/output-packages

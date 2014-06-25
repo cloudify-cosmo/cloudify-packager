@@ -19,8 +19,6 @@ from packman.packman import get_component_config as get_conf
 from packman.packman import CommonHandler
 from packman.packman import PythonHandler
 from packman.packman import WgetHandler
-from packman.packman import AptHandler
-from packman.packman import do
 
 from fabric.api import *  # NOQA
 
@@ -95,44 +93,6 @@ def get_manager(download=False):
         for module in package['modules']:
             py_handler.pip(module, package['sources_path'])
     # TODO: remove redundant data after module installation
-
-
-def get_ruby():
-    package = get_conf('ruby')
-
-    _prepare(package)
-    apt_handler = AptHandler()
-    for dep in package['prereqs']:
-        apt_handler.install(dep)
-    with lcd('/opt'):
-        do('git clone '
-           'https://github.com/sstephenson/ruby-build.git')
-    do('export PREFIX=/opt/ruby-build', sudo=False)
-    do('/opt/ruby-build/install.sh')
-    do('/opt/ruby-build/bin/ruby-build -v {} {}'.format(
-        package['version'], package['sources_path']))
-
-
-def get_workflow_gems():
-    package = get_conf('workflow_gems')
-
-    apt_handler = AptHandler()
-    common = CommonHandler()
-    dl_handler = WgetHandler()
-    _prepare(package)
-    apt_handler.installs(package['prereqs'])
-
-    dl_handler.downloads(package['source_urls'], package['sources_path'])
-    common.untar(
-        package['sources_path'],
-        '{0}/{1}'.format(package['sources_path'], '*.tar.gz'))
-    common.rm('{0}/{1}'.format(package['sources_path'], '*.tar.gz'))
-    do('sudo /opt/ruby/bin/gem install bundler')
-    do('sudo /opt/ruby/bin/bundle --gemfile {0}'
-       .format(package['gemfile_location']))
-    common.rmdir(package['gemfile_base_dir'])
-    common.cp('/opt/ruby/lib/ruby/gems/2.1.0/cache/*.gem',
-              package['sources_path'])
 
 
 # @task
