@@ -139,6 +139,6 @@ curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage -d '
 echo "creating blueprint mapping..."
 curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/blueprint/_mapping -d '{"blueprint": {"properties": {"plan": {"enabled": false}}}}'
 echo "creating deployment mapping..."
-curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/deployment/_mapping -d '{"deployment": {"properties": {"plan": {"enabled": false}}}}'
+curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/deployment/_mapping -d '{"deployment": {"properties": {"plan": {"enabled": false}, "workflows": {"enabled": false}}}}'
 echo "printing mappings..."
 curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1
