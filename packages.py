@@ -62,7 +62,7 @@ PACKAGES = {
         },
         "config_templates": {
             "__template_file_nginx": {
-                "template": "{0}/nginx/conf/default.conf.template".format(CONFIG_PATH),
+                "template": "{0}/nginx/conf/default.conf.template".format(CONFIGS_PATH),
                 "output_file": "default.conf",
                 "config_dir": "config/nginx",
                 "dst_dir": "/etc/nginx/conf.d",
@@ -77,7 +77,7 @@ PACKAGES = {
             "__template_file_nginx_init": {
                 "template": "{0}/nginx/init/nginx.conf.template".format(CONFIGS_PATH),
                 "config_dir": "config/nginx",
-                "output_file": "nginx.conf"
+                "output_file": "nginx.conf",
                 "dst_dir": "/etc/init"
             },
             "__params_rabbitmq": {
@@ -147,7 +147,7 @@ PACKAGES = {
         "name": "cloudify-ubuntu-agent",
         "version": "3.0.0",
         "package_path": "/cloudify",
-        "sources_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
+        "sources_path": "{0}/linux-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
         "dst_package_types": ["deb", "rpm"],
         "bootstrap_script": "{0}/agent-ubuntu-bootstrap.sh".format(SCRIPTS_PATH),
@@ -168,22 +168,22 @@ PACKAGES = {
             },
         },
     },
-    "Ubuntu-agent": {
-        "name": "Ubuntu-agent",
+    "linux-agent": {
+        "name": "linux-agent",
         "version": "3.0.0",
         "source_urls": [
-            # "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/feature/CFY-781-add-agent-distribution-identification.tar.gz",
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
+            # "https://github.com/cloudify-cosmo/cloudify-manager/archive/feature/CFY-781-add-agent-distribution-identification.tar.gz",
         ],
-        "package_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
-        "sources_path": "/Ubuntu-agent/env",
+        "package_path": "{0}/linux-agent".format(AGENT_PACKAGES_PATH),
+        "sources_path": "/linux-agent/env",
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
                     'https://github.com/cloudify-cosmo/cloudify-rest-client/archive/{0}.tar.gz'.format(MAIN_BRANCH),
                     'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(MAIN_BRANCH),
-                    # '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/agent-installer/'.format(MAIN_BRANCH),
-                    # '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/plugin-installer/'.format(MAIN_BRANCH),
-                    '/Ubuntu-agent/env/cloudify-manager-feature-CFY-781-add-agent-distribution-identification/plugins/agent-installer/',
-                    '/Ubuntu-agent/env/cloudify-manager-feature-CFY-781-add-agent-distribution-identification/plugins/plugin-installer/',
+                    '/linux-agent/env/cloudify-manager-{0}/plugins/agent-installer/'.format(MAIN_BRANCH),
+                    '/linux-agent/env/cloudify-manager-{0}/plugins/plugin-installer/'.format(MAIN_BRANCH),
+                    # '/Ubuntu-agent/env/cloudify-manager-feature-CFY-781-add-agent-distribution-identification/plugins/agent-installer/',
+                    # '/Ubuntu-agent/env/cloudify-manager-feature-CFY-781-add-agent-distribution-identification/plugins/plugin-installer/',
         ],
         "src_package_type": "dir",
         "dst_package_types": ["tar.gz"],
