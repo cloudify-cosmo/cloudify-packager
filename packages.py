@@ -62,7 +62,7 @@ PACKAGES = {
         },
         "config_templates": {
             "__template_file_nginx": {
-                "template": "{0}/nginx/default.conf.template".format(CONFIGS_PATH),
+                "template": "{0}/nginx/conf/default.conf.template".format(CONFIG_PATH),
                 "output_file": "default.conf",
                 "config_dir": "config/nginx",
                 "dst_dir": "/etc/nginx/conf.d",
@@ -73,6 +73,12 @@ PACKAGES = {
                 "rest_and_ui_port": "80",
                 "file_server_port": "53229",
                 "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
+            },
+            "__template_file_nginx_init": {
+                "template": "{0}/nginx/init/nginx.conf.template".format(CONFIGS_PATH),
+                "config_dir": "config/nginx",
+                "output_file": "nginx.conf"
+                "dst_dir": "/etc/init"
             },
             "__params_rabbitmq": {
                 "port": "5672"
