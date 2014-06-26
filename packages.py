@@ -385,16 +385,11 @@ PACKAGES = {
     "rabbitmq-server": {
         "name": "rabbitmq-server",
         "version": "0.0.1",
-        "source_repos": [
-            "deb http://www.rabbitmq.com/debian/ testing main"
+        "source_urls": [
+            "http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server_3.2.4-1_all.deb",
         ],
-        "source_keys": [
-            "http://www.rabbitmq.com/rabbitmq-signing-key-public.asc"
-        ],
-        # "key_files": ["{0}/rabbitmq-server/rabbitmq-signing-key-public.asc".format(PACKAGES_PATH)],
         "reqs": [
-            "rabbitmq-server",
-            "erlang-nox"
+            "erlang-nox",
         ],
         "package_path": "{0}/rabbitmq-server/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/rabbitmq-server".format(PACKAGES_PATH),
