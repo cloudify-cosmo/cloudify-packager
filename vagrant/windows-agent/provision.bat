@@ -1,5 +1,5 @@
 SET REST_CLIENT_SHA=
-SET PLUGIN_COMMON_SHA=
+SET COMMON_PLUGIN_SHA=
 SET OS_PROVIDER_SHA=
 
 
@@ -16,7 +16,7 @@ pip install . -r dev-requirements.txt
 cd C:\\Cloudify-Agent
 git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 cd C:\\Cloudify-Agent\\cloudify-plugins-common
-if not (%PLUGIN_COMMON_SHA%)==() git reset --hard %PLUGIN_COMMON_SHA%
+if not (%COMMON_PLUGIN_SHA%)==() git reset --hard %COMMON_PLUGIN_SHA%
 pip install . 
 cd C:\\Cloudify-Agent
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
