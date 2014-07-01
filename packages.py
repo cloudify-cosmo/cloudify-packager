@@ -272,6 +272,7 @@ PACKAGES = {
                 "base": "/opt/celery",
                 "rest_port": "80",
                 "file_server_port": "53229",
+                "workers_autoscale": "5,2"
             },
         }
     },

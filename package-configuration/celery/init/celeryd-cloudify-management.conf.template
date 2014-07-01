@@ -34,4 +34,5 @@ exec {{ config_templates.__params_init.work_dir }}/env/bin/python -m celery.bin.
 --loglevel=debug \
 -Q cloudify.management \
 --logfile={{ config_templates.__params_init.work_dir }}/work/cloudify.management_worker.log \
---pidfile={{ config_templates.__params_init.work_dir }}/work/cloudify.management_worker.pid
+--pidfile={{ config_templates.__params_init.work_dir }}/work/cloudify.management_worker.pid \
+--autoscale={{ config_templates.__params_init.worker_autoscale }}
