@@ -5,22 +5,6 @@ AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
 AWS_PK_PATH = ENV['AWS_PK_PATH']
 VAGRANTFILE_API_VERSION = "2"
 
-PROVISION = <<EOS
-"cd c:\\ && \
-virtualenv Cloudify-Agent && \
-mkdir C:\\Cloudify-Agent\\nssm\ && \
-copy C:\\Tools\\nssm.exe C:\\Cloudify-Agent\\nssm\\nssm.exe && \
-cd Cloudify-Agent && \
-call Scripts\\activate.bat && \
-git clone https://github.com/cloudify-cosmo/cloudify-manager.git && \
-cd C:\\Cloudify-Agent\\cloudify-manager\\plugins\\plugin-installer && \
-pip install git+https://github.com/cloudify-cosmo/cloudify-rest-client.git && \
-pip install . --process-dependency-links  && \
-cd c:\\ && \
-rmdir /s /q C:\\Cloudify-Agent\\cloudify-manager && \
-7z a -r -sfx -x!.* Cloudify.exe Cloudify-Agent\\*"
-EOS
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "windows" do |windows|
     windows.vm.box = "dummy"
@@ -31,7 +15,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       #this pre-baked AMI, not pure base image
-      aws.ami = "ami-47d61d30"
+      aws.ami = "ami-c9e923be"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
@@ -46,10 +30,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     windows.vm.synced_folder ".", "/vagrant", disabled: true
+    windows.vm.synced_folder ".", "/home/vagrant"
+
+    #shell provision use bash, so use cmd to run batch script
     windows.vm.provision "shell" do |shell|
-      shell.inline = "cmd /c #{PROVISION}"
+      shell.inline = 'cmd /c "c:\\cygwin64\\home\\vagrant\\provision.bat"'
       shell.privileged = false
-    end
+    end  
   end
 end
-
