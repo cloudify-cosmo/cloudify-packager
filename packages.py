@@ -113,9 +113,6 @@ PACKAGES = {
     "cloudify-ui": {
         "name": "cloudify-ui",
         "version": "1.0.0",
-        "source_urls": [
-            "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
-        ],
         "depends": [
             'nodejs'
         ],
