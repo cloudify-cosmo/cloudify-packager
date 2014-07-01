@@ -77,8 +77,8 @@ PACKAGES = {
             "__template_file_nginx_init": {
                 "template": "{0}/nginx/init/nginx.conf.template".format(CONFIGS_PATH),
                 "config_dir": "config/nginx",
-                "output_file": "nginx.conf"
-                "dst_dir": "/etc/init"
+                "output_file": "nginx.conf",
+                "dst_dir": "/etc/init",
             },
             "__params_rabbitmq": {
                 "port": "5672"
