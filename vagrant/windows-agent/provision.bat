@@ -4,28 +4,28 @@ SET OS_PROVIDER_SHA=
 
 
 cd c:\\ 
-virtualenv Cloudify-Agent 
-md C:\\Cloudify-Agent\\nssm\ 
-copy C:\\Tools\\nssm.exe C:\\Cloudify-Agent\\nssm\\nssm.exe 
-cd Cloudify-Agent 
+virtualenv CloudifyAgent 
+md C:\\CloudifyAgent\\nssm\ 
+copy C:\\Tools\\nssm.exe C:\\CloudifyAgent\\nssm\\nssm.exe 
+cd CloudifyAgent 
 call Scripts\\activate.bat 
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git 
-cd C:\\Cloudify-Agent\\cloudify-rest-client 
+cd C:\\CloudifyAgent\\cloudify-rest-client 
 if not (%REST_CLIENT_SHA%)==() git reset --hard %REST_CLIENT_SHA% 
 pip install . -r dev-requirements.txt
-cd C:\\Cloudify-Agent
+cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
-cd C:\\Cloudify-Agent\\cloudify-plugins-common
+cd C:\\CloudifyAgent\\cloudify-plugins-common
 if not (%COMMON_PLUGIN_SHA%)==() git reset --hard %COMMON_PLUGIN_SHA%
 pip install . 
-cd C:\\Cloudify-Agent
+cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
-cd C:\\Cloudify-Agent\\cloudify-manager
+cd C:\\CloudifyAgent\\cloudify-manager
 if not (%MANAGER_SHA%)==() git reset --hard %MANAGER_SHA% 
 cd plugins\\plugin-installer 
 pip install . 
 cd c:\\ 
-rmdir /s /q C:\\Cloudify-Agent\\cloudify-rest-client
-rmdir /s /q C:\\Cloudify-Agent\\cloudify-plugins-common
-rmdir /s /q C:\\Cloudify-Agent\\cloudify-manager 
-7z a -r -sfx -x!.* Cloudify.exe c:\\Cloudify-Agent\\*
+rmdir /s /q C:\\CloudifyAgent\\cloudify-rest-client
+rmdir /s /q C:\\CloudifyAgent\\cloudify-plugins-common
+rmdir /s /q C:\\CloudifyAgent\\cloudify-manager 
+7z a -r -sfx -x!.* Cloudify.exe c:\\CloudifyAgent\\*
