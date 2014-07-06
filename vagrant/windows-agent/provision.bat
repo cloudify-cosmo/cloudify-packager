@@ -22,7 +22,7 @@ cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
 cd C:\\CloudifyAgent\\cloudify-manager
 if not (%MANAGER_SHA%)==() git reset --hard %MANAGER_SHA% 
-cd plugins\\plugin-installer 
+cd plugins\\windows-plugin-installer
 pip install . 
 cd c:\\ 
 rmdir /s /q C:\\CloudifyAgent\\cloudify-rest-client
