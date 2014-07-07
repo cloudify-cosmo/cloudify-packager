@@ -256,8 +256,7 @@ PACKAGES = {
                     '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/agent-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
                     '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/windows-agent-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
                     '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/plugin-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
-                    '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/windows-plugin-installer/'
-                    .format(VIRTUALENVS_PATH, MAIN_BRANCH),
+                    '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/windows-plugin-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
                     'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(MAIN_BRANCH),
         ],
         "src_package_type": "dir",
