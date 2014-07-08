@@ -12,7 +12,7 @@ call Scripts\\activate.bat
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git 
 cd C:\\CloudifyAgent\\cloudify-rest-client 
 if not (%REST_CLIENT_SHA%)==() git reset --hard %REST_CLIENT_SHA% 
-pip install . -r dev-requirements.txt
+pip install .
 cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 cd C:\\CloudifyAgent\\cloudify-plugins-common
