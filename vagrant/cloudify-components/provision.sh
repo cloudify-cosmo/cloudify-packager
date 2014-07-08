@@ -32,19 +32,15 @@ sudo pip install virtualenv==1.11.4 &&
 # install packman
 sudo pip install https://github.com/cloudify-cosmo/packman/archive/develop.tar.gz
 
+# download backup components file (WORKAROUND UNTIL PACKMAN BUG IS FIXED)
+cd ~
+sudo wget https://dl.dropboxusercontent.com/u/407576/static_components.tar.gz &&
+sudo tar -xzvf static_components.tar.gz -C / &&
+
 # create cloudify components package
 cd /cloudify-packager/ &&
-# sudo pkm make -c logstash,elasticsearch,kibana3,nginx,rabbitmq-server,riemann,nodejs,openjdk-7-jdk,virtualenv,curl,make,ruby,workflow_gems -v &&
-sudo pkm make -x cloudify-components,cloudify-ui,cloudify-core,manager,celery,cloudify-ubuntu-agent,Ubuntu-agent
+sudo pkm make -c elasticsearch,logstash
 sudo pkm pack -c cloudify-components
-sudo mkdir /cloudify-packager/output-packages
-sudo mv /cloudify/* /cloudify-packager/output-packages
-
-# TODO: add virtualenv to provisioning process
-# sudo pip install virtualenvwrapper
-# mkvirtualenv packman
-# TODO: add bash completion support using docopt-completion
-# docopt-completion #VIRTUALENV#...pkm.py?
 
 echo bootstrap done
 echo NOTE: currently, using some of the packman's features requires that it's run as sudo.
