@@ -3,7 +3,7 @@
 
 # update and install prereqs
 sudo apt-get -y update &&
-sudo apt-get install -y python-setuptools python-dev rubygems rpm libyaml-dev &&
+sudo apt-get install -y curl python-dev rubygems rpm libyaml-dev &&
 
 # install ruby
 wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p547.tar.bz2
@@ -20,14 +20,7 @@ echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc 
 echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc --no-ri' >> /root/.gemrc
 
 # install pip
-sudo apt-get purge pip
-sudo easy_install -U pip &&
-sudo wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | sudo python &&
-# install pip alternative
-# curl --silent --show-error --retry 5 https://raw.githubusercontent.com/pypa/pip/master/contrib/get-pip.py | sudo python
-
-# install virtualenv
-sudo pip install virtualenv==1.11.4 &&
+curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
 
 # install packman
 sudo pip install https://github.com/cloudify-cosmo/packman/archive/develop.tar.gz
