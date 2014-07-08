@@ -113,9 +113,6 @@ PACKAGES = {
     "cloudify-ui": {
         "name": "cloudify-ui",
         "version": "1.0.0",
-        "source_urls": [
-            "http://builds.gsdev.info/cosmo-ui/1.0.0/cosmo-ui-1.0.0-latest.tgz",
-        ],
         "depends": [
             'nodejs'
         ],
@@ -181,6 +178,8 @@ PACKAGES = {
                     'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(MAIN_BRANCH),
                     '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/agent-installer/'.format(MAIN_BRANCH),
                     '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/plugin-installer/'.format(MAIN_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/windows-agent-installer/'.format(MAIN_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/windows-plugin-installer/'.format(MAIN_BRANCH),
         ],
         "src_package_type": "dir",
         "dst_package_types": ["tar.gz"],

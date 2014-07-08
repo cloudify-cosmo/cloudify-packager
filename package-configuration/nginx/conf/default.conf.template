@@ -83,7 +83,7 @@ server {
     proxy_set_header   Host             $http_host;
   }
 
-  location ~ ^/(blueprints|executions|deployments|nodes|events|search|status|provider|api|node-instances) {
+  location ~ ^/(blueprints|executions|deployments|nodes|events|search|status|provider|api|node-instances|version) {
     proxy_pass         http://cloudify-rest;
     proxy_redirect     off;
 
