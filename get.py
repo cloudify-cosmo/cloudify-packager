@@ -36,7 +36,7 @@ def _prepare(package):
 
 
 def get_ubuntu_agent(download=False):
-    package = get_conf('ubuntu-agent')
+    package = get_conf('Ubuntu-agent')
 
     dl_handler = WgetHandler()
     common = CommonHandler()
