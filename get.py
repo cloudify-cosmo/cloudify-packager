@@ -35,8 +35,8 @@ def _prepare(package):
     common.mkdir(package['package_path'])
 
 
-def get_linux_agent(download=False):
-    package = get_conf('linux-agent')
+def get_ubuntu_agent(download=False):
+    package = get_conf('ubuntu-agent')
 
     dl_handler = WgetHandler()
     common = CommonHandler()
