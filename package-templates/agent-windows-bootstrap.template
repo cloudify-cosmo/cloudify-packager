@@ -82,5 +82,6 @@ echo -e "\nInstalling ${PKG_NAME} version ${VERSION}...\n" | tee -a ${BOOTSTRAP_
 sudo mkdir -p ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 check_dir ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 sudo cp ${PKG_DIR}/*.exe ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}/CloudifyWindowsAgent.exe >> ${BOOTSTRAP_LOG} 2>&1
+sudo chmod 744 CloudifyWindowsAgent.exe >> ${BOOTSTRAP_LOG} 2>&1
 
 echo -e "${PKG_NAME} ${VERSION} installation completed successfully!\n" | tee -a ${BOOTSTRAP_LOG}
