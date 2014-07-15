@@ -165,6 +165,21 @@ PACKAGES = {
             },
         },
     },
+    "cloudify-windows-agent": {
+        "name": "cloudify-windows-agent",
+        "version": "3.0.0",
+        "package_path": "/cloudify",
+        "sources_path": "{0}/windows-agent".format(AGENT_PACKAGES_PATH),
+        "src_package_type": "dir",
+        "dst_package_types": ["deb"],
+        "bootstrap_script": "{0}/agent-windows-bootstrap.sh".format(SCRIPTS_PATH),
+        "bootstrap_template": "agent-windows-bootstrap.template",
+        "bootstrap_params": {
+            "file_server_path": "{0}/manager/resources".format(VIRTUALENVS_PATH),
+            "dst_agent_location": "packages/agents",
+        },
+        "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+    },
     "Ubuntu-agent": {
         "name": "Ubuntu-agent",
         "version": "3.0.0",

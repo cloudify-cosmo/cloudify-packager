@@ -76,21 +76,12 @@ HOME_DIR="${BASE_DIR}/${PKG_NAME}/cloudify.${WORKER_MODIFIER}/env"
 
 FILE_SERVER_PATH={{ bootstrap_params.file_server_path }}
 DST_AGENT_LOCATION={{ bootstrap_params.dst_agent_location }}
-DST_TEMPLATE_LOCATION={{ bootstrap_params.dst_template_location }}
-DST_SCRIPT_LOCATION={{ bootstrap_params.dst_script_location }}
 
 echo -e "\nInstalling ${PKG_NAME} version ${VERSION}...\n" | tee -a ${BOOTSTRAP_LOG}
 
 sudo mkdir -p ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-sudo mkdir -p ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-sudo mkdir -p ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-
 check_dir ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-check_dir ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-check_dir ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-
-sudo cp -R ${PKG_DIR}/*.tar.gz ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-sudo cp -R ${PKG_DIR}/config/*.template ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-sudo cp -R ${PKG_DIR}/config/Ubuntu-agent-disable-requiretty.sh ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+sudo cp ${PKG_DIR}/*.exe ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}/CloudifyWindowsAgent.exe >> ${BOOTSTRAP_LOG} 2>&1
+sudo chmod 744 ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION}/CloudifyWindowsAgent.exe >> ${BOOTSTRAP_LOG} 2>&1
 
 echo -e "${PKG_NAME} ${VERSION} installation completed successfully!\n" | tee -a ${BOOTSTRAP_LOG}

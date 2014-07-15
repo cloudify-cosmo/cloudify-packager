@@ -15,7 +15,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       #this pre-baked AMI, not pure base image
-      aws.ami = "ami-c9e923be"
+      aws.ami = "ami-bbd90ecc"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 

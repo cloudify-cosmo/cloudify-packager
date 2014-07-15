@@ -16,23 +16,15 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-
-BASE_BOX_NAME = 'precise64'
-BASE_BOX_URI = 'http://files.vagrantup.com/precise64.box'
+BASE_BOX_NAME = 'hashicorp/precise64'
 
 Vagrant.configure('2') do |config|
 
   config.vm.define :packman do |packman|
-
-    packman_ip = '10.0.0.2'
-
     packman.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', '1024']
-      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     end
     packman.vm.box = BASE_BOX_NAME
-    packman.vm.box_url = BASE_BOX_URI
-    packman.vm.network :private_network, ip: packman_ip
     packman.vm.hostname = 'packman'
     packman.vm.synced_folder "../", "/home/vagrant/cloudify-packager", create: true
     packman.vm.provision "shell", path: "provision.sh", privileged: true
