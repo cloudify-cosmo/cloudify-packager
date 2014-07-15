@@ -25,7 +25,7 @@ sudo pip install https://github.com/cloudify-cosmo/packman/archive/develop.tar.g
 
 # download backup components file (WORKAROUND UNTIL PACKMAN BUG IS FIXED)
 cd ~
-sudo wget https://dl.dropboxusercontent.com/u/407576/static_components.tar.gz &&
+sudo wget http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/static_components/static_components.tar.gz &&
 sudo tar -xzvf static_components.tar.gz -C / &&
 
 # create cloudify components package
