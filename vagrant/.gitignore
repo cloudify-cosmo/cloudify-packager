@@ -1,6 +1,5 @@
 *.py[cod]
 *.pyc
-*.iml
 
 # C extensions
 *.so
@@ -9,8 +8,6 @@
 *.egg
 *.egg-info
 *.deb
-*.iml
-.idea
 dist
 build
 eggs
@@ -27,10 +24,14 @@ __pycache__
 # Installer logs
 pip-log.txt
 
+# Logs files
+*.log
+
 # Unit test / coverage reports
 .coverage
 .tox
 nosetests.xml
+.travis-solo
 
 # Translations
 *.mo
@@ -40,7 +41,7 @@ nosetests.xml
 .project
 .pydevproject
 
+~
 .vagrant/
-*COMMIT_MSG
-
-packager.log
+debs/
+rpms/
