@@ -1,7 +1,7 @@
 # flake8: NOQA
 
 # user configuration (OPTIONAL)
-MAIN_BRANCH = 'develop'  # branch to use when retrieving resources
+MAIN_BRANCH = 'master'  # branch to use when retrieving resources
 PACKAGES_PATH = "/packages"  # temporary directory to which items are downloaded and in which packages are created.
 VIRTUALENVS_PATH = "/opt"  # directory for cosmo modules and virtual environments
 AGENT_VIRTUALENVS_PATH = "/env"  # final directory to put the created packages in.
