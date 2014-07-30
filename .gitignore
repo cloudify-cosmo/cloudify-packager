@@ -44,3 +44,6 @@ nosetests.xml
 *COMMIT_MSG
 
 packager.log
+
+# QuickBuild
+.qbcache/
