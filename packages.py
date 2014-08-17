@@ -89,14 +89,9 @@ PACKAGES = {
             "__params_elasticsearch": {
                 "port": "9200"
             },
-            "__template_dir_riemann": {
-                "templates": "{0}/riemann/conf".format(CONFIGS_PATH),
-                "config_dir": "config/riemann/conf",
-                "dst_dir": "/etc/riemann",
-            },
             "__params_riemann": {
-                "ws_port": "5556",
-                "tcp_port": "5555",
+                "langohr_jar": "{0}/riemann/langohr.jar".format(COMPONENT_PACKAGES_PATH),
+                "manager_config": "{0}/manager/plugins/riemann-controller/riemann_controller/resources/manager.config".format(VIRTUALENVS_PATH)
             },
             "__template_file_riemann": {
                 "template": "{0}/riemann/init/riemann.conf.template".format(CONFIGS_PATH),
@@ -415,9 +410,10 @@ PACKAGES = {
     },
     "riemann": {
         "name": "riemann",
-        "version": "0.2.2",
+        "version": "0.2.6",
         "source_urls": [
-            "http://aphyr.com/riemann/riemann_0.2.2_all.deb",
+            "http://aphyr.com/riemann/riemann_0.2.6_all.deb",
+            "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/lengohr/2.11.0/lengohr.jar"
         ],
         "depends": [
             'openjdk-7-jdk'
