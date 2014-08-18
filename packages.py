@@ -203,9 +203,8 @@ PACKAGES = {
         "package_path": "{0}/manager/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/manager".format(VIRTUALENVS_PATH),
         "modules": [
+            'https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/{0}.tar.gz'.format(MAIN_BRANCH),
             '{0}/manager/cloudify-manager-{1}/rest-service/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
-            '{0}/manager/cloudify-manager-{1}/plugins/agent-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
-            '{0}/manager/cloudify-manager-{1}/plugins/plugin-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
         ],
         "resources_path": "{0}/manager/cloudify-manager-{1}/resources/rest-service/cloudify/".format(VIRTUALENVS_PATH, MAIN_BRANCH),
         "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
