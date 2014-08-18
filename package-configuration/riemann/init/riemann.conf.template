@@ -18,5 +18,5 @@ script
     if [[ -f ${MANAGER_CONFIG_PATH} ]]; then
         CONFIG_PATH=${MANAGER_CONFIG_PATH}
     fi
-    exec sudo -u riemann -E /usr/bin/riemann ${CONFIG_PATH}
+    exec sudo -u riemann -E /usr/bin/riemann -a ${CONFIG_PATH}
 end script

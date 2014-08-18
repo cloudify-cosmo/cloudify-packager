@@ -90,7 +90,7 @@ PACKAGES = {
                 "port": "9200"
             },
             "__params_riemann": {
-                "langohr_jar": "{0}/riemann/langohr.jar".format(COMPONENT_PACKAGES_PATH),
+                "langohr_jar": "{0}/riemann/langohr/langohr.jar".format(COMPONENT_PACKAGES_PATH),
                 "manager_config": "{0}/manager/plugins/riemann-controller/riemann_controller/resources/manager.config".format(VIRTUALENVS_PATH)
             },
             "__template_file_riemann": {
@@ -408,14 +408,25 @@ PACKAGES = {
         "sources_path": "{0}/rabbitmq-server".format(PACKAGES_PATH),
         "dst_package_type": ["deb"]
     },
+    "lengohr": {
+        "name": "lengohr",
+        "version": "2.11.0",
+        "source_urls": [
+            "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/lengohr/2.11.0/lengohr.jar"
+        ],
+        "package_path": "{0}/riemann/lengohr".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/lengohr".format(PACKAGES_PATH),
+        "src_package_type": "dir",
+        "dst_package_type": ["deb"],
+    },
     "riemann": {
         "name": "riemann",
         "version": "0.2.6",
         "source_urls": [
             "http://aphyr.com/riemann/riemann_0.2.6_all.deb",
-            "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/lengohr/2.11.0/lengohr.jar"
         ],
         "depends": [
+            'lengohr'
             'openjdk-7-jdk'
         ],
         "package_path": "{0}/riemann/".format(COMPONENT_PACKAGES_PATH),
