@@ -198,7 +198,8 @@ PACKAGES = {
         "name": "manager",
         "version": "3.0.0",
         "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
+            # "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format('CFY-1049-policies'),
         ],
         "package_path": "{0}/manager/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/manager".format(VIRTUALENVS_PATH),
@@ -252,7 +253,8 @@ PACKAGES = {
         "name": "celery",
         "version": "0.0.1",
         "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
+            # "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format('CFY-1049-policies'),
         ],
         "package_path": "{0}/celery/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_PATH),
