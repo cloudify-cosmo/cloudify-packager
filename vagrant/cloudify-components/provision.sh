@@ -28,9 +28,12 @@ cd ~
 sudo wget http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/static_components/static_components.tar.gz &&
 sudo tar -xzvf static_components.tar.gz -C / &&
 
+# TODO temp workaround, Need Nir's help with this process
+sudo rm -rf /cloudify-components/riemann
+
 # create cloudify components package
 cd /cloudify-packager/ &&
-sudo pkm make -c elasticsearch,logstash
+sudo pkm make -c elasticsearch,logstash,lengohr,riemann
 sudo pkm pack -c cloudify-components
 
 echo bootstrap done
