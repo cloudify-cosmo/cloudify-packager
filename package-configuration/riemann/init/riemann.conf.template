@@ -1,7 +1,7 @@
 description "Riemann"
 
-start on started rabbitmq-server
-start on runlevel [2345]
+start on (started rabbitmq-server
+          and runlevel [2345])
 stop on runlevel [016]
 
 kill timeout 60
@@ -15,8 +15,8 @@ script
     export EXTRA_CLASSPATH="{{ config_templates.__params_riemann.langohr_jar }}"
     CONFIG_PATH=""
     MANAGER_CONFIG_PATH="{{ config_templates.__params_riemann.manager_config }}"
-    if [[ -f ${MANAGER_CONFIG_PATH} ]]; then
+    if [ -f ${MANAGER_CONFIG_PATH} ]; then
         CONFIG_PATH=${MANAGER_CONFIG_PATH}
     fi
-    exec sudo -u riemann -E /usr/bin/riemann -a ${CONFIG_PATH}
+    exec /usr/bin/riemann -a ${CONFIG_PATH}
 end script
