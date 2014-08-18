@@ -54,7 +54,7 @@ def get_ubuntu_agent(download=False):
     # TODO: remove redundant data after module installation
 
 
-def get_celery(download=False):
+def get_celery(download=True):
     package = get_conf('celery')
 
     dl_handler = WgetHandler()
@@ -73,7 +73,7 @@ def get_celery(download=False):
     # TODO: remove redundant data after module installation
 
 
-def get_manager(download=False):
+def get_manager(download=True):
     package = get_conf('manager')
 
     dl_handler = WgetHandler()

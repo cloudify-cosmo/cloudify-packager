@@ -411,14 +411,14 @@ PACKAGES = {
         "sources_path": "{0}/rabbitmq-server".format(PACKAGES_PATH),
         "dst_package_type": ["deb"]
     },
-    "lengohr": {
-        "name": "lengohr",
+    "langohr": {
+        "name": "langohr",
         "version": "2.11.0",
         "source_urls": [
             "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/lengohr/2.11.0/lengohr.jar"
         ],
-        "package_path": "{0}/riemann/lengohr".format(COMPONENT_PACKAGES_PATH),
-        "sources_path": "{0}/lengohr".format(PACKAGES_PATH),
+        "package_path": "{0}/riemann/langohr".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/langohr".format(PACKAGES_PATH),
         "src_package_type": "dir",
         "dst_package_type": ["deb"],
     },
@@ -429,7 +429,7 @@ PACKAGES = {
             "http://aphyr.com/riemann/riemann_0.2.6_all.deb",
         ],
         "depends": [
-            'lengohr'
+            'langohr'
             'openjdk-7-jdk'
         ],
         "package_path": "{0}/riemann/".format(COMPONENT_PACKAGES_PATH),
