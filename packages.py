@@ -91,7 +91,7 @@ PACKAGES = {
             },
             "__params_riemann": {
                 "langohr_jar": "{0}/riemann/langohr/langohr.jar".format(COMPONENT_PACKAGES_PATH),
-                "manager_config": "{0}/manager/plugins/riemann-controller/riemann_controller/resources/manager.config".format(VIRTUALENVS_PATH)
+                "manager_config": "{0}/manager/cloudify-manager-{1}/plugins/riemann-controller/riemann_controller/resources/manager.config".format(VIRTUALENVS_PATH, MAIN_BRANCH)
             },
             "__template_file_riemann": {
                 "template": "{0}/riemann/init/riemann.conf.template".format(CONFIGS_PATH),
@@ -257,10 +257,14 @@ PACKAGES = {
         ],
         "package_path": "{0}/celery/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_PATH),
-        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
-                    '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/agent-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
-                    '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/plugin-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
-                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(MAIN_BRANCH),
+        "modules": [
+            'billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
+            'https://github.com/cloudify-cosmo/cloudify-rest-client/archive/{0}.tar.gz'.format(MAIN_BRANCH),
+            'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(MAIN_BRANCH),
+            '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/agent-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
+            '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/plugin-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
+            '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/riemann-controller/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
+            '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/workflows/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
         ],
         "src_package_type": "dir",
         "dst_package_type": ["deb"],
