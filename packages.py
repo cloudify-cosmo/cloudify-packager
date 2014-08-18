@@ -415,7 +415,7 @@ PACKAGES = {
         "name": "langohr",
         "version": "2.11.0",
         "source_urls": [
-            "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/lengohr/2.11.0/lengohr.jar"
+            "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar"
         ],
         "package_path": "{0}/riemann/langohr".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/langohr".format(PACKAGES_PATH),
