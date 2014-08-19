@@ -2,7 +2,7 @@
 
 # user configuration (OPTIONAL)
 MAIN_BRANCH = 'master'  # branch to use when retrieving resources
-MANAGER_BRANCH = 'CFY-1049-policies'
+MANAGER_BRANCH = MAIN_BRANCH
 REST_CLIENT_BRANCH = MAIN_BRANCH
 PLUGINS_COMMON_BRANCH = MAIN_BRANCH
 DSL_PARSER_BRANCH = MAIN_BRANCH
