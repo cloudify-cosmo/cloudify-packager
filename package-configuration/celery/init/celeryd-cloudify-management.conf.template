@@ -23,10 +23,10 @@ env MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL="${MANAGER_FILE_SERVER_URL}/blueprin
 env CELERY_TASK_SERIALIZER="json"
 env CELERY_RESULT_SERIALIZER="json"
 env CELERY_RESULT_BACKEND="amqp://"
-
+env RIEMANN_CONFIGS_DIR="{{ config_templates.__params_init.work_dir }}/riemann"
 
 exec {{ config_templates.__params_init.work_dir }}/env/bin/python -m celery.bin.celeryd \
---include=system_workflows.workers_installation,plugin_installer.tasks,worker_installer.tasks \
+--include=system_workflows.workers_installation,plugin_installer.tasks,worker_installer.tasks,riemann_controller.tasks \
 --broker=amqp:// \
 -n celery.cloudify.management \
 --events \

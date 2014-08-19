@@ -2,6 +2,11 @@
 
 # user configuration (OPTIONAL)
 MAIN_BRANCH = 'master'  # branch to use when retrieving resources
+MANAGER_BRANCH = MAIN_BRANCH
+REST_CLIENT_BRANCH = MAIN_BRANCH
+PLUGINS_COMMON_BRANCH = MAIN_BRANCH
+DSL_PARSER_BRANCH = MAIN_BRANCH
+
 PACKAGES_PATH = "/packages"  # temporary directory to which items are downloaded and in which packages are created.
 VIRTUALENVS_PATH = "/opt"  # directory for cosmo modules and virtual environments
 AGENT_VIRTUALENVS_PATH = "/env"  # final directory to put the created packages in.

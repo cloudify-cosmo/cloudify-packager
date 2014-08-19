@@ -69,9 +69,9 @@ NOTE: here's an example of a packages.py file:
     PACKAGES = {
         "riemann": {
             "name": "riemann",
-            "version": "0.2.2",
+            "version": "0.2.6",
             "source_urls": [
-                "http://aphyr.com/riemann/riemann_0.2.2_all.deb",
+                "http://aphyr.com/riemann/riemann_0.2.6_all.deb",
             ],
             "depends": [
                 'openjdk-7-jdk'

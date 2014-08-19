@@ -89,14 +89,9 @@ PACKAGES = {
             "__params_elasticsearch": {
                 "port": "9200"
             },
-            "__template_dir_riemann": {
-                "templates": "{0}/riemann/conf".format(CONFIGS_PATH),
-                "config_dir": "config/riemann/conf",
-                "dst_dir": "/etc/riemann",
-            },
             "__params_riemann": {
-                "ws_port": "5556",
-                "tcp_port": "5555",
+                "langohr_jar": "{0}/riemann/langohr/langohr.jar".format(COMPONENT_PACKAGES_PATH),
+                "manager_config": "{0}/manager/cloudify-manager-{1}/plugins/riemann-controller/riemann_controller/resources/manager.config".format(VIRTUALENVS_PATH, MANAGER_BRANCH)
             },
             "__template_file_riemann": {
                 "template": "{0}/riemann/init/riemann.conf.template".format(CONFIGS_PATH),
@@ -184,17 +179,17 @@ PACKAGES = {
         "name": "Ubuntu-agent",
         "version": "3.0.0",
         "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
         ],
         "package_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
         "sources_path": "/Ubuntu-agent/env",
         "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
-                    'https://github.com/cloudify-cosmo/cloudify-rest-client/archive/{0}.tar.gz'.format(MAIN_BRANCH),
-                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(MAIN_BRANCH),
-                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/agent-installer/'.format(MAIN_BRANCH),
-                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/plugin-installer/'.format(MAIN_BRANCH),
-                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/windows-agent-installer/'.format(MAIN_BRANCH),
-                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/windows-plugin-installer/'.format(MAIN_BRANCH),
+                    'https://github.com/cloudify-cosmo/cloudify-rest-client/archive/{0}.tar.gz'.format(REST_CLIENT_BRANCH),
+                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(PLUGINS_COMMON_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/agent-installer/'.format(MANAGER_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/plugin-installer/'.format(MANAGER_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/windows-agent-installer/'.format(MANAGER_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/windows-plugin-installer/'.format(MANAGER_BRANCH),
         ],
         "src_package_type": "dir",
         "dst_package_types": ["tar.gz"],
@@ -203,16 +198,15 @@ PACKAGES = {
         "name": "manager",
         "version": "3.0.0",
         "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
         ],
         "package_path": "{0}/manager/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/manager".format(VIRTUALENVS_PATH),
         "modules": [
-            '{0}/manager/cloudify-manager-{1}/rest-service/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
-            '{0}/manager/cloudify-manager-{1}/plugins/agent-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
-            '{0}/manager/cloudify-manager-{1}/plugins/plugin-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
+            'https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/{0}.tar.gz'.format(DSL_PARSER_BRANCH),
+            '{0}/manager/cloudify-manager-{1}/rest-service/'.format(VIRTUALENVS_PATH, MANAGER_BRANCH),
         ],
-        "resources_path": "{0}/manager/cloudify-manager-{1}/resources/rest-service/cloudify/".format(VIRTUALENVS_PATH, MAIN_BRANCH),
+        "resources_path": "{0}/manager/cloudify-manager-{1}/resources/rest-service/cloudify/".format(VIRTUALENVS_PATH, MANAGER_BRANCH),
         "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
         "src_package_type": "dir",
         "dst_package_type": ["deb"],
@@ -232,7 +226,7 @@ PACKAGES = {
                 "dst_dir": "/etc/init",
             },
             "__params_init": {
-                "rest_server_path": "{0}/manager/cloudify-manager-{1}/rest-service/manager_rest/".format(VIRTUALENVS_PATH, MAIN_BRANCH),
+                "rest_server_path": "{0}/manager/cloudify-manager-{1}/rest-service/manager_rest/".format(VIRTUALENVS_PATH, MANAGER_BRANCH),
                 "gunicorn_user": "root",
                 "gunicorn_conf_path": "{0}/manager/config/conf/guni.conf".format(VIRTUALENVS_PATH),
                 "unicorn_user": "root",
@@ -258,14 +252,18 @@ PACKAGES = {
         "name": "celery",
         "version": "0.0.1",
         "source_urls": [
-            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
         ],
         "package_path": "{0}/celery/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_PATH),
-        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
-                    '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/agent-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
-                    '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/plugin-installer/'.format(VIRTUALENVS_PATH, MAIN_BRANCH),
-                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(MAIN_BRANCH),
+        "modules": [
+            'billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
+            'https://github.com/cloudify-cosmo/cloudify-rest-client/archive/{0}.tar.gz'.format(REST_CLIENT_BRANCH),
+            'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(PLUGINS_COMMON_BRANCH),
+            '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/agent-installer/'.format(VIRTUALENVS_PATH, MANAGER_BRANCH),
+            '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/plugin-installer/'.format(VIRTUALENVS_PATH, MANAGER_BRANCH),
+            '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/riemann-controller/'.format(VIRTUALENVS_PATH, MANAGER_BRANCH),
+            '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/workflows/'.format(VIRTUALENVS_PATH, MANAGER_BRANCH),
         ],
         "src_package_type": "dir",
         "dst_package_type": ["deb"],
@@ -413,13 +411,25 @@ PACKAGES = {
         "sources_path": "{0}/rabbitmq-server".format(PACKAGES_PATH),
         "dst_package_type": ["deb"]
     },
+    "langohr": {
+        "name": "langohr",
+        "version": "2.11.0",
+        "source_urls": [
+            "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar"
+        ],
+        "package_path": "{0}/riemann/langohr".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/langohr".format(PACKAGES_PATH),
+        "src_package_type": "dir",
+        "dst_package_type": ["deb"],
+    },
     "riemann": {
         "name": "riemann",
-        "version": "0.2.2",
+        "version": "0.2.6",
         "source_urls": [
-            "http://aphyr.com/riemann/riemann_0.2.2_all.deb",
+            "http://aphyr.com/riemann/riemann_0.2.6_all.deb",
         ],
         "depends": [
+            'langohr'
             'openjdk-7-jdk'
         ],
         "package_path": "{0}/riemann/".format(COMPONENT_PACKAGES_PATH),

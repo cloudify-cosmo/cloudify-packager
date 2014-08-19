@@ -233,23 +233,6 @@ else
         echo -e "kibana3 is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
-echo -ne "checking whether riemann is installed..." | tee -a ${BOOTSTRAP_LOG}
-if ! dpkg -s riemann 2>&1 | grep Status: | grep installed; then
-        echo -e "riemann is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        sudo dpkg -i ${PKG_DIR}/riemann/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-
-        echo -e "applying riemann config..." >> ${BOOTSTRAP_LOG}
-        sudo cp ${PKG_DIR}/{{ config_templates.__template_dir_riemann.config_dir }}/* {{ config_templates.__template_dir_riemann.dst_dir }} >> ${BOOTSTRAP_LOG} 2>&1
-        sudo cp ${PKG_DIR}/{{ config_templates.__template_file_riemann.config_dir }}/* {{ config_templates.__template_file_riemann.dst_dir }} >> ${BOOTSTRAP_LOG} 2>&1
-        sudo cp ${PKG_DIR}/package-configuration/riemann/* /etc/riemann >> ${BOOTSTRAP_LOG} 2>&1
-        echo -e "starting riemann..." >> ${BOOTSTRAP_LOG}
-        sudo start riemann  >> ${BOOTSTRAP_LOG} 2>&1
-        check_upstart "riemann"
-        check_pkg "riemann"
-else
-        echo -e "riemann is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
-fi
-
 echo -ne "checking whether rabbitmq-server is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s rabbitmq-server 2>&1 | grep Status: | grep installed; then
         echo -e "rabbitmq-server is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
@@ -271,6 +254,21 @@ if ! dpkg -s rabbitmq-server 2>&1 | grep Status: | grep installed; then
         check_pkg "rabbitmq-server"
 else
         echo -e "rabbitmq-server is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
+fi
+
+echo -ne "checking whether riemann is installed..." | tee -a ${BOOTSTRAP_LOG}
+if ! dpkg -s riemann 2>&1 | grep Status: | grep installed; then
+        echo -e "riemann is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
+        sudo dpkg -i ${PKG_DIR}/riemann/*.deb >> ${BOOTSTRAP_LOG} 2>&1
+        ar p ${PKG_DIR}/riemann/langohr/langohr_2.11.0_amd64.deb data.tar.gz | tar zx --strip-components=2 -C ${PKG_DIR}/riemann/ >> ${BOOTSTRAP_LOG} 2>&1
+        echo -e "applying riemann config..." >> ${BOOTSTRAP_LOG}
+        sudo cp ${PKG_DIR}/{{ config_templates.__template_file_riemann.config_dir }}/* {{ config_templates.__template_file_riemann.dst_dir }} >> ${BOOTSTRAP_LOG} 2>&1
+        echo -e "starting riemann..." >> ${BOOTSTRAP_LOG}
+        sudo start riemann  >> ${BOOTSTRAP_LOG} 2>&1
+        check_upstart "riemann"
+        check_pkg "riemann"
+else
+        echo -e "riemann is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
 echo -ne "checking whether nginx is installed..." | tee -a ${BOOTSTRAP_LOG}
@@ -335,10 +333,6 @@ sleep 1
 check_port "logstash (tcp)" "{{ config_templates.__params_logstash.port }}"
 sleep 1
 check_port "elasticsearch" "{{ config_templates.__params_elasticsearch.port }}"
-sleep 1
-check_port "riemann (tcp-server)" "{{ config_templates.__params_riemann.tcp_port }}"
-sleep 1
-check_port "riemann (ws-server)" "{{ config_templates.__params_riemann.ws_port }}"
 echo  -e "post installation tests completed successfully.\n"
 
 echo -e "${PKG_NAME} ${VERSION} installation completed successfully!\n" | tee -a ${BOOTSTRAP_LOG}
