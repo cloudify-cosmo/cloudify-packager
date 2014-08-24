@@ -427,7 +427,7 @@ PACKAGES = {
         "name": "influxdb",
         "version": "0.8",
         "source_urls": [
-            "http://s3.amazonaws.com/influxdb/influxdb_latest_amd64.deb",
+            "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",
         ],
         "package_path": "{0}/influxdb/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/influxdb".format(PACKAGES_PATH),
