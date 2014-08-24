@@ -425,7 +425,7 @@ PACKAGES = {
     },
     "influxdb": {
         "name": "influxdb",
-        "version": "0.8",
+        "version": "0.8.0",
         "source_urls": [
             "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",
         ],
