@@ -37,10 +37,7 @@ DEPLOYMENT_SCHEMA = {'mappings': {'deployment': {'properties': {'plan': {'enable
 #                     'name': {
 #                         'enabled': True
 #                     },
-#                     'management_plugins_to_install': {
-#                         'enabled': False
-#                     },
-#                     'is_management_plugins_to_install': {
+#                     'deployment_plugins_to_install': {
 #                         'enabled': False
 #                     },
 #                     'workflows': {
@@ -79,7 +76,7 @@ DEPLOYMENT_SCHEMA = {'mappings': {'deployment': {'properties': {'plan': {'enable
 #                         #     'plugins_to_install': {
 #                         #         'enabled': False
 #                         #     },
-#                         #     'management_plugins_to_install': {
+#                         #     'deployment_plugins_to_install': {
 #                         #         'enabled': False
 #                         #     },
 #                         #     'workflows': {
