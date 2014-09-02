@@ -263,6 +263,8 @@ if ! dpkg -s riemann 2>&1 | grep Status: | grep installed; then
         echo -e "applying riemann config..." >> ${BOOTSTRAP_LOG}
         sudo dpkg -x ${PKG_DIR}/riemann/langohr/langohr_2.11.0_amd64.deb ${PKG_DIR}/riemann/langohr/
         sudo mv ${PKG_DIR}/riemann/langohr/packages/langohr/langohr.jar ${PKG_DIR}/riemann/langohr/
+        sudo chmod 755 ${PKG_DIR}/riemann/langohr
+        sudo chmod 644 ${PKG_DIR}/riemann/langohr/langohr.jar
         sudo cp ${PKG_DIR}/{{ config_templates.__template_file_riemann.config_dir }}/* {{ config_templates.__template_file_riemann.dst_dir }} >> ${BOOTSTRAP_LOG} 2>&1
         echo -e "starting riemann..." >> ${BOOTSTRAP_LOG}
         sudo start riemann  >> ${BOOTSTRAP_LOG} 2>&1
