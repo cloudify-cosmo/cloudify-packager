@@ -332,7 +332,7 @@ PACKAGES = {
         "name": "elasticsearch",
         "version": "1.0.1",
         "source_urls": [
-            "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
+            "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.2.tar.gz"
         ],
         "depends": [
             'openjdk-7-jdk'
