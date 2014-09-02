@@ -185,7 +185,7 @@ PACKAGES = {
         ],
         "package_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
         "sources_path": "/Ubuntu-agent/env",
-        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
+        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'pika',
                     'https://github.com/cloudify-cosmo/cloudify-rest-client/archive/{0}.tar.gz'.format(REST_CLIENT_BRANCH),
                     'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(PLUGINS_COMMON_BRANCH),
                     '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/agent-installer/'.format(MANAGER_BRANCH),
@@ -259,7 +259,7 @@ PACKAGES = {
         "package_path": "{0}/celery/".format(CORE_PACKAGES_PATH),
         "sources_path": "{0}/celery/cloudify.management__worker/env".format(VIRTUALENVS_PATH),
         "modules": [
-            'billiard==2.7.3.28', 'celery==3.0.24', 'bernhard', 'pika',
+            'billiard==2.7.3.28', 'celery==3.0.24', 'pika',
             'https://github.com/cloudify-cosmo/cloudify-rest-client/archive/{0}.tar.gz'.format(REST_CLIENT_BRANCH),
             'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(PLUGINS_COMMON_BRANCH),
             '{0}/celery/cloudify.management__worker/env/cloudify-manager-{1}/plugins/agent-installer/'.format(VIRTUALENVS_PATH, MANAGER_BRANCH),
