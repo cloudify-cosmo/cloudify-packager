@@ -16,7 +16,7 @@ curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo
 sudo pip install virtualenv==1.11.4 &&
 
 # install packman
-sudo pip install https://github.com/cloudify-cosmo/packman/archive/develop.tar.gz
+sudo pip install packman
 
 # TODO: add virtualenv to provisioning process
 # sudo pip install virtualenvwrapper

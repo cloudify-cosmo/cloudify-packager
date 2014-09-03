@@ -238,6 +238,8 @@ if ! dpkg -s influxdb 2>&1 | grep Status: | grep installed; then
         echo -e "influxdb is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
         sudo dpkg -i ${PKG_DIR}/influxdb/*.deb >> ${BOOTSTRAP_LOG} 2>&1
         check_pkg "influxdb"
+        sudo /etc/init.d/influxdb start
+        curl -s "http://localhost:8086/db?u=admin&p=admin" -d "{\"name\": \"cloudify\"}"
 else
         echo -e "influxdb is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi

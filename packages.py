@@ -71,7 +71,7 @@ PACKAGES = {
                 "kibana_run_dir": "/opt/kibana3",
                 "kibana_port": "3000",
                 "grafana_run_dir": "/opt/grafana",
-                "ui_run_dir": "/opt/cloudify-ui"
+                "ui_run_dir": "/opt/cloudify-ui",
                 "rest_and_ui_port": "80",
                 "file_server_port": "53229",
                 "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
@@ -414,7 +414,7 @@ PACKAGES = {
         "bootstrap_template": "grafana-bootstrap.template",
         "config_templates": {
             "__template_file_config": {
-                "template": "{0}/grafana/config/config.js.template".format(CONFIGS_PATH),
+                "template": "{0}/grafana/config.js.template".format(CONFIGS_PATH),
                 "output_file": "config.js",
                 "config_dir": "config",
                 "dst_dir": "/opt/grafana",
