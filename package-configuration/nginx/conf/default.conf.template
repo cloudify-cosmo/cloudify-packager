@@ -75,6 +75,16 @@ server {
   error_log           /var/log/nginx/cloudify.error.log;
 
   location / {
+    root  {{ config_templates.__params_nginx.ui_run_dir }}//node_modules/cosmo-ui;
+    index  index.html  index.htm;
+  }
+
+  location /grafana {
+    root {{ config_templates.__params_nginx.grafana_run_dir }};
+    index  index.html  index.htm;
+  }
+
+  location /backend {
     proxy_pass         http://cloudify-ui;
     proxy_read_timeout 90;
     proxy_buffering    off;
