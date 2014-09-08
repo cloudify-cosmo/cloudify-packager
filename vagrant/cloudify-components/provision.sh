@@ -21,14 +21,15 @@ sudo gem install fpm --no-ri --no-rdoc &&
 # install pip
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
 
-# install packman
+echo 'install packman'
 git clone https://github.com/cloudify-cosmo/packman.git
 pushd packman
 	if [ -n "$PACKMAN_SHA" ]; then
 		git reset --hard $PACKMAN_SHA
 	fi
-	pip install .
+	sudo pip install .
 popd
+echo 'install packman - done'
 
 # download backup components file (WORKAROUND UNTIL PACKMAN BUG IS FIXED)
 cd ~
