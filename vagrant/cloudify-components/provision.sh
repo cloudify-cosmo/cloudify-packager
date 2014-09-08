@@ -4,7 +4,7 @@ PACKMAN_SHA=""
 
 # update and install prereqs
 sudo apt-get -y update &&
-sudo apt-get install -y curl python-dev rubygems rpm libyaml-dev &&
+sudo apt-get install -y curl python-dev rubygems rpm libyaml-dev git &&
 
 # install ruby
 wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p547.tar.bz2
