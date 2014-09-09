@@ -135,6 +135,12 @@ PACKAGES = {
             "__params_ui": {
                 "port": "9001",
             },
+            "__template_file_grafana": {
+                "template": "{0}/cloudify-ui/grafana/config.js.template".format(CONFIGS_PATH),
+                "output_file": "config.js",
+                "config_dir": "config/grafana",
+                "dst_dir": "/opt/grafana",
+            },
         }
     },
     "cloudify-ubuntu-agent": {
@@ -399,29 +405,6 @@ PACKAGES = {
         "package_path": "{0}/nginx/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/nginx".format(PACKAGES_PATH),
         "dst_package_type": ["deb"],
-    },
-    "grafana": {
-        "name": "grafana",
-        "version": "1.7.0",
-        "source_urls": [
-            "http://grafanarel.s3.amazonaws.com/grafana-1.7.0.tar.gz",
-        ],
-        "package_path": "{0}/grafana/".format(COMPONENT_PACKAGES_PATH),
-        "sources_path": "{0}/grafana".format(PACKAGES_PATH),
-        "src_package_type": "dir",
-        "dst_package_type": ["deb"],
-        "bootstrap_script": "{0}/grafana-bootstrap.sh".format(SCRIPTS_PATH),
-        "bootstrap_template": "grafana-bootstrap.template",
-        "config_templates": {
-            "__template_file_config": {
-                "template": "{0}/grafana/config.js.template".format(CONFIGS_PATH),
-                "output_file": "config.js",
-                "config_dir": "config",
-                "dst_dir": "/opt/grafana",
-            },
-            "__params_config": {
-            },
-        }
     },
     "influxdb": {
         "name": "influxdb",
