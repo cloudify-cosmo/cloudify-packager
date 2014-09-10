@@ -70,7 +70,7 @@ PACKAGES = {
             "__params_nginx": {
                 "kibana_run_dir": "/opt/kibana3",
                 "kibana_port": "3000",
-                "grafana_run_dir": "/opt/grafana",
+                "grafana_run_dir": "/opt",
                 "ui_run_dir": "/opt/cloudify-ui",
                 "rest_and_ui_port": "80",
                 "file_server_port": "53229",
