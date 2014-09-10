@@ -70,7 +70,7 @@ PACKAGES = {
             "__params_nginx": {
                 "kibana_run_dir": "/opt/kibana3",
                 "kibana_port": "3000",
-                "grafana_run_dir": "/opt/grafana",
+                "grafana_run_dir": "/opt",
                 "ui_run_dir": "/opt/cloudify-ui",
                 "rest_and_ui_port": "80",
                 "file_server_port": "53229",
@@ -134,6 +134,12 @@ PACKAGES = {
             },
             "__params_ui": {
                 "port": "9001",
+            },
+            "__template_file_grafana": {
+                "template": "{0}/cloudify-ui/grafana/config.js.template".format(CONFIGS_PATH),
+                "output_file": "config.js",
+                "config_dir": "config/grafana",
+                "dst_dir": "/opt/grafana",
             },
         }
     },
@@ -334,7 +340,7 @@ PACKAGES = {
         "name": "elasticsearch",
         "version": "1.0.1",
         "source_urls": [
-            "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
+            "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.2.tar.gz"
         ],
         "depends": [
             'openjdk-7-jdk'
@@ -399,29 +405,6 @@ PACKAGES = {
         "package_path": "{0}/nginx/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/nginx".format(PACKAGES_PATH),
         "dst_package_type": ["deb"],
-    },
-    "grafana": {
-        "name": "grafana",
-        "version": "1.7.0",
-        "source_urls": [
-            "http://grafanarel.s3.amazonaws.com/grafana-1.7.0.tar.gz",
-        ],
-        "package_path": "{0}/grafana/".format(COMPONENT_PACKAGES_PATH),
-        "sources_path": "{0}/grafana".format(PACKAGES_PATH),
-        "src_package_type": "dir",
-        "dst_package_type": ["deb"],
-        "bootstrap_script": "{0}/grafana-bootstrap.sh".format(SCRIPTS_PATH),
-        "bootstrap_template": "grafana-bootstrap.template",
-        "config_templates": {
-            "__template_file_config": {
-                "template": "{0}/grafana/config.js.template".format(CONFIGS_PATH),
-                "output_file": "config.js",
-                "config_dir": "config",
-                "dst_dir": "/opt/grafana",
-            },
-            "__params_config": {
-            },
-        }
     },
     "influxdb": {
         "name": "influxdb",
