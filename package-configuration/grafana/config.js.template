@@ -22,7 +22,7 @@ define(['settings'],
             datasources: {
                 cloudify: {
                     type: 'cloudify',
-                    url: "http://localhost:9000/backend/grafana",
+                    url: "/backend/grafana",
                     grafanaDB: true
                 }
 //                ,influxdb: {
