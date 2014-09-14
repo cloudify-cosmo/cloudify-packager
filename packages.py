@@ -70,6 +70,8 @@ PACKAGES = {
             "__params_nginx": {
                 "kibana_run_dir": "/opt/kibana3",
                 "kibana_port": "3000",
+                "grafana_run_dir": "/opt",
+                "ui_run_dir": "/opt/cloudify-ui",
                 "rest_and_ui_port": "80",
                 "file_server_port": "53229",
                 "file_server_dir": "{0}/manager/resources".format(VIRTUALENVS_PATH),
@@ -132,6 +134,12 @@ PACKAGES = {
             },
             "__params_ui": {
                 "port": "9001",
+            },
+            "__template_file_grafana": {
+                "template": "{0}/cloudify-ui/grafana/config.js.template".format(CONFIGS_PATH),
+                "output_file": "config.js",
+                "config_dir": "config/grafana",
+                "dst_dir": "/opt/grafana",
             },
         }
     },
@@ -332,7 +340,7 @@ PACKAGES = {
         "name": "elasticsearch",
         "version": "1.0.1",
         "source_urls": [
-            "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
+            "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.2.tar.gz"
         ],
         "depends": [
             'openjdk-7-jdk'
@@ -396,6 +404,16 @@ PACKAGES = {
         # "key_files": ["{0}/nginx/nginx_signing.key".format(PACKAGES_PATH)],
         "package_path": "{0}/nginx/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/nginx".format(PACKAGES_PATH),
+        "dst_package_type": ["deb"],
+    },
+    "influxdb": {
+        "name": "influxdb",
+        "version": "0.8.0",
+        "source_urls": [
+            "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",
+        ],
+        "package_path": "{0}/influxdb/".format(COMPONENT_PACKAGES_PATH),
+        "sources_path": "{0}/influxdb".format(PACKAGES_PATH),
         "dst_package_type": ["deb"],
     },
     "rabbitmq-server": {

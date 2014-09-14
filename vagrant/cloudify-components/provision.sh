@@ -1,9 +1,10 @@
+PACKMAN_SHA=""
 
 # echo bootstrapping packman...
 
 # update and install prereqs
 sudo apt-get -y update &&
-sudo apt-get install -y curl python-dev rubygems rpm libyaml-dev &&
+sudo apt-get install -y curl python-dev rubygems rpm libyaml-dev git &&
 
 # install ruby
 wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p547.tar.bz2
@@ -20,8 +21,15 @@ sudo gem install fpm --no-ri --no-rdoc &&
 # install pip
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
 
-# install packman
-sudo pip install https://github.com/cloudify-cosmo/packman/archive/develop.tar.gz
+echo 'install packman'
+git clone https://github.com/cloudify-cosmo/packman.git
+pushd packman
+	if [ -n "$PACKMAN_SHA" ]; then
+		git reset --hard $PACKMAN_SHA
+	fi
+	sudo pip install .
+popd
+echo 'install packman - done'
 
 # download backup components file (WORKAROUND UNTIL PACKMAN BUG IS FIXED)
 cd ~
@@ -33,7 +41,7 @@ sudo rm -rf /cloudify-components/riemann
 
 # create cloudify components package
 cd /cloudify-packager/ &&
-sudo pkm make -c elasticsearch,logstash,langohr,riemann
+sudo pkm make -c elasticsearch,logstash,langohr,riemann,grafana,influxdb
 sudo pkm pack -c cloudify-components
 
 echo bootstrap done
