@@ -244,15 +244,6 @@ else
         echo -e "influxdb is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
 fi
 
-echo -ne "checking whether grafana is installed..." | tee -a ${BOOTSTRAP_LOG}
-if ! dpkg -s grafana 2>&1 | grep Status: | grep installed; then
-        echo -e "grafana is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
-        sudo dpkg -i ${PKG_DIR}/grafana/*.deb >> ${BOOTSTRAP_LOG} 2>&1
-        check_pkg "grafana"
-else
-        echo -e "grafana is already installed, skipping..." | tee -a ${BOOTSTRAP_LOG}
-fi
-
 echo -ne "checking whether rabbitmq-server is installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s rabbitmq-server 2>&1 | grep Status: | grep installed; then
         echo -e "rabbitmq-server is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
