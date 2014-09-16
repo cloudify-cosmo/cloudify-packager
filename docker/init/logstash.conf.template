@@ -1,5 +1,6 @@
 # logstash - agent instance
 #
+# env vars $LOGSTASH_CONF_PATH and $LOGSTASH_JAR_PATH to be injected by dockerfile
 
 description     "logstash agent instance"
 
@@ -14,11 +15,11 @@ expect fork
 
 # You need to chdir somewhere writable because logstash needs to unpack a few
 # temporary files on startup.
-chdir ${LOGSTASH_HOME_DIR}
+chdir /tmp/
 
 script
 
-  # This runs logstash agent as the '${LOGSTASH_USERNAME}' user
-  su -s /bin/sh -c 'exec "$0" "$@"' ${LOGSTASH_USERNAME} -- /usr/bin/java -jar ${LOGSTASH_JAR_PATH} agent -f ${LOGSTASH_CONF_PATH} & #--log {{ logstash.init_file.log_file }} &
+  # This runs logstash agent as the root user
+   su -s /bin/sh -c 'exec "$0" "$@"' root -- /usr/bin/java -jar $LOGSTASH_JAR_PATH agent -f $LOGSTASH_CONF_PATH & #--log {{ logstash.init_file.log_file }} &
   emit logstash-agent-running
 end script

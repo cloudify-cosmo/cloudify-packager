@@ -20,25 +20,14 @@ RUN apt-get install -y \
 # allow rc policies
 RUN sed -i 's/101/0/g' /usr/sbin/policy-rc.d
 
-# base directory where all services will be installed.
-RUN BASE_SERVICE_DIR=/opt/
-# base home directory.
-RUN BASE_HOME_DIR=/home/
-# upstart init folder
-RUN INIT_DIR=/etc/init
-RUN CONF_DIR=/etc/
-
 # add all init and config files
 ADD conf/ /opt/tmp/
 ADD init/ /opt/tmp/
-# temp init and config folders
-RUN TMP_CONF_FOLDER=/opt/tmp/conf/
-RUN TMP_INIT_FOLDER=/opt/tmp/init/
 
 # add utility functions
 ADD utils/ /opt/tmp/
 # add bootstrap utility methods to be used by services at bootstrap
-RUN source /opt/tmp/bootstrap_utils.sh
+#RUN source /opt/tmp/bootstrap_utils.sh
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RABBITMQ, DependsOn: ~
@@ -78,47 +67,41 @@ RUN add-apt-repository -y {{ nodejs.repo_name }} && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 RUN curl {{ logstash.package_url }} --create-dirs -o {{ logstash.package_dest }}
 
-# Set env vars.
-RUN LOGSTASH_USERNAME={{ logstash.username }}
-RUN LOGSTASH_JAR_NAME=$(basename {{ logstash.package_dest }})
-RUN LOGSTASH_SERVICE_NAME={{ logstash.service_name }}
-RUN LOGSTASH_INIT_FILE=${LOGSTASH_SERVICE_NAME}.conf
-RUN LOGSTASH_CONF_FILE=${LOGSTASH_SERVICE_NAME}.conf
+##### ENV #####
+ENV LOGSTASH_JAR_NAME $(basename {{ logstash.package_dest }})
+ENV LOGSTASH_SERVICE_NAME {{ logstash.service_name }}
+ENV LOGSTASH_SERVICE_DIR /opt/$LOGSTASH_SERVICE_NAME/
+# temp init and config files
+ENV TMP_CONF_FILE /opt/tmp/conf/$LOGSTASH_SERVICE_NAME.conf
+ENV TMP_INIT_FILE /opt/tmp/init/$LOGSTASH_SERVICE_NAME.conf
+##### ENV #####
 
-RUN LOGSTASH_SERVICE_DIR=${BASE_SERVICE_DIR}${LOGSTASH_SERVICE_NAME}
-RUN LOGSTASH_HOME_DIR=${BASE_HOME_DIR}${LOGSTASH_SERVICE_NAME}
+# inject required env vars to init script
+RUN sed -i '1s/^/LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR$LOGSTASH_JAR_NAME' \n/' $TMP_INIT_FILE
+RUN sed -i '1s/^/LOGSTASH_CONF_PATH='/etc/$LOGSTASH_SERVICE_NAME.conf' \n/' $TMP_INIT_FILE
 
-RUN mkdir -p ${LOGSTASH_APP_DIR} && \
-    check_dir "${LOGSTASH_APP_DIR}"
-RUN mkdir -p ${LOGSTASH_HOME_DIR} && \
-    check_dir "${LOGSTASH_HOME_DIR}"
+# create service dir
+RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+    mkdir -p $LOGSTASH_SERVICE_DIR && \
+    check_dir "$LOGSTASH_SERVICE_DIR"
 
-# placing jar in service dir
-RUN mv {{ logstash.package_dest }} ${LOGSTASH_SERVICE_DIR} && \
-    check_file "${LOGSTASH_SERVICE_DIR}/${LOGSTASH_JAR_NAME}"
-# placing init script in init dir
-RUN mv ${TMP_INIT_FOLDER}/${LOGSTASH_INIT_FILE} ${INIT_DIR} && \
-    check_file "${INIT_DIR}/${LOGSTASH_INIT_FILE}"
-# placing conf script in conf dir
-RUN mv ${TMP_CONF_FOLDER}/${LOGSTASH_CONF_FILE} ${CONF_DIR} && \
-    check_file "${CONF_DIR}/${LOGSTASH_CONF_FILE}"
+# place jar in service dir
+RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+    mv {{ logstash.package_dest }} $LOGSTASH_SERVICE_DIR && \
+    check_file "$LOGSTASH_SERVICE_DIR$LOGSTASH_JAR_NAME"
+# place init script in local init dir
+RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+    mv $TMP_INIT_FILE /etc/init/ && \
+    check_file "/etc/init/$LOGSTASH_SERVICE_NAME.conf"
+# place conf script in conf dir
+RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+    mv $TMP_INIT_FILE /etc/ && \
+    check_file "/etc/$LOGSTASH_SERVICE_NAME.conf"
 
-# create logstash user TODO ask nir about homedir diff
-RUN useradd --shell /usr/sbin/nologin --create-home --home-dir ${LOGSTASH_HOME_DIR} --groups adm ${LOGSTASH_USERNAME} && \
-    check_user ${LOGSTASH_USERNAME}
-
-# pwning ${LOGSTASH_SERVICE_DIR} file by logstash user..."
-RUN chown ${LOGSTASH_USERNAME}:${LOGSTASH_USERNAME} ${LOGSTASH_SERVICE_DIR}/${LOGSTASH_JAR_NAME}
-
-# injecting required env vars to init script
-RUN sed -i '1s/^/LOGSTASH_HOME_DIR='$LOGSTASH_HOME_DIR' \n/' ${INIT_DIR}/${LOGSTASH_INIT_FILE}
-RUN sed -i '1s/^/LOGSTASH_USERNAME='$LOGSTASH_USERNAME' \n/' ${INIT_DIR}/${LOGSTASH_INIT_FILE}
-RUN sed -i '1s/^/LOGSTASH_JAR_PATH='${LOGSTASH_SERVICE_DIR}/${LOGSTASH_JAR_NAME}' \n/' ${INIT_DIR}/${LOGSTASH_INIT_FILE}
-RUN sed -i '1s/^/LOGSTASH_CONF_PATH='${CONF_DIR}/${LOGSTASH_CONF_FILE}' \n/' ${INIT_DIR}/${LOGSTASH_INIT_FILE}
-
-# starting logstash"
-RUN start logstash && \
-    check_upstart ${LOGSTASH_SERVICE_NAME}
+# start logstash"
+RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+    start logstash && \
+    check_upstart $LOGSTASH_SERVICE_NAME
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - ELASTICSEARCH
