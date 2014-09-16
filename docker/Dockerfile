@@ -1,5 +1,5 @@
-FROM {{ image.repository }}:{{ image.tag }}
-MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
+FROM ubuntu:12.04
+MAINTAINER adaml, adaml@gigaspaces.com
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -30,8 +30,8 @@ RUN apt-get install -y \
 # CONTAINER - RABBITMQ, DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 RUN apt-get install -y erlang-nox && \
-    curl {{ rabbitmq.package_url }} --create-dirs -o {{ rabbitmq.package_dest }} && \
-    dpkg -i {{ rabbitmq.package_dest }}
+    curl http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server_3.2.4-1_all.deb --create-dirs -o /opt/tmp/rabbitmq/rabbitmq-server.deb && \
+    dpkg -i /opt/tmp/rabbitmq/rabbitmq-server.deb
     # APPLY INIT SCRIPT
 	# cp ${PKG_DIR}/{ config_templates.__template_file_rabbitmq.config_dir }/* { config_templates.__template_file_rabbitmq.dst_dir } >> ${BOOTSTRAP_LOG} 2>&1
     rabbitmq-plugins enable rabbitmq_management
@@ -42,31 +42,31 @@ RUN apt-get install -y erlang-nox && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RIEMANN, DependsOn: langohr
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl {{ riemann.package_url }} --create-dirs -o {{ riemann.package_dest }} && \
-    dpkg -i {{ riemann.package_dest }} && \
-    curl {{ riemann.langohr_url }} --create-dirs -o {{ riemann.langohr_dest }} && \
-    chmod 644 {{ riemann.langohr_dest }}
+RUN curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb && \
+    dpkg -i /opt/tmp/riemann/riemann.deb && \
+    curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o /usr/lib/riemann/langohr.jar && \
+    chmod 644 /usr/lib/riemann/langohr.jar
     # APPLY RIEMANN INIT FILE
     # START RIEMANN
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - PYTHON and VIRTUALENV DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl --silent --show-error --retry 5 {{ python.package_url }} | python && \
-    pip install virtualenv=={{ python.virtualenv_version }}
+RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
+    pip install virtualenv==1.11.4
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NODEJS DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN add-apt-repository -y {{ nodejs.repo_name }} && \
+RUN add-apt-repository -y ppa:chris-lea/node.js && \
 	apt-get update && \
     apt-get install -y nodejs
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - LOGSTASH DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl {{ logstash.package_url }} --create-dirs -o {{ logstash.package_dest }}
+RUN curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o /opt/tmp/logstash/logstash.jar
 
 ##### ENV #####
-ENV LOGSTASH_JAR_NAME $(basename {{ logstash.package_dest }})
-ENV LOGSTASH_SERVICE_NAME {{ logstash.service_name }}
+ENV LOGSTASH_JAR_NAME $(basename /opt/tmp/logstash/logstash.jar)
+ENV LOGSTASH_SERVICE_NAME logstash
 ENV LOGSTASH_SERVICE_DIR /opt/$LOGSTASH_SERVICE_NAME/
 # temp init and config files
 ENV TMP_CONF_FILE /opt/tmp/conf/$LOGSTASH_SERVICE_NAME.conf
@@ -84,7 +84,7 @@ RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
 
 # place jar in service dir
 RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
-    mv {{ logstash.package_dest }} $LOGSTASH_SERVICE_DIR && \
+    mv /opt/tmp/logstash/logstash.jar $LOGSTASH_SERVICE_DIR && \
     check_file "$LOGSTASH_SERVICE_DIR$LOGSTASH_JAR_NAME"
 # place init script in local init dir
 RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
@@ -103,22 +103,22 @@ RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl {{ elasticsearch.package_url }} --create-dirs -o {{ elasticsearch.package_dest }} && \
-    tar -C {{ elasticsearch.untar_dest }} -xvf {{ elasticsearch.package_dest }} && \
-    ln -sf {{ elasticsearch.untar_dest }}elasticsearch-* {{ elasticsearch.sim_link }}
+RUN curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
+    tar -C /opt/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
+    ln -sf /opt/elasticsearch-* /opt/elasticsearch
     # ADD ELASTICSEARCH INIT FILE
     # START ELASTISEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - KIBANA
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl {{ kibana.package_url }} --create-dirs -o {{ kibana.package_dest }} && \
-    tar -C {{ kibana.untar_dest }} -xzvf {{ kibana.package_dest }} && \
-    ln -sf {{ kibana.untar_dest }}kibana-* {{ kibana.sim_link }}
+RUN curl https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz --create-dirs -o /opt/tmp/kibana.tar.gz && \
+    tar -C /opt/ -xzvf /opt/tmp/kibana.tar.gz && \
+    ln -sf /opt/kibana-* /opt/kibana
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - INFLUXDB
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl {{ influxdb.package_url }} --create-dirs -o {{ influxdb.package_dest }} && \
-    dpkg -i {{ influxdb.package_dest }} && \
+RUN curl http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb --create-dirs -o /opt/tmp/influxdb.deb && \
+    dpkg -i /opt/tmp/influxdb.deb && \
     /etc/init.d/influxdb start
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NGINX
@@ -134,13 +134,13 @@ RUN sed -i "2i deb http://nginx.org/packages/mainline/ubuntu/ precise nginx" /et
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - CELERY
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl {{ celery.package_url }} --create-dirs -o {{ celery.package_dest }} && \
-    mkdir -p {{ celery.untar_dest }} && \
-    tar -C {{ celery.untar_dest }} -xzvf {{ celery.package_dest }} && \
-    virtualenv {{ celery.untar_dest }} && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.cloudify_rest_client_url }} && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.plugins_common_url }} && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.untar_dest }}/cloudify-manager-master/plugins/agent-installer/ && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.untar_dest }}/cloudify-manager-master/plugins/plugin-installer/ && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.untar_dest }}/cloudify-manager-master/plugins/riemann-controller/ && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.untar_dest }}/cloudify-manager-master/workflows/
+RUN curl https://codeload.github.com/cloudify-cosmo/cloudify-manager/tar.gz/master --create-dirs -o /opt/tmp/celery/manager.tar.gz && \
+    mkdir -p /opt/celery/cloudify.management__worker/env && \
+    tar -C /opt/celery/cloudify.management__worker/env -xzvf /opt/tmp/celery/manager.tar.gz && \
+    virtualenv /opt/celery/cloudify.management__worker/env && \
+    /opt/celery/cloudify.management__worker/env/bin/pip install https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz && \
+    /opt/celery/cloudify.management__worker/env/bin/pip install https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz && \
+    /opt/celery/cloudify.management__worker/env/bin/pip install /opt/celery/cloudify.management__worker/env/cloudify-manager-master/plugins/agent-installer/ && \
+    /opt/celery/cloudify.management__worker/env/bin/pip install /opt/celery/cloudify.management__worker/env/cloudify-manager-master/plugins/plugin-installer/ && \
+    /opt/celery/cloudify.management__worker/env/bin/pip install /opt/celery/cloudify.management__worker/env/cloudify-manager-master/plugins/riemann-controller/ && \
+    /opt/celery/cloudify.management__worker/env/bin/pip install /opt/celery/cloudify.management__worker/env/cloudify-manager-master/workflows/
