@@ -41,7 +41,7 @@ sudo rm -rf /cloudify-components/riemann
 
 # create cloudify components package
 cd /cloudify-packager/ &&
-sudo pkm make -c elasticsearch,logstash,langohr,riemann,grafana,influxdb
+sudo pkm make -c elasticsearch,logstash,langohr,riemann,influxdb
 sudo pkm pack -c cloudify-components
 
 echo bootstrap done
