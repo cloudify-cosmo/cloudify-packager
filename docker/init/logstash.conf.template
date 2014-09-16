@@ -14,11 +14,11 @@ expect fork
 
 # You need to chdir somewhere writable because logstash needs to unpack a few
 # temporary files on startup.
-chdir /home/logstash
+chdir ${LOGSTASH_HOME_DIR}
 
 script
 
-  # This runs logstash agent as the '{{ logstash.init_file.user }}' user
-  su -s /bin/sh -c 'exec "$0" "$@"' {{ logstash.init_file.user }} -- /usr/bin/java -jar {{ logstash.init_file.run_dir }}/{{ logstash.init_file.jar }} agent -f {{ logstash.init_file.conf_path }} & #--log {{ logstash.init_file.log_file }} &
+  # This runs logstash agent as the '${LOGSTASH_USERNAME}' user
+  su -s /bin/sh -c 'exec "$0" "$@"' ${LOGSTASH_USERNAME} -- /usr/bin/java -jar ${LOGSTASH_JAR_PATH} agent -f ${LOGSTASH_CONF_PATH} & #--log {{ logstash.init_file.log_file }} &
   emit logstash-agent-running
 end script
