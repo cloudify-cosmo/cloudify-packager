@@ -101,7 +101,7 @@ function check_and_install
     fi
 }
 
-###############################g################# DEFINE VARIABLES
+################################################ DEFINE VARIABLES
 
 PKG_NAME="{{ name }}"
 PKG_DIR="{{ sources_path }}"
