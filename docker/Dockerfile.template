@@ -98,9 +98,9 @@ RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
     mv $TMP_INIT_FILE /etc/ && \
     check_file "/etc/$LOGSTASH_SERVICE_NAME.conf"
 
-# start logstash"
+# start logstash
 RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
-    start logstash && \
+    start $LOGSTASH_SERVICE_NAME && \
     check_upstart $LOGSTASH_SERVICE_NAME
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
