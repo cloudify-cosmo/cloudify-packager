@@ -1,0 +1,39 @@
+input {
+    rabbitmq {
+        queue => "{{ logstash.conf_file.logs_queue}}"
+        host => "localhost"
+        durable => "true"
+        auto_delete => "true"
+        exclusive => "false"
+        # key => "{{ logstash.conf_file.logs_queue}}"
+        # exchange => "test_exchange" # This matches the exchange declared above
+    }
+
+    rabbitmq {
+        queue => "{{ logstash.conf_file.events_queue}}"
+        host => "localhost"
+        durable => "true"
+        auto_delete => "true"
+        exclusive => "false"
+        # key => "{{ logstash.conf_file.events_queue}}"
+        # exchange => "test_exchange" # This matches the exchange declared above
+    }
+ 
+    tcp {
+        port => {{ logstash.conf_file.test_tcp_port }}
+    }
+}
+
+filter {
+    date {
+        match => [ "timestamp", "YYYY-MM-dd HH:mm:ss.SSS" ]
+    }
+}
+
+output {
+    elasticsearch_http {
+        host => "localhost"
+        index => "{{ logstash.conf_file.events_index}}"
+    }
+
+}
