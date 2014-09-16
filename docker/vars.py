@@ -28,14 +28,8 @@ VARS = {
         "service_name": "logstash",
         "package_url": "https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar",
         "package_dest": "/opt/tmp/logstash/logstash.jar",
-        "username": "logstash",
         "init_file": {
-            "init_file_path": "/opt/tmp/init/logstash.conf",
-            "jar": "logstash.jar",
             "log_file": "/var/log/logstash.out",
-            "conf_path": "/etc/logstash.conf",
-            "run_dir": "/opt/logstash",
-            "user": "root",
         },
         "conf_file": {
             "conf_file_path": "/opt/tmp/conf/logstash.conf",
