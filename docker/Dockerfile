@@ -21,7 +21,9 @@ RUN apt-get install -y \
 RUN sed -i 's/101/0/g' /usr/sbin/policy-rc.d
 
 # base directory where all services will be installed.
-RUN BASE_DIR=/opt/
+RUN BASE_SERVICE_DIR=/opt/
+# base home directory.
+RUN BASE_HOME_DIR=/home/
 # upstart init folder
 RUN INIT_DIR=/etc/init
 
@@ -65,9 +67,20 @@ RUN add-apt-repository -y {{ nodejs.repo_name }} && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 RUN curl {{ logstash.package_url }} --create-dirs -o {{ logstash.package_dest }}
 # Set env vars.
-RUN LOGSTASH_INIT_FILE={{ logstash.init_file }}
-RUN LOGSTASH_CONF_FILE={{ logstash.conf_file }}
-RUN LOGSTASH_HOME_DIR=${BASE_DIR} {{ logstash.install_dir_name }}
+RUN LOGSTASH_INIT_FILE={{ logstash.init_file.init_file_path }}
+RUN LOGSTASH_CONF_FILE={{ logstash.conf_file.conf_file_path }}
+
+RUN LOGSTASH_SERVICE_DIR=${BASE_SERVICE_DIR}{{ logstash.service_name }}
+RUN LOGSTASH_HOME_DIR=${BASE_HOME_DIR}{{ logstash.service_name }}
+
+RUN mkdir -p ${LOGSTASH_APP_DIR}
+RUN mkdir -p ${LOGSTASH_HOME_DIR}
+
+# placing jar
+RUN mv {{ logstash.package_dest }} ${LOGSTASH_SERVICE_DIR}
+
+
+
     # ADD LOGSTASH CONFIG
     # APPLY LOGSTASH INIT FILE
     # START LOGSTASH
