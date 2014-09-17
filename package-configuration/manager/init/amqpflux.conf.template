@@ -1,0 +1,19 @@
+# amqp-influxdb consumer instance
+#
+
+description     "amqp-influxdb consumer instance"
+
+start on virtual-filesystems
+stop on runlevel [06]
+
+# Respawn it if the process exits
+respawn
+respawn limit 5 30
+limit nofile 65550 65550
+expect fork
+
+script
+
+  su -s /bin/sh -c 'exec "$0" "$@"' {{ config_templates.__params_init.user }} -- . /opt/manager/bin/activate && amqp-influx --amqp-exchange AMQP_EXCHANGE --amqp-routing-key AMQP_ROUTING_KEY --influx-database INFLUX_DATABASE &
+  emit amqp-influxdb-consumer-running
+end script

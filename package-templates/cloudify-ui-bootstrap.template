@@ -121,7 +121,12 @@ if ! dpkg -s cloudify-ui 2>&1 | grep Status: | grep installed; then
         cd ${HOME_DIR}
         echo "installing ${PKG_NAME} and grafana"
         sudo npm install -d ${PKG_DIR}/cosmo-ui*
-        sudo npm install -d ${PKG_DIR}/grafana*
+        sudo rm /opt/grafana
+        sudo mkdir /opt/grafana
+        sudo tar xvf /packages/cloudify-ui/grafana* -C /opt/grafana --strip=1
+        sudo cp /packages/cloudify-ui/config/grafana/
+        sudo cp /packages/cloudify-ui/config/grafana/config.js /opt/grafana​
+        sudo service nginx restart
 
         echo "starting ${PKG_NAME}..."
         sudo start cloudify-ui
