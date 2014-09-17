@@ -4,10 +4,10 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # CONTAINER - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add all init and config files
-ADD conf/ /opt/tmp/
-ADD init/ /opt/tmp/
+ADD conf/ /opt/tmp/conf/
+ADD init/ /opt/tmp/init/
 # add utility functions
-ADD utils/ /opt/tmp/
+ADD utils/ /opt/tmp/utils/
 
 # allow rc policies
 RUN sed -i 's/101/0/g' /usr/sbin/policy-rc.d
@@ -15,33 +15,47 @@ RUN sed -i 's/101/0/g' /usr/sbin/policy-rc.d
 # update local cache
 RUN apt-get update
 # install 3rd party components
-RUN apt-get install -y \
-    python-dev \
-    make \
-    curl \
-    openjdk-7-jdk \
-    python-software-properties \
-    g++ \
-    logrotate \
-    vim \
-    mlocate
+#RUN apt-get install -y \
+#    python-dev \
+#    make \
+#    curl \
+#    openjdk-7-jdk \
+#    python-software-properties \
+#    g++ \
+#    logrotate \
+#    vim \
+#    mlocate
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RABBITMQ, DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN apt-get install -y erlang-nox && \
-    curl {{ rabbitmq.package_url }} --create-dirs -o {{ rabbitmq.package_dest }} && \
-    dpkg -i {{ rabbitmq.package_dest }}
-    # APPLY INIT SCRIPT
-	# cp ${PKG_DIR}/{ config_templates.__template_file_rabbitmq.config_dir }/* { config_templates.__template_file_rabbitmq.dst_dir } >> ${BOOTSTRAP_LOG} 2>&1
-    rabbitmq-plugins enable rabbitmq_management
-    rabbitmq-plugins enable rabbitmq_tracing
-    /usr/sbin/rabbitmqctl stop
-    start rabbitmq-server
+# install dependencies.
+RUN apt-get install -y $(echo {{ rabbitmq.reqs }} | tr -d "',[]")
+# download rabbit package
+RUN curl {{ rabbitmq.package_url }} --create-dirs -o {{ rabbitmq.package_dest }}
+# install rabbitmq-server
+RUN dpkg -i {{ rabbitmq.package_dest }}
+
+ENV RABBITMQ_SERVICE_NAME {{ rabbitmq.service_name }}
+ENV RABBITMQ_INIT_FILE /opt/tmp/init/$RABBITMQ_SERVICE_NAME.conf
+
+# place init script in local init dir
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    mv $RABBITMQ_INIT_FILE /etc/init/ && \
+    check_file "/etc/init/$RABBITMQ_SERVICE_NAME.conf"'
+
+# cp ${PKG_DIR}/{ config_templates.__template_file_rabbitmq.config_dir }/* { config_templates.__template_file_rabbitmq.dst_dir } >> ${BOOTSTRAP_LOG} 2>&1
+# start rabbitmq-server
+RUN rabbitmq-plugins enable rabbitmq_management && \
+    rabbitmq-plugins enable rabbitmq_tracing && \
+    /usr/sbin/rabbitmqctl stop && \
+    start rabbitmq-server && \
     rabbitmqctl trace_on
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RIEMANN, DependsOn: langohr
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+# install dependencies.
+RUN apt-get install -y $(echo {{ riemann.reqs }} | tr -d "',[]")
 RUN curl {{ riemann.package_url }} --create-dirs -o {{ riemann.package_dest }} && \
     dpkg -i {{ riemann.package_dest }} && \
     curl {{ riemann.langohr_url }} --create-dirs -o {{ riemann.langohr_dest }} && \
@@ -56,97 +70,108 @@ RUN curl --silent --show-error --retry 5 {{ python.package_url }} | python && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NODEJS DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+# install dependencies.
+#RUN apt-get install -y $(echo {{ nodejs.reqs }} | tr -d "',[]")
+# download and install
 RUN add-apt-repository -y {{ nodejs.repo_name }} && \
 	apt-get update && \
     apt-get install -y nodejs
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - LOGSTASH DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+# install dependencies.
+RUN apt-get install -y $(echo {{ logstash.reqs }} | tr -d "',[]")
+# download jar file
 RUN curl {{ logstash.package_url }} --create-dirs -o {{ logstash.package_dest }}
 
 ##### ENV #####
-ENV LOGSTASH_JAR_NAME $(basename {{ logstash.package_dest }})
 ENV LOGSTASH_SERVICE_NAME {{ logstash.service_name }}
 ENV LOGSTASH_SERVICE_DIR /opt/$LOGSTASH_SERVICE_NAME/
-# temp init and config files
-ENV TMP_CONF_FILE /opt/tmp/conf/$LOGSTASH_SERVICE_NAME.conf
-ENV TMP_INIT_FILE /opt/tmp/init/$LOGSTASH_SERVICE_NAME.conf
+# logstash init file
+ENV LOGSTASH_INIT_FILE /opt/tmp/init/$LOGSTASH_SERVICE_NAME.conf
 ##### ENV #####
 
 # inject required env vars to init script
-RUN sed -i '1s/^/LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR$LOGSTASH_JAR_NAME' \n/' $TMP_INIT_FILE
-RUN sed -i '1s/^/LOGSTASH_CONF_PATH='/etc/$LOGSTASH_SERVICE_NAME.conf' \n/' $TMP_INIT_FILE
+RUN sed -i '1s/^/LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR$(basename {{ logstash.package_dest }})' \n/' $LOGSTASH_INIT_FILE
+RUN sed -i '1s/^/LOGSTASH_CONF_PATH='/etc/$LOGSTASH_SERVICE_NAME.conf' \n/' $LOGSTASH_INIT_FILE
 
 # create service dir
-RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     mkdir -p $LOGSTASH_SERVICE_DIR && \
-    check_dir "$LOGSTASH_SERVICE_DIR"
+    check_dir "$LOGSTASH_SERVICE_DIR"'
 
 # place jar in service dir
-RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     mv {{ logstash.package_dest }} $LOGSTASH_SERVICE_DIR && \
-    check_file "$LOGSTASH_SERVICE_DIR$LOGSTASH_JAR_NAME"
+    check_file "$LOGSTASH_SERVICE_DIR$(basename {{ logstash.package_dest }})"'
 # place init script in local init dir
-RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
-    mv $TMP_INIT_FILE /etc/init/ && \
-    check_file "/etc/init/$LOGSTASH_SERVICE_NAME.conf"
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    mv $LOGSTASH_INIT_FILE /etc/init/ && \
+    check_file "/etc/init/$LOGSTASH_SERVICE_NAME.conf"'
 # place conf script in conf dir
-RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
-    mv $TMP_INIT_FILE /etc/ && \
-    check_file "/etc/$LOGSTASH_SERVICE_NAME.conf"
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    mv $LOGSTASH_INIT_FILE /etc/ && \
+    check_file "/etc/$LOGSTASH_SERVICE_NAME.conf"'
 
 # start logstash
-RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     start $LOGSTASH_SERVICE_NAME && \
-    check_upstart $LOGSTASH_SERVICE_NAME
+    check_upstart $LOGSTASH_SERVICE_NAME'
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-# TODO(adaml): what about the logging.yml file.
-# TODO(adaml): configuration path in init file is not set to same path
 RUN curl {{ elasticsearch.package_url }} --create-dirs -o {{ elasticsearch.package_dest }}
 
-    ##### ENV #####
-    ENV ELASTICSEARCH_SERVICE_NAME {{ elasticsearch.service_name }}
-    ENV ELASTICSEARCH_SERVICE_DIR /opt/$ELASTICSEARCH_SERVICE_NAME/
+##### ENV #####
+ENV ELASTICSEARCH_SERVICE_NAME {{ elasticsearch.service_name }}
+ENV ELASTICSEARCH_SERVICE_DIR /opt/$ELASTICSEARCH_SERVICE_NAME/
 
-    # temp init and config files
-    ENV TMP_CONF_FILE /opt/tmp/conf/$ELASTICSEARCH_SERVICE_NAME.yml
-    ENV TMP_INIT_FILE /opt/tmp/init/$ELASTICSEARCH_SERVICE_NAME.conf
-    ##### ENV #####
+# elasticsearch init file
+ENV ELASTICSEARCH_INIT_FILE /opt/tmp/init/$ELASTICSEARCH_SERVICE_NAME.conf
+##### ENV #####
 
-    # inject required env vars to init script
-    RUN sed -i '1s/^/ELASTICSEARCH_SERVICE_DIR='$ELASTICSEARCH_SERVICE_DIR' \n/' $TMP_INIT_FILE
+# inject required env vars to init script
+RUN sed -i '1s/^/ELASTICSEARCH_SERVICE_DIR='$ELASTICSEARCH_SERVICE_DIR' \n/' $ELASTICSEARCH_INIT_FILE
 
-    # create service dir
-    RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
-        mkdir -p $ELASTICSEARCH_SERVICE_DIR && \
-        check_dir "$ELASTICSEARCH_SERVICE_DIR"
+# create service dir
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    mkdir -p $ELASTICSEARCH_SERVICE_DIR && \
+    check_dir "$ELASTICSEARCH_SERVICE_DIR"'
 
-    # extract binaries to service dir
-    RUN tar -C $ELASTICSEARCH_SERVICE_DIR -xvf {{ elasticsearch.package_dest }}
+# extract binaries to service dir
+RUN tar -C $ELASTICSEARCH_SERVICE_DIR -xvf {{ elasticsearch.package_dest }}
 
-    # place init script in local init dir
-    RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
-        mv $TMP_INIT_FILE /etc/init/ && \
-        check_file "/etc/init/$ELASTICSEARCH_SERVICE_NAME.conf"
-    # place conf script in conf dir
-    RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
-        mv $TMP_INIT_FILE /etc/ && \
-        check_file "/etc/init/$ELASTICSEARCH_SERVICE_NAME.yml"
+# place init script in local init dir
+# config file is generated
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    mv $ELASTICSEARCH_INIT_FILE /etc/init/ && \
+    check_file "/etc/init/$ELASTICSEARCH_SERVICE_NAME.conf"'
 
-    # start elasticsearch
-    RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
-        start $ELASTICSEARCH_SERVICE_NAME && \
-        check_upstart $ELASTICSEARCH_SERVICE_NAME
+# start elasticsearch
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    start $ELASTICSEARCH_SERVICE_NAME && \
+    check_upstart $ELASTICSEARCH_SERVICE_NAME'
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - KIBANA
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl {{ kibana.package_url }} --create-dirs -o {{ kibana.package_dest }} && \
-    tar -C {{ kibana.untar_dest }} -xzvf {{ kibana.package_dest }} && \
-    ln -sf {{ kibana.untar_dest }}kibana-* {{ kibana.sim_link }}
+RUN curl {{ kibana.package_url }} --create-dirs -o {{ kibana.package_dest }}
+#RUN tar -C {{ kibana.untar_dest }} -xzvf {{ kibana.package_dest }}
+#RUN    ln -sf {{ kibana.untar_dest }}kibana-* {{ kibana.sim_link }}
+
+ENV KIBANA_SERVICE_NAME {{ kibana.service_name }}
+ENV KIBANA_SERVICE_DIR /opt/$KIBANA_SERVICE_NAME/
+
+# create service dir
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    mkdir -p $KIBANA_SERVICE_DIR && \
+    check_dir "$KIBANA_SERVICE_DIR"'
+
+# extract binaries to service dir
+RUN tar -C $KIBANA_SERVICE_DIR -xzvf {{ kibana.package_dest }}
+
+
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - INFLUXDB
 # ------------------------------------------------------------------------------------------------------------------------------------------ #

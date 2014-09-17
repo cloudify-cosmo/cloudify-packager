@@ -1,0 +1,16 @@
+description "RabbitMQ Server"
+
+start on runlevel [2345]
+stop on runlevel [016]
+
+kill timeout 60
+respawn
+respawn limit 10 5
+
+setuid rabbitmq
+setgid rabbitmq
+env HOME=/var/lib/rabbitmq
+
+exec /usr/sbin/rabbitmq-server
+post-start exec /usr/sbin/rabbitmqctl wait
+pre-stop exec /usr/sbin/rabbitmqctl stop
