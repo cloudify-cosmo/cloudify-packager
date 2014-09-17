@@ -40,10 +40,9 @@ VARS = {
         }
     },
     "elasticsearch": {
+        "service_name": "elasticsearch",
         "package_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
         "package_dest": "/opt/tmp/elasticsearch/elasticsearch.tar.gz",
-        "untar_dest": "/opt/",
-        "sim_link": "/opt/elasticsearch"
     },
     "kibana": {
         "package_url": "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
