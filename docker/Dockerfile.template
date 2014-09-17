@@ -103,11 +103,44 @@ RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl {{ elasticsearch.package_url }} --create-dirs -o {{ elasticsearch.package_dest }} && \
-    tar -C {{ elasticsearch.untar_dest }} -xvf {{ elasticsearch.package_dest }} && \
-    ln -sf {{ elasticsearch.untar_dest }}elasticsearch-* {{ elasticsearch.sim_link }}
-    # ADD ELASTICSEARCH INIT FILE
-    # START ELASTISEARCH
+# TODO(adaml): what about the logging.yml file.
+# TODO(adaml): configuration path in init file is not set to same path
+RUN curl {{ elasticsearch.package_url }} --create-dirs -o {{ elasticsearch.package_dest }}
+
+    ##### ENV #####
+    ENV ELASTICSEARCH_SERVICE_NAME {{ elasticsearch.service_name }}
+    ENV ELASTICSEARCH_SERVICE_DIR /opt/$ELASTICSEARCH_SERVICE_NAME/
+
+    # temp init and config files
+    ENV TMP_CONF_FILE /opt/tmp/conf/$ELASTICSEARCH_SERVICE_NAME.yml
+    ENV TMP_INIT_FILE /opt/tmp/init/$ELASTICSEARCH_SERVICE_NAME.conf
+    ##### ENV #####
+
+    # inject required env vars to init script
+    RUN sed -i '1s/^/ELASTICSEARCH_SERVICE_DIR='$ELASTICSEARCH_SERVICE_DIR' \n/' $TMP_INIT_FILE
+
+    # create service dir
+    RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+        mkdir -p $ELASTICSEARCH_SERVICE_DIR && \
+        check_dir "$ELASTICSEARCH_SERVICE_DIR"
+
+    # extract binaries to service dir
+    RUN tar -C $ELASTICSEARCH_SERVICE_DIR -xvf {{ elasticsearch.package_dest }}
+
+    # place init script in local init dir
+    RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+        mv $TMP_INIT_FILE /etc/init/ && \
+        check_file "/etc/init/$ELASTICSEARCH_SERVICE_NAME.conf"
+    # place conf script in conf dir
+    RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+        mv $TMP_INIT_FILE /etc/ && \
+        check_file "/etc/init/$ELASTICSEARCH_SERVICE_NAME.yml"
+
+    # start elasticsearch
+    RUN /bin/bash -c 'source /opt/tmp/bootstrap_utils.sh' && \
+        start $ELASTICSEARCH_SERVICE_NAME && \
+        check_upstart $ELASTICSEARCH_SERVICE_NAME
+
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - KIBANA
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
