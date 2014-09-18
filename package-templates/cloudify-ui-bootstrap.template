@@ -124,8 +124,7 @@ if ! dpkg -s cloudify-ui 2>&1 | grep Status: | grep installed; then
         sudo rm /opt/grafana
         sudo mkdir /opt/grafana
         sudo tar xvf /packages/cloudify-ui/grafana* -C /opt/grafana --strip=1
-        sudo cp /packages/cloudify-ui/config/grafana/
-        sudo cp /packages/cloudify-ui/config/grafana/config.js /opt/grafana​
+        sudo cp /packages/cloudify-ui/config/grafana/config.js /opt/grafana
         sudo service nginx restart
 
         echo "starting ${PKG_NAME}..."
