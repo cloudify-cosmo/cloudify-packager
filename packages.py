@@ -135,9 +135,8 @@ PACKAGES = {
             "__params_ui": {
                 "port": "9001",
             },
-            "__template_file_grafana": {
-                "template": "{0}/cloudify-ui/grafana/config.js.template".format(CONFIGS_PATH),
-                "output_file": "config.js",
+            "__config_dir_grafana": {
+                "files": "{0}/cloudify-ui/grafana".format(CONFIGS_PATH),
                 "config_dir": "config/grafana",
                 "dst_dir": "/opt/grafana",
             },
