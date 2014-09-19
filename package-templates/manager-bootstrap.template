@@ -135,3 +135,6 @@ echo "starting manager..."
 sudo start manager
 check_upstart "manager"
 
+echo "starting amqpflux..."
+sudo start amqpflux
+check_upstart "amqpflux"
