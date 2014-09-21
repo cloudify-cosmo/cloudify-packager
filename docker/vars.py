@@ -85,8 +85,8 @@ VARS = {
             "openjdk-7-jdk",
         ],
         "source_repos": [
-            "2i deb http://nginx.org/packages/mainline/ubuntu/ precise nginx",
-            "2i deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx",
+            "deb http://nginx.org/packages/mainline/ubuntu/ precise nginx",
+            "deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx",
         ],
         "source_key": "http://nginx.org/keys/nginx_signing.key",
     },
