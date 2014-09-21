@@ -55,13 +55,13 @@ function check_file
 function check_upstart
 {
 	echo "checking to see if $1 daemon is running..."
-	sudo status $1 || state_error "daemon $1 is not running"
+	status $1 || state_error "daemon $1 is not running"
 	echo "daemon $1 is running"
 }
 
 function check_service
 {
     echo "checking to see if $1 service is running..."
-    sudo service $1 status || state_error "service $1 is not running"
+    service $1 status || state_error "service $1 is not running"
     echo "service $1 is running"
 }
