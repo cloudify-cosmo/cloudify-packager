@@ -175,13 +175,22 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
 # extract binaries to service dir
 RUN tar -C $KIBANA_SERVICE_DIR -xzvf /opt/tmp/kibana.tar.gz
 
-
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - INFLUXDB
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb --create-dirs -o /opt/tmp/influxdb.deb && \
-    dpkg -i /opt/tmp/influxdb.deb && \
-    /etc/init.d/influxdb start
+# install dependencies
+RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
+# download binaries
+RUN curl http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb --create-dirs -o /opt/tmp/influxdb.deb
+##### ENV #####
+ENV INFLUXDB_SERVICE_NAME influxdb
+##### ENV #####
+
+# install influxdb
+RUN dpkg -i /opt/tmp/influxdb.deb
+
+#start influxdb
+RUN /etc/init.d/$INFLUXDB_SERVICE_NAME start
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
