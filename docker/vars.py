@@ -75,9 +75,6 @@ VARS = {
     },
     "kibana": {
         "service_name": "kibana",
-        "reqs": [
-            "curl",
-            ],
         "package_url": "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
         "package_dest": "/opt/tmp/kibana.tar.gz",
     },
