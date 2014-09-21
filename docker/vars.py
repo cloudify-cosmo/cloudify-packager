@@ -75,10 +75,17 @@ VARS = {
     },
     "kibana": {
         "service_name": "kibana",
+        "reqs": [
+            "curl",
+            ],
         "package_url": "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
         "package_dest": "/opt/tmp/kibana.tar.gz",
     },
     "influxdb": {
+        "service_name": "influxdb",
+        "reqs": [
+            "curl",
+        ],
         "package_url": "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",
         "package_dest": "/opt/tmp/influxdb.deb",
         "ports": [],
