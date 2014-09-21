@@ -121,6 +121,9 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+# install dependencies
+RUN apt-get install -y $(echo {{ elasticsearch.reqs }} | tr -d "',[]")
+# download binaries
 RUN curl {{ elasticsearch.package_url }} --create-dirs -o {{ elasticsearch.package_dest }}
 
 ##### ENV #####
