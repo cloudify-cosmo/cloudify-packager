@@ -121,6 +121,9 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+# install dependencies
+RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
+# download binaries
 RUN curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz
 
 ##### ENV #####

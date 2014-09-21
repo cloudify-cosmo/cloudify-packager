@@ -66,6 +66,9 @@ VARS = {
     },
     "elasticsearch": {
         "service_name": "elasticsearch",
+        "reqs": [
+            "curl",
+        ],
         "package_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
         "package_dest": "/opt/tmp/elasticsearch/elasticsearch.tar.gz",
         "ports": [],
