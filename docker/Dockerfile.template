@@ -87,6 +87,8 @@ ENV LOGSTASH_SERVICE_NAME {{ logstash.service_name }}
 ENV LOGSTASH_SERVICE_DIR /opt/$LOGSTASH_SERVICE_NAME/
 # logstash init file
 ENV LOGSTASH_INIT_FILE /opt/tmp/init/$LOGSTASH_SERVICE_NAME.conf
+# logstash conf file
+ENV LOGSTASH_CONF_FILE /opt/tmp/conf/$LOGSTASH_SERVICE_NAME.conf
 ##### ENV #####
 
 # inject required env vars to init script
@@ -108,7 +110,7 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     check_file "/etc/init/$LOGSTASH_SERVICE_NAME.conf"'
 # place conf script in conf dir
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mv $LOGSTASH_INIT_FILE /etc/ && \
+    mv $LOGSTASH_CONF_FILE /etc/ && \
     check_file "/etc/$LOGSTASH_SERVICE_NAME.conf"'
 
 # start logstash
