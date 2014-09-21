@@ -54,10 +54,35 @@ RUN dpkg -i {{ rabbitmq.package_dest }} && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # install dependencies.
 RUN apt-get install -y $(echo {{ riemann.reqs }} | tr -d "',[]")
-RUN curl {{ riemann.package_url }} --create-dirs -o {{ riemann.package_dest }} && \
-    dpkg -i {{ riemann.package_dest }} && \
-    curl {{ riemann.langohr_url }} --create-dirs -o {{ riemann.langohr_dest }} && \
+# download and own langohr jar.
+RUN curl {{ riemann.langohr_url }} --create-dirs -o {{ riemann.langohr_dest }} && \
     chmod 644 {{ riemann.langohr_dest }}
+# download riemann deb
+RUN curl {{ riemann.package_url }} --create-dirs -o {{ riemann.package_dest }}
+
+##### ENV #####
+ENV RIEMANN_SERVICE_NAME {{ riemann.service_name }}
+# riemann init file
+ENV RIEMANN_INIT_FILE /opt/tmp/init/$RIEMANN_SERVICE_NAME.conf
+ENV RIEMANN_SERVICE_DIR /opt/$RIEMANN_SERVICE_NAME/
+##### ENV #####
+
+# inject required env vars to init script
+RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR$(basename {{ riemann.langohr_dest }})' \n|' $RIEMANN_INIT_FILE
+
+# place jar in service dir
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    mv {{ riemann.langohr_dest }} $RIEMANN_SERVICE_DIR && \
+    check_file "$RIEMANN_SERVICE_DIR$(basename {{ riemann.langohr_dest }})"'
+# place init script in local init dir
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    mv $RIEMANN_INIT_FILE /etc/init/ && \
+    check_file "/etc/init/$RIEMANN_SERVICE_NAME.conf"'
+
+# install riemann
+RUN dpkg -i {{ riemann.package_dest }}
+
+
     # APPLY RIEMANN INIT FILE
     # START RIEMANN
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
