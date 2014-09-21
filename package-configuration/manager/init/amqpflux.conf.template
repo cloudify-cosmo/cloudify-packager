@@ -1,6 +1,7 @@
 description     "amqp-influxdb consumer instance"
 
-start on runlevel [2345]
+start on (started rabbitmq-server
+          and runlevel [2345])
 stop on runlevel [016]
 
 # Respawn it if the process exits
