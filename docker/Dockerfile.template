@@ -90,8 +90,8 @@ ENV LOGSTASH_INIT_FILE /opt/tmp/init/$LOGSTASH_SERVICE_NAME.conf
 ##### ENV #####
 
 # inject required env vars to init script
-RUN sed -i '1s/^/LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR$(basename {{ logstash.package_dest }})' \n/' $LOGSTASH_INIT_FILE
-RUN sed -i '1s/^/LOGSTASH_CONF_PATH='/etc/$LOGSTASH_SERVICE_NAME.conf' \n/' $LOGSTASH_INIT_FILE
+RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR$(basename {{ logstash.package_dest }})' \n|' $LOGSTASH_INIT_FILE
+RUN sed -i '1s|^|LOGSTASH_CONF_PATH='/etc/$LOGSTASH_SERVICE_NAME.conf' \n|' $LOGSTASH_INIT_FILE
 
 # create service dir
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
@@ -130,7 +130,7 @@ ENV ELASTICSEARCH_INIT_FILE /opt/tmp/init/$ELASTICSEARCH_SERVICE_NAME.conf
 ##### ENV #####
 
 # inject required env vars to init script
-RUN sed -i '1s/^/ELASTICSEARCH_SERVICE_DIR='$ELASTICSEARCH_SERVICE_DIR' \n/' $ELASTICSEARCH_INIT_FILE
+RUN sed -i '1s|^|ELASTICSEARCH_SERVICE_DIR='$ELASTICSEARCH_SERVICE_DIR' \n|' $ELASTICSEARCH_INIT_FILE
 
 # create service dir
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
