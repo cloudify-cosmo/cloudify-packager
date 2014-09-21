@@ -196,7 +196,7 @@ RUN /etc/init.d/$INFLUXDB_SERVICE_NAME start
 # CONTAINER - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add nginx repositories to sources.list file and update repo
-RUN echo {{ nginx.source_repos }} | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && /
+RUN echo {{ nginx.source_repos }} | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
     apt-get update
 # install dependencies
 RUN apt-get install -y $(echo {{ nginx.reqs }} | tr -d "',[]")
@@ -204,7 +204,7 @@ RUN apt-get install -y $(echo {{ nginx.reqs }} | tr -d "',[]")
 ENV NGINX_SERVICE_NAME {{ nginx.service_name }}
 
 # download and add signing key
-RUN curl {{ nginx.source_key }} --create-dirs -o /opt/tmp/nginx/nginx_signing.key && /
+RUN curl {{ nginx.source_key }} --create-dirs -o /opt/tmp/nginx/nginx_signing.key && \
     apt-key add /opt/tmp/nginx/nginx_signing.key
 
 # install nginx

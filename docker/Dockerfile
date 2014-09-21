@@ -196,7 +196,7 @@ RUN /etc/init.d/$INFLUXDB_SERVICE_NAME start
 # CONTAINER - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add nginx repositories to sources.list file and update repo
-RUN echo ['2i deb http://nginx.org/packages/mainline/ubuntu/ precise nginx', '2i deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx'] | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && /
+RUN echo ['2i deb http://nginx.org/packages/mainline/ubuntu/ precise nginx', '2i deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx'] | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
     apt-get update
 # install dependencies
 RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
@@ -204,7 +204,7 @@ RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
 ENV NGINX_SERVICE_NAME nginx
 
 # download and add signing key
-RUN curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx/nginx_signing.key && /
+RUN curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx/nginx_signing.key && \
     apt-key add /opt/tmp/nginx/nginx_signing.key
 
 # install nginx
