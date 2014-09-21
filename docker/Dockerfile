@@ -33,8 +33,6 @@ RUN apt-get update
 RUN apt-get install -y $(echo ['curl', 'logrotate', 'erlang-nox'] | tr -d "',[]")
 # download rabbit package
 RUN curl http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server_3.2.4-1_all.deb --create-dirs -o /opt/tmp/rabbitmq/rabbitmq-server.deb
-# install rabbitmq-server
-RUN dpkg -i /opt/tmp/rabbitmq/rabbitmq-server.deb
 
 ENV RABBITMQ_SERVICE_NAME rabbitmq-server
 ENV RABBITMQ_INIT_FILE /opt/tmp/init/$RABBITMQ_SERVICE_NAME.conf
@@ -44,12 +42,12 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     mv $RABBITMQ_INIT_FILE /etc/init/ && \
     check_file "/etc/init/$RABBITMQ_SERVICE_NAME.conf"'
 
-# cp ${PKG_DIR}/{ config_templates.__template_file_rabbitmq.config_dir }/* { config_templates.__template_file_rabbitmq.dst_dir } >> ${BOOTSTRAP_LOG} 2>&1
-# start rabbitmq-server
-RUN rabbitmq-plugins enable rabbitmq_management && \
+# install and run rabbitmq-server
+RUN dpkg -i /opt/tmp/rabbitmq/rabbitmq-server.deb && \
+    rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing && \
-    /usr/sbin/rabbitmqctl stop && \
-    start rabbitmq-server && \
+    invoke-rc.d $RABBITMQ_SERVICE_NAME stop && \
+    invoke-rc.d $RABBITMQ_SERVICE_NAME start && \
     rabbitmqctl trace_on
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RIEMANN, DependsOn: langohr
@@ -154,8 +152,9 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     check_upstart $ELASTICSEARCH_SERVICE_NAME'
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-# CONTAINER - KIBANA
+# CONTAINER - KIBANA -
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+#todo: comment
 RUN curl https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz --create-dirs -o /opt/tmp/kibana.tar.gz
 #RUN tar -C  -xzvf /opt/tmp/kibana.tar.gz
 #RUN    ln -sf kibana-* 

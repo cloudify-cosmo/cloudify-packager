@@ -33,8 +33,6 @@ RUN apt-get update
 RUN apt-get install -y $(echo {{ rabbitmq.reqs }} | tr -d "',[]")
 # download rabbit package
 RUN curl {{ rabbitmq.package_url }} --create-dirs -o {{ rabbitmq.package_dest }}
-# install rabbitmq-server
-RUN dpkg -i {{ rabbitmq.package_dest }}
 
 ENV RABBITMQ_SERVICE_NAME {{ rabbitmq.service_name }}
 ENV RABBITMQ_INIT_FILE /opt/tmp/init/$RABBITMQ_SERVICE_NAME.conf
@@ -44,12 +42,12 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     mv $RABBITMQ_INIT_FILE /etc/init/ && \
     check_file "/etc/init/$RABBITMQ_SERVICE_NAME.conf"'
 
-# cp ${PKG_DIR}/{ config_templates.__template_file_rabbitmq.config_dir }/* { config_templates.__template_file_rabbitmq.dst_dir } >> ${BOOTSTRAP_LOG} 2>&1
-# start rabbitmq-server
-RUN rabbitmq-plugins enable rabbitmq_management && \
+# install and run rabbitmq-server
+RUN dpkg -i {{ rabbitmq.package_dest }} && \
+    rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing && \
-    /usr/sbin/rabbitmqctl stop && \
-    start rabbitmq-server && \
+    invoke-rc.d $RABBITMQ_SERVICE_NAME stop && \
+    invoke-rc.d $RABBITMQ_SERVICE_NAME start && \
     rabbitmqctl trace_on
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RIEMANN, DependsOn: langohr
@@ -154,8 +152,9 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     check_upstart $ELASTICSEARCH_SERVICE_NAME'
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-# CONTAINER - KIBANA
+# CONTAINER - KIBANA -
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+#todo: comment
 RUN curl {{ kibana.package_url }} --create-dirs -o {{ kibana.package_dest }}
 #RUN tar -C {{ kibana.untar_dest }} -xzvf {{ kibana.package_dest }}
 #RUN    ln -sf {{ kibana.untar_dest }}kibana-* {{ kibana.sim_link }}

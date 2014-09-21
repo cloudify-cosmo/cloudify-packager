@@ -59,6 +59,9 @@ VARS = {
             "events_index": "cloudify_events",
             "test_tcp_port": "9999",
         },
+        "params": {
+
+        },
         "ports": [],
     },
     "elasticsearch": {
