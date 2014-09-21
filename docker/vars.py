@@ -32,10 +32,6 @@ VARS = {
         "langohr_dest": "/usr/lib/riemann/langohr.jar",
         "ports": [],
     },
-    "python": {
-        "package_url": "https://bootstrap.pypa.io/get-pip.py",
-        "virtualenv_version": "1.11.4"
-    },
     "nodejs": {
         "reqs": [
         ],
@@ -73,11 +69,6 @@ VARS = {
         "package_dest": "/opt/tmp/elasticsearch/elasticsearch.tar.gz",
         "ports": [],
     },
-    "kibana": {
-        "service_name": "kibana",
-        "package_url": "https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz",
-        "package_dest": "/opt/tmp/kibana.tar.gz",
-    },
     "influxdb": {
         "service_name": "influxdb",
         "reqs": [
@@ -86,6 +77,18 @@ VARS = {
         "package_url": "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",
         "package_dest": "/opt/tmp/influxdb.deb",
         "ports": [],
+    },
+    "nginx": {
+        "service_name": "nginx",
+        "reqs": [
+            "curl",
+            "openjdk-7-jdk",
+        ],
+        "source_repos": [
+            "2i deb http://nginx.org/packages/mainline/ubuntu/ precise nginx",
+            "2i deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx",
+        ],
+        "source_key": "http://nginx.org/keys/nginx_signing.key",
     },
     "celery": {
         "package_url": "https://codeload.github.com/cloudify-cosmo/cloudify-manager/tar.gz/master",

@@ -54,17 +54,37 @@ RUN dpkg -i /opt/tmp/rabbitmq/rabbitmq-server.deb && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # install dependencies.
 RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
-RUN curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb && \
-    dpkg -i /opt/tmp/riemann/riemann.deb && \
-    curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o /usr/lib/riemann/langohr.jar && \
+# download and set permissions on langohr jar.
+RUN curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o /usr/lib/riemann/langohr.jar && \
     chmod 644 /usr/lib/riemann/langohr.jar
-    # APPLY RIEMANN INIT FILE
-    # START RIEMANN
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# CONTAINER - PYTHON and VIRTUALENV DependsOn: ~
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
-    pip install virtualenv==1.11.4
+# download riemann deb
+RUN curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb
+
+##### ENV #####
+ENV RIEMANN_SERVICE_NAME riemann
+# riemann init file
+ENV RIEMANN_INIT_FILE /opt/tmp/init/$RIEMANN_SERVICE_NAME.conf
+ENV RIEMANN_SERVICE_DIR /opt/$RIEMANN_SERVICE_NAME/
+##### ENV #####
+
+# inject required env vars to init script
+RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR$(basename /usr/lib/riemann/langohr.jar)' \n|' $RIEMANN_INIT_FILE
+# todo(adaml): inject init script the proper config path according to riemann-controller plugin path
+
+# place jar in service dir
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+# place init script in local init dir
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    mv $RIEMANN_INIT_FILE /etc/init/ && \
+    check_file "/etc/init/$RIEMANN_SERVICE_NAME.conf"'
+
+    mv /usr/lib/riemann/langohr.jar $RIEMANN_SERVICE_DIR && \
+    check_file "$RIEMANN_SERVICE_DIR$(basename /usr/lib/riemann/langohr.jar)"'
+# install riemann
+RUN dpkg -i /opt/tmp/riemann/riemann.deb
+
+# todo(adaml): start riemann
+
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NODEJS DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -157,25 +177,6 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     check_upstart $ELASTICSEARCH_SERVICE_NAME'
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-# CONTAINER - KIBANA -
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-#todo: comment
-RUN curl https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz --create-dirs -o /opt/tmp/kibana.tar.gz
-#RUN tar -C  -xzvf /opt/tmp/kibana.tar.gz
-#RUN    ln -sf kibana-* 
-
-ENV KIBANA_SERVICE_NAME kibana
-ENV KIBANA_SERVICE_DIR /opt/$KIBANA_SERVICE_NAME/
-
-# create service dir
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mkdir -p $KIBANA_SERVICE_DIR && \
-    check_dir "$KIBANA_SERVICE_DIR"'
-
-# extract binaries to service dir
-RUN tar -C $KIBANA_SERVICE_DIR -xzvf /opt/tmp/kibana.tar.gz
-
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - INFLUXDB
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # install dependencies
@@ -194,14 +195,21 @@ RUN /etc/init.d/$INFLUXDB_SERVICE_NAME start
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN sed -i "2i deb http://nginx.org/packages/mainline/ubuntu/ precise nginx" /etc/apt/sources.list && \
-    sed -i "2i deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx" /etc/apt/sources.list && \
-    curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx/nginx_signing.key && \
-    apt-key add /opt/tmp/nginx/nginx_signing.key && \
-    apt-get update && \
-    apt-get install -y nginx
-    # APPLY NGINX CONFIG
-    # START NGINX
+# add nginx repositories to sources.list file and update repo
+RUN echo ['2i deb http://nginx.org/packages/mainline/ubuntu/ precise nginx', '2i deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx'] | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && /
+    apt-get update
+# install dependencies
+RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
+
+ENV NGINX_SERVICE_NAME nginx
+
+# download and add signing key
+RUN curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx/nginx_signing.key && /
+    apt-key add /opt/tmp/nginx/nginx_signing.key
+
+# install nginx
+RUN apt-get install -y $NGINX_SERVICE_NAME
+
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - CELERY
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
