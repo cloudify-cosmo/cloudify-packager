@@ -142,7 +142,7 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
 # CONTAINER - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # install dependencies
-RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
+RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
 # download binaries
 RUN curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz
 
@@ -163,7 +163,7 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     check_dir "$ELASTICSEARCH_SERVICE_DIR"'
 
 # extract binaries to service dir
-RUN tar -C $ELASTICSEARCH_SERVICE_DIR -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz
+RUN tar -C $ELASTICSEARCH_SERVICE_DIR -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1
 
 # place init script in local init dir
 # config file is generated
@@ -174,7 +174,18 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
 # start elasticsearch
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     start $ELASTICSEARCH_SERVICE_NAME && \
-    check_upstart $ELASTICSEARCH_SERVICE_NAME'
+    check_upstart $ELASTICSEARCH_SERVICE_NAME && \
+    wait_for_port 9200'
+
+# set elasticsearch indexes. start by deleting all.
+RUN curl --retry 5 --retry-delay 3 -XDELETE http://localhost:9200/cloudify_storage
+RUN curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage -d '{"settings": {"analysis": {"analyzer": {"default": {"tokenizer": "whitespace"}}}}}' && \
+    curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/blueprint/_mapping -d '{"blueprint": {"properties": {"plan": {"enabled": false}}}}' && \
+    curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/deployment/_mapping -d '{"deployment": {"properties": {"plan": {"enabled": false}, "workflows": {"enabled": false}}}}' && \
+    curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node/_mapping -d '{ "node": { "_id": { "path": "id" }, "properties": { "types": { "type": "string", "index_name": "type" }, "properties": { "enabled": false } } } }' && \
+    curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node_instance/_mapping -d '{ "node_instance": { "_id": { "path": "id" }, "properties": { "runtime_properties": { "enabled": false } } } }' && \
+# print all indexes to see working
+RUN curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - INFLUXDB
@@ -190,25 +201,36 @@ ENV INFLUXDB_SERVICE_NAME influxdb
 # install influxdb
 RUN dpkg -i /opt/tmp/influxdb.deb
 
-#start influxdb
-RUN /etc/init.d/$INFLUXDB_SERVICE_NAME start
+# start influxdb and create cloudify table
+RUN /etc/init.d/$INFLUXDB_SERVICE_NAME start && \
+    curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add nginx repositories to sources.list file and update repo
-RUN echo ['2i deb http://nginx.org/packages/mainline/ubuntu/ precise nginx', '2i deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx'] | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
+RUN echo ['deb http://nginx.org/packages/mainline/ubuntu/ precise nginx', 'deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx'] | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
     apt-get update
 # install dependencies
-RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
+RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
 
+# set nginx service name
 ENV NGINX_SERVICE_NAME nginx
+# nginx init file
+ENV NGINX_INIT_FILE /opt/tmp/init/$NGINX_SERVICE_NAME.conf
 
 # download and add signing key
 RUN curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx/nginx_signing.key && \
     apt-key add /opt/tmp/nginx/nginx_signing.key
 
+# place init script in local init dir
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    mv $NGINX_INIT_FILE /etc/init/ && \
+    check_file "/etc/init/$NGINX_SERVICE_NAME.conf"'
+
 # install nginx
-RUN apt-get install -y $NGINX_SERVICE_NAME
+RUN apt-get install -y --force-yes $NGINX_SERVICE_NAME
+
+RUN service $NGINX_SERVICE_NAME start
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - CELERY
