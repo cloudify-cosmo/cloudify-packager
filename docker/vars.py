@@ -64,10 +64,13 @@ VARS = {
         "service_name": "elasticsearch",
         "reqs": [
             "curl",
+            "openjdk-7-jdk",
         ],
         "package_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
         "package_dest": "/opt/tmp/elasticsearch/elasticsearch.tar.gz",
-        "ports": [],
+        "ports": ["9200"],
+        "min_mem": "1024m",
+        "max_mem": "1024m",
     },
     "influxdb": {
         "service_name": "influxdb",
@@ -82,13 +85,13 @@ VARS = {
         "service_name": "nginx",
         "reqs": [
             "curl",
-            "openjdk-7-jdk",
         ],
         "source_repos": [
             "deb http://nginx.org/packages/mainline/ubuntu/ precise nginx",
             "deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx",
         ],
         "source_key": "http://nginx.org/keys/nginx_signing.key",
+        "ports": ["9200"],
     },
     "celery": {
         "package_url": "https://codeload.github.com/cloudify-cosmo/cloudify-manager/tar.gz/master",
