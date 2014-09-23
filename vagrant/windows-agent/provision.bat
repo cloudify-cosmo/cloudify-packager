@@ -1,6 +1,7 @@
 SET REST_CLIENT_SHA=
 SET COMMON_PLUGIN_SHA=
 SET MANAGER_SHA=
+SET SCRIPTS_PLUGIN_SHA=
 
 
 cd c:\\
@@ -22,7 +23,7 @@ if not (%COMMON_PLUGIN_SHA%)==() git reset --hard %COMMON_PLUGIN_SHA%
 pip install .
 git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 cd C:\\CloudifyAgent\\cloudify-script-plugin
-if not (%SCRIPT_PLUGIN_SHA%)==() git reset --hard %SCRIPT_PLUGIN_SHA%
+if not (%SCRIPTS_PLUGIN_SHA%)==() git reset --hard %SCRIPT_PLUGIN_SHA%
 pip install .
 cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
