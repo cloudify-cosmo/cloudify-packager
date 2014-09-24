@@ -1,0 +1,76 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": ""
+  },
+  "builders": [
+    {
+      "type": "virtualbox-ovf",
+      "source_path": "/home/nir0s/.vagrant.d/boxes/precise64/0/virtualbox/box.ovf",
+      "vm_name": "cloudify",
+      "ssh_username": "vagrant",
+      "ssh_key_path": "insecure_private_key",
+      "ssh_wait_timeout": "3m",
+      "shutdown_command": "echo 'packer' | sudo -S shutdown -P now",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "2048"],
+        ["modifyvm", "{{.Name}}", "--cpus", "2"],
+        ["modifyvm", "{{.Name}}", "--natdnshostresolver1", "on"]
+      ]
+    },
+    {
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "eu-west-1",
+      "ssh_private_key_file": "/home/nir0s/.ssh/aws/vagrant_build.pem",
+      "source_ami": "ami-07ed3a70",
+      "instance_type": "m3.medium",
+      "ssh_username": "ubuntu",
+      "ami_name": "cloudify {{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "only": ["virtualbox-ovf"],
+      "inline": ["mkdir -p /home/vagrant/.ssh/"]
+    },
+    {
+      "type": "shell",
+      "only": ["amazon-ebs"],
+      "inline": ["mkdir -p /home/ubuntu/.ssh/"]
+    },
+    {
+      "type": "file",
+      "only": ["virtualbox-ovf"],
+      "source": "insecure_private_key",
+      "destination": "/home/vagrant/.ssh/cloudify_private_key"
+    },
+    {
+      "type": "file",
+      "only": ["amazon-ebs"],
+      "source": "/home/nir0s/.ssh/aws/vagrant_build.pem",
+      "destination": "/home/ubuntu/.ssh/cloudify_private_key.pem"
+    },
+    {
+      "type": "shell",
+      "script": "vagrant/provision.sh",
+      "environment_vars": [
+        "COMPONENTS_PACKAGE_URL={{ components_package_url }}",
+        "CORE_PACKAGE_URL={{ core_package_url }}",
+        "UI_PACKAGE_URL={{ ui_package_url }}",
+        "UBUNTU_AGENT_URL={{ ubuntu_agent_url }}",
+        "CENTOS_AGENT_URL={{ centos_agent_url }}",
+        "WINDOWS_AGENT_URL={{ windows_agent_url }}"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "compression_level": 9,
+      "output": "cloudify_{{ release }}_{{.Provider}}.box"
+    }
+  ]
+}
