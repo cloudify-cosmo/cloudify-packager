@@ -7,8 +7,9 @@ SCRIPTS_PLUGIN_SHA=""
 # echo bootstrapping packman...
 
 # update and install prereqs
+sudo add-apt-repository ppa:git-core/ppa &&
 sudo apt-get -y update &&
-sudo apt-get install -y curl python-dev rubygems rpm &&
+sudo apt-get install -y curl python-dev rubygems rpm git &&
 
 # install ruby
 wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p547.tar.bz2
@@ -33,7 +34,7 @@ pushd packman
 	if [ -n "$PACKMAN_SHA" ]; then
 		git reset --hard $PACKMAN_SHA
 	fi
-	pip install .
+	sudo pip install .
 popd
 
 # install virtualenv
