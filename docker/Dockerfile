@@ -149,10 +149,6 @@ RUN curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elastics
 ##### ENV #####
 ENV ELASTICSEARCH_SERVICE_NAME elasticsearch
 ENV ELASTICSEARCH_SERVICE_DIR /opt/$ELASTICSEARCH_SERVICE_NAME/
-
-# setting elasticsearch max and min memory
-ENV ES_MIN_MEM 1024m
-ENV ES_MAX_MEM 1024m
 ##### ENV #####
 
 # create service dir
@@ -177,7 +173,7 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1
 
 # start elasticsearch as non-daemon
-CMD ["/opt/elasticsearch/bin/elasticsearch"]
+CMD ["ES_JAVA_OPTS=-Xmx1024m -Xms1024m; /opt/elasticsearch/bin/elasticsearch"]
 
 # expose elasticsearch port
 EXPOSE 9200
@@ -191,15 +187,29 @@ RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
 RUN curl http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb --create-dirs -o /opt/tmp/influxdb.deb
 ##### ENV #####
 ENV INFLUXDB_SERVICE_NAME influxdb
+# default influxdb config path
+ENV INFLUXDB_CONFIG_FILE /opt/influxdb/shared/config.toml
 ##### ENV #####
+
+# todo(adaml): allow ability to configure ssl and default ports via config file. this should be done using a script.
+# RUN sed -i -r -e 's/^# ssl-/ssl-/g' -e 's/^port *= * 8086/# port = 8086/' $INFLUXDB_CONFIG_FILE
 
 # install influxdb
 RUN dpkg -i /opt/tmp/influxdb.deb
 
-# start influxdb and create cloudify db
-# todo(adaml) move to upstart
-RUN /etc/init.d/$INFLUXDB_SERVICE_NAME start && \
+# start influxdb as daemon and create cloudify db
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    /usr/bin/influxdb-daemon -config=$INFLUXDB_CONFIG_FILE && \
+    wait_for_port 8086' && \
     curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"
+
+# run the service as non-daemon
+CMD ["/usr/bin/influxdb -config=/opt/influxdb/shared/config.toml"]
+
+# expose api port
+EXPOSE 8086
+# expose admin port
+EXPOSE 8083
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #

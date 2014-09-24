@@ -79,7 +79,7 @@ VARS = {
         ],
         "package_url": "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",
         "package_dest": "/opt/tmp/influxdb.deb",
-        "ports": [],
+        "ports": ["8086"],
     },
     "nginx": {
         "service_name": "nginx",
