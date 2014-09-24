@@ -149,10 +149,6 @@ RUN curl {{ elasticsearch.package_url }} --create-dirs -o {{ elasticsearch.packa
 ##### ENV #####
 ENV ELASTICSEARCH_SERVICE_NAME {{ elasticsearch.service_name }}
 ENV ELASTICSEARCH_SERVICE_DIR /opt/$ELASTICSEARCH_SERVICE_NAME/
-
-# setting elasticsearch max and min memory
-ENV ES_MIN_MEM {{ elasticsearch.min_mem }}
-ENV ES_MAX_MEM {{ elasticsearch.max_mem }}
 ##### ENV #####
 
 # create service dir
@@ -177,7 +173,7 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1
 
 # start elasticsearch as non-daemon
-CMD ["/opt/elasticsearch/bin/elasticsearch"]
+CMD ["ES_JAVA_OPTS=-Xmx{{ elasticsearch.max_mem }} -Xms{{ elasticsearch.min_mem }}; /opt/elasticsearch/bin/elasticsearch"]
 
 # expose elasticsearch port
 EXPOSE {{ elasticsearch.ports[0] }}
@@ -191,15 +187,29 @@ RUN apt-get install -y $(echo {{ influxdb.reqs }} | tr -d "',[]")
 RUN curl {{ influxdb.package_url }} --create-dirs -o {{ influxdb.package_dest }}
 ##### ENV #####
 ENV INFLUXDB_SERVICE_NAME {{ influxdb.service_name }}
+# default influxdb config path
+ENV INFLUXDB_CONFIG_FILE /opt/influxdb/shared/config.toml
 ##### ENV #####
+
+# todo(adaml): allow ability to configure ssl and default ports via config file. this should be done using a script.
+# RUN sed -i -r -e 's/^# ssl-/ssl-/g' -e 's/^port *= * 8086/# port = 8086/' $INFLUXDB_CONFIG_FILE
 
 # install influxdb
 RUN dpkg -i {{ influxdb.package_dest }}
 
-# start influxdb and create cloudify db
-# todo(adaml) move to upstart
-RUN /etc/init.d/$INFLUXDB_SERVICE_NAME start && \
+# start influxdb as daemon and create cloudify db
+RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    /usr/bin/influxdb-daemon -config=$INFLUXDB_CONFIG_FILE && \
+    wait_for_port {{ influxdb.ports[0] }}' && \
     curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"
+
+# run the service as non-daemon
+CMD ["/usr/bin/influxdb -config=/opt/influxdb/shared/config.toml"]
+
+# expose api port
+EXPOSE {{ influxdb.ports[0] }}
+# expose admin port
+EXPOSE 8083
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
