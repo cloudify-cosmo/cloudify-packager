@@ -97,47 +97,32 @@ RUN add-apt-repository -y ppa:chris-lea/node.js && \
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - LOGSTASH DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+##### ENV #####
+ENV LOGSTASH_SERVICE_NAME logstash
+ENV LOGSTASH_SERVICE_DIR /opt/$LOGSTASH_SERVICE_NAME
+# logstash init file
+ENV LOGSTASH_INIT_FILE $LOGSTASH_SERVICE_DIR/run.sh
+# logstash conf file
+ENV LOGSTASH_CONF_FILE $LOGSTASH_SERVICE_DIR/config.conf
+##### ENV #####
+
+ADD logstash/ $LOGSTASH_SERVICE_DIR/
+
 # install dependencies.
 RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
 # download jar file
-RUN curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o /opt/tmp/logstash/logstash.jar
+RUN curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/$LOGSTASH_SERVICE_NAME.jar
 
-##### ENV #####
-ENV LOGSTASH_SERVICE_NAME logstash
-ENV LOGSTASH_SERVICE_DIR /opt/$LOGSTASH_SERVICE_NAME/
-# logstash init file
-ENV LOGSTASH_INIT_FILE /opt/tmp/init/$LOGSTASH_SERVICE_NAME.conf
-# logstash conf file
-ENV LOGSTASH_CONF_FILE /opt/tmp/conf/$LOGSTASH_SERVICE_NAME.conf
-##### ENV #####
+# inject required env vars to run script
+RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/$LOGSTASH_SERVICE_NAME.jar' \n|' $LOGSTASH_INIT_FILE
+RUN sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_INIT_FILE
+RUN sed -i '1s|^|#!/bin/bash \n|' $LOGSTASH_INIT_FILE
 
-# inject required env vars to init script
-RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR$(basename /opt/tmp/logstash/logstash.jar)' \n|' $LOGSTASH_INIT_FILE
-RUN sed -i '1s|^|LOGSTASH_CONF_PATH='/etc/$LOGSTASH_SERVICE_NAME.conf' \n|' $LOGSTASH_INIT_FILE
-
-# create service dir
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mkdir -p $LOGSTASH_SERVICE_DIR && \
-    check_dir "$LOGSTASH_SERVICE_DIR"'
-
-# place jar in service dir
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mv /opt/tmp/logstash/logstash.jar $LOGSTASH_SERVICE_DIR && \
-    check_file "$LOGSTASH_SERVICE_DIR$(basename /opt/tmp/logstash/logstash.jar)"'
-# place init script in local init dir
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mv $LOGSTASH_INIT_FILE /etc/init/ && \
-    check_file "/etc/init/$LOGSTASH_SERVICE_NAME.conf"'
-# place conf script in conf dir
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mv $LOGSTASH_CONF_FILE /etc/ && \
-    check_file "/etc/$LOGSTASH_SERVICE_NAME.conf"'
+# grant exec permissions
+RUN chmod 0755 /opt/logstash/run.sh
 
 # start logstash
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    start $LOGSTASH_SERVICE_NAME && \
-    check_upstart $LOGSTASH_SERVICE_NAME'
-
+CMD /opt/logstash/run.sh
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
