@@ -1,0 +1,12 @@
+description     "amqp-influxdb consumer instance"
+
+start on (started rabbitmq-server
+          and runlevel [2345])
+stop on runlevel [016]
+
+# Respawn it if the process exits
+respawn
+respawn limit 5 30
+limit nofile 65550 65550
+
+exec /opt/manager/bin/cloudify-amqp-influxdb --amqp-exchange cloudify-monitoring --amqp-routing-key '*' --influx-database cloudify

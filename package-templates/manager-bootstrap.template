@@ -113,9 +113,9 @@ check_dir "${LOG_DIR}"
 
 echo "moving some stuff aorund..."
 sudo cp ${PKG_INIT_DIR}/*.conf ${INIT_DIR}
-# sudo cp ${PKG_CONF_DIR}/guni.conf ${PKG_DIR}
 
 check_file "${INIT_DIR}/manager.conf"
+check_file "${INIT_DIR}/amqpflux.conf"
 
 # sudo mv ${PKG_DIR}/${PKG_NAME} ${BASE_DIR}
 sudo ln -sf ${HOME_DIR}/cosmo-manager-*/ ${HOME_DIR}/${PKG_NAME}
@@ -135,3 +135,6 @@ echo "starting manager..."
 sudo start manager
 check_upstart "manager"
 
+echo "starting amqpflux..."
+sudo start amqpflux
+check_upstart "amqpflux"

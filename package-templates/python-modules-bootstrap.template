@@ -81,4 +81,4 @@ if [ ! -z "${VIRTUALENV}" ]
     	sudo virtualenv ${VIRTUALENV}
 fi
 echo "installing requirements in virtual env..."
-sudo ${VIRTUALENV}/bin/pip install --no-index --process-dependency-links --find-links="${PKG_DIR}" ${PKG_DIR}/*.*
+sudo ${VIRTUALENV}/bin/pip install --no-index --find-links="${PKG_DIR}" ${PKG_DIR}/*.*

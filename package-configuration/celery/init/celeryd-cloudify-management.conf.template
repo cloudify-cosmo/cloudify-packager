@@ -17,16 +17,16 @@ env MANAGEMENT_IP="IPSTRING"
 env CELERY_WORK_DIR="{{ config_templates.__params_init.work_dir }}/work"
 env IS_MANAGEMENT_NODE="True"
 env AGENT_IP="cloudify.management"
-env VIRTUALENV="${CELERY_BASE_DIR}"
+env VIRTUALENV="{{ config_templates.__params_init.work_dir }}/env"
 env MANAGER_FILE_SERVER_URL="http://IPSTRING:{{ config_templates.__params_init.file_server_port }}"
-env MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL="${MANAGER_FILE_SERVER_URL}/blueprints"
+env MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL="http://IPSTRING:{{ config_templates.__params_init.file_server_port }}/blueprints"
 env CELERY_TASK_SERIALIZER="json"
 env CELERY_RESULT_SERIALIZER="json"
 env CELERY_RESULT_BACKEND="amqp://"
 env RIEMANN_CONFIGS_DIR="{{ config_templates.__params_init.work_dir }}/riemann"
 
 exec {{ config_templates.__params_init.work_dir }}/env/bin/python -m celery.bin.celeryd \
---include=system_workflows.deployment_environment,plugin_installer.tasks,worker_installer.tasks,riemann_controller.tasks \
+--include=cloudify_system_workflows.deployment_environment,plugin_installer.tasks,worker_installer.tasks,riemann_controller.tasks,cloudify.plugins.workflows \
 --broker=amqp:// \
 -n celery.cloudify.management \
 --events \
