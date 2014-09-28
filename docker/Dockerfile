@@ -59,38 +59,42 @@ CMD /opt/rabbitmq-server/run.sh
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RIEMANN, DependsOn: langohr
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-# install dependencies.
-RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
-# download and set permissions on langohr jar.
-RUN curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o /usr/lib/riemann/langohr.jar && \
-    chmod 644 /usr/lib/riemann/langohr.jar
-# download riemann deb
-RUN curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb
-
 ##### ENV #####
 ENV RIEMANN_SERVICE_NAME riemann
 # riemann init file
-ENV RIEMANN_INIT_FILE /opt/tmp/init/$RIEMANN_SERVICE_NAME.conf
-ENV RIEMANN_SERVICE_DIR /opt/$RIEMANN_SERVICE_NAME/
+ENV RIEMANN_SERVICE_DIR /opt/$RIEMANN_SERVICE_NAME
+ENV RIEMANN_INIT_FILE $RIEMANN_SERVICE_DIR/run.sh
+ENV MANAGER_CONFIG_PATH $RIEMANN_SERVICE_DIR/manager.config
 ##### ENV #####
 
+ADD riemann/ $RIEMANN_SERVICE_DIR/
+
+# install dependencies.
+RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
+# download and set permissions on langohr jar.
+RUN curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o $RIEMANN_SERVICE_DIR/langohr.jar && \
+    chmod 644 
+# download riemann deb
+RUN curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb
+# download riemann config
+RUN curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config
+
 # inject required env vars to init script
-RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR$(basename /usr/lib/riemann/langohr.jar)' \n|' $RIEMANN_INIT_FILE
-# todo(adaml): inject init script the proper config path according to riemann-controller plugin path
+RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_INIT_FILE
+RUN sed -i '1s|^|MANAGER_CONFIG_PATH='$MANAGER_CONFIG_PATH' \n|' $RIEMANN_INIT_FILE
 
-# place jar in service dir
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
 # place init script in local init dir
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mv $RIEMANN_INIT_FILE /etc/init/ && \
-    check_file "/etc/init/$RIEMANN_SERVICE_NAME.conf"'
+#RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+#    mv $RIEMANN_INIT_FILE /etc/init/ && \
+#    check_file "/etc/init/$RIEMANN_SERVICE_NAME.conf"'
 
-    mv /usr/lib/riemann/langohr.jar $RIEMANN_SERVICE_DIR && \
-    check_file "$RIEMANN_SERVICE_DIR$(basename /usr/lib/riemann/langohr.jar)"'
 # install riemann
 RUN dpkg -i /opt/tmp/riemann/riemann.deb
 
-# todo(adaml): start riemann
+# grant exec permissions
+RUN chmod 0755 /opt/$RIEMANN_SERVICE_NAME/run.sh
+
+CMD /opt/riemann/run.sh
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NODEJS DependsOn: ~
