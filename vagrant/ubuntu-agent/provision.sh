@@ -46,28 +46,28 @@ cd /cloudify-packager/ &&
 sudo pkm get -c Ubuntu-agent
 
 echo '# GET PROCESS'
-/Ubuntu-agent/env/bin/pip install celery==3.0.24
-/Ubuntu-agent/env/bin/pip install pyzmq==14.3.1
+sudo /Ubuntu-agent/env/bin/pip install celery==3.0.24
+sudo /Ubuntu-agent/env/bin/pip install pyzmq==14.3.1
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 pushd cloudify-rest-client
 	if [ -n "$REST_CLIENT_SHA" ]; then
 		git reset --hard $REST_CLIENT_SHA
 	fi
-	/Ubuntu-agent/env/bin/pip install .
+	sudo /Ubuntu-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 pushd cloudify-plugins-common
 	if [ -n "$COMMON_PLUGIN_SHA" ]; then
 		git reset --hard $COMMON_PLUGIN_SHA
 	fi
-	/Ubuntu-agent/env/bin/pip install .
+	sudo /Ubuntu-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 pushd cloudify-script-plugin
 	if [ -n "$SCRIPTS_PLUGIN_SHA" ]; then
 		git reset --hard $SCRIPTS_PLUGIN_SHA
 	fi
-	/Ubuntu-agent/env/bin/pip install .
+	sudo /Ubuntu-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
 pushd cloudify-manager
@@ -75,13 +75,13 @@ pushd cloudify-manager
 		git reset --hard $MANAGER_SHA
 	fi
 	pushd plugins/plugin-installer
-	  /Ubuntu-agent/env/bin/pip install .
+	  sudo /Ubuntu-agent/env/bin/pip install .
 	popd
 	pushd plugins/agent-installer
-	  /Ubuntu-agent/env/bin/pip install .
+	  sudo /Ubuntu-agent/env/bin/pip install .
 	popd
 	pushd plugins/windows-agent-installer
-	  /Ubuntu-agent/env/bin/pip install .
+	  sudo /Ubuntu-agent/env/bin/pip install .
 	popd	
 popd
 
@@ -90,4 +90,4 @@ sudo pkm pack -c Ubuntu-agent
 sudo pkm pack -c cloudify-ubuntu-agent
 
 echo bootstrap done
-echo NOTE: currently, using some of the packman's features requires that it's run as sudo.
+echo "NOTE: currently, using some of the packman's features requires that it's run as sudo."
