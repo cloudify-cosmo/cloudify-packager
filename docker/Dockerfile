@@ -73,7 +73,7 @@ ADD riemann/ $RIEMANN_SERVICE_DIR/
 RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
 # download and set permissions on langohr jar.
 RUN curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o $RIEMANN_SERVICE_DIR/langohr.jar && \
-    chmod 644 
+    chmod 644 $RIEMANN_SERVICE_DIR/langohr.jar
 # download riemann deb
 RUN curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb
 # download riemann config
