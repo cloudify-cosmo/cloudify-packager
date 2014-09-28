@@ -21,6 +21,7 @@ git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 cd C:\\CloudifyAgent\\cloudify-plugins-common
 if not (%COMMON_PLUGIN_SHA%)==() git reset --hard %COMMON_PLUGIN_SHA%
 pip install .
+cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 cd C:\\CloudifyAgent\\cloudify-script-plugin
 if not (%SCRIPTS_PLUGIN_SHA%)==() git reset --hard %SCRIPT_PLUGIN_SHA%
@@ -35,4 +36,5 @@ cd c:\\
 rmdir /s /q C:\\CloudifyAgent\\cloudify-rest-client
 rmdir /s /q C:\\CloudifyAgent\\cloudify-plugins-common
 rmdir /s /q C:\\CloudifyAgent\\cloudify-manager
+rmdir /s /q C:\\CloudifyAgent\\cloudify-script-plugin
 7z a -r -sfx -x!.* Cloudify.exe c:\\CloudifyAgent\\*
