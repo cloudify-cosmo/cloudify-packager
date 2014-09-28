@@ -46,28 +46,28 @@ cd /cloudify-packager/ &&
 sudo pkm get -c Ubuntu-agent
 
 echo '# GET PROCESS'
-/centos-agent/env/bin/pip install celery==3.0.24
-/centos-agent/env/bin/pip install pyzmq==14.3.1
+/Ubuntu-agent/env/bin/pip install celery==3.0.24
+/Ubuntu-agent/env/bin/pip install pyzmq==14.3.1
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 pushd cloudify-rest-client
 	if [ -n "$REST_CLIENT_SHA" ]; then
 		git reset --hard $REST_CLIENT_SHA
 	fi
-	/centos-agent/env/bin/pip install .
+	/Ubuntu-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 pushd cloudify-plugins-common
 	if [ -n "$COMMON_PLUGIN_SHA" ]; then
 		git reset --hard $COMMON_PLUGIN_SHA
 	fi
-	/centos-agent/env/bin/pip install .
+	/Ubuntu-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 pushd cloudify-script-plugin
 	if [ -n "$SCRIPTS_PLUGIN_SHA" ]; then
 		git reset --hard $SCRIPTS_PLUGIN_SHA
 	fi
-	/centos-agent/env/bin/pip install .
+	/Ubuntu-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
 pushd cloudify-manager
@@ -75,13 +75,13 @@ pushd cloudify-manager
 		git reset --hard $MANAGER_SHA
 	fi
 	pushd plugins/plugin-installer
-	  /centos-agent/env/bin/pip install .
+	  /Ubuntu-agent/env/bin/pip install .
 	popd
 	pushd plugins/agent-installer
-	  /centos-agent/env/bin/pip install .
+	  /Ubuntu-agent/env/bin/pip install .
 	popd
 	pushd plugins/windows-agent-installer
-	  /centos-agent/env/bin/pip install .
+	  /Ubuntu-agent/env/bin/pip install .
 	popd	
 popd
 
