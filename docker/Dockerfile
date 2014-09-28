@@ -36,19 +36,26 @@ RUN curl http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server
 
 ENV RABBITMQ_SERVICE_NAME rabbitmq-server
 ENV RABBITMQ_INIT_FILE /opt/tmp/init/$RABBITMQ_SERVICE_NAME.conf
+ENV RABBITMQ_SERVICE_DIR /opt/$RABBITMQ_SERVICE_NAME
+
+ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
 
 # place init script in local init dir
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mv $RABBITMQ_INIT_FILE /etc/init/ && \
-    check_file "/etc/init/$RABBITMQ_SERVICE_NAME.conf"'
+#RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+#    mv $RABBITMQ_INIT_FILE /etc/init/ && \
+#    check_file "/etc/init/$RABBITMQ_SERVICE_NAME.conf"'
 
 # install and run rabbitmq-server
 RUN dpkg -i /opt/tmp/rabbitmq/rabbitmq-server.deb && \
     rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing && \
-    invoke-rc.d $RABBITMQ_SERVICE_NAME stop && \
-    invoke-rc.d $RABBITMQ_SERVICE_NAME start && \
     rabbitmqctl trace_on
+
+# grant exec permissions
+RUN chmod 0755 $RABBITMQ_SERVICE_DIR/run.sh
+
+# start rabbitmq
+CMD /opt/rabbitmq-server/run.sh
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RIEMANN, DependsOn: langohr
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
