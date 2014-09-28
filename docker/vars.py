@@ -15,7 +15,6 @@ VARS = {
             "erlang-nox",
         ],
         "package_url": "http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server_3.2.4-1_all.deb",
-        "package_dest": "/opt/tmp/rabbitmq/rabbitmq-server.deb",
         "ports": [
             "8080",
         ],
@@ -27,7 +26,6 @@ VARS = {
             "openjdk-7-jdk"
         ],
         "package_url": "http://aphyr.com/riemann/riemann_0.2.6_all.deb",
-        "package_dest": "/opt/tmp/riemann/riemann.deb",
         "langohr_url": "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar",
         "config_url": "https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config",
         "ports": [],
@@ -67,7 +65,6 @@ VARS = {
             "openjdk-7-jdk",
         ],
         "package_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
-        "package_dest": "/opt/tmp/elasticsearch/elasticsearch.tar.gz",
         "ports": ["9200"],
         "min_mem": "1024m",
         "max_mem": "1024m",
@@ -78,7 +75,6 @@ VARS = {
             "curl",
         ],
         "package_url": "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",
-        "package_dest": "/opt/tmp/influxdb.deb",
         "ports": ["8086"],
     },
     "nginx": {

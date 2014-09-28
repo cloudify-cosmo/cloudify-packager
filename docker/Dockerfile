@@ -3,40 +3,22 @@ MAINTAINER adaml, adaml@gigaspaces.com
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-# add all init and config files
-ADD conf/ /opt/tmp/conf/
-ADD init/ /opt/tmp/init/
 # add utility functions
 ADD utils/ /opt/tmp/utils/
-
-# allow rc policies
-RUN sed -i 's/101/0/g' /usr/sbin/policy-rc.d
-
-# update local cache
-RUN apt-get update
-# install 3rd party components
-#RUN apt-get install -y \
-#    python-dev \
-#    make \
-#    curl \
-#    openjdk-7-jdk \
-#    python-software-properties \
-#    g++ \
-#    logrotate \
-#    vim \
-#    mlocate
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RABBITMQ, DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+##### ENV #####
+ENV RABBITMQ_SERVICE_NAME rabbitmq-server
+#ENV RABBITMQ_INIT_FILE /opt/tmp/init/$RABBITMQ_SERVICE_NAME.conf
+ENV RABBITMQ_SERVICE_DIR /opt/$RABBITMQ_SERVICE_NAME
+##### ENV #####
+
 # install dependencies.
 RUN apt-get install -y $(echo ['curl', 'logrotate', 'erlang-nox'] | tr -d "',[]")
 # download rabbit package
 RUN curl http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server_3.2.4-1_all.deb --create-dirs -o /opt/tmp/rabbitmq/rabbitmq-server.deb
-
-ENV RABBITMQ_SERVICE_NAME rabbitmq-server
-ENV RABBITMQ_INIT_FILE /opt/tmp/init/$RABBITMQ_SERVICE_NAME.conf
-ENV RABBITMQ_SERVICE_DIR /opt/$RABBITMQ_SERVICE_NAME
 
 ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
 
@@ -71,7 +53,7 @@ ADD riemann/ $RIEMANN_SERVICE_DIR/
 
 # install dependencies.
 RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
-# download and set permissions on langohr jar.
+# download to service dir and set permissions on langohr jar.
 RUN curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o $RIEMANN_SERVICE_DIR/langohr.jar && \
     chmod 644 $RIEMANN_SERVICE_DIR/langohr.jar
 # download riemann deb
@@ -111,8 +93,8 @@ RUN add-apt-repository -y ppa:chris-lea/node.js && \
 ##### ENV #####
 ENV LOGSTASH_SERVICE_NAME logstash
 ENV LOGSTASH_SERVICE_DIR /opt/$LOGSTASH_SERVICE_NAME
-# logstash init file
-ENV LOGSTASH_INIT_FILE $LOGSTASH_SERVICE_DIR/run.sh
+# logstash exec file
+ENV LOGSTASH_RUN_FILE $LOGSTASH_SERVICE_DIR/run.sh
 # logstash conf file
 ENV LOGSTASH_CONF_FILE $LOGSTASH_SERVICE_DIR/config.conf
 ##### ENV #####
@@ -122,43 +104,46 @@ ADD logstash/ $LOGSTASH_SERVICE_DIR/
 # install dependencies.
 RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
 # download jar file
-RUN curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/$LOGSTASH_SERVICE_NAME.jar
+RUN curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar
 
 # inject required env vars to run script
-RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/$LOGSTASH_SERVICE_NAME.jar' \n|' $LOGSTASH_INIT_FILE
-RUN sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_INIT_FILE
-RUN sed -i '1s|^|#!/bin/bash \n|' $LOGSTASH_INIT_FILE
+RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/$LOGSTASH_SERVICE_NAME.jar' \n|' $LOGSTASH_RUN_FILE
+RUN sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_RUN_FILE
 
 # grant exec permissions
 RUN chmod 0755 /opt/logstash/run.sh
 
 # start logstash
 CMD /opt/logstash/run.sh
+
+EXPOSE 9999
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+##### ENV #####
+ENV ELASTICSEARCH_SERVICE_NAME elasticsearch
+ENV ELASTICSEARCH_SERVICE_DIR /opt/$ELASTICSEARCH_SERVICE_NAME
+##### ENV #####
+
+ADD elasticsearch/ $ELASTICSEARCH_SERVICE_DIR/
+
 # install dependencies
 RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
 # download binaries
 RUN curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz
 
-##### ENV #####
-ENV ELASTICSEARCH_SERVICE_NAME elasticsearch
-ENV ELASTICSEARCH_SERVICE_DIR /opt/$ELASTICSEARCH_SERVICE_NAME/
-##### ENV #####
-
 # create service dir
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mkdir -p $ELASTICSEARCH_SERVICE_DIR && \
-    check_dir "$ELASTICSEARCH_SERVICE_DIR"'
+    mkdir -p $ELASTICSEARCH_SERVICE_DIR/ && \
+    check_dir "$ELASTICSEARCH_SERVICE_DIR/"'
 
 # extract binaries to service dir
-RUN tar -C $ELASTICSEARCH_SERVICE_DIR -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1
+RUN tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1
 
 # start elasticsearch as daemon for configuration purpeses.
 # config includes setting elasticsearch indexes.
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    ${ELASTICSEARCH_SERVICE_DIR}bin/elasticsearch -d && \
+    $ELASTICSEARCH_SERVICE_DIR/bin/elasticsearch -d && \
     wait_for_port 9200' && \
     curl --retry 5 --retry-delay 3 -XDELETE http://localhost:9200/cloudify_storage && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage -d '{"settings": {"analysis": {"analyzer": {"default": {"tokenizer": "whitespace"}}}}}' && \
@@ -168,8 +153,11 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node_instance/_mapping -d '{ "node_instance": { "_id": { "path": "id" }, "properties": { "runtime_properties": { "enabled": false } } } }' && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1
 
+# grant exec permissions
+RUN chmod 0755 ELASTICSEARCH_SERVICE_DIR/run.sh
+
 # start elasticsearch as non-daemon
-CMD ["ES_JAVA_OPTS=-Xmx1024m -Xms1024m; /opt/elasticsearch/bin/elasticsearch"]
+CMD ["ES_JAVA_OPTS=-Xmx1024m -Xms1024m; /opt/elasticsearch/run.sh"]
 
 # expose elasticsearch port
 EXPOSE 9200
@@ -177,21 +165,22 @@ EXPOSE 9200
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - INFLUXDB
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-# install dependencies
-RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
-# download binaries
-RUN curl http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb --create-dirs -o /opt/tmp/influxdb.deb
 ##### ENV #####
 ENV INFLUXDB_SERVICE_NAME influxdb
 # default influxdb config path
 ENV INFLUXDB_CONFIG_FILE /opt/influxdb/shared/config.toml
+ENV INFLUXDB_RUN_FILE /opt/$INFLUXDB_SERVICE_NAME/run.sh
 ##### ENV #####
 
-# todo(adaml): allow ability to configure ssl and default ports via config file. this should be done using a script.
-# RUN sed -i -r -e 's/^# ssl-/ssl-/g' -e 's/^port *= * 8086/# port = 8086/' $INFLUXDB_CONFIG_FILE
+ADD influxdb/ /opt/$INFLUXDB_SERVICE_NAME/
+
+# install dependencies
+RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
+# download binaries
+RUN curl http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb --create-dirs -o /opt/tmp/influxdb/influxdb.deb
 
 # install influxdb
-RUN dpkg -i /opt/tmp/influxdb.deb
+RUN dpkg -i /opt/tmp/influxdb/influxdb.deb
 
 # start influxdb as daemon and create cloudify db
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
@@ -199,8 +188,14 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     wait_for_port 8086' && \
     curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"
 
+# set config path in run file
+RUN sed -i '1s|^|INFLUXDB_CONFIG_FILE='$INFLUXDB_CONFIG_FILE' \n|' $INFLUXDB_RUN_FILE
+
+# grant exec permissions
+RUN chmod 0755 /opt/influxdb/run.sh
+
 # run the service as non-daemon
-CMD ["/usr/bin/influxdb -config=/opt/influxdb/shared/config.toml"]
+CMD /opt/influxdb/run.sh
 
 # expose api port
 EXPOSE 8086
@@ -209,16 +204,21 @@ EXPOSE 8083
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
+##### ENV #####
+# set nginx service name
+ENV NGINX_SERVICE_NAME nginx
+# nginx conf file
+ENV NGINX_CONF_FILE /opt/nginx/default.conf
+##### ENV #####
+
+ADD nginx/ /opt/$NGINX_SERVICE_NAME/
+
 # add nginx repositories to sources.list file and update repo
 RUN echo ['deb http://nginx.org/packages/mainline/ubuntu/ precise nginx', 'deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx'] | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
     apt-get update
 # install dependencies
 RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
 
-# set nginx service name
-ENV NGINX_SERVICE_NAME nginx
-# nginx conf file
-ENV NGINX_CONF_FILE /opt/tmp/conf/default.conf
 
 # download and add signing key
 RUN curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx/nginx_signing.key && \
@@ -235,8 +235,11 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
 # turn-off daemon execution
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 
-# Define default command.
-CMD ["/usr/sbin/nginx"]
+# grant exec permissions
+RUN chmod 0755 /opt/nginx/run.sh
+
+# run the service as non-daemon
+CMD /opt/nginx/run.sh
 
 # Expose ports.
 EXPOSE 80
