@@ -73,7 +73,7 @@ ADD riemann/ $RIEMANN_SERVICE_DIR/
 RUN apt-get install -y $(echo {{ riemann.reqs }} | tr -d "',[]")
 # download and set permissions on langohr jar.
 RUN curl {{ riemann.langohr_url }} --create-dirs -o $RIEMANN_SERVICE_DIR/langohr.jar && \
-    chmod 644 {{ riemann.langohr_dest }}
+    chmod 644 $RIEMANN_SERVICE_DIR/langohr.jar
 # download riemann deb
 RUN curl {{ riemann.package_url }} --create-dirs -o {{ riemann.package_dest }}
 # download riemann config
