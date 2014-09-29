@@ -23,7 +23,6 @@ cd ~
 # install fpm and configure gem/bundler
 sudo gem install fpm --no-ri --no-rdoc &&
 echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc --no-ri' >> ~/.gemrc
-echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc --no-ri' >> /root/.gemrc
 
 # install pip
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
