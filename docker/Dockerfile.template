@@ -5,7 +5,6 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
 ADD utils/ /opt/tmp/utils/
-RUN rm -fR /var/lib/apt/lists/*
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RABBITMQ, DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -246,13 +245,41 @@ EXPOSE 80
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - CELERY
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl {{ celery.package_url }} --create-dirs -o {{ celery.package_dest }} && \
-    mkdir -p {{ celery.untar_dest }} && \
-    tar -C {{ celery.untar_dest }} -xzvf {{ celery.package_dest }} && \
-    virtualenv {{ celery.untar_dest }} && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.cloudify_rest_client_url }} && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.plugins_common_url }} && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.untar_dest }}/cloudify-manager-master/plugins/agent-installer/ && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.untar_dest }}/cloudify-manager-master/plugins/plugin-installer/ && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.untar_dest }}/cloudify-manager-master/plugins/riemann-controller/ && \
-    {{ celery.untar_dest }}/bin/pip install {{ celery.untar_dest }}/cloudify-manager-master/workflows/
+##### ENV #####
+ENV CELERY_SERVICE_NAME {{ celery.service_name }}
+ENV CELERY_SERVICE_DIR /opt/$CELERY_SERVICE_NAME
+ENV CELERY_VIRTUAL_ENV_DIR $CELERY_SERVICE_DIR/env
+##### ENV #####
+
+# install dependencies.
+RUN apt-get install -y $(echo {{ celery.reqs }} | tr -d "',[]")
+# install pip
+RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
+# install virtualenv
+RUN pip install virtualenv==1.11.4
+# create service dir
+RUN mkdir $CELERY_SERVICE_DIR
+# create python virtualenv
+RUN virtualenv $CELERY_VIRTUAL_ENV_DIR
+
+# install requirements
+RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo {{ celery.python_install_requires }} | tr -d "',[]")
+
+############################## install cloudify core components ##############################
+WORKDIR $CELERY_SERVICE_DIR
+
+RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_rest_client }} && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_plugins_common }} && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_script_plugin }}
+
+RUN /bin/bash -c 'git clone {{ celery.modules.cloudify_manager }} && \
+    pushd cloudify-manager/plugins/plugin-installer && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
+    popd && \
+    pushd cloudify-manager/plugins/agent-installer && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
+    popd && \
+    pushd cloudify-manager/plugins/windows-agent-installer && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install .'
+
+
