@@ -26,30 +26,35 @@ virtualenv cloudify &&
 source cloudify/bin/activate &&
 
 # install cli
-echo installing cli
-git clone https://github.com/cloudify-cosmo/cloudify-dsl-parser.git
-pushd cloudify-dsl-parser
-	if [ -n "$DSL_SHA" ]; then
-		git reset --hard $DSL_SHA
-	fi
-	pip install .
-popd
+if [ -n  "$INSTALL_CLI_FROM_PYPI" ]; then
+	echo installing cli from pypi
+	pip install cloudify
+else
+	echo installing cli from github
+	git clone https://github.com/cloudify-cosmo/cloudify-dsl-parser.git
+	pushd cloudify-dsl-parser
+		if [ -n "$DSL_SHA" ]; then
+			git reset --hard $DSL_SHA
+		fi
+		pip install .
+	popd
 
-git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
-pushd cloudify-rest-client
-	if [ -n "$REST_CLIENT_SHA" ]; then	
-		git reset --hard $REST_CLIENT_SHA
-	fi
-	pip install .
-popd
+	git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
+	pushd cloudify-rest-client
+		if [ -n "$REST_CLIENT_SHA" ]; then
+			git reset --hard $REST_CLIENT_SHA
+		fi
+		pip install .
+	popd
 
-git clone https://github.com/cloudify-cosmo/cloudify-cli.git
-pushd cloudify-cli
-	if [ -n "$CLI_SHA" ]; then
-		git reset --hard $CLI_SHA
-	fi
-	pip install .
-popd
+	git clone https://github.com/cloudify-cosmo/cloudify-cli.git
+	pushd cloudify-cli
+		if [ -n "$CLI_SHA" ]; then
+			git reset --hard $CLI_SHA
+		fi
+		pip install .
+	popd
+fi
 
 # add cfy bash completion
 activate_cfy_bash_completion
@@ -60,7 +65,9 @@ mkdir -p simple &&
 cd simple &&
 cfy init simple_provider &&
 
-USERNAME=$(id -u -n)
+# TODO: fix user identification issue
+# USERNAME=$(id -u -n)
+USERNAME="vagrant"
 
 # copy the ssh key only when bootstrapping with vagrant. otherwise, implemented in packer
 # copy vagrant ssh key

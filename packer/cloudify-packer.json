@@ -44,7 +44,7 @@
     {
       "type": "file",
       "only": ["virtualbox-ovf"],
-      "source": "insecure_private_key",
+      "source": "vagrant/insecure_private_key",
       "destination": "/home/vagrant/.ssh/cloudify_private_key"
     },
     {
