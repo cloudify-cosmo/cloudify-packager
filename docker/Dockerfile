@@ -5,7 +5,7 @@ MAINTAINER adaml, adaml@gigaspaces.com
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
 ADD utils/ /opt/tmp/utils/
-
+RUN rm -fR /var/lib/apt/lists/*
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RABBITMQ, DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -30,8 +30,7 @@ ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
 # install and run rabbitmq-server
 RUN dpkg -i /opt/tmp/rabbitmq/rabbitmq-server.deb && \
     rabbitmq-plugins enable rabbitmq_management && \
-    rabbitmq-plugins enable rabbitmq_tracing && \
-    rabbitmqctl trace_on
+    rabbitmq-plugins enable rabbitmq_tracing
 
 # grant exec permissions
 RUN chmod 0755 $RABBITMQ_SERVICE_DIR/run.sh
@@ -84,9 +83,9 @@ CMD /opt/riemann/run.sh
 # install dependencies.
 #RUN apt-get install -y $(echo [] | tr -d "',[]")
 # download and install
-RUN add-apt-repository -y ppa:chris-lea/node.js && \
-	apt-get update && \
-    apt-get install -y nodejs
+#RUN add-apt-repository -y ppa:chris-lea/node.js && \
+#	apt-get update && \
+#    apt-get install -y nodejs
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - LOGSTASH DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -107,7 +106,7 @@ RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
 RUN curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar
 
 # inject required env vars to run script
-RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/$LOGSTASH_SERVICE_NAME.jar' \n|' $LOGSTASH_RUN_FILE
+RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/logstash.jar' \n|' $LOGSTASH_RUN_FILE
 RUN sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_RUN_FILE
 
 # grant exec permissions
@@ -154,7 +153,7 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1
 
 # grant exec permissions
-RUN chmod 0755 ELASTICSEARCH_SERVICE_DIR/run.sh
+RUN chmod 0755 $ELASTICSEARCH_SERVICE_DIR/run.sh
 
 # start elasticsearch as non-daemon
 CMD ["ES_JAVA_OPTS=-Xmx1024m -Xms1024m; /opt/elasticsearch/run.sh"]

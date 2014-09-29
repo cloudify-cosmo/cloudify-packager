@@ -42,7 +42,6 @@ VARS = {
             "openjdk-7-jdk"
         ],
         "package_url": "https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar",
-        "package_dest": "/opt/tmp/logstash/logstash.jar",
         "init_file": {
             "log_file": "/var/log/logstash.out",
         },
