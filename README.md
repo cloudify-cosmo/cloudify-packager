@@ -34,6 +34,8 @@ The Vagrant folder contains vagrant configuration for different components that 
 - Packman is used to create the environment into which the components are retrieved.
 - Packman is used to create the package.
 
+NOTE: the Windows Agent Vagrantfile uses a premade image already containing the basic requirements for creating the Windows agent.
+
 ### [Packer](http://www.packer.io)
 
 Currently, we only use packer to create the demo Vagrant box for Cloudify's [Quickstart guide](http://getcloudify.org/guide/3.1/quickstart.html).
