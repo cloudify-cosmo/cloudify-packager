@@ -5,7 +5,6 @@ MAINTAINER adaml, adaml@gigaspaces.com
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
 ADD utils/ /opt/tmp/utils/
-RUN rm -fR /var/lib/apt/lists/*
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - RABBITMQ, DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -246,13 +245,40 @@ EXPOSE 80
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # CONTAINER - CELERY
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-RUN curl https://codeload.github.com/cloudify-cosmo/cloudify-manager/tar.gz/master --create-dirs -o /opt/tmp/celery/manager.tar.gz && \
-    mkdir -p /opt/celery/cloudify.management__worker/env && \
-    tar -C /opt/celery/cloudify.management__worker/env -xzvf /opt/tmp/celery/manager.tar.gz && \
-    virtualenv /opt/celery/cloudify.management__worker/env && \
-    /opt/celery/cloudify.management__worker/env/bin/pip install https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz && \
-    /opt/celery/cloudify.management__worker/env/bin/pip install https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz && \
-    /opt/celery/cloudify.management__worker/env/bin/pip install /opt/celery/cloudify.management__worker/env/cloudify-manager-master/plugins/agent-installer/ && \
-    /opt/celery/cloudify.management__worker/env/bin/pip install /opt/celery/cloudify.management__worker/env/cloudify-manager-master/plugins/plugin-installer/ && \
-    /opt/celery/cloudify.management__worker/env/bin/pip install /opt/celery/cloudify.management__worker/env/cloudify-manager-master/plugins/riemann-controller/ && \
-    /opt/celery/cloudify.management__worker/env/bin/pip install /opt/celery/cloudify.management__worker/env/cloudify-manager-master/workflows/
+##### ENV #####
+ENV CELERY_SERVICE_NAME celery
+ENV CELERY_SERVICE_DIR /opt/$CELERY_SERVICE_NAME
+ENV CELERY_VIRTUAL_ENV_DIR $CELERY_SERVICE_DIR/env
+##### ENV #####
+
+# install dependencies.
+RUN apt-get install -y $(echo ['curl', 'python-dev', 'git', 'g++'] | tr -d "',[]")
+# install pip
+RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
+# install virtualenv
+RUN pip install virtualenv==1.11.4
+# create service dir
+RUN mkdir $CELERY_SERVICE_DIR
+# create python virtualenv
+RUN virtualenv $CELERY_VIRTUAL_ENV_DIR
+
+# install requirements
+RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo ['celery==3.0.24', 'pyzmq==14.3.1'] | tr -d "',[]")
+
+############################## install cloudify core components ##############################
+WORKDIR $CELERY_SERVICE_DIR
+
+RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master
+
+RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    pushd cloudify-manager/plugins/plugin-installer && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
+    popd && \
+    pushd cloudify-manager/plugins/agent-installer && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
+    popd && \
+    pushd cloudify-manager/plugins/windows-agent-installer && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install .'
+

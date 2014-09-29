@@ -89,11 +89,23 @@ VARS = {
         "ports": ["9200"],
     },
     "celery": {
-        "package_url": "https://codeload.github.com/cloudify-cosmo/cloudify-manager/tar.gz/master",
-        "package_dest": "/opt/tmp/celery/manager.tar.gz",
-        "untar_dest": "/opt/celery/cloudify.management__worker/env",
-        "cloudify_rest_client_url": "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz",
-        "plugins_common_url": "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz",
+        "service_name": "celery",
+        "reqs": [
+            "curl",
+            "python-dev",
+            "git",
+            "g++"
+        ],
+        "python_install_requires": [
+            "celery==3.0.24",
+            "pyzmq==14.3.1"
+        ],
+        "modules": {
+                "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",
+                "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",
+                "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
+                "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
+            },
         "ports": [],
     }
 }
