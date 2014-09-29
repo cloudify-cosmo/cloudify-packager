@@ -43,17 +43,36 @@ def get_ubuntu_agent(download=False):
     py_handler = PythonHandler()
     _prepare(package)
     py_handler.venv(package['sources_path'])
-    tar_file = '{0}/{1}.tar.gz'.format(
-        package['sources_path'], package['name'])
-    for url in package['source_urls']:
-        dl_handler.download(url, file=tar_file)
-    common.untar(package['sources_path'], tar_file)
-    # if download:
-    for module in package['modules']:
-        py_handler.pip(module, package['sources_path'])
+    if download:
+        tar_file = '{0}/{1}.tar.gz'.format(
+            package['sources_path'], package['name'])
+        for url in package['source_urls']:
+            dl_handler.download(url, file=tar_file)
+        common.untar(package['sources_path'], tar_file)
+        for module in package['modules']:
+            py_handler.pip(module, package['sources_path'])
     # TODO: remove redundant data after module installation
 
 
+def get_centos_agent(download=False):
+    package = get_conf('centos-agent')
+
+    dl_handler = WgetHandler()
+    common = CommonHandler()
+    py_handler = PythonHandler()
+    _prepare(package)
+    py_handler.venv(package['sources_path'])
+    if download:
+        tar_file = '{0}/{1}.tar.gz'.format(
+            package['sources_path'], package['name'])
+        for url in package['source_urls']:
+            dl_handler.download(url, file=tar_file)
+        common.untar(package['sources_path'], tar_file)
+        for module in package['modules']:
+            py_handler.pip(module, package['sources_path'])
+    # TODO: remove redundant data after module installation
+    
+    
 def get_celery(download=False):
     package = get_conf('celery')
 
