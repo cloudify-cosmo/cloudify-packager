@@ -1,2 +1,2 @@
-ES_JAVA_OPTS=-Xmx{{ elasticsearch.max_mem }} -Xms{{ elasticsearch.min_mem }}
+ES_JAVA_OPTS="-Xmx1024m -Xms1024m"
 /opt/elasticsearch/bin/elasticsearch

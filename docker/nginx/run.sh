@@ -1,1 +1,1 @@
-/usr/sbin/nginx
+nginx
