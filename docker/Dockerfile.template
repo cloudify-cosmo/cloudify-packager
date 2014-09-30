@@ -250,6 +250,7 @@ ENV CELERY_SERVICE_NAME {{ celery.service_name }}
 ENV CELERY_SERVICE_DIR /opt/$CELERY_SERVICE_NAME
 ENV CELERY_VIRTUAL_ENV_DIR $CELERY_SERVICE_DIR/env
 ##### ENV #####
+ADD celery/ $CELERY_SERVICE_DIR/
 
 # install dependencies.
 RUN apt-get install -y $(echo {{ celery.reqs }} | tr -d "',[]")
@@ -257,8 +258,6 @@ RUN apt-get install -y $(echo {{ celery.reqs }} | tr -d "',[]")
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
 # install virtualenv
 RUN pip install virtualenv==1.11.4
-# create service dir
-RUN mkdir $CELERY_SERVICE_DIR
 # create python virtualenv
 RUN virtualenv $CELERY_VIRTUAL_ENV_DIR
 
@@ -266,7 +265,7 @@ RUN virtualenv $CELERY_VIRTUAL_ENV_DIR
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo {{ celery.python_install_requires }} | tr -d "',[]")
 
 ############################## install cloudify core components ##############################
-WORKDIR $CELERY_SERVICE_DIR
+WORKDIR /opt/celery/
 
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_rest_client }} && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_plugins_common }} && \
@@ -280,6 +279,19 @@ RUN /bin/bash -c 'git clone {{ celery.modules.cloudify_manager }} && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
     popd && \
     pushd cloudify-manager/plugins/windows-agent-installer && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
+    popd && \
+    pushd cloudify-manager/plugins/riemann-controller && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
+    popd && \
+    pushd cloudify-manager/workflows && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install .'
 
+# set config path in run file
+RUN sed -i '1s|^|CELERY_HOME_DIR='$CELERY_SERVICE_DIR' \n|' $CELERY_SERVICE_DIR/run.sh
 
+# grant exec permissions
+RUN chmod 0755 $CELERY_SERVICE_DIR/run.sh
+
+# run the service as non-daemon
+CMD /opt/celery/run.sh
