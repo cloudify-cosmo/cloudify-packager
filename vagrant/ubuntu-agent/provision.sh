@@ -81,7 +81,10 @@ pushd cloudify-manager
 	popd
 	pushd plugins/windows-agent-installer
 	  sudo /Ubuntu-agent/env/bin/pip install .
-	popd	
+	popd
+	pushd plugins/windows-plugin-installer
+	  sudo /Ubuntu-agent/env/bin/pip install .
+	popd
 popd
 
 # create package
