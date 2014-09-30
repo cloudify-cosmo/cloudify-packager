@@ -85,6 +85,9 @@ VARS = {
             "deb http://nginx.org/packages/mainline/ubuntu/ precise nginx",
             "deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx",
         ],
+        "params": {
+            "file_server_port": "53229",
+        },
         "source_key": "http://nginx.org/keys/nginx_signing.key",
         "ports": ["9200"],
     },
@@ -106,6 +109,8 @@ VARS = {
                 "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
                 "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
             },
+        "manager_rest_port": "8100",
+        "workers_autoscale": "5,2",
         "ports": [],
     }
 }
