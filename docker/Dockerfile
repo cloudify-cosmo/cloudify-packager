@@ -295,3 +295,47 @@ RUN chmod 0755 $CELERY_SERVICE_DIR/run.sh
 
 # run the service as non-daemon
 CMD /opt/celery/run.sh
+
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+# CONTAINER - MANAGER
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+##### ENV #####
+ENV MANAGER_SERVICE_NAME manager
+ENV MANAGER_SERVICES_DIR /opt/$MANAGER_SERVICE_NAME
+ENV AMQPFLUX_RUN_FILE $MANAGER_SERVICES_DIR/run_amqpflux.sh
+ENV MANAGER_RUN_FILE $MANAGER_SERVICES_DIR/run_manager.sh
+ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR/env
+ENV MANAGER_LOGS_DIR /var/log/cosmo
+##### ENV #####
+#install dependencies
+RUN apt-get install -y $(echo ['git'] | tr -d "',[]")
+
+ADD manager/ $MANAGER_SERVICES_DIR/
+
+RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE
+RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $MANAGER_RUN_FILE
+
+# install pip
+RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
+# install virtualenv
+RUN pip install virtualenv==1.11.4
+# create python virtualenv
+RUN virtualenv $MANAGER_VIRTUAL_ENV_DIR
+
+# create logs folder
+RUN mkdir MANAGER_LOGS_DIR/
+
+WORKDIR /opt/manager/
+
+# install amqpinflux
+RUN $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master
+# install rest-service
+RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    pushd cloudify-manager/rest-service && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .'
+
+# grant exec permissions for amqpflux
+RUN chmod 0755 $AMQPFLUX_RUN_FILE
+# grant exec permissions for rest-service
+RUN chmod 0755 $MANAGER_RUN_FILE
