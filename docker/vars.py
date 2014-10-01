@@ -109,8 +109,19 @@ VARS = {
                 "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
                 "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
             },
-        "manager_rest_port": "8100",
         "workers_autoscale": "5,2",
         "ports": [],
+    },
+    "manager": {
+        "service_name": "manager",
+        "reqs": [
+            "git"
+        ],
+        "modules": {
+            "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",
+            "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",
+            "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
+        },
+        "manager_rest_port": "8100",
     }
 }
