@@ -305,10 +305,13 @@ CMD /opt/celery/run.sh
 ##### ENV #####
 ENV MANAGER_SERVICE_NAME manager
 ENV MANAGER_SERVICES_DIR /opt/$MANAGER_SERVICE_NAME
+ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR/env
+ENV SERVER_FILES_DIR $MANAGER_SERVICES_DIR/cloudify-manager/rest-service/manager_rest
+
 ENV AMQPFLUX_RUN_FILE $MANAGER_SERVICES_DIR/run_amqpflux.sh
 ENV MANAGER_RUN_FILE $MANAGER_SERVICES_DIR/run_manager.sh
+
 ENV MANAGER_REST_CONFIG_PATH $MANAGER_SERVICES_DIR/guni.conf
-ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR
 ##### ENV #####
 #install dependencies
 RUN apt-get install -y $(echo ['git'] | tr -d "',[]")
@@ -317,7 +320,8 @@ ADD manager/ $MANAGER_SERVICES_DIR/
 
 RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE && \
     sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $MANAGER_RUN_FILE && \
-    sed -i '1s|^|MANAGER_REST_CONFIG_PATH='$MANAGER_REST_CONFIG_PATH' \n|' $MANAGER_RUN_FILE
+    sed -i '1s|^|MANAGER_REST_CONFIG_PATH='$MANAGER_REST_CONFIG_PATH' \n|' $MANAGER_RUN_FILE && \
+    sed -i '1s|^|SERVER_FILES_DIR='$SERVER_FILES_DIR' \n|' $MANAGER_RUN_FILE
 
 # install pip
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
@@ -336,11 +340,11 @@ RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .'
 
 # move required resources to resource folder
-RUN mkdir resources/ && \
-    cp -r /opt/manager/cloudify-manager/resources/rest-service/cloudify/* $MANAGER_SERVICES_DIR/resources/
+#RUN mkdir resources/ && \
+#    cp -r /opt/manager/cloudify-manager/resources/rest-service/cloudify/* $MANAGER_SERVICES_DIR/resources/
 
 # move rest-service modules to parent dir
-RUN cp -r $MANAGER_SERVICES_DIR/cloudify-manager/rest-service/manager_rest/* $MANAGER_SERVICES_DIR/
+#RUN cp -r $MANAGER_SERVICES_DIR/cloudify-manager/rest-service/manager_rest/* $MANAGER_SERVICES_DIR/
 
 # grant exec permissions for amqpflux and for rest-service
 RUN chmod 0755 $AMQPFLUX_RUN_FILE && \
