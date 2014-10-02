@@ -60,8 +60,8 @@ RUN curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tm
 RUN curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config
 
 # inject required env vars to init script
-RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_INIT_FILE
-RUN sed -i '1s|^|MANAGER_CONFIG_PATH='$MANAGER_CONFIG_PATH' \n|' $RIEMANN_INIT_FILE
+RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_INIT_FILE && \
+    sed -i '1s|^|MANAGER_CONFIG_PATH='$MANAGER_CONFIG_PATH' \n|' $RIEMANN_INIT_FILE
 
 # place init script in local init dir
 #RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
@@ -105,8 +105,8 @@ RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
 RUN curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar
 
 # inject required env vars to run script
-RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/logstash.jar' \n|' $LOGSTASH_RUN_FILE
-RUN sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_RUN_FILE
+RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/logstash.jar' \n|' $LOGSTASH_RUN_FILE && \
+    sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_RUN_FILE
 
 # grant exec permissions
 RUN chmod 0755 /opt/logstash/run.sh
@@ -130,7 +130,7 @@ RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
 # download binaries
 RUN curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz
 
-# create service dir
+# create service dir todo(adaml): this command is not necessary
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     mkdir -p $ELASTICSEARCH_SERVICE_DIR/ && \
     check_dir "$ELASTICSEARCH_SERVICE_DIR/"'
@@ -205,11 +205,12 @@ EXPOSE 8083
 ##### ENV #####
 # set nginx service name
 ENV NGINX_SERVICE_NAME nginx
+ENV NGINX_SERVICE_DIR /opt/$NGINX_SERVICE_NAME
 # nginx conf file
 ENV NGINX_CONF_FILE /opt/nginx/default.conf
 ##### ENV #####
 
-ADD nginx/ /opt/$NGINX_SERVICE_NAME/
+ADD nginx/ $NGINX_SERVICE_DIR
 
 # add nginx repositories to sources.list file and update repo
 RUN echo ['deb http://nginx.org/packages/mainline/ubuntu/ precise nginx', 'deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx'] | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
@@ -234,7 +235,7 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 
 # grant exec permissions
-RUN chmod 0755 /opt/nginx/run.sh
+RUN chmod 0755 $NGINX_SERVICE_DIR/run.sh
 
 # run the service as non-daemon
 CMD /opt/nginx/run.sh
@@ -304,26 +305,23 @@ ENV MANAGER_SERVICE_NAME manager
 ENV MANAGER_SERVICES_DIR /opt/$MANAGER_SERVICE_NAME
 ENV AMQPFLUX_RUN_FILE $MANAGER_SERVICES_DIR/run_amqpflux.sh
 ENV MANAGER_RUN_FILE $MANAGER_SERVICES_DIR/run_manager.sh
-ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR/env
-ENV MANAGER_LOGS_DIR /var/log/cosmo
+ENV MANAGER_REST_CONFIG_PATH $MANAGER_SERVICES_DIR/guni.conf
+ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR
 ##### ENV #####
 #install dependencies
 RUN apt-get install -y $(echo ['git'] | tr -d "',[]")
 
 ADD manager/ $MANAGER_SERVICES_DIR/
 
-RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE
-RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $MANAGER_RUN_FILE
+RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE && \
+    sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $MANAGER_RUN_FILE && \
+    sed -i '1s|^|MANAGER_REST_CONFIG_PATH='$MANAGER_REST_CONFIG_PATH' \n|' $MANAGER_RUN_FILE
 
 # install pip
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
-# install virtualenv
-RUN pip install virtualenv==1.11.4
-# create python virtualenv
-RUN virtualenv $MANAGER_VIRTUAL_ENV_DIR
-
-# create logs folder
-RUN mkdir MANAGER_LOGS_DIR/
+# install virtualenv and create one
+RUN pip install virtualenv==1.11.4 && \
+    virtualenv $MANAGER_VIRTUAL_ENV_DIR
 
 WORKDIR /opt/manager/
 
@@ -335,7 +333,13 @@ RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify
     pushd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .'
 
-# grant exec permissions for amqpflux
-RUN chmod 0755 $AMQPFLUX_RUN_FILE
-# grant exec permissions for rest-service
-RUN chmod 0755 $MANAGER_RUN_FILE
+# move required resources to resource folder
+RUN mkdir resources/ && \
+    cp -r /opt/manager/cloudify-manager/resources/rest-service/cloudify/* $MANAGER_SERVICES_DIR/resources/
+
+# move rest-service modules to parent dir
+RUN cp -r $MANAGER_SERVICES_DIR/cloudify-manager/rest-service/manager_rest/* $MANAGER_SERVICES_DIR/
+
+# grant exec permissions for amqpflux and for rest-service
+RUN chmod 0755 $AMQPFLUX_RUN_FILE && \
+    chmod 0755 $MANAGER_RUN_FILE
