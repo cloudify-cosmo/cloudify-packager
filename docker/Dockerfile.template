@@ -12,8 +12,8 @@ RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV RABBITMQ_SERVICE_NAME {{ rabbitmq.service_name }}
-#ENV RABBITMQ_INIT_FILE /opt/tmp/init/$RABBITMQ_SERVICE_NAME.conf
 ENV RABBITMQ_SERVICE_DIR /opt/$RABBITMQ_SERVICE_NAME
+#ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run.sh
 ##### ENV #####
 
 # install dependencies.
@@ -23,18 +23,13 @@ RUN curl {{ rabbitmq.package_url }} --create-dirs -o /opt/tmp/rabbitmq/rabbitmq-
 
 ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
 
-# place init script in local init dir
-#RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-#    mv $RABBITMQ_INIT_FILE /etc/init/ && \
-#    check_file "/etc/init/$RABBITMQ_SERVICE_NAME.conf"'
-
 # install and run rabbitmq-server
 RUN dpkg -i /opt/tmp/rabbitmq/rabbitmq-server.deb && \
     rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing
 
 # grant exec permissions
-RUN chmod 0755 $RABBITMQ_SERVICE_DIR/run.sh
+RUN chmod 0755 $RABBITMQ_RUN_FILE
 
 # start rabbitmq
 CMD /opt/rabbitmq-server/run.sh
@@ -43,9 +38,8 @@ CMD /opt/rabbitmq-server/run.sh
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV RIEMANN_SERVICE_NAME {{ riemann.service_name }}
-# riemann init file
 ENV RIEMANN_SERVICE_DIR /opt/$RIEMANN_SERVICE_NAME
-ENV RIEMANN_INIT_FILE $RIEMANN_SERVICE_DIR/run.sh
+ENV RIEMANN_RUN_FILE $RIEMANN_SERVICE_DIR/run.sh
 ENV MANAGER_CONFIG_PATH $RIEMANN_SERVICE_DIR/manager.config
 ##### ENV #####
 
@@ -61,14 +55,9 @@ RUN curl {{ riemann.package_url }} --create-dirs -o /opt/tmp/riemann/riemann.deb
 # download riemann config
 RUN curl -o $MANAGER_CONFIG_PATH {{ riemann.config_url }}
 
-# inject required env vars to init script
-RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_INIT_FILE && \
-    sed -i '1s|^|MANAGER_CONFIG_PATH='$MANAGER_CONFIG_PATH' \n|' $RIEMANN_INIT_FILE
-
-# place init script in local init dir
-#RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-#    mv $RIEMANN_INIT_FILE /etc/init/ && \
-#    check_file "/etc/init/$RIEMANN_SERVICE_NAME.conf"'
+# inject required env vars to run script
+RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_RUN_FILE && \
+    sed -i '1s|^|MANAGER_CONFIG_PATH='$MANAGER_CONFIG_PATH' \n|' $RIEMANN_RUN_FILE
 
 # install riemann
 RUN dpkg -i /opt/tmp/riemann/riemann.deb

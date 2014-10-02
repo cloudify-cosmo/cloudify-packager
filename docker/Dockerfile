@@ -12,8 +12,8 @@ RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV RABBITMQ_SERVICE_NAME rabbitmq-server
-#ENV RABBITMQ_INIT_FILE /opt/tmp/init/$RABBITMQ_SERVICE_NAME.conf
 ENV RABBITMQ_SERVICE_DIR /opt/$RABBITMQ_SERVICE_NAME
+#ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run.sh
 ##### ENV #####
 
 # install dependencies.
@@ -23,18 +23,13 @@ RUN curl http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server
 
 ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
 
-# place init script in local init dir
-#RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-#    mv $RABBITMQ_INIT_FILE /etc/init/ && \
-#    check_file "/etc/init/$RABBITMQ_SERVICE_NAME.conf"'
-
 # install and run rabbitmq-server
 RUN dpkg -i /opt/tmp/rabbitmq/rabbitmq-server.deb && \
     rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing
 
 # grant exec permissions
-RUN chmod 0755 $RABBITMQ_SERVICE_DIR/run.sh
+RUN chmod 0755 $RABBITMQ_RUN_FILE
 
 # start rabbitmq
 CMD /opt/rabbitmq-server/run.sh
@@ -43,9 +38,8 @@ CMD /opt/rabbitmq-server/run.sh
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV RIEMANN_SERVICE_NAME riemann
-# riemann init file
 ENV RIEMANN_SERVICE_DIR /opt/$RIEMANN_SERVICE_NAME
-ENV RIEMANN_INIT_FILE $RIEMANN_SERVICE_DIR/run.sh
+ENV RIEMANN_RUN_FILE $RIEMANN_SERVICE_DIR/run.sh
 ENV MANAGER_CONFIG_PATH $RIEMANN_SERVICE_DIR/manager.config
 ##### ENV #####
 
@@ -61,14 +55,9 @@ RUN curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tm
 # download riemann config
 RUN curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config
 
-# inject required env vars to init script
-RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_INIT_FILE && \
-    sed -i '1s|^|MANAGER_CONFIG_PATH='$MANAGER_CONFIG_PATH' \n|' $RIEMANN_INIT_FILE
-
-# place init script in local init dir
-#RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-#    mv $RIEMANN_INIT_FILE /etc/init/ && \
-#    check_file "/etc/init/$RIEMANN_SERVICE_NAME.conf"'
+# inject required env vars to run script
+RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_RUN_FILE && \
+    sed -i '1s|^|MANAGER_CONFIG_PATH='$MANAGER_CONFIG_PATH' \n|' $RIEMANN_RUN_FILE
 
 # install riemann
 RUN dpkg -i /opt/tmp/riemann/riemann.deb
@@ -140,7 +129,8 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
 # extract binaries to service dir
 RUN tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1
 
-# start elasticsearch as daemon for configuration purpeses.
+# start elasticsearch as daemon for configuration purposes.
+# todo(adaml): move config to run script
 # config includes setting elasticsearch indexes.
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     $ELASTICSEARCH_SERVICE_DIR/bin/elasticsearch -d && \
@@ -338,13 +328,6 @@ RUN $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo
 RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .'
-
-# move required resources to resource folder
-#RUN mkdir resources/ && \
-#    cp -r /opt/manager/cloudify-manager/resources/rest-service/cloudify/* $MANAGER_SERVICES_DIR/resources/
-
-# move rest-service modules to parent dir
-#RUN cp -r $MANAGER_SERVICES_DIR/cloudify-manager/rest-service/manager_rest/* $MANAGER_SERVICES_DIR/
 
 # grant exec permissions for amqpflux and for rest-service
 RUN chmod 0755 $AMQPFLUX_RUN_FILE && \
