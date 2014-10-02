@@ -3,6 +3,7 @@ COMMON_PLUGIN_SHA=""
 MANAGER_SHA=""
 PACKMAN_SHA=""
 SCRIPTS_PLUGIN_SHA=""
+DIAMOND_PLUGIN_SHA=""
 
 # echo bootstrapping packman...
 
@@ -65,6 +66,13 @@ git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 pushd cloudify-script-plugin
 	if [ -n "$SCRIPTS_PLUGIN_SHA" ]; then
 		git reset --hard $SCRIPTS_PLUGIN_SHA
+	fi
+	sudo /Ubuntu-agent/env/bin/pip install .
+popd
+git clone https://github.com/cloudify-cosmo/cloudify-diamond-plugin.git
+pushd cloudify-diamond-plugin
+	if [ -n "$DIAMOND_PLUGIN_SHA" ]; then
+		git reset --hard $DIAMOND_PLUGIN_SHA
 	fi
 	sudo /Ubuntu-agent/env/bin/pip install .
 popd
