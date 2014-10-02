@@ -83,7 +83,7 @@ pushd cloudify-diamond-plugin
 	if [ -n "$DIAMOND_PLUGIN_SHA" ]; then
 		git reset --hard $DIAMOND_PLUGIN_SHA
 	fi
-	sudo /Ubuntu-agent/env/bin/pip install .
+	/centos-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
 pushd cloudify-manager
