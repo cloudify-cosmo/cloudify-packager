@@ -15,13 +15,13 @@ ENV RABBITMQ_SERVICE_NAME rabbitmq-server
 ENV RABBITMQ_SERVICE_DIR /opt/$RABBITMQ_SERVICE_NAME
 #ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run.sh
 ##### ENV #####
+# add run scripts and configuration
+ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
 
 # install dependencies.
 RUN apt-get install -y $(echo ['curl', 'logrotate', 'erlang-nox'] | tr -d "',[]")
 # download rabbit package
 RUN curl http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server_3.2.4-1_all.deb --create-dirs -o /opt/tmp/rabbitmq/rabbitmq-server.deb
-
-ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
 
 # install and run rabbitmq-server
 RUN dpkg -i /opt/tmp/rabbitmq/rabbitmq-server.deb && \
@@ -42,7 +42,7 @@ ENV RIEMANN_SERVICE_DIR /opt/$RIEMANN_SERVICE_NAME
 ENV RIEMANN_RUN_FILE $RIEMANN_SERVICE_DIR/run.sh
 ENV MANAGER_CONFIG_PATH $RIEMANN_SERVICE_DIR/manager.config
 ##### ENV #####
-
+# add run scripts and configuration
 ADD riemann/ $RIEMANN_SERVICE_DIR/
 
 # install dependencies.
@@ -87,7 +87,7 @@ ENV LOGSTASH_RUN_FILE $LOGSTASH_SERVICE_DIR/run.sh
 # logstash conf file
 ENV LOGSTASH_CONF_FILE $LOGSTASH_SERVICE_DIR/config.conf
 ##### ENV #####
-
+# add run scripts and configuration
 ADD logstash/ $LOGSTASH_SERVICE_DIR/
 
 # install dependencies.
@@ -113,7 +113,7 @@ EXPOSE 9999
 ENV ELASTICSEARCH_SERVICE_NAME elasticsearch
 ENV ELASTICSEARCH_SERVICE_DIR /opt/$ELASTICSEARCH_SERVICE_NAME
 ##### ENV #####
-
+# add run scripts and configuration
 ADD elasticsearch/ $ELASTICSEARCH_SERVICE_DIR/
 
 # install dependencies
@@ -161,7 +161,7 @@ ENV INFLUXDB_SERVICE_NAME influxdb
 ENV INFLUXDB_CONFIG_FILE /opt/influxdb/shared/config.toml
 ENV INFLUXDB_RUN_FILE /opt/$INFLUXDB_SERVICE_NAME/run.sh
 ##### ENV #####
-
+# add run scripts and configuration
 ADD influxdb/ /opt/$INFLUXDB_SERVICE_NAME/
 
 # install dependencies
@@ -198,10 +198,13 @@ EXPOSE 8083
 # set nginx service name
 ENV NGINX_SERVICE_NAME nginx
 ENV NGINX_SERVICE_DIR /opt/$NGINX_SERVICE_NAME
-# nginx conf file
-ENV NGINX_CONF_FILE /opt/nginx/default.conf
-##### ENV #####
 
+# nginx default conf file path
+ENV NGINX_CONF_FILE /etc/nginx/nginx.conf
+ENV NGINX_RUN_FILE $NGINX_SERVICE_DIR/run.sh
+ENV NGINX_LOGS_DIR $NGINX_SERVICE_DIR/logs
+##### ENV #####
+# add run scripts and configuration
 ADD nginx/ $NGINX_SERVICE_DIR
 
 # add nginx repositories to sources.list file and update repo
@@ -209,7 +212,6 @@ RUN echo ['deb http://nginx.org/packages/mainline/ubuntu/ precise nginx', 'deb-s
     apt-get update
 # install dependencies
 RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
-
 
 # download and add signing key
 RUN curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx/nginx_signing.key && \
@@ -219,15 +221,22 @@ RUN curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx
 RUN apt-get install -y --force-yes $NGINX_SERVICE_NAME
 
 # place config file in config path
+# todo: do we need this config file?
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mv $NGINX_CONF_FILE /etc/nginx/conf.d && \
+    mv /opt/nginx/default.conf /etc/nginx/conf.d && \
     check_file "/etc/nginx/conf.d/default.conf"'
 
-# turn-off daemon execution
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+# turn-off daemon execution and set logging dir in conf file
+RUN echo "daemon off;" >> $NGINX_CONF_FILE && \
+    sed -i "s%/var/log/nginx/error.log warn%$NGINX_SERVICE_DIR/logs/error.log warn%g" $NGINX_CONF_FILE && \
+    sed -i "s%/var/run/nginx.pid%$NGINX_SERVICE_DIR/logs/nginx.pid%g" /etc/nginx/nginx.conf && \
+    mkdir $NGINX_LOGS_DIR
+
+# set config path in run file
+RUN sed -i '1s|^|NGINX_CONF_FILE='$NGINX_CONF_FILE' \n|' $NGINX_RUN_FILE
 
 # grant exec permissions
-RUN chmod 0755 $NGINX_SERVICE_DIR/run.sh
+RUN chmod 0755 $NGINX_RUN_FILE
 
 # run the service as non-daemon
 CMD /opt/nginx/run.sh
@@ -241,18 +250,24 @@ EXPOSE 80
 ##### ENV #####
 ENV CELERY_SERVICE_NAME celery
 ENV CELERY_SERVICE_DIR /opt/$CELERY_SERVICE_NAME
+ENV CELERY_RUN_FILE $CELERY_SERVICE_DIR/run.sh
 ENV CELERY_VIRTUAL_ENV_DIR $CELERY_SERVICE_DIR/env
+ENV CELERY_LOG_DIR $CELERY_SERVICE_DIR/logs
 ##### ENV #####
+# add run scripts and configuration
 ADD celery/ $CELERY_SERVICE_DIR/
 
 # install dependencies.
 RUN apt-get install -y $(echo ['curl', 'python-dev', 'git', 'g++'] | tr -d "',[]")
 # install pip
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
-# install virtualenv
-RUN pip install virtualenv==1.11.4
-# create python virtualenv
-RUN virtualenv $CELERY_VIRTUAL_ENV_DIR
+
+# install virtualenv and create one
+RUN pip install virtualenv==1.11.4 && \
+    virtualenv $MANAGER_VIRTUAL_ENV_DIR
+
+# create celery log dir
+RUN mkdir $CELERY_LOG_DIR
 
 # install requirements
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo ['celery==3.0.24', 'pyzmq==14.3.1'] | tr -d "',[]")
@@ -280,8 +295,9 @@ RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify
     pushd cloudify-manager/workflows && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install .'
 
-# set config path in run file
-RUN sed -i '1s|^|CELERY_HOME_DIR='$CELERY_SERVICE_DIR' \n|' $CELERY_SERVICE_DIR/run.sh
+# inject required params to run script
+RUN sed -i '1s|^|CELERY_HOME_DIR='$CELERY_SERVICE_DIR' \n|' $CELERY_RUN_FILE && \
+    sed -i '1s|^|CELERY_LOG_DIR='$CELERY_LOG_DIR' \n|' $CELERY_RUN_FILE
 
 # grant exec permissions
 RUN chmod 0755 $CELERY_SERVICE_DIR/run.sh
@@ -303,11 +319,13 @@ ENV MANAGER_RUN_FILE $MANAGER_SERVICES_DIR/run_manager.sh
 
 ENV MANAGER_REST_CONFIG_PATH $MANAGER_SERVICES_DIR/guni.conf
 ##### ENV #####
+# add run scripts and configuration
+ADD manager/ $MANAGER_SERVICES_DIR/
+
 #install dependencies
 RUN apt-get install -y $(echo ['git'] | tr -d "',[]")
 
-ADD manager/ $MANAGER_SERVICES_DIR/
-
+# inject required params to run script
 RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE && \
     sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $MANAGER_RUN_FILE && \
     sed -i '1s|^|MANAGER_REST_CONFIG_PATH='$MANAGER_REST_CONFIG_PATH' \n|' $MANAGER_RUN_FILE && \
