@@ -2,6 +2,7 @@
 # $1 = true iff install from PYPI
 
 INSTALL_FROM_PYPI=$1
+echo "install from pypi: ${INSTALL_FROM_PYPI}"
 
 DSL_SHA=""
 REST_CLIENT_SHA=""
@@ -11,7 +12,7 @@ USERNAME=$(id -u -n)
 if [ "$USERNAME" = "" ]; then
 	echo "using default username"
 	USERNAME="vagrant"
-fi 	
+fi
 
 echo "username is [$USERNAME]"
 
