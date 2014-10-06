@@ -19,7 +19,25 @@
 BASE_BOX_NAME = 'precise64'
 BASE_BOX_URI = 'http://files.vagrantup.com/precise64.box'
 
+INSTALL_FROM_PYPI = ENV['INSTALL_FROM_PYPI']
 # BASE_BOX_NAME = 'cloudify'
+
+# You can run this vagrant on HP 
+# you will need hp plugin
+# https://github.com/mohitsethi/vagrant-hp
+# vagrant plugin install vagrant-hp
+# vagrant box add dummy https://github.com/mohitsethi/vagrant-hp/raw/master/dummy_hp.box
+# vagrant up hp--provider=hp
+HP_ACCESS_KEY = ENV['HP_ACCESS_KEY']
+HP_SECRET_KEY = ENV['HP_SECRET_KEY']
+HP_TENANT_ID  = ENV['HP_TENANT_ID']
+
+HP_PRIVATE_KEY_PATH = ENV['HP_PRIVATE_KEY_PATH']
+HP_KEYPAIR_NAME = ENV['HP_KEYPAIR_NAME']
+hp_server_name = ENV['HP_SERVER_NAME'] # optional
+HP_SERVER_IMAGE = ENV['HP_SERVER_IMAGE'] || "Ubuntu Server 14.04.1 LTS (amd64 20140927) - Partner Image" #optional
+HP_SSH_USERNAME = ENV['HP_SSH_USERNAME'] || "ubuntu" #optional 
+HP_AVAILABILITY_ZONE = ENV['HP_AVAILABILITY_ZONE'] || "az1" #optional
 
 Vagrant.configure('2') do |config|
 
@@ -35,6 +53,39 @@ Vagrant.configure('2') do |config|
     cloudify.vm.box = BASE_BOX_NAME
     cloudify.vm.box_url = BASE_BOX_URI
     cloudify.vm.hostname = 'cloudify'
-    cloudify.vm.provision "shell", path: "provision.sh", privileged: false
+    cloudify.vm.provision "shell", path: "provision.sh", privileged: false, args: "#{INSTALL_FROM_PYPI}"
   end
+
+  # default server names for HP whether you chose to install from pypi (stable) or from github (latest)
+  if INSTALL_FROM_PYPI === 'true'
+    hp_server_name ||= "install_cloudify_3_stable"
+  else 
+    hp_server_name ||= "install_cloudify_3_latest"
+  end
+  println "install from pypi = #{INSTALL_FROM_PYPI}, hp_server_name = #{hp_server_name}"
+
+  config.vm.define :hp do |hp|
+
+    hp.vm.box = "dummy"
+    hp.vm.provider :hp do |rs|
+      rs.access_key  = "#{HP_ACCESS_KEY}"
+      rs.secret_key = "#{HP_SECRET_KEY}"
+      rs.flavor   = "standard.medium"
+      rs.tenant_id = "#{HP_TENANT_ID}"
+      rs.server_name = "#{hp_server_name}"
+      rs.image    = "#{HP_SERVER_IMAGE}" 
+      rs.keypair_name = "#{HP_KEYPAIR_NAME}"
+      rs.ssh_private_key_path = "#{HP_PRIVATE_KEY_PATH}"
+      rs.ssh_username = "#{HP_SSH_USERNAME}"
+      rs.availability_zone = "az1"
+    end
+
+    hp.vm.provision "shell" do |shell|
+        shell.path = "provision.sh"
+        shell.args = "#{INSTALL_FROM_PYPI}"
+        shell.privileged = false
+    end
+  end
+
+
 end
