@@ -1,7 +1,21 @@
+# accepted arguments
+# $1 = true iff install from PYPI
+
+INSTALL_FROM_PYPI=$1
+echo "install from pypi: ${INSTALL_FROM_PYPI}"
+
 DSL_SHA=""
 REST_CLIENT_SHA=""
 CLI_SHA=""
 PLUGINS_COMMON_SHA=""
+
+USERNAME=$(id -u -n)
+if [ "$USERNAME" = "" ]; then
+	echo "using default username"
+	USERNAME="vagrant"
+fi
+
+echo "username is [$USERNAME]"
 
 echo bootstrapping...
 
@@ -27,7 +41,7 @@ virtualenv cloudify &&
 source cloudify/bin/activate &&
 
 # install cli
-if [ -n  "$INSTALL_CLI_FROM_PYPI" ]; then
+if [ "$INSTALL_FROM_PYPI" = "true" ]; then
 	echo installing cli from pypi
 	pip install cloudify
 else
@@ -73,10 +87,6 @@ cd ~
 mkdir -p simple &&
 cd simple &&
 cfy init simple_provider &&
-
-# TODO: fix user identification issue
-# USERNAME=$(id -u -n)
-USERNAME="vagrant"
 
 # copy the ssh key only when bootstrapping with vagrant. otherwise, implemented in packer
 # copy vagrant ssh key
