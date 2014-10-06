@@ -30,9 +30,9 @@ HP_ACCESS_KEY = ENV['HP_ACCESS_KEY']
 HP_SECRET_KEY = ENV['HP_SECRET_KEY']
 HP_TENANT_ID  = ENV['HP_TENANT_ID']
 
-HP_PRIVATE_KEY_PATH = ENV['HP_PRIVATE_KEY_PATH']
+HP_PRIVATE_DIR_PATH = ENV['HP_PRIVATE_DIR_PATH']
 HP_KEYPAIR_NAME = ENV['HP_KEYPAIR_NAME']
-HP_SERVER_IMAGE = ENV['HP_SERVER_IMAGE'] || "Ubuntu Server 14.04.1 LTS (amd64 20140927) - Partner Image" #optional
+HP_SERVER_IMAGE = ENV['HP_SERVER_IMAGE'] || "Ubuntu Precise 12.04.4 LTS Server 64-bit 20140414 (Rescue Image)" #optional
 HP_SSH_USERNAME = ENV['HP_SSH_USERNAME'] || "ubuntu" #optional
 HP_AVAILABILITY_ZONE = ENV['HP_AVAILABILITY_ZONE'] || "az1" #optional
 
@@ -80,11 +80,12 @@ Vagrant.configure('2') do |config|
       rs.server_name = "#{HP_SERVER_NAME}"
       rs.image    = "#{HP_SERVER_IMAGE}"
       rs.keypair_name = "#{HP_KEYPAIR_NAME}"
-      rs.ssh_private_key_path = "#{HP_PRIVATE_KEY_PATH}"
+      rs.ssh_private_key_path = "#{HP_PRIVATE_DIR_PATH}/insecure_private_key"
       rs.ssh_username = "#{HP_SSH_USERNAME}"
       rs.availability_zone = "az1"
     end
 
+    hp.vm.synced_folder "#{HP_PRIVATE_DIR_PATH}", "/vagrant", create: true
     hp.vm.provision "shell" do |s|
       s.path = "provision.sh"
       s.args = "#{INSTALL_FROM_PYPI}"
