@@ -1,6 +1,7 @@
 DSL_SHA=""
 REST_CLIENT_SHA=""
 CLI_SHA=""
+PLUGINS_COMMON_SHA=""
 
 echo bootstrapping...
 
@@ -43,6 +44,14 @@ else
 	pushd cloudify-rest-client
 		if [ -n "$REST_CLIENT_SHA" ]; then
 			git reset --hard $REST_CLIENT_SHA
+		fi
+		pip install .
+	popd
+
+	git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
+	pushd cloudify-plugins-common
+		if [ -n "$PLUGINS_COMMON_SHA" ]; then
+			git reset --hard $PLUGINS_COMMON_SHA
 		fi
 		pip install .
 	popd
