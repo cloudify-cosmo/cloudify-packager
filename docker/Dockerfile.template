@@ -13,7 +13,7 @@ RUN apt-get update
 ##### ENV #####
 ENV RABBITMQ_SERVICE_NAME {{ rabbitmq.service_name }}
 ENV RABBITMQ_SERVICE_DIR /opt/$RABBITMQ_SERVICE_NAME
-#ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run.sh
+ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run.sh
 ##### ENV #####
 # add run scripts and configuration
 ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
@@ -119,7 +119,7 @@ ADD elasticsearch/ $ELASTICSEARCH_SERVICE_DIR/
 # install dependencies
 RUN apt-get install -y $(echo {{ elasticsearch.reqs }} | tr -d "',[]")
 # download binaries
-RUN curl {{ elasticsearch.package_url }} --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz
+RUN curl {{ elasticsearch.elasticsearch_tar_url }} --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz
 
 # create service dir todo(adaml): this command is not necessary
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
@@ -219,16 +219,11 @@ RUN curl {{ nginx.source_key }} --create-dirs -o /opt/tmp/nginx/nginx_signing.ke
 # install nginx
 RUN apt-get install -y --force-yes $NGINX_SERVICE_NAME
 
-# place config file in config path
-# todo: do we need this config file?
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mv /opt/nginx/default.conf /etc/nginx/conf.d && \
-    check_file "/etc/nginx/conf.d/default.conf"'
-
-# turn-off daemon execution and set logging dir in conf file
+# turn-off daemon execution, set logging dir and default.conf location in conf file
 RUN echo "daemon off;" >> $NGINX_CONF_FILE && \
     sed -i "s%/var/log/nginx/error.log warn%$NGINX_SERVICE_DIR/logs/error.log warn%g" $NGINX_CONF_FILE && \
     sed -i "s%/var/run/nginx.pid%$NGINX_SERVICE_DIR/logs/nginx.pid%g" /etc/nginx/nginx.conf && \
+    sed -i "s%/etc/nginx/conf.d/\*.conf%$NGINX_SERVICE_DIR/default.conf%g" /etc/nginx/nginx.conf && \
     mkdir $NGINX_LOGS_DIR
 
 # set config path in run file
@@ -263,7 +258,7 @@ RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | 
 
 # install virtualenv and create one
 RUN pip install virtualenv==1.11.4 && \
-    virtualenv $MANAGER_VIRTUAL_ENV_DIR
+    virtualenv $CELERY_VIRTUAL_ENV_DIR
 
 # install requirements
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo {{ celery.python_install_requires }} | tr -d "',[]")
@@ -309,7 +304,7 @@ CMD /opt/celery/run.sh
 ENV MANAGER_SERVICE_NAME {{ manager.service_name }}
 ENV MANAGER_SERVICES_DIR /opt/$MANAGER_SERVICE_NAME
 ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR/env
-ENV SERVER_FILES_DIR $MANAGER_SERVICES_DIR/cloudify-manager/rest-service/manager_rest
+ENV SERVER_FILES_DIR $MANAGER_SERVICES_DIR/cloudify-manager*/rest-service/manager_rest
 
 ENV AMQPFLUX_RUN_FILE $MANAGER_SERVICES_DIR/run_amqpflux.sh
 ENV MANAGER_RUN_FILE $MANAGER_SERVICES_DIR/run_manager.sh
@@ -318,6 +313,8 @@ ENV MANAGER_REST_CONFIG_PATH $MANAGER_SERVICES_DIR/guni.conf
 ##### ENV #####
 # add run scripts and configuration
 ADD manager/ $MANAGER_SERVICES_DIR/
+
+WORKDIR /opt/manager/
 
 #install dependencies
 RUN apt-get install -y $(echo {{ manager.reqs }} | tr -d "',[]")
@@ -334,7 +331,6 @@ RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | 
 RUN pip install virtualenv==1.11.4 && \
     virtualenv $MANAGER_VIRTUAL_ENV_DIR
 
-WORKDIR /opt/manager/
 
 # install amqpinflux
 RUN $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_amqp_influxdb }} && \
@@ -347,3 +343,42 @@ RUN /bin/bash -c 'git clone {{ manager.modules.cloudify_manager }} && \
 # grant exec permissions for amqpflux and for rest-service
 RUN chmod 0755 $AMQPFLUX_RUN_FILE && \
     chmod 0755 $MANAGER_RUN_FILE
+
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+# CONTAINER - WEB-UI
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+##### ENV #####
+ENV WEBUI_SERVICE_NAME {{ webui.service_name }}
+ENV WEBUI_SERVICE_DIR /opt/$WEBUI_SERVICE_NAME
+ENV WEBUI_RUN_FILE $WEBUI_SERVICE_DIR/run.sh
+ENV WEBUI_VIRTUAL_ENV_DIR $WEBUI_SERVICE_DIR/env
+##### ENV #####
+ADD cloudify-webui/ $WEBUI_SERVICE_DIR/
+
+# install dependencies
+RUN apt-get install -y {{ webui.reqs | join(", ") }}
+
+# download cloudify-webui package and extract webui and grafana tar.gz
+RUN curl {{ webui.cloudify_webui_tar_url}} --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
+    dpkg-deb -x /opt/tmp/cloudify-webui/cloudify-webui.deb /opt/tmp/cloudify-webui/ && \
+    mkdir -p $WEBUI_SERVICE_DIR/cosmo-ui && \
+    tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/cosmo-ui* -C $WEBUI_SERVICE_DIR/cosmo-ui --strip-components=1 && \
+    mkdir -p $WEBUI_SERVICE_DIR/grafana && \
+    tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/grafana* -C $WEBUI_SERVICE_DIR/grafana --strip-components=1 && \
+    cp /opt/tmp/cloudify-webui/packages/cloudify-ui/config/grafana/config.js $WEBUI_SERVICE_DIR/grafana/
+
+# install nodejs from source files
+RUN cd /tmp && \
+  curl {{ webui.nodejs_latest_url }} -o /tmp/node-latest.tar.gz && \
+  tar xvzf node-latest.tar.gz && \
+  rm -f node-latest.tar.gz && \
+  cd node-v* && \
+  ./configure && \
+  CXX="g++ -Wno-unused-local-typedefs" make && \
+  CXX="g++ -Wno-unused-local-typedefs" make install && \
+  cd /tmp && \
+  rm -rf /tmp/node-v* && \
+  echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc
+
+RUN chmod 0755 $WEBUI_SERVICE_DIR/run.sh
+

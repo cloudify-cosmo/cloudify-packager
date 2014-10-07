@@ -13,7 +13,7 @@ RUN apt-get update
 ##### ENV #####
 ENV RABBITMQ_SERVICE_NAME rabbitmq-server
 ENV RABBITMQ_SERVICE_DIR /opt/$RABBITMQ_SERVICE_NAME
-#ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run.sh
+ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run.sh
 ##### ENV #####
 # add run scripts and configuration
 ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
@@ -100,7 +100,7 @@ RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/logstash.jar' \n|' $LO
     sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_RUN_FILE
 
 # grant exec permissions
-RUN chmod 0755 /opt/logstash/run.sh
+RUN chmod 0755 $LOGSTASH_RUN_FILE
 
 # start logstash
 CMD /opt/logstash/run.sh
@@ -198,7 +198,6 @@ EXPOSE 8083
 # set nginx service name
 ENV NGINX_SERVICE_NAME nginx
 ENV NGINX_SERVICE_DIR /opt/$NGINX_SERVICE_NAME
-
 # nginx default conf file path
 ENV NGINX_CONF_FILE /etc/nginx/nginx.conf
 ENV NGINX_RUN_FILE $NGINX_SERVICE_DIR/run.sh
@@ -220,16 +219,11 @@ RUN curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx
 # install nginx
 RUN apt-get install -y --force-yes $NGINX_SERVICE_NAME
 
-# place config file in config path
-# todo: do we need this config file?
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mv /opt/nginx/default.conf /etc/nginx/conf.d && \
-    check_file "/etc/nginx/conf.d/default.conf"'
-
-# turn-off daemon execution and set logging dir in conf file
+# turn-off daemon execution, set logging dir and default.conf location in conf file
 RUN echo "daemon off;" >> $NGINX_CONF_FILE && \
     sed -i "s%/var/log/nginx/error.log warn%$NGINX_SERVICE_DIR/logs/error.log warn%g" $NGINX_CONF_FILE && \
     sed -i "s%/var/run/nginx.pid%$NGINX_SERVICE_DIR/logs/nginx.pid%g" /etc/nginx/nginx.conf && \
+    sed -i "s%/etc/nginx/conf.d/\*.conf%$NGINX_SERVICE_DIR/default.conf%g" /etc/nginx/nginx.conf && \
     mkdir $NGINX_LOGS_DIR
 
 # set config path in run file
@@ -264,10 +258,7 @@ RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | 
 
 # install virtualenv and create one
 RUN pip install virtualenv==1.11.4 && \
-    virtualenv $MANAGER_VIRTUAL_ENV_DIR
-
-# create celery log dir
-RUN mkdir $CELERY_LOG_DIR
+    virtualenv $CELERY_VIRTUAL_ENV_DIR
 
 # install requirements
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo ['celery==3.0.24', 'pyzmq==14.3.1'] | tr -d "',[]")
@@ -295,9 +286,10 @@ RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify
     pushd cloudify-manager/workflows && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install .'
 
-# inject required params to run script
+# inject required params to run script and create logs dir
 RUN sed -i '1s|^|CELERY_HOME_DIR='$CELERY_SERVICE_DIR' \n|' $CELERY_RUN_FILE && \
-    sed -i '1s|^|CELERY_LOG_DIR='$CELERY_LOG_DIR' \n|' $CELERY_RUN_FILE
+    sed -i '1s|^|CELERY_LOG_DIR='$CELERY_LOG_DIR' \n|' $CELERY_RUN_FILE && \
+    mkdir $CELERY_LOG_DIR
 
 # grant exec permissions
 RUN chmod 0755 $CELERY_SERVICE_DIR/run.sh
@@ -312,7 +304,7 @@ CMD /opt/celery/run.sh
 ENV MANAGER_SERVICE_NAME manager
 ENV MANAGER_SERVICES_DIR /opt/$MANAGER_SERVICE_NAME
 ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR/env
-ENV SERVER_FILES_DIR $MANAGER_SERVICES_DIR/cloudify-manager/rest-service/manager_rest
+ENV SERVER_FILES_DIR $MANAGER_SERVICES_DIR/cloudify-manager*/rest-service/manager_rest
 
 ENV AMQPFLUX_RUN_FILE $MANAGER_SERVICES_DIR/run_amqpflux.sh
 ENV MANAGER_RUN_FILE $MANAGER_SERVICES_DIR/run_manager.sh
@@ -322,8 +314,10 @@ ENV MANAGER_REST_CONFIG_PATH $MANAGER_SERVICES_DIR/guni.conf
 # add run scripts and configuration
 ADD manager/ $MANAGER_SERVICES_DIR/
 
+WORKDIR /opt/manager/
+
 #install dependencies
-RUN apt-get install -y $(echo ['git'] | tr -d "',[]")
+RUN apt-get install -y $(echo ['git', 'python2.7'] | tr -d "',[]")
 
 # inject required params to run script
 RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE && \
@@ -337,7 +331,6 @@ RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | 
 RUN pip install virtualenv==1.11.4 && \
     virtualenv $MANAGER_VIRTUAL_ENV_DIR
 
-WORKDIR /opt/manager/
 
 # install amqpinflux
 RUN $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master && \
@@ -350,3 +343,41 @@ RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify
 # grant exec permissions for amqpflux and for rest-service
 RUN chmod 0755 $AMQPFLUX_RUN_FILE && \
     chmod 0755 $MANAGER_RUN_FILE
+
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+# CONTAINER - WEB-UI
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+##### ENV #####
+ENV WEBUI_SERVICE_NAME cloudify-webui
+ENV WEBUI_SERVICE_DIR /opt/$WEBUI_SERVICE_NAME
+ENV WEBUI_RUN_FILE $WEBUI_SERVICE_DIR/run.sh
+ENV WEBUI_VIRTUAL_ENV_DIR $WEBUI_SERVICE_DIR/env
+##### ENV #####
+ADD cloudify-webui/ $WEBUI_SERVICE_DIR/
+
+# install dependencies
+RUN apt-get install -y curl, g++, python2.7, make
+
+# download cloudify-webui package and extract webui and grafana tar.gz
+RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ui_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
+    dpkg-deb -x /opt/tmp/cloudify-webui/cloudify-webui.deb /opt/tmp/cloudify-webui/ && \
+    mkdir -p $WEBUI_SERVICE_DIR/cosmo-ui && \
+    tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/cosmo-ui* -C $WEBUI_SERVICE_DIR/cosmo-ui --strip-components=1 && \
+    mkdir -p $WEBUI_SERVICE_DIR/grafana && \
+    tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/grafana* -C $WEBUI_SERVICE_DIR/grafana --strip-components=1 && \
+    cp /opt/tmp/cloudify-webui/packages/cloudify-ui/config/grafana/config.js $WEBUI_SERVICE_DIR/grafana/
+
+# install nodejs from source files
+RUN cd /tmp && \
+  curl http://nodejs.org/dist/node-latest.tar.gz -o /tmp/node-latest.tar.gz && \
+  tar xvzf node-latest.tar.gz && \
+  rm -f node-latest.tar.gz && \
+  cd node-v* && \
+  ./configure && \
+  CXX="g++ -Wno-unused-local-typedefs" make && \
+  CXX="g++ -Wno-unused-local-typedefs" make install && \
+  cd /tmp && \
+  rm -rf /tmp/node-v* && \
+  echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc
+
+RUN chmod 0755 $WEBUI_SERVICE_DIR/run.sh

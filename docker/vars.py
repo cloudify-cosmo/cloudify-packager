@@ -63,7 +63,7 @@ VARS = {
             "curl",
             "openjdk-7-jdk",
         ],
-        "package_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
+        "elasticsearch_tar_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
         "ports": ["9200"],
         "min_mem": "1024m",
         "max_mem": "1024m",
@@ -115,7 +115,8 @@ VARS = {
     "manager": {
         "service_name": "manager",
         "reqs": [
-            "git"
+            "git",
+            "python2.7"
         ],
         "modules": {
             "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",
@@ -123,5 +124,16 @@ VARS = {
             "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
         },
         "manager_rest_port": "8100",
+        },
+    "webui": {
+        "service_name": "cloudify-webui",
+        "reqs": [
+            "curl",
+            "g++",
+            "python2.7",
+            "make"
+        ],
+        "nodejs_latest_url": "http://nodejs.org/dist/node-latest.tar.gz",
+        "cloudify_webui_tar_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ui_amd64.deb",
     }
 }
