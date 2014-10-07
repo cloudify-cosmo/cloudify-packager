@@ -67,18 +67,6 @@ RUN chmod 0755 /opt/$RIEMANN_SERVICE_NAME/run.sh
 
 CMD /opt/riemann/run.sh
 
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# CONTAINER - NODEJS DependsOn: ~
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# install dependencies.
-#RUN apt-get install -y $(echo {{ nodejs.reqs }} | tr -d "',[]")
-# download and install
-#RUN add-apt-repository -y {{ nodejs.repo_name }} && \
-#	apt-get update && \
-#    apt-get install -y nodejs
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# CONTAINER - LOGSTASH DependsOn: ~
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV LOGSTASH_SERVICE_NAME {{ logstash.service_name }}
 ENV LOGSTASH_SERVICE_DIR /opt/$LOGSTASH_SERVICE_NAME
