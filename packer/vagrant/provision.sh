@@ -96,7 +96,7 @@ git clone https://github.com/cloudify-cosmo/cloudify-manager-blueprints.git
 			git reset --hard $MANAGER_BLUEPRINTS_SHA
 		fi
 		pushd simple
-			pip install . -r requirements.txt
+			pip install -r requirements.txt
 		popd
 	popd
 
