@@ -16,39 +16,48 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+AWS_ACCESS_KEY_ID = ENV['AWS_ACCESS_KEY_ID']
+AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
+
+BASE_BOX_NAME = 'hashicorp/precise64'
+
 Vagrant.configure('2') do |config|
-
-  config.vm.define "centos" do |centos|
+  config.vm.define "ubuntu" do |ubuntu|
     #dummy box, will be overriden
-    centos.vm.box = "dummy"
-    centos.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+    ubuntu.vm.box = "dummy"
+    ubuntu.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
 
-    centos.vm.provider :aws do |aws, override|
+    ubuntu.vm.provider :aws do |aws, override|
       aws.access_key_id = AWS_ACCESS_KEY_ID
       aws.secret_access_key = AWS_ACCESS_KEY
 
-      aws.ami = "ami-3689325f"
+      #official ubuntu 12.04 64bit box
+      aws.ami = "ami-036eaa74"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
       aws.keypair_name = "vagrant_build"
-      override.ssh.username = "centos"
+      override.ssh.username = "ubuntu"
       override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
 
       aws.tags = {
-          "Name" => "vagrant components centos build",
+          "Name" => "vagrant core ubuntu build",
       }
-        aws.security_groups = "vagrant_core_build"
+        aws.security_groups = "vagrant_cfy_build"
     end
 
     #need to sync folders
-    centos.vm.synced_folder "../", "/home/vagrant/cloudify-packager", create: true
-
-    centos.vm.provision "shell" do |shell|
-      shell.path = "provision.sh"
-      shell.privileged = true
-    end
-
+    ubuntu.vm.synced_folder "../../", "/cloudify-packager", create: true
+    ubuntu.vm.provision "shell", path: "provision.sh", privileged: false
   end
 
+  config.vm.define :local do |local|
+    local.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', '1024']
+    end
+    local.vm.box = BASE_BOX_NAME
+    local.vm.hostname = 'local'
+    local.vm.synced_folder "../../", "/cloudify-packager", create: true
+    local.vm.provision "shell", path: "provision.sh", privileged: false
+  end
 end
