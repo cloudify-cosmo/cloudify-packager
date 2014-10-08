@@ -67,9 +67,6 @@ RUN chmod 0755 /opt/$RIEMANN_SERVICE_NAME/run.sh
 
 CMD /opt/riemann/run.sh
 
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# CONTAINER - LOGSTASH DependsOn: ~
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV LOGSTASH_SERVICE_NAME logstash
 ENV LOGSTASH_SERVICE_DIR /opt/$LOGSTASH_SERVICE_NAME
@@ -331,6 +328,24 @@ RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify
     pushd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .'
 
+# create resources folder and copy all required resources
+RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ubuntu-agent_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
+    dpkg-deb -x /opt/tmp/manager/ubuntu_agent.deb /opt/tmp/manager && \
+    mkdir -p /opt/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-agent-disable-requiretty.sh /opt/manager/resources/packages/scripts && \
+    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.conf.template /opt/manager/resources/packages/templates && \
+    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.init.template /opt/manager/resources/packages/templates && \
+    mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/Ubuntu*/Ubuntu-agent.tar.gz /opt/manager/resources/packages/agents && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-centos-agent_amd64.deb --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
+    dpkg-deb -x /opt/tmp/manager/centos_agent.deb /opt/tmp/manager && \
+    mkdir -p /opt/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/centos*/config/centos-agent-disable-requiretty.sh /opt/manager/resources/packages/scripts && \
+    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.conf.template /opt/manager/resources/packages/templates && \
+    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.init.template /opt/manager/resources/packages/templates && \
+    mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/centos*/centos-agent.tar.gz /opt/manager/resources/packages/agents && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-windows-agent_amd64.deb --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
+    dpkg-deb -x /opt/tmp/manager/windows_agent.deb /opt/tmp/manager && \
+    mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/windows*/Cloudify.exe /opt/manager/resources/packages/agents/CloudifyWindowsAgent.exe && \
+    cp -r /opt/manager/cloudify-manager/resources/rest-service/* /opt/manager/resources
+    
 # grant exec permissions for amqpflux and for rest-service
 RUN chmod 0755 $AMQPFLUX_RUN_FILE && \
     chmod 0755 $MANAGER_RUN_FILE
@@ -347,7 +362,7 @@ ENV WEBUI_VIRTUAL_ENV_DIR $WEBUI_SERVICE_DIR/env
 ADD cloudify-webui/ $WEBUI_SERVICE_DIR/
 
 # install dependencies
-RUN apt-get install -y curl, g++, python2.7, make
+RUN apt-get install -y curl g++ python2.7 make
 
 # download cloudify-webui package and extract webui and grafana tar.gz
 RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ui_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
