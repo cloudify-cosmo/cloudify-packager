@@ -19,7 +19,7 @@ ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run.sh
 ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
 
 # install dependencies.
-RUN apt-get install -y $(echo ['curl', 'logrotate', 'erlang-nox'] | tr -d "',[]")
+RUN apt-get install -y  curl logrotate erlang-nox
 # download rabbit package
 RUN curl http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server_3.2.4-1_all.deb --create-dirs -o /opt/tmp/rabbitmq/rabbitmq-server.deb
 
@@ -47,14 +47,14 @@ ENV MANAGER_CONFIG_PATH $RIEMANN_SERVICE_DIR/manager.config
 ADD riemann/ $RIEMANN_SERVICE_DIR/
 
 # install dependencies.
-RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
+RUN apt-get install -y  curl openjdk-7-jdk
 # download to service dir and set permissions on langohr jar.
 RUN curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o $RIEMANN_SERVICE_DIR/langohr.jar && \
     chmod 644 $RIEMANN_SERVICE_DIR/langohr.jar
 # download riemann deb
 RUN curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb
 # download riemann config
-RUN curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config
+RUN curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/3.1m4/plugins/riemann-controller/riemann_controller/resources/manager.config
 
 # inject required env vars to run script
 RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_RUN_FILE && \
@@ -83,7 +83,7 @@ ENV LOGSTASH_CONF_FILE $LOGSTASH_SERVICE_DIR/config.conf
 ADD logstash/ $LOGSTASH_SERVICE_DIR/
 
 # install dependencies.
-RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
+RUN apt-get install -y  curl openjdk-7-jdk
 # download jar file
 RUN curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar
 
@@ -109,7 +109,7 @@ ENV ELASTICSEARCH_SERVICE_DIR /opt/$ELASTICSEARCH_SERVICE_NAME
 ADD elasticsearch/ $ELASTICSEARCH_SERVICE_DIR/
 
 # install dependencies
-RUN apt-get install -y $(echo ['curl', 'openjdk-7-jdk'] | tr -d "',[]")
+RUN apt-get install -y  curl openjdk-7-jdk
 # download binaries
 RUN curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz
 
@@ -119,7 +119,8 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     check_dir "$ELASTICSEARCH_SERVICE_DIR/"'
 
 # extract binaries to service dir
-RUN tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1
+RUN tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1 && \
+    rm -rf /opt/tmp/elasticsearch/elasticsearch.tar.gz
 
 # start elasticsearch as daemon for configuration purposes.
 # todo(adaml): move config to run script
@@ -157,12 +158,13 @@ ENV INFLUXDB_RUN_FILE /opt/$INFLUXDB_SERVICE_NAME/run.sh
 ADD influxdb/ /opt/$INFLUXDB_SERVICE_NAME/
 
 # install dependencies
-RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
+RUN apt-get install -y  curl
 # download binaries
 RUN curl http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb --create-dirs -o /opt/tmp/influxdb/influxdb.deb
 
 # install influxdb
-RUN dpkg -i /opt/tmp/influxdb/influxdb.deb
+RUN dpkg -i /opt/tmp/influxdb/influxdb.deb && \
+    rm -rf /opt/tmp/influxdb/influxdb.deb
 
 # start influxdb as daemon and create cloudify db
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
@@ -202,7 +204,7 @@ ADD nginx/ $NGINX_SERVICE_DIR
 RUN echo ['deb http://nginx.org/packages/mainline/ubuntu/ precise nginx', 'deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx'] | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
     apt-get update
 # install dependencies
-RUN apt-get install -y $(echo ['curl'] | tr -d "',[]")
+RUN apt-get install -y  curl
 
 # download and add signing key
 RUN curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx/nginx_signing.key && \
@@ -244,7 +246,7 @@ ENV CELERY_LOG_DIR $CELERY_SERVICE_DIR/logs
 ADD celery/ $CELERY_SERVICE_DIR/
 
 # install dependencies.
-RUN apt-get install -y $(echo ['curl', 'python-dev', 'git', 'g++'] | tr -d "',[]")
+RUN apt-get install -y  curl python-dev git g++ wget sudo
 # install pip
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
 
@@ -258,11 +260,11 @@ RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo ['celery==3.0.24', 'pyzmq==14
 ############################## install cloudify core components ##############################
 WORKDIR /opt/celery/
 
-RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master
+RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@3.1m4 && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@3.1m4 && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@3.1m4
 
-RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+RUN /bin/bash -c 'git clone -b 3.1m4 https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/plugins/plugin-installer && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
     popd && \
@@ -309,7 +311,7 @@ ADD manager/ $MANAGER_SERVICES_DIR/
 WORKDIR /opt/manager/
 
 #install dependencies
-RUN apt-get install -y $(echo ['git', 'python2.7'] | tr -d "',[]")
+RUN apt-get install -y  git python2.7
 
 # inject required params to run script
 RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE && \
@@ -325,30 +327,33 @@ RUN pip install virtualenv==1.11.4 && \
 
 
 # install amqpinflux
-RUN $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master && \
-    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master
+RUN $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@3.1m4 && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@3.1m4
 # install rest-service
-RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+RUN /bin/bash -c 'git clone -b 3.1m4 https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .'
 
 # create resources folder and copy all required resources
-RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ubuntu-agent_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
+RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/m4-RELEASE/cloudify-ubuntu-agent_3.1.0-m4-b81_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/ubuntu_agent.deb /opt/tmp/manager && \
     mkdir -p /opt/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-agent-disable-requiretty.sh /opt/manager/resources/packages/scripts && \
     mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.conf.template /opt/manager/resources/packages/templates && \
     mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.init.template /opt/manager/resources/packages/templates && \
     mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/Ubuntu*/Ubuntu-agent.tar.gz /opt/manager/resources/packages/agents && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-centos-agent_amd64.deb --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
+    rm -rf /opt/tmp/manager/ubuntu_agent.deb && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/m4-RELEASE/cloudify-centos-agent_3.1.0-m4-b81_amd64.deb --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/centos_agent.deb /opt/tmp/manager && \
     mkdir -p /opt/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/centos*/config/centos-agent-disable-requiretty.sh /opt/manager/resources/packages/scripts && \
     mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.conf.template /opt/manager/resources/packages/templates && \
     mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.init.template /opt/manager/resources/packages/templates && \
     mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/centos*/centos-agent.tar.gz /opt/manager/resources/packages/agents && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-windows-agent_amd64.deb --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
+    rm -rf /opt/tmp/manager/centos_agent.deb && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/m4-RELEASE/cloudify-windows-agent_3.1.0-m4-b81_amd64.deb --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/windows_agent.deb /opt/tmp/manager && \
     mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/windows*/Cloudify.exe /opt/manager/resources/packages/agents/CloudifyWindowsAgent.exe && \
-    cp -r /opt/manager/cloudify-manager/resources/rest-service/* /opt/manager/resources
+    cp -r /opt/manager/cloudify-manager/resources/rest-service/* /opt/manager/resources && \
+    rm -rf /opt/tmp/manager/windows_agent.deb
     
 # grant exec permissions for amqpflux and for rest-service
 RUN chmod 0755 $AMQPFLUX_RUN_FILE && \
@@ -366,7 +371,7 @@ ENV WEBUI_VIRTUAL_ENV_DIR $WEBUI_SERVICE_DIR/env
 ADD cloudify-webui/ $WEBUI_SERVICE_DIR/
 
 # install dependencies
-RUN apt-get install -y curl g++ python2.7 make
+RUN apt-get install -y  curl g++ python2.7 make
 
 # download cloudify-webui package and extract webui and grafana tar.gz
 RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ui_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
