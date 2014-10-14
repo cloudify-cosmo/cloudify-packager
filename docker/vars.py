@@ -97,7 +97,9 @@ VARS = {
             "curl",
             "python-dev",
             "git",
-            "g++"
+            "g++",
+            "wget",
+            "sudo"
         ],
         "python_install_requires": [
             "celery==3.0.24",
