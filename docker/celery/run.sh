@@ -4,17 +4,17 @@
 #   CELERY_HOME_DIR - virtualenv path
 #   CELERY_LOG_DIR - a predefined log dir
 #
-export BROKER_URL="amqp://guest:guest@localhost:5672//"
+MANAGEMENT_IP=${MANAGEMENT_IP=localhost}
+export BROKER_URL="amqp://guest:guest@$MANAGEMENT_IP:5672//"
 # todo(adaml): this var should be injected since it propogates to the agent nodes.
 export MANAGEMENT_USER="root"
 export MANAGER_REST_PORT="8100"
 # todo(adaml): this var should be injected since it propogates to the agent nodes.
-export MANAGEMENT_IP="localhost"
 export VIRTUALENV="$CELERY_HOME_DIR/env"
 export IS_MANAGEMENT_NODE="True"
 export AGENT_IP="cloudify.management"
-export MANAGER_FILE_SERVER_URL="http://localhost:53229"
-export MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL="http://localhost:53229/blueprints"
+export MANAGER_FILE_SERVER_URL="http://$MANAGEMENT_IP:53229"
+export MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL="http://$MANAGEMENT_IP:53229/blueprints"
 export CELERY_TASK_SERIALIZER="json"
 export CELERY_RESULT_SERIALIZER="json"
 export CELERY_RESULT_BACKEND="amqp://"
