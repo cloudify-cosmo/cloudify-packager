@@ -4,7 +4,11 @@
 #   CELERY_HOME_DIR - virtualenv path
 #   CELERY_LOG_DIR - a predefined log dir
 #
-MANAGEMENT_IP=${MANAGEMENT_IP=localhost}
+if [ -z "MANAGEMENT_IP" ]; then
+	echo 'MANAGEMENT_IP must be provided.'
+	exit 1
+fi
+export $MANAGEMENT_IP
 export BROKER_URL="amqp://guest:guest@$MANAGEMENT_IP:5672//"
 # todo(adaml): this var should be injected since it propogates to the agent nodes.
 export MANAGEMENT_USER="root"
