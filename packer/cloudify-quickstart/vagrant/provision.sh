@@ -103,9 +103,11 @@ git clone https://github.com/cloudify-cosmo/cloudify-manager-blueprints.git
 
 # copy the ssh key only when bootstrapping with vagrant. otherwise, implemented in packer
 # copy vagrant ssh key
-echo copying ssh key
-mkdir -p /home/${USERNAME}/.ssh/
-cp /vagrant/insecure_private_key /home/${USERNAME}/.ssh/cloudify_private_key
+# echo copying ssh key
+# mkdir -p /home/${USERNAME}/.ssh/
+# cp /vagrant/insecure_private_key /home/${USERNAME}/.ssh/cloudify_private_key
+ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -N ''
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 # sudo iptables -L
 # sudo iptables -A INPUT -p tcp --dport ssh -j ACCEPT
@@ -115,7 +117,7 @@ cp cloudify-manager-blueprints/simple/inputs.json.template inputs.json
 sed -i "s|\"public_ip\": \"\"|\"public_ip\": \"127.0.0.1\"|g" inputs.json
 sed -i "s|\"private_ip\": \"\"|\"private_ip\": \"127.0.0.1\"|g" inputs.json
 sed -i "s|\"ssh_user\": \"\"|\"ssh_user\": \"${USERNAME}\"|g" inputs.json
-sed -i "s|\"ssh_key_filename\": \"\"|\"ssh_key_filename\": \"/home/${USERNAME}/.ssh/cloudify_private_key\"|g" inputs.json
+sed -i "s|\"ssh_key_filename\": \"\"|\"ssh_key_filename\": \"~/.ssh/id_rsa\"|g" inputs.json
 
 # bootstrap the manager locally
 cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.json &&
