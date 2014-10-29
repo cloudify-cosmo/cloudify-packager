@@ -4,8 +4,8 @@ VARS = {
         "email": "adaml@gigaspaces.com"
     },
     "image": {
-        "repository": "ubuntu",
-        "tag": "12.04"
+        "repository": "phusion/baseimage",
+        "tag": "0.9.15"
     },
     "rabbitmq": {
         "service_name": "rabbitmq-server",
@@ -14,7 +14,6 @@ VARS = {
             "logrotate",
             "erlang-nox",
         ],
-        "package_url": "http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server_3.2.4-1_all.deb",
         "ports": [
             "8080",
         ],

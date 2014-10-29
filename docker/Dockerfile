@@ -1,10 +1,13 @@
-FROM ubuntu:12.04
+FROM phusion/baseimage:0.9.15
 MAINTAINER adaml, adaml@gigaspaces.com
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
 ADD utils/ /opt/tmp/utils/
+# add execution script
+#ADD /run_management_services.sh /opt/
+#RUN chmod +x /opt/run_management_services.sh
 
 RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -12,35 +15,30 @@ RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV RABBITMQ_SERVICE_NAME rabbitmq-server
-ENV RABBITMQ_SERVICE_DIR /opt/$RABBITMQ_SERVICE_NAME
-ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run.sh
+ENV RABBITMQ_SERVICE_DIR /etc/service/$RABBITMQ_SERVICE_NAME
+ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run
 ##### ENV #####
 # add run scripts and configuration
 ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
 
 # install dependencies.
 RUN apt-get install -y  curl logrotate erlang-nox
-# download rabbit package
-RUN curl http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server_3.2.4-1_all.deb --create-dirs -o /opt/tmp/rabbitmq/rabbitmq-server.deb
 
 # install and run rabbitmq-server
-RUN dpkg -i /opt/tmp/rabbitmq/rabbitmq-server.deb && \
+RUN apt-get -y install rabbitmq-server && \
     rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing
 
 # grant exec permissions
-RUN chmod 0755 $RABBITMQ_RUN_FILE
-
-# start rabbitmq
-CMD /opt/rabbitmq-server/run.sh
+RUN chmod +x $RABBITMQ_RUN_FILE
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - RIEMANN
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV RIEMANN_SERVICE_NAME riemann
-ENV RIEMANN_SERVICE_DIR /opt/$RIEMANN_SERVICE_NAME
-ENV RIEMANN_RUN_FILE $RIEMANN_SERVICE_DIR/run.sh
+ENV RIEMANN_SERVICE_DIR /etc/service/$RIEMANN_SERVICE_NAME
+ENV RIEMANN_RUN_FILE $RIEMANN_SERVICE_DIR/run
 ENV MANAGER_CONFIG_PATH $RIEMANN_SERVICE_DIR/manager.config
 ##### ENV #####
 # add run scripts and configuration
@@ -54,28 +52,27 @@ RUN curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.1
 # download riemann deb
 RUN curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb
 # download riemann config
-RUN curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/3.1m4/plugins/riemann-controller/riemann_controller/resources/manager.config
+RUN curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config
 
 # inject required env vars to run script
 RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_RUN_FILE && \
-    sed -i '1s|^|MANAGER_CONFIG_PATH='$MANAGER_CONFIG_PATH' \n|' $RIEMANN_RUN_FILE
+    sed -i '1s|^|MANAGER_CONFIG_PATH='$MANAGER_CONFIG_PATH' \n|' $RIEMANN_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $RIEMANN_RUN_FILE
 
 # install riemann
-RUN dpkg -i /opt/tmp/riemann/riemann.deb
+RUN dpkg -i /opt/tmp/riemann/riemann.deb && \
+    rm -rf /opt/tmp/riemann/riemann.deb
 
-# grant exec permissions
-RUN chmod 0755 /opt/$RIEMANN_SERVICE_NAME/run.sh
-
-CMD /opt/riemann/run.sh
+RUN chmod +x $RIEMANN_RUN_FILE
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - LOGSTASH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV LOGSTASH_SERVICE_NAME logstash
-ENV LOGSTASH_SERVICE_DIR /opt/$LOGSTASH_SERVICE_NAME
+ENV LOGSTASH_SERVICE_DIR /etc/service/$LOGSTASH_SERVICE_NAME
 # logstash exec file
-ENV LOGSTASH_RUN_FILE $LOGSTASH_SERVICE_DIR/run.sh
+ENV LOGSTASH_RUN_FILE $LOGSTASH_SERVICE_DIR/run
 # logstash conf file
 ENV LOGSTASH_CONF_FILE $LOGSTASH_SERVICE_DIR/config.conf
 ##### ENV #####
@@ -89,13 +86,10 @@ RUN curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-fla
 
 # inject required env vars to run script
 RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/logstash.jar' \n|' $LOGSTASH_RUN_FILE && \
-    sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_RUN_FILE
+    sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $LOGSTASH_RUN_FILE
 
-# grant exec permissions
-RUN chmod 0755 $LOGSTASH_RUN_FILE
-
-# start logstash
-CMD /opt/logstash/run.sh
+RUN chmod +x $LOGSTASH_RUN_FILE
 
 EXPOSE 9999
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -103,7 +97,7 @@ EXPOSE 9999
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV ELASTICSEARCH_SERVICE_NAME elasticsearch
-ENV ELASTICSEARCH_SERVICE_DIR /opt/$ELASTICSEARCH_SERVICE_NAME
+ENV ELASTICSEARCH_SERVICE_DIR /etc/service/$ELASTICSEARCH_SERVICE_NAME
 ##### ENV #####
 # add run scripts and configuration
 ADD elasticsearch/ $ELASTICSEARCH_SERVICE_DIR/
@@ -112,11 +106,6 @@ ADD elasticsearch/ $ELASTICSEARCH_SERVICE_DIR/
 RUN apt-get install -y  curl openjdk-7-jdk
 # download binaries
 RUN curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz
-
-# create service dir todo(adaml): this command is not necessary
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
-    mkdir -p $ELASTICSEARCH_SERVICE_DIR/ && \
-    check_dir "$ELASTICSEARCH_SERVICE_DIR/"'
 
 # extract binaries to service dir
 RUN tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1 && \
@@ -137,10 +126,7 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1
 
 # grant exec permissions
-RUN chmod 0755 $ELASTICSEARCH_SERVICE_DIR/run.sh
-
-# start elasticsearch as non-daemon
-CMD ["ES_JAVA_OPTS=-Xmx1024m -Xms1024m; /opt/elasticsearch/run.sh"]
+RUN chmod +x $ELASTICSEARCH_SERVICE_DIR/run
 
 # expose elasticsearch port
 EXPOSE 9200
@@ -152,10 +138,10 @@ EXPOSE 9200
 ENV INFLUXDB_SERVICE_NAME influxdb
 # default influxdb config path
 ENV INFLUXDB_CONFIG_FILE /opt/influxdb/shared/config.toml
-ENV INFLUXDB_RUN_FILE /opt/$INFLUXDB_SERVICE_NAME/run.sh
+ENV INFLUXDB_RUN_FILE /etc/service/$INFLUXDB_SERVICE_NAME/run
 ##### ENV #####
 # add run scripts and configuration
-ADD influxdb/ /opt/$INFLUXDB_SERVICE_NAME/
+ADD influxdb/ /etc/service/$INFLUXDB_SERVICE_NAME/
 
 # install dependencies
 RUN apt-get install -y  curl
@@ -173,14 +159,10 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"
 
 # set config path in run file
-RUN sed -i '1s|^|INFLUXDB_CONFIG_FILE='$INFLUXDB_CONFIG_FILE' \n|' $INFLUXDB_RUN_FILE
+RUN sed -i '1s|^|INFLUXDB_CONFIG_FILE='$INFLUXDB_CONFIG_FILE' \n|' $INFLUXDB_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $INFLUXDB_RUN_FILE
 
-# grant exec permissions
-RUN chmod 0755 /opt/influxdb/run.sh
-
-# run the service as non-daemon
-CMD /opt/influxdb/run.sh
-
+RUN chmod +x $INFLUXDB_RUN_FILE
 # expose api port
 EXPOSE 8086
 # expose admin port
@@ -191,10 +173,10 @@ EXPOSE 8083
 ##### ENV #####
 # set nginx service name
 ENV NGINX_SERVICE_NAME nginx
-ENV NGINX_SERVICE_DIR /opt/$NGINX_SERVICE_NAME
+ENV NGINX_SERVICE_DIR /etc/service/$NGINX_SERVICE_NAME
 # nginx default conf file path
 ENV NGINX_CONF_FILE /etc/nginx/nginx.conf
-ENV NGINX_RUN_FILE $NGINX_SERVICE_DIR/run.sh
+ENV NGINX_RUN_FILE $NGINX_SERVICE_DIR/run
 ENV NGINX_LOGS_DIR $NGINX_SERVICE_DIR/logs
 ##### ENV #####
 # add run scripts and configuration
@@ -221,13 +203,10 @@ RUN echo "daemon off;" >> $NGINX_CONF_FILE && \
     mkdir $NGINX_LOGS_DIR
 
 # set config path in run file
-RUN sed -i '1s|^|NGINX_CONF_FILE='$NGINX_CONF_FILE' \n|' $NGINX_RUN_FILE
+RUN sed -i '1s|^|NGINX_CONF_FILE='$NGINX_CONF_FILE' \n|' $NGINX_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $NGINX_RUN_FILE
 
-# grant exec permissions
-RUN chmod 0755 $NGINX_RUN_FILE
-
-# run the service as non-daemon
-CMD /opt/nginx/run.sh
+RUN chmod +x $NGINX_RUN_FILE
 
 # Expose ports.
 EXPOSE 80
@@ -237,8 +216,8 @@ EXPOSE 80
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV CELERY_SERVICE_NAME celery
-ENV CELERY_SERVICE_DIR /opt/$CELERY_SERVICE_NAME
-ENV CELERY_RUN_FILE $CELERY_SERVICE_DIR/run.sh
+ENV CELERY_SERVICE_DIR /etc/service/$CELERY_SERVICE_NAME
+ENV CELERY_RUN_FILE $CELERY_SERVICE_DIR/run
 ENV CELERY_VIRTUAL_ENV_DIR $CELERY_SERVICE_DIR/env
 ENV CELERY_LOG_DIR $CELERY_SERVICE_DIR/logs
 ##### ENV #####
@@ -258,13 +237,13 @@ RUN pip install virtualenv==1.11.4 && \
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo ['celery==3.0.24', 'pyzmq==14.3.1'] | tr -d "',[]")
 
 ############################## install cloudify core components ##############################
-WORKDIR /opt/celery/
+WORKDIR /etc/service/celery/
 
-RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@3.1m4 && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@3.1m4 && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@3.1m4
+RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master
 
-RUN /bin/bash -c 'git clone -b 3.1m4 https://github.com/cloudify-cosmo/cloudify-manager.git && \
+RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/plugins/plugin-installer && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
     popd && \
@@ -283,32 +262,29 @@ RUN /bin/bash -c 'git clone -b 3.1m4 https://github.com/cloudify-cosmo/cloudify-
 # inject required params to run script and create logs dir
 RUN sed -i '1s|^|CELERY_HOME_DIR='$CELERY_SERVICE_DIR' \n|' $CELERY_RUN_FILE && \
     sed -i '1s|^|CELERY_LOG_DIR='$CELERY_LOG_DIR' \n|' $CELERY_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $CELERY_RUN_FILE && \
     mkdir $CELERY_LOG_DIR
 
-# grant exec permissions
-RUN chmod 0755 $CELERY_SERVICE_DIR/run.sh
-
-# run the service as non-daemon
-CMD /opt/celery/run.sh
+RUN chmod +x $CELERY_RUN_FILE
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - MANAGER
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV MANAGER_SERVICE_NAME manager
-ENV MANAGER_SERVICES_DIR /opt/$MANAGER_SERVICE_NAME
+ENV MANAGER_SERVICES_DIR /etc/service/$MANAGER_SERVICE_NAME
 ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR/env
 ENV SERVER_FILES_DIR $MANAGER_SERVICES_DIR/cloudify-manager*/rest-service/manager_rest
 
 ENV AMQPFLUX_RUN_FILE $MANAGER_SERVICES_DIR/run_amqpflux.sh
-ENV MANAGER_RUN_FILE $MANAGER_SERVICES_DIR/run_manager.sh
+ENV MANAGER_RUN_FILE $MANAGER_SERVICES_DIR/run
 
 ENV MANAGER_REST_CONFIG_PATH $MANAGER_SERVICES_DIR/guni.conf
 ##### ENV #####
 # add run scripts and configuration
 ADD manager/ $MANAGER_SERVICES_DIR/
 
-WORKDIR /opt/manager/
+WORKDIR /etc/service/manager/
 
 #install dependencies
 RUN apt-get install -y  git python2.7
@@ -317,7 +293,8 @@ RUN apt-get install -y  git python2.7
 RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE && \
     sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $MANAGER_RUN_FILE && \
     sed -i '1s|^|MANAGER_REST_CONFIG_PATH='$MANAGER_REST_CONFIG_PATH' \n|' $MANAGER_RUN_FILE && \
-    sed -i '1s|^|SERVER_FILES_DIR='$SERVER_FILES_DIR' \n|' $MANAGER_RUN_FILE
+    sed -i '1s|^|SERVER_FILES_DIR='$SERVER_FILES_DIR' \n|' $MANAGER_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $MANAGER_RUN_FILE
 
 # install pip
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
@@ -327,45 +304,42 @@ RUN pip install virtualenv==1.11.4 && \
 
 
 # install amqpinflux
-RUN $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@3.1m4 && \
-    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@3.1m4
+RUN $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master
 # install rest-service
-RUN /bin/bash -c 'git clone -b 3.1m4 https://github.com/cloudify-cosmo/cloudify-manager.git && \
+RUN /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .'
 
 # create resources folder and copy all required resources
-RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/m4-RELEASE/cloudify-ubuntu-agent_3.1.0-m4-b81_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
+RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ubuntu-agent_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/ubuntu_agent.deb /opt/tmp/manager && \
-    mkdir -p /opt/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-agent-disable-requiretty.sh /opt/manager/resources/packages/scripts && \
-    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.conf.template /opt/manager/resources/packages/templates && \
-    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.init.template /opt/manager/resources/packages/templates && \
-    mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/Ubuntu*/Ubuntu-agent.tar.gz /opt/manager/resources/packages/agents && \
+    mkdir -p /etc/service/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-agent-disable-requiretty.sh /etc/service/manager/resources/packages/scripts && \
+    mkdir -p /etc/service/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.conf.template /etc/service/manager/resources/packages/templates && \
+    mkdir -p /etc/service/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.init.template /etc/service/manager/resources/packages/templates && \
+    mkdir -p /etc/service/manager/resources/packages/agents && mv /opt/tmp/manager/agents/Ubuntu*/Ubuntu-agent.tar.gz /etc/service/manager/resources/packages/agents && \
     rm -rf /opt/tmp/manager/ubuntu_agent.deb && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/m4-RELEASE/cloudify-centos-agent_3.1.0-m4-b81_amd64.deb --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-centos-agent_amd64.deb --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/centos_agent.deb /opt/tmp/manager && \
-    mkdir -p /opt/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/centos*/config/centos-agent-disable-requiretty.sh /opt/manager/resources/packages/scripts && \
-    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.conf.template /opt/manager/resources/packages/templates && \
-    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.init.template /opt/manager/resources/packages/templates && \
-    mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/centos*/centos-agent.tar.gz /opt/manager/resources/packages/agents && \
+    mkdir -p /etc/service/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/centos*/config/centos-agent-disable-requiretty.sh /etc/service/manager/resources/packages/scripts && \
+    mkdir -p /etc/service/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.conf.template /etc/service/manager/resources/packages/templates && \
+    mkdir -p /etc/service/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.init.template /etc/service/manager/resources/packages/templates && \
+    mkdir -p /etc/service/manager/resources/packages/agents && mv /opt/tmp/manager/agents/centos*/centos-agent.tar.gz /etc/service/manager/resources/packages/agents && \
     rm -rf /opt/tmp/manager/centos_agent.deb && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/m4-RELEASE/cloudify-windows-agent_3.1.0-m4-b81_amd64.deb --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-windows-agent_amd64.deb --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/windows_agent.deb /opt/tmp/manager && \
-    mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/windows*/Cloudify.exe /opt/manager/resources/packages/agents/CloudifyWindowsAgent.exe && \
-    cp -r /opt/manager/cloudify-manager/resources/rest-service/* /opt/manager/resources && \
+    mkdir -p /etc/service/manager/resources/packages/agents && mv /opt/tmp/manager/agents/windows*/Cloudify.exe /etc/service/manager/resources/packages/agents/CloudifyWindowsAgent.exe && \
+    cp -r /etc/service/manager/cloudify-manager/resources/rest-service/* /etc/service/manager/resources && \
     rm -rf /opt/tmp/manager/windows_agent.deb
-    
-# grant exec permissions for amqpflux and for rest-service
-RUN chmod 0755 $AMQPFLUX_RUN_FILE && \
-    chmod 0755 $MANAGER_RUN_FILE
 
+RUN chmod +x $MANAGER_RUN_FILE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - WEB-UI
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV WEBUI_SERVICE_NAME cloudify-webui
-ENV WEBUI_SERVICE_DIR /opt/$WEBUI_SERVICE_NAME
-ENV WEBUI_RUN_FILE $WEBUI_SERVICE_DIR/run.sh
+ENV WEBUI_SERVICE_DIR /etc/service/$WEBUI_SERVICE_NAME
+ENV WEBUI_RUN_FILE $WEBUI_SERVICE_DIR/run
 ENV WEBUI_VIRTUAL_ENV_DIR $WEBUI_SERVICE_DIR/env
 ##### ENV #####
 ADD cloudify-webui/ $WEBUI_SERVICE_DIR/
@@ -382,6 +356,7 @@ RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/
     tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/grafana* -C $WEBUI_SERVICE_DIR/grafana --strip-components=1 && \
     cp /opt/tmp/cloudify-webui/packages/cloudify-ui/config/grafana/config.js $WEBUI_SERVICE_DIR/grafana/
 
+#RUN apt-get -y install nodejs npm
 # install nodejs from source files
 RUN cd /tmp && \
   curl http://nodejs.org/dist/node-latest.tar.gz -o /tmp/node-latest.tar.gz && \
@@ -395,4 +370,4 @@ RUN cd /tmp && \
   rm -rf /tmp/node-v* && \
   echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc
 
-RUN chmod 0755 $WEBUI_SERVICE_DIR/run.sh
+RUN chmod +x $WEBUI_RUN_FILE
