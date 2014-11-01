@@ -35,4 +35,5 @@ exec {{ config_templates.__params_init.work_dir }}/env/bin/python -m celery.bin.
 -Q cloudify.management \
 --logfile={{ config_templates.__params_init.work_dir }}/work/cloudify.management_worker.log \
 --pidfile={{ config_templates.__params_init.work_dir }}/work/cloudify.management_worker.pid \
---autoscale={{ config_templates.__params_init.workers_autoscale }}
+--autoscale={{ config_templates.__params_init.workers_autoscale }} \
+--maxtasksperchild=3
