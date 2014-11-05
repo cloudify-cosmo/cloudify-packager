@@ -16,6 +16,7 @@ export MANAGER_REST_PORT="8100"
 # todo(adaml): this var should be injected since it propogates to the agent nodes.
 export VIRTUALENV="$CELERY_HOME_DIR/env"
 export IS_MANAGEMENT_NODE="True"
+export CELERY_WORK_DIR=$CELERY_HOME_DIR/work
 export AGENT_IP="cloudify.management"
 export MANAGER_FILE_SERVER_URL="http://$MANAGEMENT_IP:53229"
 export MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL="http://$MANAGEMENT_IP:53229/blueprints"

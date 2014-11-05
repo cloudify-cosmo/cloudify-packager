@@ -230,7 +230,7 @@ RUN apt-get install -y {% for dep in celery.reqs %} {{ dep }}{% endfor %}
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
 
 # install virtualenv and create one
-RUN pip install virtualenv==1.11.4 && \
+RUN pip install virtualenv && \
     virtualenv $CELERY_VIRTUAL_ENV_DIR
 
 # install requirements
@@ -299,7 +299,7 @@ RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLU
 # install pip
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
 # install virtualenv and create one
-RUN pip install virtualenv==1.11.4 && \
+RUN pip install virtualenv && \
     virtualenv $MANAGER_VIRTUAL_ENV_DIR
 
 

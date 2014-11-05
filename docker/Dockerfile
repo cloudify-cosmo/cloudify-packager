@@ -225,12 +225,12 @@ ENV CELERY_LOG_DIR $CELERY_SERVICE_DIR/logs
 ADD celery/ $CELERY_SERVICE_DIR/
 
 # install dependencies.
-RUN apt-get install -y  curl python-dev git g++ wget sudo
+RUN apt-get install -y  curl python-dev libpython2.7-dev git g++ wget sudo
 # install pip
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
 
 # install virtualenv and create one
-RUN pip install virtualenv==1.11.4 && \
+RUN pip install virtualenv && \
     virtualenv $CELERY_VIRTUAL_ENV_DIR
 
 # install requirements
@@ -299,7 +299,7 @@ RUN sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLU
 # install pip
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
 # install virtualenv and create one
-RUN pip install virtualenv==1.11.4 && \
+RUN pip install virtualenv && \
     virtualenv $MANAGER_VIRTUAL_ENV_DIR
 
 
