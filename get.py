@@ -31,7 +31,7 @@ def _prepare(package):
 
     common = CommonHandler()
     common.rmdir(package['sources_path'])
-    common.mkdir('{}/archives'.format(package['sources_path']))
+    common.mkdir('{0}/archives'.format(package['sources_path']))
     common.mkdir(package['package_path'])
 
 
@@ -71,8 +71,8 @@ def get_centos_agent(download=False):
         for module in package['modules']:
             py_handler.pip(module, package['sources_path'])
     # TODO: remove redundant data after module installation
-    
-    
+
+
 def get_celery(download=False):
     package = get_conf('celery')
 
