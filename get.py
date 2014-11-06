@@ -31,7 +31,7 @@ def _prepare(package):
 
     common = CommonHandler()
     common.rmdir(package['sources_path'])
-    common.mkdir('{}/archives'.format(package['sources_path']))
+    common.mkdir('{0}/archives'.format(package['sources_path']))
     common.mkdir(package['package_path'])
 
 
