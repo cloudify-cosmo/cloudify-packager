@@ -33,7 +33,7 @@ RUN echo installing rabbitmq dependencies && \
 # INSTALL - RIEMANN
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
-ENV $RIEMANN_SERVICE_NAME {{ riemann.service_name }}
+ENV RIEMANN_SERVICE_NAME {{ riemann.service_name }}
 ENV RIEMANN_SERVICE_DIR /etc/service/$RIEMANN_SERVICE_NAME
 ENV RIEMANN_RUN_FILE $RIEMANN_SERVICE_DIR/run
 ENV MANAGER_CONFIG_PATH $RIEMANN_SERVICE_DIR/manager.config
@@ -227,7 +227,7 @@ RUN echo installing celery dependencies && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo {{ celery.python_install_requires }} | tr -d "',[]")
 
 ############################## install cloudify core components ##############################
-WORKDIR /etc/service/celery/
+WORKDIR /etc/service/celeryd-cloudify-management/
 
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_rest_client }} && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_plugins_common }} && \
@@ -311,10 +311,10 @@ RUN curl {{ manager.agents.ubuntu_agent_deb }} --create-dirs -o /opt/tmp/manager
     mkdir -p /etc/service/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.init.template /etc/service/manager/resources/packages/templates && \
     mkdir -p /etc/service/manager/resources/packages/agents && mv /opt/tmp/manager/agents/Ubuntu*/Ubuntu-agent.tar.gz /etc/service/manager/resources/packages/agents/Ubuntu-precise-agent.tar.gz && \
     rm -rf /opt/tmp/manager/ubuntu_agent.deb && \
-    echo compiling ubuntu 14.04 trusty agent
-    source env/bin/activate && \
+    echo compiling ubuntu 14.04 trusty agent && \
+    /bin/bash -c 'source env/bin/activate && \
     pip install https://github.com/cloudify-cosmo/cloudify-agent-packager/archive/master.tar.gz && \
-    cfy-ap -f -c my_config.yaml -v && \
+    cfy-ap -f -c my_config.yaml -v' && \
     curl {{ manager.agents.centos_agent_deb }} --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/centos_agent.deb /opt/tmp/manager && \
     mkdir -p /etc/service/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/centos*/config/centos-agent-disable-requiretty.sh /etc/service/manager/resources/packages/scripts && \

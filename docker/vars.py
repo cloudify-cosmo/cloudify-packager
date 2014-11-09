@@ -91,7 +91,7 @@ VARS = {
         "ports": ["9200"],
     },
     "celery": {
-        "service_name": "celery",
+        "service_name": "celeryd-cloudify-management",
         "reqs": [
             "curl",
             "python-dev",
@@ -108,7 +108,7 @@ VARS = {
                 "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",
                 "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",
                 "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
-                "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
+                "cloudify_manager": "-b CFY-1308-run-cloudify-on-one-docker-container https://github.com/cloudify-cosmo/cloudify-manager.git",
             },
         "workers_autoscale": "5,2",
         "ports": [],
@@ -122,7 +122,7 @@ VARS = {
         "modules": {
             "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",
             "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",
-            "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
+            "cloudify_manager": "-b CFY-1308-run-cloudify-on-one-docker-container https://github.com/cloudify-cosmo/cloudify-manager.git",
         },
         "agents": {
           "ubuntu_agent_deb": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ubuntu-agent_amd64.deb",

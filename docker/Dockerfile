@@ -33,7 +33,7 @@ RUN echo installing rabbitmq dependencies && \
 # INSTALL - RIEMANN
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
-ENV $RIEMANN_SERVICE_NAME riemann
+ENV RIEMANN_SERVICE_NAME riemann
 ENV RIEMANN_SERVICE_DIR /etc/service/$RIEMANN_SERVICE_NAME
 ENV RIEMANN_RUN_FILE $RIEMANN_SERVICE_DIR/run
 ENV MANAGER_CONFIG_PATH $RIEMANN_SERVICE_DIR/manager.config
@@ -204,7 +204,7 @@ RUN echo "daemon off;" >> $NGINX_CONF_FILE && \
 # INSTALL - CELERY
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
-ENV CELERY_SERVICE_NAME celery
+ENV CELERY_SERVICE_NAME celeryd-cloudify-management
 ENV CELERY_SERVICE_DIR /etc/service/$CELERY_SERVICE_NAME
 ENV CELERY_RUN_FILE $CELERY_SERVICE_DIR/run
 ENV CELERY_VIRTUAL_ENV_DIR $CELERY_SERVICE_DIR/env
@@ -227,12 +227,12 @@ RUN echo installing celery dependencies && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo ['celery==3.0.24', 'pyzmq==14.3.1'] | tr -d "',[]")
 
 ############################## install cloudify core components ##############################
-WORKDIR /etc/service/celery/
+WORKDIR /etc/service/celeryd-cloudify-management/
 
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master && \
-    /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    /bin/bash -c 'git clone -b CFY-1308-run-cloudify-on-one-docker-container https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/plugins/plugin-installer && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
     popd && \
@@ -289,7 +289,7 @@ RUN echo install dependencies && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master && \
     \
     echo installing rest-service && \
-    /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    /bin/bash -c 'git clone -b CFY-1308-run-cloudify-on-one-docker-container https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .' && \
     \
@@ -311,10 +311,10 @@ RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/
     mkdir -p /etc/service/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.init.template /etc/service/manager/resources/packages/templates && \
     mkdir -p /etc/service/manager/resources/packages/agents && mv /opt/tmp/manager/agents/Ubuntu*/Ubuntu-agent.tar.gz /etc/service/manager/resources/packages/agents/Ubuntu-precise-agent.tar.gz && \
     rm -rf /opt/tmp/manager/ubuntu_agent.deb && \
-    echo compiling ubuntu 14.04 trusty agent
-    source env/bin/activate && \
+    echo compiling ubuntu 14.04 trusty agent && \
+    /bin/bash -c 'source env/bin/activate && \
     pip install https://github.com/cloudify-cosmo/cloudify-agent-packager/archive/master.tar.gz && \
-    cfy-ap -f -c my_config.yaml -v && \
+    cfy-ap -f -c my_config.yaml -v' && \
     curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-centos-agent_amd64.deb --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/centos_agent.deb /opt/tmp/manager && \
     mkdir -p /etc/service/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/centos*/config/centos-agent-disable-requiretty.sh /etc/service/manager/resources/packages/scripts && \
