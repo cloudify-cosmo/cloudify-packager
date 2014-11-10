@@ -132,7 +132,7 @@ VARS = {
         "manager_rest_port": "8100",
         },
     "webui": {
-        "service_name": "cloudify-webui",
+        "service_name": "cloudify-ui",
         "reqs": [
             "curl",
             "g++",

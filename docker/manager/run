@@ -1,4 +1,4 @@
-# description "manager gunicorn"
+# description "manager gunicorn rest-service"
 #
 # The following are to be injected by docker installation process:
 #   MANAGER_REST_CONFIG_PATH - path to the manager virtualenv

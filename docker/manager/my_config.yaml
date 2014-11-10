@@ -1,12 +1,13 @@
 distribution: Ubuntu
 version: 3.0
 python_path: /usr/bin/python
-venv: /Ubuntu-agent/env
+venv: /cloudify/env/env
 base_modules:
     plugins_common: https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz
     rest_client: https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz
     script_plugin: https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/master.tar.gz
     diamond_plugin: https://github.com/cloudify-cosmo/cloudify-diamond-plugin/archive/master.tar.gz
+management_modules_version: CFY-1308-run-cloudify-on-one-docker-container
 additional_modules:
     - pyzmq==14.3.1
     - https://github.com/cloudify-cosmo/cloudify-fabric-plugin/archive/master.tar.gz

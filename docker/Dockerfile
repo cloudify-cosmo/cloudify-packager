@@ -332,12 +332,12 @@ RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/
 # INSTALL - WEB-UI
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
-ENV WEBUI_SERVICE_NAME cloudify-webui
+ENV WEBUI_SERVICE_NAME cloudify-ui
 ENV WEBUI_SERVICE_DIR /etc/service/$WEBUI_SERVICE_NAME
 ENV WEBUI_RUN_FILE $WEBUI_SERVICE_DIR/run
 ENV WEBUI_VIRTUAL_ENV_DIR $WEBUI_SERVICE_DIR/env
 ##### ENV #####
-ADD cloudify-webui/ $WEBUI_SERVICE_DIR/
+ADD cloudify-ui/ $WEBUI_SERVICE_DIR/
 
 RUN echo installing web-ui dependencies && \
     apt-get install -y  curl g++ python2.7 make && \
@@ -363,5 +363,6 @@ RUN echo installing web-ui dependencies && \
     mkdir -p $WEBUI_SERVICE_DIR/grafana && \
     tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/grafana* -C $WEBUI_SERVICE_DIR/grafana --strip-components=1 && \
     cp /opt/tmp/cloudify-webui/packages/cloudify-ui/config/grafana/config.js $WEBUI_SERVICE_DIR/grafana/ && \
+    rm -rf /opt/tmp/cloudify-webui/cloudify-webui.deb && \
     chmod +x $WEBUI_RUN_FILE
 #RUN apt-get -y install nodejs npm
