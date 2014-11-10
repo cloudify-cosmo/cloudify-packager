@@ -17,12 +17,10 @@ sudo yum install yum-downloadonly wget mlocate yum-utils python-devel libyaml-de
 sudo gem install fpm --no-rdoc --no-ri
 
 # install pip
-cd /py26
 sudo wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py &&
 sudo /usr/bin/python get-pip.py &&
 
 # install packman
-#sudo /usr/bin/pip2.7 install https://github.com/cloudify-cosmo/packman/archive/develop.tar.gz
 git clone https://github.com/cloudify-cosmo/packman.git
 pushd packman
 	if [ -n "$PACKMAN_SHA" ]; then
@@ -41,37 +39,37 @@ echo '# create package resources'
 sudo pkm get -c centos-agent
 
 echo '# GET PROCESS'
-/centos-agent/env/bin/pip install celery==3.0.24
-/centos-agent/env/bin/pip install pyzmq==14.3.1
-git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
+sudo /centos-agent/env/bin/pip install celery==3.0.24
+sudo /centos-agent/env/bin/pip install pyzmq==14.3.1
+sudo git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 pushd cloudify-rest-client
 	if [ -n "$REST_CLIENT_SHA" ]; then
 		git reset --hard $REST_CLIENT_SHA
 	fi
 	sudo /centos-agent/env/bin/pip install .
 popd
-git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
+sudo git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 pushd cloudify-plugins-common
 	if [ -n "$COMMON_PLUGIN_SHA" ]; then
 		git reset --hard $COMMON_PLUGIN_SHA
 	fi
 	sudo /centos-agent/env/bin/pip install .
 popd
-git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
+sudo git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 pushd cloudify-script-plugin
 	if [ -n "$SCRIPTS_PLUGIN_SHA" ]; then
 		git reset --hard $SCRIPTS_PLUGIN_SHA
 	fi
 	sudo /centos-agent/env/bin/pip install .
 popd
-git clone https://github.com/cloudify-cosmo/cloudify-diamond-plugin.git
+sudo git clone https://github.com/cloudify-cosmo/cloudify-diamond-plugin.git
 pushd cloudify-diamond-plugin
 	if [ -n "$DIAMOND_PLUGIN_SHA" ]; then
 		git reset --hard $DIAMOND_PLUGIN_SHA
 	fi
 	sudo /centos-agent/env/bin/pip install .
 popd
-git clone https://github.com/cloudify-cosmo/cloudify-manager.git
+sudo git clone https://github.com/cloudify-cosmo/cloudify-manager.git
 pushd cloudify-manager
 	if [ -n "$MANAGER_SHA" ]; then
 		git reset --hard $MANAGER_SHA
