@@ -440,7 +440,6 @@ PACKAGES = {
             "deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx",
         ],
         "source_keys": ["http://nginx.org/keys/nginx_signing.key"],
-        # "key_files": ["{0}/nginx/nginx_signing.key".format(PACKAGES_PATH)],
         "package_path": "{0}/nginx/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/nginx".format(PACKAGES_PATH),
         "dst_package_type": ["deb"],

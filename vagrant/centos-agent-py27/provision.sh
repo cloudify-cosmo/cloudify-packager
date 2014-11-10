@@ -13,13 +13,27 @@ echo bootstrapping...
 sudo yum -y update &&
 sudo yum install yum-downloadonly wget mlocate yum-utils python-devel libyaml-devel ruby rubygems ruby-devel -y
 
+# install python and additions
+# http://bicofino.io/blog/2014/01/16/installing-python-2-dot-7-6-on-centos-6-dot-5/
+sudo yum groupinstall -y 'development tools'
+sudo yum install -y zlib-devel bzip2-devel openssl-devel xz-libs
+sudo mkdir /py27
+cd /py27
+sudo wget http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tar.xz
+sudo xz -d Python-2.7.6.tar.xz
+sudo tar -xvf Python-2.7.6.tar
+cd Python-2.7.6
+sudo ./configure --prefix=/usr
+sudo make
+sudo make altinstall
+
 # install fpm
 sudo gem install fpm --no-rdoc --no-ri
 
 # install pip
-cd /py26
+cd /py27
 sudo wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py &&
-sudo /usr/bin/python get-pip.py &&
+sudo /usr/bin/python2.7 get-pip.py &&
 
 # install packman
 #sudo /usr/bin/pip2.7 install https://github.com/cloudify-cosmo/packman/archive/develop.tar.gz
@@ -28,7 +42,7 @@ pushd packman
 	if [ -n "$PACKMAN_SHA" ]; then
 		git reset --hard $PACKMAN_SHA
 	fi
-	sudo pip install .
+	pip install .
 popd
 
 
@@ -48,28 +62,28 @@ pushd cloudify-rest-client
 	if [ -n "$REST_CLIENT_SHA" ]; then
 		git reset --hard $REST_CLIENT_SHA
 	fi
-	sudo /centos-agent/env/bin/pip install .
+	/centos-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 pushd cloudify-plugins-common
 	if [ -n "$COMMON_PLUGIN_SHA" ]; then
 		git reset --hard $COMMON_PLUGIN_SHA
 	fi
-	sudo /centos-agent/env/bin/pip install .
+	/centos-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 pushd cloudify-script-plugin
 	if [ -n "$SCRIPTS_PLUGIN_SHA" ]; then
 		git reset --hard $SCRIPTS_PLUGIN_SHA
 	fi
-	sudo /centos-agent/env/bin/pip install .
+	/centos-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-diamond-plugin.git
 pushd cloudify-diamond-plugin
 	if [ -n "$DIAMOND_PLUGIN_SHA" ]; then
 		git reset --hard $DIAMOND_PLUGIN_SHA
 	fi
-	sudo /centos-agent/env/bin/pip install .
+	/centos-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
 pushd cloudify-manager
@@ -77,16 +91,16 @@ pushd cloudify-manager
 		git reset --hard $MANAGER_SHA
 	fi
 	pushd plugins/plugin-installer
-	  sudo /centos-agent/env/bin/pip install .
+	  /centos-agent/env/bin/pip install .
 	popd
 	pushd plugins/agent-installer
-	  sudo /centos-agent/env/bin/pip install .
+	  /centos-agent/env/bin/pip install .
 	popd
 	pushd plugins/windows-agent-installer
-	  sudo /centos-agent/env/bin/pip install .
+	  /centos-agent/env/bin/pip install .
 	popd
 	pushd plugins/windows-plugin-installer
-	  sudo /centos-agent/env/bin/pip install .
+	  /centos-agent/env/bin/pip install .
 	popd
 popd
 

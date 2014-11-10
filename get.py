@@ -71,8 +71,8 @@ def get_centos_agent(download=False):
         for module in package['modules']:
             py_handler.pip(module, package['sources_path'])
     # TODO: remove redundant data after module installation
-    
-    
+
+
 def get_celery(download=False):
     package = get_conf('celery')
 
