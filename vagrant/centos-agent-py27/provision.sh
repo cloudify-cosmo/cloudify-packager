@@ -11,7 +11,7 @@ echo bootstrapping...
 
 # update and install prereqs
 sudo yum -y update &&
-sudo yum install yum-downloadonly wget mlocate yum-utils python-devel libyaml-devel ruby rubygems ruby-devel -y
+sudo yum install yum-downloadonly wget mlocate yum-utils python-devel libyaml-devel ruby rubygems ruby-devel make gcc git -y
 
 # install python and additions
 # http://bicofino.io/blog/2014/01/16/installing-python-2-dot-7-6-on-centos-6-dot-5/

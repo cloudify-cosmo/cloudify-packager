@@ -148,7 +148,7 @@ PACKAGES = {
         "package_path": "/cloudify",
         "sources_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
-        "dst_package_types": ["deb", "rpm"],
+        "dst_package_types": ["deb"],
         "bootstrap_script": "{0}/agent-ubuntu-bootstrap.sh".format(SCRIPTS_PATH),
         "bootstrap_template": "agent-ubuntu-bootstrap.template",
         "bootstrap_params": {
@@ -206,7 +206,7 @@ PACKAGES = {
         "package_path": "/cloudify",
         "sources_path": "{0}/centos-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
-        "dst_package_types": ["rpm", "deb"],
+        "dst_package_types": ["deb"],
         "bootstrap_script": "{0}/agent-centos-bootstrap.sh".format(SCRIPTS_PATH),
         "bootstrap_template": "agent-centos-bootstrap.template",
         "bootstrap_params": {
