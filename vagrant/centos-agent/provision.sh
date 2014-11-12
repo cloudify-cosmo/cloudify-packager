@@ -36,7 +36,7 @@ sudo pip install virtualenv==1.11.4 &&
 cd /cloudify-packager/ &&
 
 echo '# create package resources'
-sudo pkm get -c centos-agent
+sudo pkm get -c centos-Final-agent
 
 echo '# GET PROCESS'
 sudo /centos-agent/env/bin/pip install celery==3.0.24
@@ -90,8 +90,8 @@ popd
 
 
 # create package
-sudo pkm pack -c centos-agent
-sudo pkm pack -c cloudify-centos-agent
+sudo pkm pack -c centos-Final-agent
+sudo pkm pack -c cloudify-centos-final-agent
 
 echo bootstrap done
 echo NOTE: currently, using some of the packman's features requires that it's run as sudo.
