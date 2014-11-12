@@ -1,0 +1,62 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_ACCESS_KEY`}}",
+    "components_package_url": "{{env `COMPONENTS_PACKAGE_URL`}}",
+    "core_package_url": "{{env `CORE_PACKAGE_URL`}}",
+    "ui_package_url": "{{env `UI_PACKAGE_URL`}}",
+    "ubuntu_agent_url": "{{env `UBUNTU_AGENT_URL`}}",
+    "centos_agent_url": "{{env `CENTOS_AGENT_URL`}}",
+    "windows_agent_url": "{{env `WINDOWS_AGENT_URL`}}",
+    "cloudify_release": "{{env `CLOUDIFY_RELEASE`}}"
+    },
+  "builders": [
+    {
+      "type": "virtualbox-ovf",
+      "source_path": "/Users/michael/.vagrant.d/boxes/hashicorp-VAGRANTSLASH-precise64/1.1.0/virtualbox/box.ovf",
+      "vm_name": "cloudify",
+      "ssh_username": "vagrant",
+      "ssh_key_path": "/Users/michael/.vagrant.d/insecure_private_key",
+      "ssh_wait_timeout": "3m",
+      "shutdown_command": "echo 'packer' | sudo -S shutdown -P now",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "2048"],
+        ["modifyvm", "{{.Name}}", "--cpus", "2"],
+        ["modifyvm", "{{.Name}}", "--natdnshostresolver1", "on"]
+      ],
+      "headless": true
+    },
+    {
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "eu-west-1",
+      "ssh_private_key_file": "/home/nir0s/.ssh/aws/vagrant_build.pem",
+      "source_ami": "ami-07ed3a70",
+      "instance_type": "m3.medium",
+      "ssh_username": "ubuntu",
+      "ami_name": "cloudify {{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "vagrant/provision.sh",
+      "environment_vars": [
+        "COMPONENTS_PACKAGE_URL={{user `components_package_url`}}",
+        "CORE_PACKAGE_URL={{user `core_package_url`}}",
+        "UI_PACKAGE_URL={{user `ui_package_url`}}",
+        "UBUNTU_AGENT_URL={{user `ubuntu_agent_url`}}",
+        "CENTOS_AGENT_URL={{user `centos_agent_url`}}",
+        "WINDOWS_AGENT_URL={{user `windows_agent_url`}}"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "compression_level": 9,
+      "output": "cloudify_{{user `cloudify_release`}}_{{.Provider}}.box"
+    }
+  ]
+}

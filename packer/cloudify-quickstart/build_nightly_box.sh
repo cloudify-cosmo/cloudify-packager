@@ -1,11 +1,8 @@
-PACKER_FILE=cloudify-packer.json
-cp ${PACKER_FILE}{,.bak}
-sed -i "s|{{ components_package_url }}|http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.0.0/nightly_6/cloudify-components_3.0.0-ga-b6_amd64.deb|g" ${PACKER_FILE}
-sed -i "s|{{ core_package_url }}|http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.0.0/nightly_6/cloudify-core_3.0.0-ga-b6_amd64.deb|g" ${PACKER_FILE}
-sed -i "s|{{ ui_package_url }}|http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.0.0/nightly_6/cloudify-ui_3.0.0-ga-b6_amd64.deb|g" ${PACKER_FILE}
-sed -i "s|{{ ubuntu_agent_url }}|http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.0.0/nightly_6/cloudify-ubuntu-agent_3.0.0-ga-b6_amd64.deb|g" ${PACKER_FILE}
-sed -i "s|{{ centos_agent_url }}|http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.0.0/nightly_6/cloudify-centos-agent_3.0.0-ga-b6_amd64.deb|g" ${PACKER_FILE}
-sed -i "s|{{ windows_agent_url }}|http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.0.0/nightly_6/cloudify-windows-agent_3.0.0-ga-b6_amd64.deb|g" ${PACKER_FILE}
-sed -i "s|{{ release }}|3.0.0|g" ${PACKER_FILE}
-packer build -only=virtualbox-ovf -force ${PACKER_FILE}
-mv ${PACKER_FILE}{.bak,}
+export COMPONENTS_PACKAGE_URL="http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-components_3.1.0-rc1-b83_amd64.deb"
+export CORE_PACKAGE_URL="http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-core_3.1.0-rc1-b83_amd64.deb"
+export UI_PACKAGE_URL="http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-ui_3.1.0-rc1-b83_amd64.deb"
+export UBUNTU_AGENT_URL="http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-ubuntu-agent_3.1.0-rc1-b83_amd64.deb"
+export CENTOS_AGENT_URL="http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-centos-agent_3.1.0-rc1-b83_amd64.deb"
+export WINDOWS_AGENT_URL="http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-windows-agent_3.1.0-rc1-b83_amd64.deb"
+export CLOUDIFY_RELEASE="3.1.0-rc1"
+packer build -only=virtualbox-ovf -force cloudify-packer.json

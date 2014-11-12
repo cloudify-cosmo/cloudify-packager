@@ -89,28 +89,18 @@ mkdir -p cloudify &&
 cd cloudify
 cfy init
 
-# clone manager blueprints and install dependencies of simple manager blueprint
+# clone manager blueprints
 git clone https://github.com/cloudify-cosmo/cloudify-manager-blueprints.git
 	pushd cloudify-manager-blueprints
 		if [ -n "$MANAGER_BLUEPRINTS_SHA" ]; then
 			git reset --hard $MANAGER_BLUEPRINTS_SHA
 		fi
-		pushd simple
-			pip install -r requirements.txt
-		popd
 	popd
 
 
-# copy the ssh key only when bootstrapping with vagrant. otherwise, implemented in packer
-# copy vagrant ssh key
-# echo copying ssh key
-# mkdir -p /home/${USERNAME}/.ssh/
-# cp /vagrant/insecure_private_key /home/${USERNAME}/.ssh/cloudify_private_key
+# generate public/private key pair and add to authorized_keys
 ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -N ''
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-
-# sudo iptables -L
-# sudo iptables -A INPUT -p tcp --dport ssh -j ACCEPT
 
 # configure inputs
 cp cloudify-manager-blueprints/simple/inputs.json.template inputs.json
@@ -120,7 +110,7 @@ sed -i "s|\"ssh_user\": \"\"|\"ssh_user\": \"${USERNAME}\"|g" inputs.json
 sed -i "s|\"ssh_key_filename\": \"\"|\"ssh_key_filename\": \"~/.ssh/id_rsa\"|g" inputs.json
 
 # bootstrap the manager locally
-cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.json &&
+cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.json --install-plugins &&
 
 # create blueprints dir
 mkdir -p ~/cloudify/blueprints
