@@ -35,9 +35,7 @@ def _prepare(package):
     common.mkdir(package['package_path'])
 
 
-def get_ubuntu_agent(download=False):
-    package = get_conf('Ubuntu-agent')
-
+def create_agent(package, download=False):
     dl_handler = WgetHandler()
     common = CommonHandler()
     py_handler = PythonHandler()
@@ -51,26 +49,21 @@ def get_ubuntu_agent(download=False):
         common.untar(package['sources_path'], tar_file)
         for module in package['modules']:
             py_handler.pip(module, package['sources_path'])
-    # TODO: remove redundant data after module installation
 
 
-def get_centos_agent(download=False):
-    package = get_conf('centos-agent')
+def get_ubuntu_precise_agent(download=False):
+    package = get_conf('Ubuntu-precise-agent')
+    create_agent(package, download)
 
-    dl_handler = WgetHandler()
-    common = CommonHandler()
-    py_handler = PythonHandler()
-    _prepare(package)
-    py_handler.venv(package['sources_path'])
-    if download:
-        tar_file = '{0}/{1}.tar.gz'.format(
-            package['sources_path'], package['name'])
-        for url in package['source_urls']:
-            dl_handler.download(url, file=tar_file)
-        common.untar(package['sources_path'], tar_file)
-        for module in package['modules']:
-            py_handler.pip(module, package['sources_path'])
-    # TODO: remove redundant data after module installation
+
+def get_ubuntu_trusty_agent(download=False):
+    package = get_conf('Ubuntu-trusty-agent')
+    create_agent(package, download)
+
+
+def get_centos_final_agent(download=False):
+    package = get_conf('centos-Final-agent')
+    create_agent(package, download)
 
 
 def get_celery(download=False):
@@ -89,7 +82,6 @@ def get_celery(download=False):
     if download:
         for module in package['modules']:
             py_handler.pip(module, package['sources_path'])
-    # TODO: remove redundant data after module installation
 
 
 def get_manager(download=False):
@@ -111,32 +103,6 @@ def get_manager(download=False):
     if download:
         for module in package['modules']:
             py_handler.pip(module, package['sources_path'])
-    # TODO: remove redundant data after module installation
-
-
-# @task
-# def get_riemann():
-#     package = get_conf('riemann')
-
-#     dl_handler = WgetHandler()
-#     _prepare(package)
-#     # stream_id = str(uuid.uuid1())
-#     # se(event_origin="cosmo-packman",
-#     #     event_type="packman.get.%s" % package['name'],
-#     #     event_subtype="started",
-#     #     event_description='started downloading %s' % package['name'],
-#     #     event_stream_id=stream_id)
-
-#     for url in package['source_urls']:
-#         dl_handler.download(
-#             url,
-#             dir='{0}/archives'.format(package['sources_path']))
-
-#     # se(event_origin="cosmo-packman",
-#     #     event_type="packman.get.%s" % package['name'],
-#     #     event_subtype="success",
-#     #     event_description='finished downloading %s' % package['name'],
-#     #     event_stream_id=stream_id)
 
 
 def main():
