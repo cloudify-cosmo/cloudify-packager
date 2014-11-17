@@ -108,7 +108,7 @@ VARS = {
                 "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",
                 "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",
                 "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
-                "cloudify_manager": "-b CFY-1308-run-cloudify-on-one-docker-container https://github.com/cloudify-cosmo/cloudify-manager.git",
+                "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
             },
         "workers_autoscale": "5,2",
         "ports": [],
@@ -122,12 +122,12 @@ VARS = {
         "modules": {
             "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",
             "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",
-            "cloudify_manager": "-b CFY-1308-run-cloudify-on-one-docker-container https://github.com/cloudify-cosmo/cloudify-manager.git",
+            "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
         },
         "agents": {
-          "ubuntu_agent_deb": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ubuntu-agent_amd64.deb",
-          "centos_agent_deb": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-centos-agent_amd64.deb",
-          "windows_agent_deb": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-windows-agent_amd64.deb",
+          "ubuntu_agent_deb": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-ubuntu-agent_3.1.0-rc1-b83_amd64.deb",
+          "centos_agent_deb": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-centos-agent_3.1.0-rc1-b83_amd64.deb",
+          "windows_agent_deb": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-windows-agent_3.1.0-rc1-b83_amd64.deb",
         },
         "manager_rest_port": "8100",
         },
@@ -140,6 +140,6 @@ VARS = {
             "make"
         ],
         "nodejs_latest_url": "http://nodejs.org/dist/node-latest.tar.gz",
-        "cloudify_webui_tar_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ui_amd64.deb",
+        "cloudify_webui_tar_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-ui_3.1.0-rc1-b83_amd64.deb",
     }
 }

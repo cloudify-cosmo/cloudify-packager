@@ -5,6 +5,8 @@ MAINTAINER adaml, adaml@gigaspaces.com
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
 ADD utils/ /opt/tmp/utils/
+# Used by 'cfy status' impl to determine if running in container.
+ENV DOCKER_ENV True
 
 RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -232,7 +234,7 @@ WORKDIR /etc/service/celeryd-cloudify-management/
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master && \
-    /bin/bash -c 'git clone -b CFY-1308-run-cloudify-on-one-docker-container https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/plugins/plugin-installer && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
     popd && \
@@ -260,19 +262,21 @@ RUN sed -i '1s|^|CELERY_HOME_DIR='$CELERY_SERVICE_DIR' \n|' $CELERY_RUN_FILE && 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
 ENV MANAGER_SERVICE_NAME manager
-ENV MANAGER_SERVICES_DIR /etc/service/$MANAGER_SERVICE_NAME
+ENV MANAGER_SERVICES_DIR /opt/$MANAGER_SERVICE_NAME
 ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR/env
 ENV SERVER_FILES_DIR $MANAGER_SERVICES_DIR/cloudify-manager*/rest-service/manager_rest
 
-ENV AMQPFLUX_RUN_FILE $MANAGER_SERVICES_DIR/run_amqpflux.sh
-ENV MANAGER_RUN_FILE $MANAGER_SERVICES_DIR/run
+ENV AMQPFLUX_RUN_FILE /etc/service/amqp-influx/run
+ENV REST_RUN_FILE /etc/service/rest-service/run
 
-ENV MANAGER_REST_CONFIG_PATH $MANAGER_SERVICES_DIR/guni.conf
+ENV REST_CONFIG_PATH /etc/service/rest-service/guni.conf
 ##### ENV #####
 # add run scripts and configuration
 ADD manager/ $MANAGER_SERVICES_DIR/
+ADD amqp_influx/ /etc/service/amqp-influx/
+ADD rest_service/ /etc/service/rest-service/
 
-WORKDIR /etc/service/manager/
+WORKDIR /opt/manager/
 
 RUN echo install dependencies && \
     apt-get install -y  git python2.7 && \
@@ -289,43 +293,45 @@ RUN echo install dependencies && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master && \
     \
     echo installing rest-service && \
-    /bin/bash -c 'git clone -b CFY-1308-run-cloudify-on-one-docker-container https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .' && \
     \
     echo injecting required params to run script && \
     sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE && \
-    sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $MANAGER_RUN_FILE && \
-    sed -i '1s|^|MANAGER_REST_CONFIG_PATH='$MANAGER_REST_CONFIG_PATH' \n|' $MANAGER_RUN_FILE && \
-    sed -i '1s|^|SERVER_FILES_DIR='$SERVER_FILES_DIR' \n|' $MANAGER_RUN_FILE && \
-    sed -i '1s|^|#!/bin/bash \n|' $MANAGER_RUN_FILE && \
+    sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $REST_RUN_FILE && \
+    sed -i '1s|^|MANAGER_REST_CONFIG_PATH='$REST_CONFIG_PATH' \n|' $REST_RUN_FILE && \
+    sed -i '1s|^|SERVER_FILES_DIR='$SERVER_FILES_DIR' \n|' $REST_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $REST_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $AMQPFLUX_RUN_FILE && \
     \
     echo granting run permissions to run file && \
-    chmod +x $MANAGER_RUN_FILE
+    chmod +x $AMQPFLUX_RUN_FILE && \
+    chmod +x $REST_RUN_FILE
 
 # create resources folder and copy all required resources
-RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ubuntu-agent_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
+RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-ubuntu-agent_3.1.0-rc1-b83_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/ubuntu_agent.deb /opt/tmp/manager && \
-    mkdir -p /etc/service/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-agent-disable-requiretty.sh /etc/service/manager/resources/packages/scripts && \
-    mkdir -p /etc/service/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.conf.template /etc/service/manager/resources/packages/templates && \
-    mkdir -p /etc/service/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.init.template /etc/service/manager/resources/packages/templates && \
-    mkdir -p /etc/service/manager/resources/packages/agents && mv /opt/tmp/manager/agents/Ubuntu*/Ubuntu-agent.tar.gz /etc/service/manager/resources/packages/agents/Ubuntu-precise-agent.tar.gz && \
+    mkdir -p /opt/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-agent-disable-requiretty.sh /opt/manager/resources/packages/scripts && \
+    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.conf.template /opt/manager/resources/packages/templates && \
+    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/Ubuntu*/config/Ubuntu-celeryd-cloudify.init.template /opt/manager/resources/packages/templates && \
+    mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/Ubuntu*/Ubuntu-agent.tar.gz /opt/manager/resources/packages/agents/Ubuntu-precise-agent.tar.gz && \
     rm -rf /opt/tmp/manager/ubuntu_agent.deb && \
     echo compiling ubuntu 14.04 trusty agent && \
     /bin/bash -c 'source env/bin/activate && \
     pip install https://github.com/cloudify-cosmo/cloudify-agent-packager/archive/master.tar.gz && \
     cfy-ap -f -c my_config.yaml -v' && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-centos-agent_amd64.deb --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-centos-agent_3.1.0-rc1-b83_amd64.deb --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/centos_agent.deb /opt/tmp/manager && \
-    mkdir -p /etc/service/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/centos*/config/centos-agent-disable-requiretty.sh /etc/service/manager/resources/packages/scripts && \
-    mkdir -p /etc/service/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.conf.template /etc/service/manager/resources/packages/templates && \
-    mkdir -p /etc/service/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.init.template /etc/service/manager/resources/packages/templates && \
-    mkdir -p /etc/service/manager/resources/packages/agents && mv /opt/tmp/manager/agents/centos*/centos-agent.tar.gz /etc/service/manager/resources/packages/agents && \
+    mkdir -p /opt/manager/resources/packages/scripts && mv /opt/tmp/manager/agents/centos*/config/centos-agent-disable-requiretty.sh /opt/manager/resources/packages/scripts && \
+    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.conf.template /opt/manager/resources/packages/templates && \
+    mkdir -p /opt/manager/resources/packages/templates && mv /opt/tmp/manager/agents/centos*/config/centos-celeryd-cloudify.init.template /opt/manager/resources/packages/templates && \
+    mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/centos*/centos-agent.tar.gz /opt/manager/resources/packages/agents && \
     rm -rf /opt/tmp/manager/centos_agent.deb && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-windows-agent_amd64.deb --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-windows-agent_3.1.0-rc1-b83_amd64.deb --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
     dpkg-deb -x /opt/tmp/manager/windows_agent.deb /opt/tmp/manager && \
-    mkdir -p /etc/service/manager/resources/packages/agents && mv /opt/tmp/manager/agents/windows*/Cloudify.exe /etc/service/manager/resources/packages/agents/CloudifyWindowsAgent.exe && \
-    cp -r /etc/service/manager/cloudify-manager/resources/rest-service/* /etc/service/manager/resources && \
+    mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/windows*/Cloudify.exe /opt/manager/resources/packages/agents/CloudifyWindowsAgent.exe && \
+    cp -r /opt/manager/cloudify-manager/resources/rest-service/* /opt/manager/resources && \
     rm -rf /opt/tmp/manager/windows_agent.deb
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -356,7 +362,7 @@ RUN echo installing web-ui dependencies && \
     echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc && \
     \
     echo downloading cloudify-webui package and extracting webui and grafana tar.gz && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/nightly/cloudify-ui_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-ui_3.1.0-rc1-b83_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
     dpkg-deb -x /opt/tmp/cloudify-webui/cloudify-webui.deb /opt/tmp/cloudify-webui/ && \
     mkdir -p $WEBUI_SERVICE_DIR/cosmo-ui && \
     tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/cosmo-ui* -C $WEBUI_SERVICE_DIR/cosmo-ui --strip-components=1 && \
