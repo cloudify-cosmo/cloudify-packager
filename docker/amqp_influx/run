@@ -3,6 +3,8 @@
 # The following are to be injected by docker installation process:
 #   MANAGER_VIRTUALENV_DIR - path to the manager virtualenv
 #
+# amqp_influx requires rabbitMQ to be available. We wait for 30 seconds until it starts.
+sleep 30
 $MANAGER_VIRTUALENV_DIR/bin/python $MANAGER_VIRTUALENV_DIR/bin/cloudify-amqp-influxdb \
     --amqp-exchange cloudify-monitoring \
     --amqp-routing-key '*' \

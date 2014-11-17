@@ -318,7 +318,7 @@ RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc
     mkdir -p /opt/manager/resources/packages/agents && mv /opt/tmp/manager/agents/Ubuntu*/Ubuntu-agent.tar.gz /opt/manager/resources/packages/agents/Ubuntu-precise-agent.tar.gz && \
     rm -rf /opt/tmp/manager/ubuntu_agent.deb && \
     echo compiling ubuntu 14.04 trusty agent && \
-    /bin/bash -c 'source env/bin/activate && \
+    /bin/bash -c 'virtualenv temp_env && source temp_env/bin/activate && \
     pip install https://github.com/cloudify-cosmo/cloudify-agent-packager/archive/master.tar.gz && \
     cfy-ap -f -c my_config.yaml -v' && \
     curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-centos-agent_3.1.0-rc1-b83_amd64.deb --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
