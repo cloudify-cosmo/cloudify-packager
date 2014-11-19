@@ -132,6 +132,10 @@ do
         c=$((c+1))
 done
 # export STORAGE_INDEX_URL="http://localhost:9200/cloudify_storage"
+echo "deleting events index if exists..."
+curl --retry 5 --retry-delay 3 -XDELETE http://localhost:9200/cloudify_events/
+echo "creating events index..."
+curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_events -d '{"settings": {"analysis": {"analyzer": {"default": {"tokenizer": "whitespace"}}}}}'
 echo "deleting index if exists..."
 curl --retry 5 --retry-delay 3 -XDELETE http://localhost:9200/cloudify_storage
 echo "creating index..."
