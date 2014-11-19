@@ -22,8 +22,7 @@ RUN echo installing riemann dependencies && \
     echo downloading jar to service dir and setting permissions on langohr jar && \
     curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o $RIEMANN_SERVICE_DIR/langohr.jar && \
     chmod 644 $RIEMANN_SERVICE_DIR/langohr.jar && \
-    \
-    echo downloading and installing riemann deb && \
+    \    echo downloading and installing riemann deb && \
     curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb && \
     dpkg -i /opt/tmp/riemann/riemann.deb && \
     rm -rf /opt/tmp/riemann/riemann.deb && \
@@ -64,12 +63,23 @@ RUN echo  installing elasticsearch dependencies && \
 RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     $ELASTICSEARCH_SERVICE_DIR/bin/elasticsearch -d && \
     wait_for_port 9200' && \
+    echo "deleting events index if exists..." && \
+    curl --retry 5 --retry-delay 3 -XDELETE http://localhost:9200/cloudify_events/ && \
+    echo "creating events index..." && \
+    curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_events -d '{"settings": {"analysis": {"analyzer": {"default": {"tokenizer": "whitespace"}}}}}' && \
+    echo "deleting index if exists..." && \
     curl --retry 5 --retry-delay 3 -XDELETE http://localhost:9200/cloudify_storage && \
+    echo "creating index..." && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage -d '{"settings": {"analysis": {"analyzer": {"default": {"tokenizer": "whitespace"}}}}}' && \
+    echo "creating blueprint mapping..." && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/blueprint/_mapping -d '{"blueprint": {"properties": {"plan": {"enabled": false}}}}' && \
-    curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/deployment/_mapping -d '{"deployment": {"properties": {"plan": {"enabled": false}, "workflows": {"enabled": false}}}}' && \
+    echo "creating deployment mapping..." && \
+    curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/deployment/_mapping -d '{"deployment": {"properties": {"workflows": {"enabled": false}, "inputs": {"enabled": false}, "policy_type": {"enabled": false}, "policy_triggers": {"enabled": false}, "groups": {"enabled": false}, "outputs": {"enabled": false}}}}' && \
+    echo "creating node mapping..." && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node/_mapping -d '{ "node": { "_id": { "path": "id" }, "properties": { "types": { "type": "string", "index_name": "type" }, "properties": { "enabled": false } } } }' && \
+    echo "creating node-instance mapping..." && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node_instance/_mapping -d '{ "node_instance": { "_id": { "path": "id" }, "properties": { "runtime_properties": { "enabled": false } } } }' && \
+    echo "printing mappings..." && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1
 
 #elasticsearch persistence paths
