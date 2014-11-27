@@ -13,4 +13,4 @@ WORKERS=$(($(nproc)*2+1))
 # run the server service using predefined virtual env
 source $MANAGER_VIRTUALENV_DIR/bin/activate
 pushd $SERVER_FILES_DIR
-gunicorn  -w ${WORKERS} -b 0.0.0.0:8100 --timeout 300 server:app
+gunicorn  -w ${WORKERS} -b 0.0.0.0:8100 --timeout 300 server:app --log-file /var/log/cloudify/gunicorn.log --access-logfile /var/log/cloudify/gunicorn-access.log

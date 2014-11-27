@@ -113,3 +113,10 @@ RUN echo starting influxdb as daemon to create cloudify db && \
 
 #influxdb persistence path
 VOLUME /opt/influxdb/shared/data
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+# Rest-Service persistence path
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+RUN echo creating logs folder && \
+    mkdir -p /var/log/cloudify
+
+VOLUME /var/log/cloudify

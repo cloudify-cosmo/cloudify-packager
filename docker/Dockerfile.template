@@ -323,6 +323,9 @@ RUN echo install dependencies && \
     sed -i '1s|^|#!/bin/bash \n|' $REST_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $AMQPFLUX_RUN_FILE && \
     \
+    echo creating logs folder && \
+    mkdir -p /var/log/cloudify && \
+    \
     echo granting run permissions to run file && \
     chmod +x $AMQPFLUX_RUN_FILE && \
     chmod +x $REST_RUN_FILE
