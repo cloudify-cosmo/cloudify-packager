@@ -116,6 +116,8 @@ MANAGEMENT_IP=${2:-${PRIVATE_IP}}
 
 echo -e "\nInstalling ${PKG_NAME} version ${VERSION}...\n" | tee -a ${BOOTSTRAP_LOG}
 
+mkdir -p /var/log/cloudify
+
 echo -ne "checking whether celery and the management plugins are installed..." | tee -a ${BOOTSTRAP_LOG}
 if ! dpkg -s celery 2>&1 | grep Status: | grep installed; then
         echo -e "celery is not installed, installing..." | tee -a ${BOOTSTRAP_LOG}
