@@ -39,6 +39,7 @@ PACKAGES = {
             },
             "__params_manager": {
                 "port": "8100",
+                "cloudify_logs_base": CLOUDIFY_LOGS_PATH,
             },
         }
     },
@@ -142,13 +143,38 @@ PACKAGES = {
             },
         }
     },
-    "cloudify-ubuntu-agent": {
-        "name": "cloudify-ubuntu-agent",
+    "cloudify-ubuntu-trusty-agent": {
+        "name": "cloudify-ubuntu-trusty-agent",
         "version": "3.0.0",
         "package_path": "/cloudify",
         "sources_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
-        "dst_package_types": ["deb", "rpm"],
+        "dst_package_types": ["deb"],
+        "bootstrap_script": "{0}/agent-ubuntu-bootstrap.sh".format(SCRIPTS_PATH),
+        "bootstrap_template": "agent-ubuntu-bootstrap.template",
+        "bootstrap_params": {
+            "file_server_path": "{0}/manager/resources".format(VIRTUALENVS_PATH),
+            "dst_agent_location": "packages/agents",
+            "dst_template_location": "packages/templates",
+            "dst_script_location": "packages/scripts"
+        },
+        "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+        # TODO: CREATE INIT AND DEFAULTS FILES FROM TEMPLATES!
+        "config_templates": {
+            "__config_dir": {
+                "files": "{0}/ubuntu-agent".format(CONFIGS_PATH),
+                "config_dir": "config",
+                "dst_dir": "{0}/manager/resources/packages/agents/templates/".format(VIRTUALENVS_PATH),
+            },
+        },
+    },
+    "cloudify-ubuntu-precise-agent": {
+        "name": "cloudify-ubuntu-precise-agent",
+        "version": "3.0.0",
+        "package_path": "/cloudify",
+        "sources_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
+        "src_package_type": "dir",
+        "dst_package_types": ["deb"],
         "bootstrap_script": "{0}/agent-ubuntu-bootstrap.sh".format(SCRIPTS_PATH),
         "bootstrap_template": "agent-ubuntu-bootstrap.template",
         "bootstrap_params": {
@@ -182,8 +208,8 @@ PACKAGES = {
         },
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
     },
-    "Ubuntu-agent": {
-        "name": "Ubuntu-agent",
+    "Ubuntu-trusty-agent": {
+        "name": "Ubuntu-trusty-agent",
         "version": "3.0.0",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
@@ -200,13 +226,31 @@ PACKAGES = {
         "src_package_type": "dir",
         "dst_package_types": ["tar.gz"],
     },
-    "cloudify-centos-agent": {
-        "name": "cloudify-centos-agent",
+    "Ubuntu-precise-agent": {
+        "name": "Ubuntu-precise-agent",
+        "version": "3.0.0",
+        "source_urls": [
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
+        ],
+        "package_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
+        "sources_path": "/Ubuntu-agent/env",
+        "modules": ['billiard==2.7.3.28', 'celery==3.0.24', 'pika',
+                    'https://github.com/cloudify-cosmo/cloudify-rest-client/archive/{0}.tar.gz'.format(REST_CLIENT_BRANCH),
+                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(PLUGINS_COMMON_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/agent-installer/'.format(MANAGER_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/plugin-installer/'.format(MANAGER_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/windows-agent-installer/'.format(MANAGER_BRANCH),
+        ],
+        "src_package_type": "dir",
+        "dst_package_types": ["tar.gz"],
+    },
+    "cloudify-centos-final-agent": {
+        "name": "cloudify-centos-final-agent",
         "version": "3.0.0",
         "package_path": "/cloudify",
         "sources_path": "{0}/centos-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
-        "dst_package_types": ["rpm", "deb"],
+        "dst_package_types": ["deb"],
         "bootstrap_script": "{0}/agent-centos-bootstrap.sh".format(SCRIPTS_PATH),
         "bootstrap_template": "agent-centos-bootstrap.template",
         "bootstrap_params": {
@@ -225,8 +269,8 @@ PACKAGES = {
             },
         },
     },
-    "centos-agent": {
-        "name": "centos-agent",
+    "centos-Final-agent": {
+        "name": "centos-Final-agent",
         "version": "3.0.0",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
@@ -278,6 +322,9 @@ PACKAGES = {
                 "gunicorn_conf_path": "{0}/manager/config/conf/guni.conf".format(VIRTUALENVS_PATH),
                 "unicorn_user": "root",
                 "rest_port": "8100",
+                "gunicorn_log_path": "{0}/gunicorn.log".format(CLOUDIFY_LOGS_PATH),
+                "gunicorn_access_log_path": "{0}/gunicorn-access.log".format(CLOUDIFY_LOGS_PATH),
+                "rest_service_log_path": "{0}/cloudify-rest-service.log".format(CLOUDIFY_LOGS_PATH),
             },
             "__template_file_conf": {
                 "template": "{0}/manager/conf/guni.conf.template".format(CONFIGS_PATH),
@@ -440,7 +487,6 @@ PACKAGES = {
             "deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx",
         ],
         "source_keys": ["http://nginx.org/keys/nginx_signing.key"],
-        # "key_files": ["{0}/nginx/nginx_signing.key".format(PACKAGES_PATH)],
         "package_path": "{0}/nginx/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/nginx".format(PACKAGES_PATH),
         "dst_package_type": ["deb"],

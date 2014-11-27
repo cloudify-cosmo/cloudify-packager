@@ -8,6 +8,7 @@ DSL_SHA=""
 REST_CLIENT_SHA=""
 CLI_SHA=""
 PLUGINS_COMMON_SHA=""
+MANAGER_BLUEPRINTS_SHA=""
 
 USERNAME=$(id -u -n)
 if [ "$USERNAME" = "" ]; then
@@ -82,44 +83,44 @@ fi
 # add cfy bash completion
 activate_cfy_bash_completion
 
-# init simple provider
+# init cfy work dir
 cd ~
-mkdir -p simple &&
-cd simple &&
-cfy init simple_provider &&
+mkdir -p cloudify &&
+cd cloudify
+cfy init
+
+# clone manager blueprints and install dependencies of simple manager blueprint
+git clone https://github.com/cloudify-cosmo/cloudify-manager-blueprints.git
+
 
 # copy the ssh key only when bootstrapping with vagrant. otherwise, implemented in packer
 # copy vagrant ssh key
-echo copying ssh key
-mkdir -p /home/${USERNAME}/.ssh/
-cp /vagrant/insecure_private_key /home/${USERNAME}/.ssh/cloudify_private_key
+# echo copying ssh key
+# mkdir -p /home/${USERNAME}/.ssh/
+# cp /vagrant/insecure_private_key /home/${USERNAME}/.ssh/cloudify_private_key
+ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -N ''
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 # sudo iptables -L
 # sudo iptables -A INPUT -p tcp --dport ssh -j ACCEPT
 
-# configure yaml provider params
-sed -i "s|Enter-Public-IP-Here|127.0.0.1|g" cloudify-config.yaml
-sed -i "s|Enter-Private-IP-Here|127.0.0.1|g" cloudify-config.yaml
-sed -i "s|Enter-SSH-Key-Path-Here|/home/${USERNAME}/.ssh/cloudify_private_key|g" cloudify-config.yaml
-sed -i "s|Enter-SSH-Username-Here|${USERNAME}|g" cloudify-config.yaml
-
-
-# configure user for agents
-sed -i "s|#user: (no default - optional parameter)|user: ${USERNAME}|g" cloudify-config.yaml
-
-# remove hashes to override config defaults
-sed -i "s|^# ||g" cloudify-config.yaml
+# configure inputs
+cp cloudify-manager-blueprints/simple/inputs.json.template inputs.json
+sed -i "s|\"public_ip\": \"\"|\"public_ip\": \"127.0.0.1\"|g" inputs.json
+sed -i "s|\"private_ip\": \"\"|\"private_ip\": \"127.0.0.1\"|g" inputs.json
+sed -i "s|\"ssh_user\": \"\"|\"ssh_user\": \"${USERNAME}\"|g" inputs.json
+sed -i "s|\"ssh_key_filename\": \"\"|\"ssh_key_filename\": \"~/.ssh/id_rsa\"|g" inputs.json
 
 # bootstrap the manager locally
-cfy bootstrap -v &&
+cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.json --install-plugins &&
 
 # create blueprints dir
-mkdir -p ~/simple/blueprints
+mkdir -p ~/cloudify/blueprints
 
 # source virtualenv on login
 echo "source /home/${USERNAME}/cloudify/bin/activate" >> /home/${USERNAME}/.bashrc
 
 # set shell login base dir
-echo "cd ~/simple" >> /home/${USERNAME}/.bashrc
+echo "cd ~/cloudify" >> /home/${USERNAME}/.bashrc
 
 echo bootstrap done.

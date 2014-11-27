@@ -8,9 +8,10 @@ DIAMOND_PLUGIN_SHA=""
 # echo bootstrapping packman...
 
 # update and install prereqs
-sudo add-apt-repository ppa:git-core/ppa &&
 sudo apt-get -y update &&
-sudo apt-get install -y curl python-dev rubygems rpm git &&
+sudo apt-get install -y software-properties-common
+sudo add-apt-repository -y ppa:git-core/ppa &&
+sudo apt-get install -y curl python-dev rpm git make gcc libyaml-dev zlib1g-dev &&
 
 # install ruby
 wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p547.tar.bz2
@@ -26,7 +27,7 @@ sudo gem install fpm --no-ri --no-rdoc &&
 echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc --no-ri' >> ~/.gemrc
 
 # install pip
-curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
+curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python &&
 
 # install packman
 git clone https://github.com/cloudify-cosmo/packman.git
@@ -43,10 +44,10 @@ sudo pip install virtualenv==1.11.4 &&
 cd /cloudify-packager/ &&
 
 # create package resources
-sudo pkm get -c Ubuntu-agent
+sudo pkm get -c Ubuntu-trusty-agent &&
 
 echo '# GET PROCESS'
-sudo /Ubuntu-agent/env/bin/pip install celery==3.0.24
+sudo /Ubuntu-agent/env/bin/pip install celery==3.0.24 &&
 sudo /Ubuntu-agent/env/bin/pip install pyzmq==14.3.1
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 pushd cloudify-rest-client
@@ -96,8 +97,8 @@ pushd cloudify-manager
 popd
 
 # create package
-sudo pkm pack -c Ubuntu-agent
-sudo pkm pack -c cloudify-ubuntu-agent
+sudo pkm pack -c Ubuntu-trusty-agent &&
+sudo pkm pack -c cloudify-ubuntu-trusty-agent &&
 
 echo bootstrap done
 echo "NOTE: currently, using some of the packman's features requires that it's run as sudo."

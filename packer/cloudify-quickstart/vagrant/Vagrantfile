@@ -1,0 +1,67 @@
+########
+# Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+#    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    * See the License for the specific language governing permissions and
+#    * limitations under the License.
+
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+INSTALL_FROM_PYPI = ENV['INSTALL_FROM_PYPI']
+
+HP_ACCESS_KEY = ENV['HP_ACCESS_KEY']
+HP_SECRET_KEY = ENV['HP_SECRET_KEY']
+HP_TENANT_ID  = ENV['HP_TENANT_ID']
+HP_KEYPAIR_NAME = ENV['HP_KEYPAIR_NAME']
+HP_PRIVATE_KEY_PATH = ENV['HP_PRIVATE_KEY_PATH']
+HP_SERVER_IMAGE = ENV['HP_SERVER_IMAGE'] || "Ubuntu Server 12.04.5 LTS (amd64 20140927) - Partner Image"
+HP_SSH_USERNAME = ENV['HP_SSH_USERNAME'] || "ubuntu"
+HP_AVAILABILITY_ZONE = ENV['HP_AVAILABILITY_ZONE'] || "us-east"
+
+SERVER_NAME = INSTALL_FROM_PYPI==="true"? "install_cloudify_3_stable" : "install_cloudify_3_latest"
+
+Vagrant.configure('2') do |config|
+  config.vm.define :local do |cloudify|
+
+    cloudify.vm.provider :virtualbox do |vb, override|
+      override.vm.box = "ubuntu/precise64"
+
+      vb.name = "#{SERVER_NAME}"
+      vb.customize ['modifyvm', :id, '--memory', '2048']
+    end
+
+    cloudify.vm.provider :hp do |hp, override|
+      unless Vagrant.has_plugin?("vagrant-hp")
+          raise 'vagrant-hp plugin not installed!'
+      end
+      override.vm.box = "dummy_hp"
+      override.vm.box_url = "https://github.com/mohitsethi/vagrant-hp/raw/master/dummy_hp.box"
+
+      hp.access_key             = "#{HP_ACCESS_KEY}"
+      hp.secret_key             = "#{HP_SECRET_KEY}"
+      hp.flavor                 = "standard.medium"
+      hp.tenant_id              = "#{HP_TENANT_ID}"
+      hp.server_name            = "#{SERVER_NAME}"
+      hp.image                  = "#{HP_SERVER_IMAGE}"
+      hp.keypair_name           = "#{HP_KEYPAIR_NAME}"
+      hp.ssh_private_key_path   = "#{HP_PRIVATE_KEY_PATH}"
+      hp.ssh_username           = "#{HP_SSH_USERNAME}"
+      hp.availability_zone      = "#{HP_AVAILABILITY_ZONE}"
+    end
+
+    cloudify.vm.provision "shell" do |sh|
+      sh.path = "provision.sh"
+      sh.args = "#{INSTALL_FROM_PYPI}"
+      sh.privileged = false
+    end
+  end
+end
