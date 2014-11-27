@@ -9,6 +9,7 @@ DSL_PARSER_BRANCH = MAIN_BRANCH
 
 PACKAGES_PATH = "/packages"  # temporary directory to which items are downloaded and in which packages are created.
 VIRTUALENVS_PATH = "/opt"  # directory for cosmo modules and virtual environments
+CLOUDIFY_LOGS_PATH = "/var/log/cloudify"  # directory for cloudify logs
 AGENT_VIRTUALENVS_PATH = "/env"  # final directory to put the created packages in.
 COMPONENT_PACKAGES_PATH = "/cloudify-components"  # where to put 3rd party components packages
 CORE_PACKAGES_PATH = "/cloudify-core"  # where to put code package
