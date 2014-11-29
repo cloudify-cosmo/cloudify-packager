@@ -22,7 +22,8 @@ RUN echo installing riemann dependencies && \
     echo downloading jar to service dir and setting permissions on langohr jar && \
     curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o $RIEMANN_SERVICE_DIR/langohr.jar && \
     chmod 644 $RIEMANN_SERVICE_DIR/langohr.jar && \
-    \    echo downloading and installing riemann deb && \
+    \
+    echo downloading and installing riemann deb && \
     curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb && \
     dpkg -i /opt/tmp/riemann/riemann.deb && \
     rm -rf /opt/tmp/riemann/riemann.deb && \
@@ -53,7 +54,7 @@ RUN echo  installing elasticsearch dependencies && \
     curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
     \
     echo extracting binaries to service dir && \
-    mkdir $ELASTICSEARCH_SERVICE_DIR && \
+    mkdir -p $ELASTICSEARCH_SERVICE_DIR && \
     tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1 && \
     rm -rf /opt/tmp/elasticsearch/elasticsearch.tar.gz
 
@@ -92,6 +93,7 @@ VOLUME /etc/service/elasticsearch/logs
 ENV INFLUXDB_SERVICE_NAME influxdb
 # default influxdb config path
 ENV INFLUXDB_CONFIG_FILE /opt/influxdb/shared/config.toml
+ENV INFLUXDB_RUN_FILE /etc/service/$INFLUXDB_SERVICE_NAME/run
 ##### ENV #####
 
 RUN echo installing influxdb dependencies && \
@@ -112,3 +114,10 @@ RUN echo starting influxdb as daemon to create cloudify db && \
 
 #influxdb persistence path
 VOLUME /opt/influxdb/shared/data
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+# Rest-Service persistence path
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+RUN echo creating logs folder && \
+    mkdir -p /var/log/cloudify
+
+VOLUME /var/log/cloudify

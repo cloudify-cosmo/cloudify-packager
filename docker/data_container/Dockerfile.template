@@ -54,6 +54,7 @@ RUN echo  installing elasticsearch dependencies && \
     curl {{ elasticsearch.elasticsearch_tar_url }} --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
     \
     echo extracting binaries to service dir && \
+    mkdir -p $ELASTICSEARCH_SERVICE_DIR && \
     tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1 && \
     rm -rf /opt/tmp/elasticsearch/elasticsearch.tar.gz
 

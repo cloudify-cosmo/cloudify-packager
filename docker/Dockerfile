@@ -110,6 +110,7 @@ RUN echo  installing elasticsearch dependencies && \
     curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
     \
     echo extracting binaries to service dir && \
+    mkdir -p $ELASTICSEARCH_SERVICE_DIR && \
     tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1 && \
     rm -rf /opt/tmp/elasticsearch/elasticsearch.tar.gz
 
@@ -213,7 +214,7 @@ RUN echo "daemon off;" >> $NGINX_CONF_FILE && \
     sed -i "s%/var/log/nginx/error.log warn%$NGINX_SERVICE_DIR/logs/error.log warn%g" $NGINX_CONF_FILE && \
     sed -i "s%/var/run/nginx.pid%$NGINX_SERVICE_DIR/logs/nginx.pid%g" $NGINX_CONF_FILE && \
     sed -i "s%/etc/nginx/conf.d/\*.conf%$NGINX_SERVICE_DIR/default.conf%g" $NGINX_CONF_FILE && \
-    mkdir $NGINX_LOGS_DIR && \
+    mkdir -p $NGINX_LOGS_DIR && \
     \
     echo setting config path in run file && \
     sed -i '1s|^|NGINX_CONF_FILE='$NGINX_CONF_FILE' \n|' $NGINX_RUN_FILE && \
@@ -272,7 +273,7 @@ RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/
 RUN sed -i '1s|^|CELERY_HOME_DIR='$CELERY_SERVICE_DIR' \n|' $CELERY_RUN_FILE && \
     sed -i '1s|^|CELERY_LOG_DIR='$CELERY_LOG_DIR' \n|' $CELERY_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $CELERY_RUN_FILE && \
-    mkdir $CELERY_LOG_DIR && \
+    mkdir -p $CELERY_LOG_DIR && \
     chmod +x $CELERY_RUN_FILE
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -322,6 +323,9 @@ RUN echo install dependencies && \
     sed -i '1s|^|SERVER_FILES_DIR='$SERVER_FILES_DIR' \n|' $REST_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $REST_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $AMQPFLUX_RUN_FILE && \
+    \
+    echo creating logs folder && \
+    mkdir -p /var/log/cloudify && \
     \
     echo granting run permissions to run file && \
     chmod +x $AMQPFLUX_RUN_FILE && \
