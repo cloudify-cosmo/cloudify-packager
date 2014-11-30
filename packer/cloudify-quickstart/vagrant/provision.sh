@@ -115,6 +115,9 @@ cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.jso
 # create blueprints dir
 mkdir -p ~/cloudify/blueprints
 
+# copy inputs.json for the nodecellar blueprint
+sudo cp /tmp/inputs.json ~/cloudify/blueprints
+
 # source virtualenv on login
 echo "source /home/${USERNAME}/cloudify/bin/activate" >> /home/${USERNAME}/.bashrc
 

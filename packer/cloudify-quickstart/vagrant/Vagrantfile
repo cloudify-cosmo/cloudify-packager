@@ -58,6 +58,7 @@ Vagrant.configure('2') do |config|
       hp.availability_zone      = "#{HP_AVAILABILITY_ZONE}"
     end
 
+    cloudify.vm.synced_folder "../", "/vagrant"
     cloudify.vm.provision "shell" do |sh|
       sh.path = "provision.sh"
       sh.args = "#{INSTALL_FROM_PYPI}"
