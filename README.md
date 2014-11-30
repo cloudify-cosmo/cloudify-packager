@@ -44,4 +44,8 @@ Soon, we will also use packer to:
 - Create the same demo image on AWS (and potentially, Openstack).
 - Create base images for our package creation process.
 
+### [Docker](http://www.docker.com)
 
+Please see [Bootstrapping using Docker](http://getcloudify.org/guide/3.1/installation-bootstrapping.html#bootstrapping-using-docker) for information on our transition from packages to containers based installations.
+
+To generate our [Dockerfile.template](https://github.com/cloudify-cosmo/cloudify-packager/raw/master/docker/Dockerfile.template) file, we're using [Jocker](https://github.com/nir0s/jocker).
