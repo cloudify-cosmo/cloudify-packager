@@ -193,6 +193,31 @@ PACKAGES = {
             },
         },
     },
+    "cloudify-ubuntu-agent": {
+        "name": "cloudify-trusty-agent",
+        "version": "3.1.0",
+        "package_path": "/cloudify",
+        "sources_path": "/tmp/Ubuntu-agent",
+        "src_package_type": "dir",
+        "dst_package_types": ["deb"],
+        "bootstrap_script": "{0}/agent-ubuntu-bootstrap.sh".format(SCRIPTS_PATH),
+        "bootstrap_template": "agent-ubuntu-bootstrap.template",
+        "bootstrap_params": {
+            "file_server_path": "{0}/manager/resources".format(VIRTUALENVS_PATH),
+            "dst_agent_location": "packages/agents",
+            "dst_template_location": "packages/templates",
+            "dst_script_location": "packages/scripts"
+        },
+        "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+        # TODO: CREATE INIT AND DEFAULTS FILES FROM TEMPLATES!
+        "config_templates": {
+            "__config_dir": {
+                "files": "{0}/ubuntu-agent".format(CONFIGS_PATH),
+                "config_dir": "config",
+                "dst_dir": "{0}/manager/resources/packages/agents/templates/".format(VIRTUALENVS_PATH),
+            },
+        },
+    },
     "cloudify-windows-agent": {
         "name": "cloudify-windows-agent",
         "version": "3.0.0",
