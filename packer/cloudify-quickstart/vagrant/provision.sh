@@ -71,6 +71,14 @@ else
 		pip install .
 	popd
 
+	git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
+	pushd cloudify-script-plugin
+		if [ -n "$SCRIPT_PLUGIN_SHA" ]; then
+			git reset --hard $SCRIPT_PLUGIN_SHA
+		fi
+		pip install .
+	popd
+
 	git clone https://github.com/cloudify-cosmo/cloudify-cli.git
 	pushd cloudify-cli
 		if [ -n "$CLI_SHA" ]; then
@@ -112,11 +120,15 @@ sed -i "s|\"ssh_key_filename\": \"\"|\"ssh_key_filename\": \"~/.ssh/id_rsa\"|g" 
 # bootstrap the manager locally
 cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.json --install-plugins &&
 
-# create blueprints dir
-mkdir -p ~/cloudify/blueprints
+# create blueprints and inputs dir
+mkdir -p ~/cloudify/blueprints/inputs
 
-# copy inputs.json for the nodecellar blueprint
-sudo cp /tmp/inputs.json ~/cloudify/blueprints
+# create inputs.json for the nodecellar blueprint
+echo """{
+  \"host_ip\": \"localhost\",
+  \"agent_user\": \"vagrant\",
+  \"agent_private_key_path\": \"/home/vagrant/.ssh/id_rsa\"
+}""" > ~/cloudify/blueprints/inputs/nodecellar-singlehost.json
 
 # source virtualenv on login
 echo "source /home/${USERNAME}/cloudify/bin/activate" >> /home/${USERNAME}/.bashrc

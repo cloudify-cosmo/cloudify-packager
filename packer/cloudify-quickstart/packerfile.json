@@ -40,12 +40,6 @@
   ],
   "provisioners": [
     {
-      "type": "file",
-      "only": ["virtualbox-ovf"],
-      "source": "inputs.json",
-      "destination": "/tmp/"
-    },
-    {
       "type": "shell",
       "script": "vagrant/provision.sh",
       "environment_vars": [
