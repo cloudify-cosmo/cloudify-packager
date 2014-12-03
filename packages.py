@@ -20,7 +20,7 @@ from user_definitions import *
 PACKAGES = {
     "cloudify-core": {
         "name": "cloudify-core",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "depends": [
             'cloudify-components'
         ],
@@ -45,7 +45,7 @@ PACKAGES = {
     },
     "cloudify-components": {
         "name": "cloudify-components",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "package_path": "/cloudify",
         "sources_path": COMPONENT_PACKAGES_PATH,
         "src_package_type": "dir",
