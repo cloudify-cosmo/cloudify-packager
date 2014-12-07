@@ -1,10 +1,10 @@
 # This script configures and starts a PyPi mirror and http-server for cloudify offline
 # Note that you should edit HOME_FOLDER and FILES_DIR variables before running this script
 
-HOME_FOLDER="/home/vagrant"
+HOME_FOLDER="/home/ubuntu"
 
 # Expected to contain all the needed files - nginx.conf, bandersnatch.conf etc
-FILES_DIR="/vagrant"
+FILES_DIR="/home/ubuntu"
 
 echo "Using $HOME_FOLDER as a home folder"
 echo "Using $FILES_DIR as a files folder"
