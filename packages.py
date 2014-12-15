@@ -145,7 +145,7 @@ PACKAGES = {
     },
     "cloudify-ubuntu-trusty-agent": {
         "name": "cloudify-ubuntu-trusty-agent",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "package_path": "/cloudify",
         "sources_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
@@ -170,7 +170,7 @@ PACKAGES = {
     },
     "cloudify-ubuntu-precise-agent": {
         "name": "cloudify-ubuntu-precise-agent",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "package_path": "/cloudify",
         "sources_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
@@ -195,7 +195,7 @@ PACKAGES = {
     },
     "cloudify-windows-agent": {
         "name": "cloudify-windows-agent",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "package_path": "/cloudify",
         "sources_path": "{0}/windows-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
@@ -210,7 +210,7 @@ PACKAGES = {
     },
     "Ubuntu-trusty-agent": {
         "name": "Ubuntu-trusty-agent",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
         ],
@@ -228,7 +228,7 @@ PACKAGES = {
     },
     "Ubuntu-precise-agent": {
         "name": "Ubuntu-precise-agent",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
         ],
@@ -246,7 +246,7 @@ PACKAGES = {
     },
     "cloudify-centos-final-agent": {
         "name": "cloudify-centos-final-agent",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "package_path": "/cloudify",
         "sources_path": "{0}/centos-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
@@ -271,7 +271,7 @@ PACKAGES = {
     },
     "centos-Final-agent": {
         "name": "centos-Final-agent",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
         ],
