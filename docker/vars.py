@@ -140,6 +140,6 @@ VARS = {
             "make"
         ],
         "nodejs_latest_url": "http://nodejs.org/dist/node-latest.tar.gz",
-        "cloudify_webui_tar_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-ui_3.1.0-rc1-b83_amd64.deb",
+        "cloudify_webui_tar_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/ga-RELEASE/cloudify-ui_3.1.0-ga-b85_amd64.deb",
     }
 }
