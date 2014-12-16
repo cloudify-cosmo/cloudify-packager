@@ -38,7 +38,7 @@
       "region": "eu-west-1",
       "source_ami": "{{user `aws_source_ami`}}",
       "instance_type": "m3.medium",
-      "ssh_username": "ubuntu",
+      "ssh_username": "vagrant",
       "user_data_file": "userdata/add_vagrant_user.sh",
       "ami_name": "cloudify nightly {{timestamp}}"
     },
