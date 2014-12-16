@@ -2,23 +2,27 @@
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_ACCESS_KEY`}}",
-    "components_package_url": "{{env `COMPONENTS_PACKAGE_URL`}}",
-    "core_package_url": "{{env `CORE_PACKAGE_URL`}}",
-    "ui_package_url": "{{env `UI_PACKAGE_URL`}}",
-    "ubuntu_agent_url": "{{env `UBUNTU_AGENT_URL`}}",
-    "centos_agent_url": "{{env `CENTOS_AGENT_URL`}}",
-    "windows_agent_url": "{{env `WINDOWS_AGENT_URL`}}",
-    "cloudify_release": "{{env `CLOUDIFY_RELEASE`}}"
+    "aws_source_ami": "ami-6ca1011b",
+    "virtualbox_source_image": "",
+    "virtualbox_key": "./keys/insecure_private_key",
+    "components_package_url": null,
+    "core_package_url": null,
+    "ui_package_url": null,
+    "ubuntu_agent_url": null,
+    "centos_agent_url": null,
+    "windows_agent_url": null,
+    "cloudify_release": null
     },
   "builders": [
     {
+      "name": "virtualbox",
       "type": "virtualbox-ovf",
-      "source_path": "/home/nir0s/.vagrant.d/boxes/hashicorp-VAGRANTSLASH-precise64/1.1.0/virtualbox/box.ovf",
+      "source_path": "{{user `virtualbox_source_image`}}",
       "vm_name": "cloudify",
       "ssh_username": "vagrant",
-      "ssh_key_path": "/home/nir0s/.vagrant.d/insecure_private_key",
-      "ssh_wait_timeout": "3m",
-      "shutdown_command": "echo 'packer' | sudo -S shutdown -P now",
+      "ssh_key_path": "{{user `virtualbox_key`}}",
+      "ssh_wait_timeout": "2m",
+      "shutdown_command": "sudo -S shutdown -P now",
       "vboxmanage": [
         ["modifyvm", "{{.Name}}", "--memory", "2048"],
         ["modifyvm", "{{.Name}}", "--cpus", "2"],
@@ -27,12 +31,24 @@
       "headless": true
     },
     {
+      "name": "nightly_virtualbox_build",
       "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
       "region": "eu-west-1",
-      "ssh_private_key_file": "/home/nir0s/.ssh/aws/vagrant_build.pem",
-      "source_ami": "ami-07ed3a70",
+      "source_ami": "{{user `aws_source_ami`}}",
+      "instance_type": "m3.medium",
+      "ssh_username": "ubuntu",
+      "user_data_file": "userdata/add_vagrant_user.sh",
+      "ami_name": "cloudify nightly {{timestamp}}"
+    },
+    {
+      "name": "amazon",
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "eu-west-1",
+      "source_ami": "{{user `aws_source_ami`}}",
       "instance_type": "m3.medium",
       "ssh_username": "ubuntu",
       "ami_name": "cloudify {{timestamp}}"
@@ -41,7 +57,7 @@
   "provisioners": [
     {
       "type": "shell",
-      "script": "vagrant/provision.sh",
+      "script": "provision/common.sh",
       "environment_vars": [
         "COMPONENTS_PACKAGE_URL={{user `components_package_url`}}",
         "CORE_PACKAGE_URL={{user `core_package_url`}}",
@@ -50,12 +66,22 @@
         "CENTOS_AGENT_URL={{user `centos_agent_url`}}",
         "WINDOWS_AGENT_URL={{user `windows_agent_url`}}"
       ]
+    },
+    {
+      "type": "shell",
+      "script": "provision/prepare_nightly.sh",
+      "only": ["nightly_virtualbox_build"]
+    },
+    {
+      "type": "shell",
+      "script": "provision/cleanup.sh",
+      "only": ["nightly_virtualbox_build"]
     }
   ],
   "post-processors": [
     {
       "type": "vagrant",
-      "compression_level": 9,
+      "only": ["virtualbox", "amazon"],
       "output": "cloudify_{{user `cloudify_release`}}_{{.Provider}}.box"
     }
   ]
