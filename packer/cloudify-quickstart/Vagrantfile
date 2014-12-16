@@ -16,7 +16,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-BASE_BOX_NAME = 'cloudify'
+BASE_BOX_NAME = 'cloudify-box'
 
 Vagrant.configure('2') do |config|
 
