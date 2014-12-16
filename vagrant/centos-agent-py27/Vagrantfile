@@ -22,8 +22,6 @@ AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
 BASE_BOX_NAME = 'centos6point4'
 BASE_BOX_URI = 'https://github.com/2creatives/vagrant-centos/releases/download/v0.1.0/centos64-x86_64-20131030.box'
 
-BASE_CENTOS65_BOX_NAME = 'chef/centos-6.5'
-
 Vagrant.configure('2') do |config|
   config.vm.define "centos" do |centos|
     #dummy box, will be overriden
@@ -49,7 +47,7 @@ Vagrant.configure('2') do |config|
     end
 
     #need to sync folders
-    centos.vm.synced_folder "../../", "/cloudify-packager", create: true, type: "rsync", rsync__exclude: ".git/"
+    centos.vm.synced_folder "../../", "/cloudify-packager", create: true
     centos.vm.provision "shell", path: "provision.sh", privileged: false
   end
 
@@ -63,16 +61,4 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell", path: "provision.sh", privileged: false
   end
-
-  # for testing
-  config.vm.define :local65 do |local65|
-    local65.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', '1024']
-    end
-    local65.vm.box = BASE_CENTOS65_BOX_NAME
-    local65.vm.hostname = 'local65'
-    local65.vm.synced_folder "../../", "/cloudify-packager", create: true
-    # local65.vm.provision "shell", path: "provision.sh", privileged: false
-  end
-
 end

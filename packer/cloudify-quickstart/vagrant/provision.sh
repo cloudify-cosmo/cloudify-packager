@@ -8,6 +8,7 @@ DSL_SHA=""
 REST_CLIENT_SHA=""
 CLI_SHA=""
 PLUGINS_COMMON_SHA=""
+SCRIPT_PLUGIN_SHA=""
 MANAGER_BLUEPRINTS_SHA=""
 
 USERNAME=$(id -u -n)
@@ -22,7 +23,7 @@ echo bootstrapping...
 
 # update
 echo updating apt cache
-sudo apt-get -y update &&
+sudo apt-get -y update
 
 # install prereqs
 echo installing prerequisites
@@ -36,10 +37,10 @@ cd ~
 
 # virtualenv
 echo installing virtualenv
-sudo pip install virtualenv==1.11.4 &&
+sudo pip install virtualenv==1.11.4
 echo creating cloudify virtualenv
-virtualenv cloudify &&
-source cloudify/bin/activate &&
+virtualenv cloudify
+source cloudify/bin/activate
 
 # install cli
 if [ "$INSTALL_FROM_PYPI" = "true" ]; then
@@ -93,17 +94,17 @@ activate_cfy_bash_completion
 
 # init cfy work dir
 cd ~
-mkdir -p cloudify &&
+mkdir -p cloudify
 cd cloudify
 cfy init
 
 # clone manager blueprints
 git clone https://github.com/cloudify-cosmo/cloudify-manager-blueprints.git
-	pushd cloudify-manager-blueprints
-		if [ -n "$MANAGER_BLUEPRINTS_SHA" ]; then
-			git reset --hard $MANAGER_BLUEPRINTS_SHA
-		fi
-	popd
+pushd cloudify-manager-blueprints
+	if [ -n "$MANAGER_BLUEPRINTS_SHA" ]; then
+		git reset --hard $MANAGER_BLUEPRINTS_SHA
+	fi
+popd
 
 
 # generate public/private key pair and add to authorized_keys
@@ -118,7 +119,7 @@ sed -i "s|\"ssh_user\": \"\"|\"ssh_user\": \"${USERNAME}\"|g" inputs.json
 sed -i "s|\"ssh_key_filename\": \"\"|\"ssh_key_filename\": \"~/.ssh/id_rsa\"|g" inputs.json
 
 # bootstrap the manager locally
-cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.json --install-plugins &&
+cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.json --install-plugins
 
 # create blueprints and inputs dir
 mkdir -p ~/cloudify/blueprints/inputs

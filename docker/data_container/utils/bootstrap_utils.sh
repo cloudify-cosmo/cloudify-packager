@@ -52,54 +52,30 @@ function check_file
 	fi
 }
 
+function wait_for_port
+{
+    c=0
+    while ! echo exit | curl http://localhost:$1;
+    do
+            if [[ $c -gt 24 ]]; then
+                    state_error "failed to connect to elasticsearch..."
+            fi
+            echo "elasticsearch host not up yet... retrying... ($c/24)"
+            sleep 5;
+            c=$((c+1))
+    done
+}
+
 function check_upstart
 {
 	echo "checking to see if $1 daemon is running..."
-	sudo status $1 || state_error "daemon $1 is not running"
+	status $1 || state_error "daemon $1 is not running"
 	echo "daemon $1 is running"
 }
 
 function check_service
 {
     echo "checking to see if $1 service is running..."
-    sudo service $1 status || state_error "service $1 is not running"
+    service $1 status || state_error "service $1 is not running"
     echo "service $1 is running"
 }
-
-
-PKG_NAME="{{ name }}"
-PKG_DIR="{{ sources_path }}"
-BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
-
-PORT="{{ port }}"
-BASE_DIR="/opt"
-HOME_DIR="${BASE_DIR}/${PKG_NAME}"
-
-PKG_INIT_DIR="${PKG_DIR}/init"
-INIT_DIR="/etc/init.d"
-
-PKG_CONF_DIR="${PKG_DIR}/conf"
-
-
-echo -e "\n\n\n############################## INSTALLING ${PKG_NAME}"
-
-# echo "unpacking ${PKG_NAME}..."
-# sudo mv ${PKG_DIR}/${PKG_NAME} ${BASE_DIR}
-# check_dir "${BASE_DIR}/${PKG_NAME}"
-
-# cd ${BASE_DIR}
-sudo virtualenv ${HOME_DIR}
-
-echo "creating ${PKG_NAME} app directory..."
-sudo mkdir ${HOME_DIR}/app
-check_dir "${HOME_DIR}/app"
-
-echo "moving some stuff around..."
-sudo cp ${HOME_DIR}/lib/python2.7/site-packages/cosmo/celery.py ${HOME_DIR}/app
-check_file "${HOME_DIR}/app/celery.py"
-sudo cp ${PKG_INIT_DIR}/celeryd ${INIT_DIR}
-check_file "${INIT_DIR}/celeryd"
-sudo cp ${PKG_CONF_DIR}/cosmo.txt ${HOME_DIR}/app
-check_file "${HOME_DIR}/app/cosmo.txt"
-sudo cp ${PKG_CONF_DIR}/celeryd /etc/default
-check_file "/etc/default/celeryd"

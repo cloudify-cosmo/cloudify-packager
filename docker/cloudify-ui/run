@@ -1,0 +1,8 @@
+#!/bin/bash
+# description "cloudify-webui service"
+#
+# The following are to be injected by docker installation process:
+#
+#
+cd /etc/service/cloudify-ui/cosmo-ui/
+node cosmoui.js localhost

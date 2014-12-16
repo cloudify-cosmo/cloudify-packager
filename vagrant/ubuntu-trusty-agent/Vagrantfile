@@ -19,38 +19,37 @@
 AWS_ACCESS_KEY_ID = ENV['AWS_ACCESS_KEY_ID']
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
 
-BASE_BOX_NAME = 'centos6point4'
-BASE_BOX_URI = 'https://github.com/2creatives/vagrant-centos/releases/download/v0.1.0/centos64-x86_64-20131030.box'
-
-BASE_CENTOS65_BOX_NAME = 'chef/centos-6.5'
+BASE_BOX_NAME = 'ubuntu/trusty64'
 
 Vagrant.configure('2') do |config|
-  config.vm.define "centos" do |centos|
+  config.vm.define "ubuntu" do |ubuntu|
     #dummy box, will be overriden
-    centos.vm.box = "dummy"
-    centos.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+    ubuntu.vm.box = "dummy"
+    ubuntu.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
 
-    centos.vm.provider :aws do |aws, override|
+    # vagrant up ubuntu --provider=aws
+    ubuntu.vm.provider :aws do |aws, override|
       aws.access_key_id = AWS_ACCESS_KEY_ID
       aws.secret_access_key = AWS_ACCESS_KEY
 
-      aws.ami = "ami-3b39ee4c"
+      #official ubuntu 14.04 64bit box
+      aws.ami = "ami-f0b11187"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
       aws.keypair_name = "vagrant_build"
-      override.ssh.username = "root"
+      override.ssh.username = "ubuntu"
       override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
 
       aws.tags = {
-          "Name" => "vagrant agent centos build",
+          "Name" => "vagrant agent ubuntu build",
       }
-        aws.security_groups = "vagrant_linux_build"
+        aws.security_groups = "vagrant_cfy_build"
     end
 
     #need to sync folders
-    centos.vm.synced_folder "../../", "/cloudify-packager", create: true, type: "rsync", rsync__exclude: ".git/"
-    centos.vm.provision "shell", path: "provision.sh", privileged: false
+    ubuntu.vm.synced_folder "../../", "/cloudify-packager", create: true
+    ubuntu.vm.provision "shell", path: "provision.sh", privileged: false
   end
 
   config.vm.define :local do |local|
@@ -58,21 +57,8 @@ Vagrant.configure('2') do |config|
       vb.customize ['modifyvm', :id, '--memory', '1024']
     end
     local.vm.box = BASE_BOX_NAME
-    local.vm.box_url = BASE_BOX_URI
     local.vm.hostname = 'local'
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell", path: "provision.sh", privileged: false
   end
-
-  # for testing
-  config.vm.define :local65 do |local65|
-    local65.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', '1024']
-    end
-    local65.vm.box = BASE_CENTOS65_BOX_NAME
-    local65.vm.hostname = 'local65'
-    local65.vm.synced_folder "../../", "/cloudify-packager", create: true
-    # local65.vm.provision "shell", path: "provision.sh", privileged: false
-  end
-
 end
