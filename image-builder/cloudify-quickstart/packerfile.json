@@ -2,9 +2,9 @@
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_ACCESS_KEY`}}",
-    "aws_source_ami": "ami-6ca1011b",
+    "aws_source_ami": "",
     "virtualbox_source_image": "",
-    "virtualbox_key": "./keys/insecure_private_key",
+    "insecure_private_key": "./keys/insecure_private_key",
     "components_package_url": null,
     "core_package_url": null,
     "ui_package_url": null,
@@ -20,7 +20,7 @@
       "source_path": "{{user `virtualbox_source_image`}}",
       "vm_name": "cloudify",
       "ssh_username": "vagrant",
-      "ssh_key_path": "{{user `virtualbox_key`}}",
+      "ssh_key_path": "{{user `insecure_private_key`}}",
       "ssh_wait_timeout": "2m",
       "shutdown_command": "sudo -S shutdown -P now",
       "vboxmanage": [
@@ -35,6 +35,7 @@
       "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
+      "ssh_private_key_file": "{{user `insecure_private_key`}}",
       "region": "eu-west-1",
       "source_ami": "{{user `aws_source_ami`}}",
       "instance_type": "m3.medium",

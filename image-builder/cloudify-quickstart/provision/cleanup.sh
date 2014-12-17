@@ -1,3 +1,3 @@
 #!/bin/bash
 
-# clean private data before creating ami
+sudo apt-get clean -y
