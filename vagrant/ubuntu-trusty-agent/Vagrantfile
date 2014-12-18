@@ -27,12 +27,13 @@ Vagrant.configure('2') do |config|
     ubuntu.vm.box = "dummy"
     ubuntu.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
 
+    # vagrant up ubuntu --provider=aws
     ubuntu.vm.provider :aws do |aws, override|
       aws.access_key_id = AWS_ACCESS_KEY_ID
       aws.secret_access_key = AWS_ACCESS_KEY
 
-      #official ubuntu 12.04 64bit box
-      aws.ami = "ami-036eaa74"
+      #official ubuntu 14.04 64bit box
+      aws.ami = "ami-f0b11187"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 

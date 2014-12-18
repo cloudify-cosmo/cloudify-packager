@@ -16,13 +16,13 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-BASE_BOX_NAME = 'cloudify'
+BASE_BOX_NAME = 'cloudify-box'
 
 Vagrant.configure('2') do |config|
 
   config.vm.define :cloudify do |cloudify|
     cloudify.vm.provider :virtualbox do |vb|
-      vb.name = 'cloudify'
+      vb.name = 'cfy'
       vb.customize ['modifyvm', :id, '--memory', '2048']
       vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     end
