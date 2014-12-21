@@ -1,0 +1,5 @@
+DEFAULT cloudify
+LABEL cloudify
+LINUX /vmlinuz
+APPEND root=/dev/disk/by-uuid/$UUID `sudo blkid -s UUID -o value /dev/mapper/loop0p1`
+INITRD /initrd.img

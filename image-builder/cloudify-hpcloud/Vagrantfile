@@ -30,38 +30,28 @@ HP_AVAILABILITY_ZONE = ENV['HP_AVAILABILITY_ZONE'] || "us-east"
 SERVER_NAME = INSTALL_FROM_PYPI==="true"? "install_cloudify_3_stable" : "install_cloudify_3_latest"
 
 Vagrant.configure('2') do |config|
-  config.vm.define :local do |cloudify|
-
-    cloudify.vm.provider :virtualbox do |vb, override|
-      override.vm.box = "ubuntu/precise64"
-
-      vb.name = "#{SERVER_NAME}"
-      vb.customize ['modifyvm', :id, '--memory', '2048']
+  cloudify.vm.provider :hp do |hp, override|
+    unless Vagrant.has_plugin?("vagrant-hp")
+        raise 'vagrant-hp plugin not installed!'
     end
+    override.vm.box = "dummy_hp"
+    override.vm.box_url = "https://github.com/mohitsethi/vagrant-hp/raw/master/dummy_hp.box"
 
-    cloudify.vm.provider :hp do |hp, override|
-      unless Vagrant.has_plugin?("vagrant-hp")
-          raise 'vagrant-hp plugin not installed!'
-      end
-      override.vm.box = "dummy_hp"
-      override.vm.box_url = "https://github.com/mohitsethi/vagrant-hp/raw/master/dummy_hp.box"
+    hp.access_key             = "#{HP_ACCESS_KEY}"
+    hp.secret_key             = "#{HP_SECRET_KEY}"
+    hp.flavor                 = "standard.medium"
+    hp.tenant_id              = "#{HP_TENANT_ID}"
+    hp.server_name            = "#{SERVER_NAME}"
+    hp.image                  = "#{HP_SERVER_IMAGE}"
+    hp.keypair_name           = "#{HP_KEYPAIR_NAME}"
+    hp.ssh_private_key_path   = "#{HP_PRIVATE_KEY_PATH}"
+    hp.ssh_username           = "#{HP_SSH_USERNAME}"
+    hp.availability_zone      = "#{HP_AVAILABILITY_ZONE}"
+  end
 
-      hp.access_key             = "#{HP_ACCESS_KEY}"
-      hp.secret_key             = "#{HP_SECRET_KEY}"
-      hp.flavor                 = "standard.medium"
-      hp.tenant_id              = "#{HP_TENANT_ID}"
-      hp.server_name            = "#{SERVER_NAME}"
-      hp.image                  = "#{HP_SERVER_IMAGE}"
-      hp.keypair_name           = "#{HP_KEYPAIR_NAME}"
-      hp.ssh_private_key_path   = "#{HP_PRIVATE_KEY_PATH}"
-      hp.ssh_username           = "#{HP_SSH_USERNAME}"
-      hp.availability_zone      = "#{HP_AVAILABILITY_ZONE}"
-    end
-
-    cloudify.vm.provision "shell" do |sh|
-      sh.path = "provision.sh"
-      sh.args = "#{INSTALL_FROM_PYPI}"
-      sh.privileged = false
-    end
+  config.vm.provision "shell" do |sh|
+    sh.path = "../provision/common.sh"
+    sh.args = "#{INSTALL_FROM_PYPI}"
+    sh.privileged = false
   end
 end
