@@ -122,6 +122,10 @@ sed -i "s|\"ssh_key_filename\": \"\"|\"ssh_key_filename\": \"~/.ssh/id_rsa\"|g" 
 
 # bootstrap the manager locally
 cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.json --install-plugins
+if [ "$?" -ne "0" ]; then
+  echo "Bootstrap failed, stoping provision."
+  exit 1
+fi
 
 # create blueprints and inputs dir
 mkdir -p ~/cloudify/blueprints/inputs

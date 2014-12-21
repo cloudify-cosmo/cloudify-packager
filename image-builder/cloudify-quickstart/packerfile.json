@@ -1,8 +1,9 @@
 {
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
-    "aws_secret_key": "{{env `AWS_ACCESS_KEY`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "aws_source_ami": "",
+    "instance_type": "m3.large",
     "virtualbox_source_image": "",
     "insecure_private_key": "./keys/insecure_private_key",
     "components_package_url": null,
@@ -38,7 +39,7 @@
       "ssh_private_key_file": "{{user `insecure_private_key`}}",
       "region": "eu-west-1",
       "source_ami": "{{user `aws_source_ami`}}",
-      "instance_type": "m3.medium",
+      "instance_type": "{{user `instance_type`}}",
       "ssh_username": "vagrant",
       "user_data_file": "userdata/add_vagrant_user.sh",
       "ami_name": "cloudify nightly {{timestamp}}"
@@ -50,7 +51,7 @@
       "secret_key": "{{user `aws_secret_key`}}",
       "region": "eu-west-1",
       "source_ami": "{{user `aws_source_ami`}}",
-      "instance_type": "m3.medium",
+      "instance_type": "{{user `instance_type`}}",
       "ssh_username": "ubuntu",
       "ami_name": "cloudify {{timestamp}}"
     }

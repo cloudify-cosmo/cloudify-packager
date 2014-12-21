@@ -16,3 +16,7 @@ echo manual | sudo tee /etc/init/ttyS0.override
 
 # install guest additions
 sudo apt-get install -y virtualbox-guest-utils
+
+# change hostname
+echo cloudify | sudo -S tee /etc/hostname
+echo 127.0.0.1 cloudify | sudo -S tee /etc/hosts
