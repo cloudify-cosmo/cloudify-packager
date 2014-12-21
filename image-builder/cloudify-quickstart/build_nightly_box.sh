@@ -8,8 +8,7 @@ export CENTOS_AGENT_URL="http://gigaspaces-repository-eu.s3.amazonaws.com/org/cl
 export WINDOWS_AGENT_URL="http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/ga-RELEASE/cloudify-windows-agent_3.1.0-ga-b85_amd64.deb"
 export CLOUDIFY_RELEASE="3.1.0"
 
-export aws_access_key="AKIAI3E4DH26QFVMKGUA"
-export aws_secret_key="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"
+
 
 packer validate -syntax-only packerfile.json
 
