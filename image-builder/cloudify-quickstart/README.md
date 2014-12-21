@@ -1,5 +1,6 @@
 # Image Builder
-Number of scenarios are supported: 
+This directory contains configuration and script files that are intended to be used for creating Vagrant box with working Cloudify Manager to number of Vagrant providers.
+Supported scenarios: 
 
 1. Create Vagrant box locally by using Virtualbox (for Virtualbox Vagrant provider)
 1. Create Vagrant box remotly by using AWS (for Virtualbox Vagrant provider)
@@ -16,7 +17,7 @@ Number of scenarios are supported:
 # How to use this
 ## Pre Requirements
 
-1. Python (>=2.7):
+1. Python2.7 (for scenerio 2):
   * [Fabric](http://www.fabfile.org/)
   * [Boto](http://docs.pythonboto.org/en/latest/)
 1. [Packer](https://www.packer.io/)
@@ -83,4 +84,29 @@ Example for role policy:
 
 ## Running
 
+### Create Vagrant box locally by using Virtualbox 
+```shell
+packer build  \
+       -only=virtualbox
+       -var-file=packer_inputs.json
+       packerfile.json
+```
 
+### Create Vagrant box remotly by using AWS (for Virtualbox provider)
+```shell
+python nightly-builder.py
+````
+
+### Create Vagrant box remotly by using AWS (for AWS provider)
+```shell
+packer build  \
+       -only=amazon
+       -var-file=packer_inputs.json
+       packerfile.json
+```
+
+### Create Vagrant box locally by using HPCloud
+```shell
+cd cloudify-hpcloud
+vagrant up --provider hp
+```
