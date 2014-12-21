@@ -16,8 +16,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.configure('2') do |config|
-  config.vm.box = $BOX_NAME
-  config.vm.box_url = $BOX_URL
+Vagrant.configure("2") do |config|
+  config.vm.box = "$BOX_NAME"
+  config.vm.box_url = "$BOX_URL"
   config.vm.network :private_network, ip: "11.0.0.7"
 end
