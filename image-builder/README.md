@@ -11,6 +11,9 @@ Supported scenarios:
 * `userdata` - contains userdata scripts for AWS machines 
 * `templates` - templates files used for building
 * `provision` - provisioning scripts used by Packer & Vagrant
+  * common.sh - Main provisioning script (installing manager). Includes all the GIT repos (SHA)
+  * cleanup.sh - Post install for provisioning with AWS
+  * prepare_nightly.sh - All the needed changes to make Cloud image into Virtualbox image
 * `keys` - insecure keys for Vagrant
 * `cloudify-hpcloud` - Vagrant box creator for hpcloud
 
