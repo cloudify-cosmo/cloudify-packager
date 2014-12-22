@@ -42,6 +42,6 @@ The Vagrant folder contains vagrant configuration for different components that 
 
 NOTE: the Windows Agent Vagrantfile uses a premade image already containing the basic requirements for creating the Windows agent.
 
-### [Packer](http://www.packer.io)
+#### image-builder
 
-Packer is used to create the demo Vagrant box for Cloudify's [Quickstart guide](http://getcloudify.org/guide/3.1/quickstart.html).
+Create Vagrant box with Cloudify Manager installed for Virtualbox, AWS, HPCloud
