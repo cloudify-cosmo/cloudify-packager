@@ -113,3 +113,7 @@ packer build  \
 cd cloudify-hpcloud
 vagrant up --provider hp
 ```
+## How nightly image is built
+The nightly image process is more complecated from the rest. This is because we use AWS as the platform to build our images on. The following diagram explains the process:
+![](https://raw.githubusercontent.com/cloudify-cosmo/cloudify-packager/master/image-builder/nightly.png)
+
