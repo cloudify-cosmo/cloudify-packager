@@ -6,12 +6,6 @@
     "instance_type": "m3.large",
     "virtualbox_source_image": "",
     "insecure_private_key": "./keys/insecure_private_key",
-    "components_package_url": null,
-    "core_package_url": null,
-    "ui_package_url": null,
-    "ubuntu_agent_url": null,
-    "centos_agent_url": null,
-    "windows_agent_url": null,
     "cloudify_release": null
     },
   "builders": [
@@ -59,15 +53,7 @@
   "provisioners": [
     {
       "type": "shell",
-      "script": "provision/common.sh",
-      "environment_vars": [
-        "COMPONENTS_PACKAGE_URL={{user `components_package_url`}}",
-        "CORE_PACKAGE_URL={{user `core_package_url`}}",
-        "UI_PACKAGE_URL={{user `ui_package_url`}}",
-        "UBUNTU_AGENT_URL={{user `ubuntu_agent_url`}}",
-        "CENTOS_AGENT_URL={{user `centos_agent_url`}}",
-        "WINDOWS_AGENT_URL={{user `windows_agent_url`}}"
-      ]
+      "script": "provision/common.sh"
     },
     {
       "type": "shell",
