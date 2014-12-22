@@ -9,7 +9,7 @@ echo "install from pypi: ${INSTALL_FROM_PYPI}"
 DSL_SHA=""
 REST_CLIENT_SHA=""
 CLI_SHA=""
-PLUGINS_COMMON_SHA=""
+COMMON_PLUGIN_SHA=""
 SCRIPT_PLUGIN_SHA=""
 MANAGER_BLUEPRINTS_SHA=""
 
@@ -68,8 +68,8 @@ else
 
 	git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 	pushd cloudify-plugins-common
-		if [ -n "$PLUGINS_COMMON_SHA" ]; then
-			git reset --hard $PLUGINS_COMMON_SHA
+		if [ -n "$COMMON_PLUGIN_SHA" ]; then
+			git reset --hard $COMMON_PLUGIN_SHA
 		fi
 		pip install .
 	popd
