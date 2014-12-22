@@ -69,8 +69,8 @@
   "post-processors": [
     {
       "type": "vagrant",
-      "only": ["virtualbox", "amazon"],
-      "output": "cloudify_{{user `cloudify_release`}}_{{.Provider}}.box"
+      "only": ["virtualbox"],
+      "output": "cloudify_{{.Provider}}.box"
     }
   ]
 }
