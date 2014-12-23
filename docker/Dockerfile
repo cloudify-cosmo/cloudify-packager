@@ -51,7 +51,7 @@ RUN echo installing riemann dependencies && \
     chmod 644 $RIEMANN_SERVICE_DIR/langohr.jar && \
     \
     echo downloading and installing riemann deb && \
-    curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb && \
+    curl https://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb && \
     dpkg -i /opt/tmp/riemann/riemann.deb && \
     rm -rf /opt/tmp/riemann/riemann.deb && \
     \
@@ -384,7 +384,7 @@ RUN echo installing web-ui dependencies && \
     echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc && \
     \
     echo downloading cloudify-webui package and extracting webui and grafana tar.gz && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-ui_3.1.0-rc1-b83_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/ga-RELEASE/cloudify-ui_3.1.0-ga-b85_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
     dpkg-deb -x /opt/tmp/cloudify-webui/cloudify-webui.deb /opt/tmp/cloudify-webui/ && \
     mkdir -p $WEBUI_SERVICE_DIR/cosmo-ui && \
     tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/cosmo-ui* -C $WEBUI_SERVICE_DIR/cosmo-ui --strip-components=1 && \

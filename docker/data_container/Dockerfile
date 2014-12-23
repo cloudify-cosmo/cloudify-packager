@@ -24,7 +24,7 @@ RUN echo installing riemann dependencies && \
     chmod 644 $RIEMANN_SERVICE_DIR/langohr.jar && \
     \
     echo downloading and installing riemann deb && \
-    curl http://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb && \
+    curl https://aphyr.com/riemann/riemann_0.2.6_all.deb --create-dirs -o /opt/tmp/riemann/riemann.deb && \
     dpkg -i /opt/tmp/riemann/riemann.deb && \
     rm -rf /opt/tmp/riemann/riemann.deb && \
     \
