@@ -18,17 +18,12 @@ input {
         # key => "{{ config_templates.__params_conf.events_queue}}"
         # exchange => "test_exchange" # This matches the exchange declared above
     }
- 
+
     tcp {
         port => {{ config_templates.__params_conf.test_tcp_port }}
     }
 }
 
-filter {
-    date {
-        match => [ "timestamp", "YYYY-MM-dd HH:mm:ss.SSS" ]
-    }
-}
 
 output {
     elasticsearch_http {
