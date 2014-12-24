@@ -5,8 +5,7 @@
     "aws_source_ami": "",
     "instance_type": "m3.large",
     "virtualbox_source_image": "",
-    "insecure_private_key": "./keys/insecure_private_key",
-    "cloudify_release": null
+    "insecure_private_key": "./keys/insecure_private_key"
     },
   "builders": [
     {
