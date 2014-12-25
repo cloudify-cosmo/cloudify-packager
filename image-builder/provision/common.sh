@@ -76,8 +76,8 @@ else
 
 	git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 	pushd cloudify-script-plugin
-		if [ -n "$SCRIPT_PLUGIN_SHA" ]; then
-			git reset --hard $SCRIPT_PLUGIN_SHA
+		if [ -n "$SCRIPTS_PLUGIN_SHA" ]; then
+			git reset --hard $SCRIPTS_PLUGIN_SHA
 		fi
 		pip install .
 	popd
