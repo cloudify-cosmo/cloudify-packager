@@ -5,6 +5,7 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
 ADD utils/ /opt/tmp/utils/
+ADD NOTICE.txt /root/license
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
 
