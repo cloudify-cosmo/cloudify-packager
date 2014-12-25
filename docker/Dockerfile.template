@@ -331,13 +331,13 @@ RUN echo install dependencies && \
     chmod +x $REST_RUN_FILE
 
 # create resources folder and copy all required resources
-RUN curl {{ manager.agents.ubuntu_agent_deb }} --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
+RUN curl {{ manager.agents.ubuntu_agent_url }} --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
     dpkg -i /opt/tmp/manager/ubuntu_agent.deb && \
     rm -rf /opt/tmp/manager/ubuntu_agent.deb && \
-    curl {{ manager.agents.centos_agent_deb }} --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
+    curl {{ manager.agents.centos_agent_url }} --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
     dpkg -i /opt/tmp/manager/centos_agent.deb && \
     rm -rf /opt/tmp/manager/centos_agent.deb && \
-    curl {{ manager.agents.windows_agent_deb }} --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
+    curl {{ manager.agents.windows_agent_url }} --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
     dpkg -i /opt/tmp/manager/windows_agent.deb && \
     cp -r /opt/manager/cloudify-manager/resources/rest-service/* /opt/manager/resources && \
     rm -rf /opt/tmp/manager/windows_agent.deb
@@ -370,7 +370,7 @@ RUN echo installing web-ui dependencies && \
     echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc && \
     \
     echo downloading cloudify-webui package and extracting webui and grafana tar.gz && \
-    curl {{ webui.cloudify_webui_tar_url}} --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
+    curl {{ webui.ui_package_url }} --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
     dpkg-deb -x /opt/tmp/cloudify-webui/cloudify-webui.deb /opt/tmp/cloudify-webui/ && \
     mkdir -p $WEBUI_SERVICE_DIR/cosmo-ui && \
     tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/cosmo-ui* -C $WEBUI_SERVICE_DIR/cosmo-ui --strip-components=1 && \
