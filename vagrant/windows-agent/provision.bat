@@ -43,4 +43,4 @@ rmdir /s /q C:\\CloudifyAgent\\cloudify-plugins-common
 rmdir /s /q C:\\CloudifyAgent\\cloudify-manager
 rmdir /s /q C:\\CloudifyAgent\\cloudify-script-plugin
 rmdir /s /q C:\\CloudifyAgent\\cloudify-diamond-plugin
-7z a -r -sfx -x!.* Cloudify.exe c:\\CloudifyAgent\\*
+7z a -r -sfx -x!.* cloudify-windows-agent.exe c:\\CloudifyAgent\\*

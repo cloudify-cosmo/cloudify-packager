@@ -2,9 +2,10 @@ function clone {
 	REPO=$1
 	SHA=$2
 	ORG=${3:-cloudify-cosmo}
+	URL=https://github.com/${ORG}/${REPO}.git
 
-	echo cloning ${REPO} repo
-	git clone https://github.com/${ORG}/${REPO}.git
+	echo cloning ${URL}
+	git clone ${URL}
 	pushd ${REPO}
 		if [ -n "$SHA" ]; then
 			git reset --hard $SHA
@@ -61,15 +62,15 @@ pushd cloudify-agent-packager
 popd
 
 # clone modules
-clone cloudify-rest-client ${REST_CLIENT_SHA}
-clone cloudify-plugins-common ${PLUGINS_COMMON_SHA}
-clone cloudify-script-plugin ${SCRIPTS_PLUGIN_SHA}
-clone cloudify-diamond-plugin ${DIAMOND_PLUGIN_SHA}
-clone cloudify-agent-installer-plugin ${AGENT_INSTALLER_SHA} iliapolo
-clone cloudify-plugin-installer-plugin ${PLUGIN_INSTALLER_SHA} iliapolo
-clone cloudify-windows-agent-installer-plugin ${WINDOWS_AGENT_INSTALLER_SHA} iliapolo
-clone cloudify-windows-plugin-installer-plugin ${WINDOWS_PLUGIN_INSTALLER_SHA} iliapolo
-clone cloudify-agent ${CLOUDIFY_AGENT_SHA} nir0s
+clone "cloudify-rest-client" ${REST_CLIENT_SHA}
+clone "cloudify-plugins-common" ${PLUGINS_COMMON_SHA}
+clone "cloudify-script-plugin" ${SCRIPTS_PLUGIN_SHA}
+clone "cloudify-diamond-plugin" ${DIAMOND_PLUGIN_SHA}
+clone "cloudify-agent-installer-plugin" ${AGENT_INSTALLER_SHA} "iliapolo"
+clone "cloudify-plugin-installer-plugin" ${PLUGIN_INSTALLER_SHA} "iliapolo"
+clone "cloudify-windows-agent-installer-plugin" ${WINDOWS_AGENT_INSTALLER_SHA} "iliapolo"
+clone "cloudify-windows-plugin-installer-plugin" ${WINDOWS_PLUGIN_INSTALLER_SHA} "iliapolo"
+clone "cloudify-agent" ${CLOUDIFY_AGENT_SHA} "nir0s"
 
 # create agent
 cfy-ap -c /vagrant/packager.yaml -f -v
