@@ -1,8 +1,26 @@
+function clone {
+	REPO=$1
+	SHA=$2
+	ORG=${3:-cloudify-cosmo}
+
+	echo cloning ${REPO} repo
+	git clone https://github.com/${ORG}/${REPO}.git
+	pushd ${REPO}
+		if [ -n "${SHA}" ]; then
+			git reset --hard ${SHA}
+		fi
+	popd
+}
+
 AGENT_PACKAGER_SHA=""
 REST_CLIENT_SHA=""
-COMMON_PLUGIN_SHA=""
+PLUGINS_COMMON_SHA=""
 SCRIPTS_PLUGIN_SHA=""
 DIAMOND_PLUGIN_SHA=""
+AGENT_INSTALLER_SHA=""
+PLUGIN_INSTALLER_SHA=""
+WINDOWS_AGENT_INSTALLER_SHA=""
+WINDOWS_PLUGIN_INSTALLER_SHA=""
 CLOUDIFY_AGENT_SHA=""
 
 # update and install prereqs
@@ -25,56 +43,32 @@ source agent-packager/bin/activate &&
 
 cd /tmp
 
+# echo cloning cloudify-agent-packager repo
+# git clone https://github.com/cloudify-cosmo/cloudify-agent-packager.git
+# pushd cloudify-agent-packager
+# 	if [ -n "$AGENT_PACKAGER_SHA" ]; then
+# 		git reset --hard $AGENT_PACKAGER_SHA
+# 	fi
+# 	git checkout agent-refactoring-project
+# 	sudo pip install .
+# popd
+
 # install agent packager
-echo cloning cloudify-agent-packager repo
-git clone https://github.com/cloudify-cosmo/cloudify-agent-packager.git
+clone cloudify-agent-packager AGENT_PACKAGER_SHA
 pushd cloudify-agent-packager
-	if [ -n "$AGENT_PACKAGER_SHA" ]; then
-		git reset --hard $AGENT_PACKAGER_SHA
-	fi
 	git checkout agent-refactoring-project
 	sudo pip install .
 popd
 
-echo '# GET PROCESS'
-echo cloning cloudify-rest-client repo
-git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
-pushd cloudify-rest-client
-	if [ -n "$REST_CLIENT_SHA" ]; then
-		git reset --hard $REST_CLIENT_SHA
-	fi
-popd
-echo cloning cloudify-plugins-common
-git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
-pushd cloudify-plugins-common
-	if [ -n "$COMMON_PLUGIN_SHA" ]; then
-		git reset --hard $COMMON_PLUGIN_SHA
-	fi
-popd
-echo cloning cloudify-script-plugin
-git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
-pushd cloudify-script-plugin
-	if [ -n "$SCRIPTS_PLUGIN_SHA" ]; then
-		git reset --hard $SCRIPTS_PLUGIN_SHA
-	fi
-popd
-echo cloning cloudify-diamond-plugin repo
-git clone https://github.com/cloudify-cosmo/cloudify-diamond-plugin.git
-pushd cloudify-diamond-plugin
-	if [ -n "$DIAMOND_PLUGIN_SHA" ]; then
-		git reset --hard $DIAMOND_PLUGIN_SHA
-	fi
-popd
-echo cloning cloudify-agent repo
-git clone https://github.com/nir0s/cloudify-agent.git
-pushd cloudify-agent
-	if [ -n "$CLOUDIFY_AGENT_SHA" ]; then
-		git reset --hard $CLOUDIFY_AGENT_SHA
-	fi
-popd
+# clone modules
+clone cloudify-rest-client REST_CLIENT_SHA
+clone cloudify-plugins-common PLUGINS_COMMON_SHA
+clone cloudify-script-plugin SCRIPTS_PLUGIN_SHA
+clone cloudify-diamond-plugin DIAMOND_PLUGIN_SHA
+clone cloudify-agent-installer-plugin AGENT_INSTALLER_SHA iliapolo
+clone cloudify-plugin-installer-plugin PLUGIN_INSTALLER_SHA iliapolo
+clone cloudify-windows-agent-installer-plugin WINDOWS_AGENT_INSTALLER_SHA iliapolo
+clone cloudify-windows-plugin-installer-plugin WINDOWS_PLUGIN_INSTALLER_SHA iliapolo
 
+# create agent
 cfy-ap -c /vagrant/packager.yaml -f -v
-
-# # create package
-# sudo pkm pack -c Ubuntu-trusty-agent &&
-# sudo pkm pack -c cloudify-ubuntu-trusty-agent &&
