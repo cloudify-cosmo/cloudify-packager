@@ -1,3 +1,24 @@
+function install_deps
+{
+	if which apt-get; then
+		# ubuntu
+		sudo apt-get -y update &&
+		# trusty
+		sudo apt-get install -y software-properties-common ||
+		#precise
+		sudo apt-get install -y python-software-properties
+		sudo add-apt-repository -y ppa:git-core/ppa
+		sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev
+	elif which yum; then
+		# centos
+		sudo yum -y update
+		sudo yum install curl python-devel make gcc git libyaml-devel -y
+	else
+		echo 'unsupported package manager, exiting'
+		exit 1
+	fi
+}
+
 function clone {
 	REPO=$1
 	SHA=$2
@@ -16,7 +37,7 @@ function clone {
 AGENT_PACKAGER_SHA=""
 REST_CLIENT_SHA=""
 PLUGINS_COMMON_SHA=""
-SCRIPTS_PLUGIN_SHA=""
+SCRIPT_PLUGIN_SHA=""
 DIAMOND_PLUGIN_SHA=""
 AGENT_INSTALLER_SHA=""
 PLUGIN_INSTALLER_SHA=""
@@ -25,11 +46,7 @@ WINDOWS_PLUGIN_INSTALLER_SHA=""
 CLOUDIFY_AGENT_SHA=""
 
 # update and install prereqs
-sudo apt-get -y update &&
-sudo apt-get install -y software-properties-common
-sudo add-apt-repository -y ppa:git-core/ppa &&
-sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev &&
-
+install_deps
 cd ~
 
 # install pip
