@@ -124,13 +124,8 @@ VARS = {
             "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",
             "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
         },
-        "agents": {
-          "ubuntu_agent_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m1-RELEASE/cloudify-ubuntu-agent_3.2.0-m1-b170_amd64.deb",
-          "centos_agent_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m1-RELEASE/cloudify-centos-final-agent_3.2.0-m1-b170_amd64.deb",
-          "windows_agent_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m1-RELEASE/cloudify-windows-agent_3.2.0-m1-b170_amd64.deb",
-        },
         "manager_rest_port": "8100",
-        },
+    },
     "webui": {
         "service_name": "cloudify-ui",
         "reqs": [
