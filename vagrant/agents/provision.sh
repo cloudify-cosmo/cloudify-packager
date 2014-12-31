@@ -36,7 +36,7 @@ function clone {
 
 AGENT_PACKAGER_SHA=""
 REST_CLIENT_SHA=""
-PLUGINS_COMMON_SHA=""
+COMMON_PLUGIN_SHA=""
 SCRIPT_PLUGIN_SHA=""
 DIAMOND_PLUGIN_SHA=""
 AGENT_INSTALLER_SHA=""
@@ -64,7 +64,7 @@ cd /tmp
 # clone modules
 clone "cloudify-agent-packager" "${AGENT_PACKAGER_SHA}"
 clone "cloudify-rest-client" "${REST_CLIENT_SHA}"
-clone "cloudify-plugins-common" "${PLUGINS_COMMON_SHA}"
+clone "cloudify-plugins-common" "${COMMON_PLUGIN_SHA}"
 clone "cloudify-script-plugin" "${SCRIPTS_PLUGIN_SHA}"
 clone "cloudify-diamond-plugin" "${DIAMOND_PLUGIN_SHA}"
 clone "cloudify-agent-installer-plugin" "${AGENT_INSTALLER_SHA}" "iliapolo"
