@@ -12,7 +12,7 @@ function wait_for_port
                     state_error "failed waiting for RabbitMQ to start."
                     return
             fi
-            echo "Failed starting amqp-influx, RabbitMQ is not up yet. retrying... ($c/10)"
+            echo "Failed starting amqp-influx since RabbitMQ is not up yet. retrying... ($c/10)"
             sleep 5;
             ((c++))
     done
