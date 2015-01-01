@@ -331,18 +331,6 @@ RUN echo install dependencies && \
     chmod +x $AMQPFLUX_RUN_FILE && \
     chmod +x $REST_RUN_FILE
 
-# create resources folder and copy all required resources
-RUN curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m1-RELEASE/cloudify-ubuntu-agent_3.2.0-m1-b170_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
-    dpkg -i /opt/tmp/manager/ubuntu_agent.deb && \
-    rm -rf /opt/tmp/manager/ubuntu_agent.deb && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m1-RELEASE/cloudify-centos-final-agent_3.2.0-m1-b170_amd64.deb --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
-    dpkg -i /opt/tmp/manager/centos_agent.deb && \
-    rm -rf /opt/tmp/manager/centos_agent.deb && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m1-RELEASE/cloudify-windows-agent_3.2.0-m1-b170_amd64.deb --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
-    dpkg -i /opt/tmp/manager/windows_agent.deb && \
-    cp -r /opt/manager/cloudify-manager/resources/rest-service/* /opt/manager/resources && \
-    rm -rf /opt/tmp/manager/windows_agent.deb
-
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - WEB-UI
 # ------------------------------------------------------------------------------------------------------------------------------------------ #

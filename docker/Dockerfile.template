@@ -331,18 +331,6 @@ RUN echo install dependencies && \
     chmod +x $AMQPFLUX_RUN_FILE && \
     chmod +x $REST_RUN_FILE
 
-# create resources folder and copy all required resources
-RUN curl {{ manager.agents.ubuntu_agent_url }} --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
-    dpkg -i /opt/tmp/manager/ubuntu_agent.deb && \
-    rm -rf /opt/tmp/manager/ubuntu_agent.deb && \
-    curl {{ manager.agents.centos_agent_url }} --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
-    dpkg -i /opt/tmp/manager/centos_agent.deb && \
-    rm -rf /opt/tmp/manager/centos_agent.deb && \
-    curl {{ manager.agents.windows_agent_url }} --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
-    dpkg -i /opt/tmp/manager/windows_agent.deb && \
-    cp -r /opt/manager/cloudify-manager/resources/rest-service/* /opt/manager/resources && \
-    rm -rf /opt/tmp/manager/windows_agent.deb
-
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - WEB-UI
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
