@@ -44,7 +44,7 @@ popd
 pip install virtualenv==1.11.4
 
 # clone custom packager branch containing package config
-git clone -b ubuntu-trusty-precise-agent-package https://github.com/cloudify-cosmo/cloudify-packager.git
+git clone https://github.com/cloudify-cosmo/cloudify-packager.git
 cd cloudify-packager/
 
 pkm pack -c cloudify-ubuntu-agent
