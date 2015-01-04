@@ -1,7 +1,6 @@
-
-
-
 #! /bin/bash -e
+
+PACKAGER_SHA=""
 
 install_docker()
 {
@@ -17,6 +16,11 @@ setup_jocker_env()
 clone_packager()
 {
   git clone https://github.com/cloudify-cosmo/cloudify-packager.git $1
+  pushd $1/cloudify-packager
+	  if [ -n "PACKAGER_SHA" ]; then
+		  git reset --hard $PACKAGER_SHA
+	  fi
+  popd
 }
 
 # $1 - path to dockerfile folder
