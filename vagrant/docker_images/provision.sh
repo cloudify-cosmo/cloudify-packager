@@ -9,7 +9,7 @@ install_docker()
 
 setup_jocker_env()
 {
-  sudo apt-get install python-pip
+  sudo apt-get install -y python-pip
   sudo pip install git+https://github.com/nir0s/jocker.git
 }
 
