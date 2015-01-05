@@ -47,7 +47,7 @@ build_images()
 start_and_export_containers()
 {
   sudo docker run -t --name=cloudify -d cloudify:latest /bin/bash
-  sudo docker export cloudify > /tmp/coudify-docker_3.1.0-ga-b85.tar
+  sudo docker export cloudify > /tmp/cloudify-docker_.tar
 }
 
 main() 
