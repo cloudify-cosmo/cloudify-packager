@@ -327,6 +327,9 @@ RUN echo install dependencies && \
     echo creating logs folder && \
     mkdir -p /var/log/cloudify && \
     \
+    echo copying rest-service resources to resource folder && \
+    cp -r /opt/manager/cloudify-manager/resources/rest-service/* /opt/manager/resources && \
+    \
     echo granting run permissions to run file && \
     chmod +x $AMQPFLUX_RUN_FILE && \
     chmod +x $REST_RUN_FILE
