@@ -4,10 +4,11 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
-ADD utils/ /opt/tmp/utils/
-ADD NOTICE.txt /root/license
+COPY utils/ /opt/tmp/utils/
+COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
+
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -21,8 +22,9 @@ ENV NGINX_RUN_FILE $NGINX_SERVICE_DIR/run
 ENV NGINX_LOGS_DIR $NGINX_SERVICE_DIR/logs
 ##### ENV #####
 # add run scripts and configuration
-ADD nginx/ $NGINX_SERVICE_DIR
-# TODO: Consider using http://nginx.com/blog/deploying-nginx-nginx-plus-docker/ instead of this container
+COPY nginx/ $NGINX_SERVICE_DIR
+
+
 RUN apt-get update && \
     # adding nginx repositories to sources.list file and update repo
     echo {{ nginx.source_repos }} | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
@@ -48,3 +50,6 @@ RUN apt-get update && \
     # remove curl
     apt-get remove curl -y && \
     apt-get autoremove -y
+
+EXPOSE 80
+EXPOSE 53229

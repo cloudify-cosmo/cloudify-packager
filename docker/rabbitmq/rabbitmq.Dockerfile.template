@@ -4,12 +4,11 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
-ADD utils/ /opt/tmp/utils/
-ADD NOTICE.txt /root/license
+COPY utils/ /opt/tmp/utils/
+COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
 
-RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - RABBITMQ, DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -19,15 +18,16 @@ ENV RABBITMQ_SERVICE_DIR /etc/service/$RABBITMQ_SERVICE_NAME
 ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run
 ##### ENV #####
 # add run scripts and configuration
-ADD rabbitmq/ $RABBITMQ_SERVICE_DIR/
+COPY rabbitmq/ $RABBITMQ_SERVICE_DIR/
 
-RUN echo installing rabbitmq dependencies && \
+RUN apt-get update && \
+    # installing rabbitmq dependencies
     apt-get install -y {% for dep in rabbitmq.reqs %} {{ dep }}{% endfor %} && \
-    \
-    echo installing rabbitmq-server and setting its properties && \
+    # installing rabbitmq-server and setting its properties
     apt-get -y install rabbitmq-server && \
     rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing && \
-    \
-    echo granting exec permissions && \
+    # granting exec permissions
     chmod +x $RABBITMQ_RUN_FILE
+
+EXPOSE 5672

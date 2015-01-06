@@ -4,12 +4,11 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
-ADD utils/ /opt/tmp/utils/
-ADD NOTICE.txt /root/license
+COPY utils/ /opt/tmp/utils/
+COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
 
-RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - CELERY
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -21,19 +20,17 @@ ENV CELERY_VIRTUAL_ENV_DIR $CELERY_SERVICE_DIR/env
 ENV CELERY_LOG_DIR $CELERY_SERVICE_DIR/logs
 ##### ENV #####
 # add run scripts and configuration
-ADD celery/ $CELERY_SERVICE_DIR/
+COPY mgmtworker/ $CELERY_SERVICE_DIR/
 
-RUN echo installing celery dependencies && \
+RUN apt-get update && \
+    # installing celery dependencies
     apt-get install -y {% for dep in celery.reqs %} {{ dep }}{% endfor %} && \
-    \
-    echo installing pip && \
+    # installing pip
     curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
-    \
-    echo installing virtualenv and creating one && \
+    # installing virtualenv and creating one
     pip install virtualenv && \
     virtualenv $CELERY_VIRTUAL_ENV_DIR && \
-    \
-    echo installing celery python requirements in virtualenv && \
+    # installing celery python requirements in virtualenv
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo {{ celery.python_install_requires }} | tr -d "',[]")
 
 ############################## install cloudify core components ##############################
@@ -56,10 +53,9 @@ RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_rest_clie
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
     popd && \
     pushd cloudify-manager/workflows && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install .'
-
-# inject required params to run script and create logs dir
-RUN sed -i '1s|^|CELERY_HOME_DIR='$CELERY_SERVICE_DIR' \n|' $CELERY_RUN_FILE && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install .' && \
+    # inject required params to run script and create logs dir
+    sed -i '1s|^|CELERY_HOME_DIR='$CELERY_SERVICE_DIR' \n|' $CELERY_RUN_FILE && \
     sed -i '1s|^|CELERY_LOG_DIR='$CELERY_LOG_DIR' \n|' $CELERY_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $CELERY_RUN_FILE && \
     mkdir -p $CELERY_LOG_DIR && \

@@ -7,3 +7,11 @@ generate_and_build()
 }
 
 generate_and_build nginx
+generate_and_build ui
+generate_and_build influxdb
+generate_and_build elasticsearch
+generate_and_build logstash
+generate_and_build mgmtworker
+generate_and_build rabbitmq
+generate_and_build riemann
+generate_and_build restservice

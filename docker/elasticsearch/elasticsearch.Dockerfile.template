@@ -4,12 +4,11 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
-ADD utils/ /opt/tmp/utils/
-ADD NOTICE.txt /root/license
+COPY utils/ /opt/tmp/utils/
+COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
 
-RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -18,24 +17,22 @@ ENV ELASTICSEARCH_SERVICE_NAME {{ elasticsearch.service_name }}
 ENV ELASTICSEARCH_SERVICE_DIR /etc/service/$ELASTICSEARCH_SERVICE_NAME
 ##### ENV #####
 # add run scripts and configuration
-ADD elasticsearch/ $ELASTICSEARCH_SERVICE_DIR/
+COPY elasticsearch/ $ELASTICSEARCH_SERVICE_DIR/
 
 
-RUN echo  installing elasticsearch dependencies && \
+RUN apt-get update && \
+    # installing elasticsearch dependencies
     apt-get install -y {% for dep in elasticsearch.reqs %} {{ dep }}{% endfor %} && \
-    \
-    echo download elasticsearch binaries && \
+    # download elasticsearch binaries
     curl {{ elasticsearch.elasticsearch_tar_url }} --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
-    \
-    echo extracting binaries to service dir && \
+    # extracting binaries to service dir
     mkdir -p $ELASTICSEARCH_SERVICE_DIR && \
     tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1 && \
-    rm -rf /opt/tmp/elasticsearch/elasticsearch.tar.gz
-
-# start elasticsearch as daemon for configuration purposes.
-# todo(adaml): move config to run script
-# config includes setting elasticsearch indexes.
-RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    rm -rf /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
+    # start elasticsearch as daemon for configuration purposes.
+    # todo(adaml): move config to run script
+    # config includes setting elasticsearch indexes.
+    /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     $ELASTICSEARCH_SERVICE_DIR/bin/elasticsearch -d && \
     wait_for_port {{ elasticsearch.ports[0] }}' && \
     echo "deleting events index if exists..." && \
@@ -59,7 +56,13 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     \
     echo granting run permissions to run file && \
     chmod +x $ELASTICSEARCH_SERVICE_DIR/run
+    # cleanup
+    # remove curl
+    apt-get remove curl -y && \
+    apt-get autoremove -y
 
-#elasticsearch persistence paths
+# elasticsearch persistence paths
 VOLUME /etc/service/elasticsearch/data
 VOLUME /etc/service/elasticsearch/logs
+
+EXPOSE 9200

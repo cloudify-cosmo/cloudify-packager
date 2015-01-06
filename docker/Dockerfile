@@ -1,52 +1,62 @@
-# TODO: Consider using http://nginx.com/blog/deploying-nginx-nginx-plus-docker/ instead.
 FROM phusion/baseimage:0.9.15
 MAINTAINER Cloudify, cosmo-admin@gigaspaces.com
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
-ADD utils/ /opt/tmp/utils/
-ADD NOTICE.txt /root/license
+COPY utils/ /opt/tmp/utils/
+COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
+
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - NGINX
+# INSTALL - MANAGER
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 ##### ENV #####
-# set nginx service name
-ENV NGINX_SERVICE_NAME nginx
-ENV NGINX_SERVICE_DIR /etc/service/$NGINX_SERVICE_NAME
-# nginx default conf file path
-ENV NGINX_CONF_FILE /etc/nginx/nginx.conf
-ENV NGINX_RUN_FILE $NGINX_SERVICE_DIR/run
-ENV NGINX_LOGS_DIR $NGINX_SERVICE_DIR/logs
+ENV MANAGER_SERVICE_NAME manager
+ENV MANAGER_SERVICES_DIR /opt/$MANAGER_SERVICE_NAME
+ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR/env
+ENV SERVER_FILES_DIR $MANAGER_SERVICES_DIR/cloudify-manager*/rest-service/manager_rest
+
+ENV AMQPFLUX_RUN_FILE /etc/service/amqp-influx/run
+ENV REST_RUN_FILE /etc/service/rest-service/run
+
+ENV REST_CONFIG_PATH /etc/service/rest-service/guni.conf
 ##### ENV #####
 # add run scripts and configuration
-ADD nginx/ $NGINX_SERVICE_DIR
+COPY amqp_influx/ /etc/service/amqp-influx/
+COPY restservice/ /etc/service/rest-service/
+
+WORKDIR /opt/manager/
 
 RUN apt-get update && \
-    echo adding nginx repositories to sources.list file and update repo && \
-    echo ['deb http://nginx.org/packages/mainline/ubuntu/ precise nginx', 'deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx'] | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
-    apt-get update && \
-    \
-    echo installing nginx dependencies && \
-    apt-get install -y  curl && \
-    \
-    echo download and add signing key && \
-    curl http://nginx.org/keys/nginx_signing.key --create-dirs -o /opt/tmp/nginx/nginx_signing.key && \
-    apt-key add /opt/tmp/nginx/nginx_signing.key && \
-    \
-    echo installing nginx && \
-    apt-get install -y --force-yes $NGINX_SERVICE_NAME && \
-    \
-    # turn-off daemon execution, set logging dir and default.conf location in conf file
-    echo "daemon off;" >> $NGINX_CONF_FILE && \
-    sed -i "s%/var/log/nginx/error.log warn%$NGINX_SERVICE_DIR/logs/error.log warn%g" $NGINX_CONF_FILE && \
-    sed -i "s%/var/run/nginx.pid%$NGINX_SERVICE_DIR/logs/nginx.pid%g" $NGINX_CONF_FILE && \
-    sed -i "s%/etc/nginx/conf.d/\*.conf%$NGINX_SERVICE_DIR/default.conf%g" $NGINX_CONF_FILE && \
-    mkdir -p $NGINX_LOGS_DIR && \
-    \
-    echo setting config path in run file && \
-    sed -i '1s|^|NGINX_CONF_FILE='$NGINX_CONF_FILE' \n|' $NGINX_RUN_FILE && \
-    sed -i '1s|^|#!/bin/bash \n|' $NGINX_RUN_FILE && \
-    chmod +x $NGINX_RUN_FILE
+    # install dependencies
+    apt-get install -y  git python2.7 && \
+    # installing pip
+    curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
+    # install virtualenv and create one
+    pip install virtualenv && \
+    virtualenv $MANAGER_VIRTUAL_ENV_DIR && \
+    # installing amqpinflux
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master && \
+    # installing rest-service
+    /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    pushd cloudify-manager/rest-service && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .' && \
+    # injecting required params to run script
+    sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE && \
+    sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $REST_RUN_FILE && \
+    sed -i '1s|^|MANAGER_REST_CONFIG_PATH='$REST_CONFIG_PATH' \n|' $REST_RUN_FILE && \
+    sed -i '1s|^|SERVER_FILES_DIR='$SERVER_FILES_DIR' \n|' $REST_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $REST_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $AMQPFLUX_RUN_FILE && \
+    # creating logs folder
+    mkdir -p /var/log/cloudify && \
+    # copying rest-service resources to resource folder
+    cp -r /opt/manager/cloudify-manager/resources/rest-service/. /opt/manager/resources && \
+    # granting run permissions to run file
+    chmod +x $AMQPFLUX_RUN_FILE && \
+    chmod +x $REST_RUN_FILE
+
+EXPOSE 8100

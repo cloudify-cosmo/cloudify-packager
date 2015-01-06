@@ -4,12 +4,11 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
-ADD utils/ /opt/tmp/utils/
-ADD NOTICE.txt /root/license
+COPY utils/ /opt/tmp/utils/
+COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
 
-RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - WEB-UI
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -19,12 +18,12 @@ ENV WEBUI_SERVICE_DIR /etc/service/$WEBUI_SERVICE_NAME
 ENV WEBUI_RUN_FILE $WEBUI_SERVICE_DIR/run
 ENV WEBUI_VIRTUAL_ENV_DIR $WEBUI_SERVICE_DIR/env
 ##### ENV #####
-ADD cloudify-ui/ $WEBUI_SERVICE_DIR/
+COPY ui/ $WEBUI_SERVICE_DIR/
 
-RUN echo installing web-ui dependencies && \
+RUN apt-get update && \
+    # installing web-ui dependencies
     apt-get install -y {% for dep in webui.reqs %} {{ dep }}{% endfor %} && \
-    \
-    echo installing nodejs from source && \
+    # installing nodejs from source
     cd /tmp && \
     curl {{ webui.nodejs_latest_url }} -o /tmp/node-latest.tar.gz && \
     tar xvzf node-latest.tar.gz && \
@@ -36,8 +35,7 @@ RUN echo installing web-ui dependencies && \
     cd /tmp && \
     rm -rf /tmp/node-v* && \
     echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc && \
-    \
-    echo downloading cloudify-webui package and extracting webui and grafana tar.gz && \
+    # downloading cloudify-webui package and extracting webui and grafana tar.gz
     curl {{ webui.ui_package_url }} --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
     dpkg-deb -x /opt/tmp/cloudify-webui/cloudify-webui.deb /opt/tmp/cloudify-webui/ && \
     mkdir -p $WEBUI_SERVICE_DIR/cosmo-ui && \
@@ -49,4 +47,5 @@ RUN echo installing web-ui dependencies && \
     chmod +x $WEBUI_RUN_FILE && \
     cd /etc/service/cloudify-ui/cosmo-ui && \
     npm update
-#RUN apt-get -y install nodejs npm
+
+EXPOSE 9100

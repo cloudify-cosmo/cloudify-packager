@@ -4,12 +4,11 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
-ADD utils/ /opt/tmp/utils/
-ADD NOTICE.txt /root/license
+COPY utils/ /opt/tmp/utils/
+COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
 
-RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - INFLUXDB
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -20,26 +19,23 @@ ENV INFLUXDB_CONFIG_FILE /opt/influxdb/shared/config.toml
 ENV INFLUXDB_RUN_FILE /etc/service/$INFLUXDB_SERVICE_NAME/run
 ##### ENV #####
 # add run scripts and configuration
-ADD influxdb/ /etc/service/$INFLUXDB_SERVICE_NAME/
+COPY influxdb/ /etc/service/$INFLUXDB_SERVICE_NAME/
 
-RUN echo installing influxdb dependencies && \
+RUN apt-get update && \
+    # installing influxdb dependencies
     apt-get install -y {% for dep in influxdb.reqs %} {{ dep }}{% endfor %} && \
-    \
-    echo downloading influxdb binaries && \
+    # downloading influxdb binaries
     curl {{ influxdb.package_url }} --create-dirs -o /opt/tmp/influxdb/influxdb.deb && \
-    \
-    echo installing influxdb && \
+    # installing influxdb
     dpkg -i /opt/tmp/influxdb/influxdb.deb && \
-    rm -rf /opt/tmp/influxdb/influxdb.deb
-
-RUN echo starting influxdb as daemon to create cloudify db && \
+    rm -rf /opt/tmp/influxdb/influxdb.deb && \
+    # starting influxdb as daemon to create cloudify db && \
     /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     /usr/bin/influxdb-daemon -config=$INFLUXDB_CONFIG_FILE && \
     wait_for_port {{ influxdb.ports[0] }}' && \
-    curl -s "http://localhost:{{ influxdb.ports[0] }}/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"
-
-# set config path in run file
-RUN sed -i '1s|^|INFLUXDB_CONFIG_FILE='$INFLUXDB_CONFIG_FILE' \n|' $INFLUXDB_RUN_FILE && \
+    curl -s "http://localhost:{{ influxdb.ports[0] }}/db?u=root&p=root" -d "{\"name\": \"cloudify\"}" && \
+    # set config path in run file
+    sed -i '1s|^|INFLUXDB_CONFIG_FILE='$INFLUXDB_CONFIG_FILE' \n|' $INFLUXDB_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $INFLUXDB_RUN_FILE && \
     chmod +x $INFLUXDB_RUN_FILE
 

@@ -117,7 +117,8 @@ VARS = {
         "service_name": "manager",
         "reqs": [
             "git",
-            "python2.7"
+            "python2.7",
+            "python-dev"
         ],
         "modules": {
             "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",  # NOQA
@@ -132,7 +133,9 @@ VARS = {
             "curl",
             "g++",
             "python2.7",
-            "make"
+            "make",
+            "python-dev",
+            "git"
         ],
         "nodejs_latest_url": "http://nodejs.org/dist/node-latest.tar.gz",
         "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m2-RELEASE/cloudify-ui_3.2.0-m2-b171_amd64.deb",  # NOQA

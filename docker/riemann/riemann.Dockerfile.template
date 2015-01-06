@@ -4,12 +4,11 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
-ADD utils/ /opt/tmp/utils/
-ADD NOTICE.txt /root/license
+COPY utils/ /opt/tmp/utils/
+COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
 
-RUN apt-get update
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - RIEMANN
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -20,28 +19,28 @@ ENV RIEMANN_RUN_FILE $RIEMANN_SERVICE_DIR/run
 ENV MANAGER_CONFIG_PATH $RIEMANN_SERVICE_DIR/manager.config
 ##### ENV #####
 # add run scripts and configuration
-ADD riemann/ $RIEMANN_SERVICE_DIR/
+COPY riemann/ $RIEMANN_SERVICE_DIR/
 
-RUN echo installing riemann dependencies && \
+RUN apt-get update && \
+    # installing riemann dependencies
     apt-get install -y {% for dep in riemann.reqs %} {{ dep }}{% endfor %} && \
-    \
-    echo downloading jar to service dir and setting permissions on langohr jar && \
+    # downloading jar to service dir and setting permissions on langohr jar
     curl {{ riemann.langohr_url }} --create-dirs -o $RIEMANN_SERVICE_DIR/langohr.jar && \
     chmod 644 $RIEMANN_SERVICE_DIR/langohr.jar && \
-    \
-    echo downloading and installing riemann deb && \
+    # downloading and installing riemann deb
     curl {{ riemann.package_url }} --create-dirs -o /opt/tmp/riemann/riemann.deb && \
     dpkg -i /opt/tmp/riemann/riemann.deb && \
     rm -rf /opt/tmp/riemann/riemann.deb && \
-    \
-    echo download riemann config && \
-    curl -o $MANAGER_CONFIG_PATH {{ riemann.config_url }}
-
-# inject required env vars to run script
-RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_RUN_FILE && \
+    # download riemann config
+    curl -o $MANAGER_CONFIG_PATH {{ riemann.config_url }} && \
+    # inject required env vars to run script
+    sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_RUN_FILE && \
     sed -i '1s|^|MANAGER_CONFIG_PATH='$MANAGER_CONFIG_PATH' \n|' $RIEMANN_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $RIEMANN_RUN_FILE && \
     chmod +x $RIEMANN_RUN_FILE
 
 # riemann persistence path
 VOLUME /etc/service/riemann
+
+EXPOSE 5556
+EXPOSE 5555
