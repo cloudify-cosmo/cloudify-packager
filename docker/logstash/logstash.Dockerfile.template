@@ -1,0 +1,37 @@
+FROM {{ image.repository }}:{{ image.tag }}
+MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+# INSTALL - BASE
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+# add utility functions
+ADD utils/ /opt/tmp/utils/
+ADD NOTICE.txt /root/license
+# Used by 'cfy status' impl to determine if running in container.
+ENV DOCKER_ENV True
+
+RUN apt-get update
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+# INSTALL - LOGSTASH
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+##### ENV #####
+ENV LOGSTASH_SERVICE_NAME {{ logstash.service_name }}
+ENV LOGSTASH_SERVICE_DIR /etc/service/$LOGSTASH_SERVICE_NAME
+# logstash exec file
+ENV LOGSTASH_RUN_FILE $LOGSTASH_SERVICE_DIR/run
+# logstash conf file
+ENV LOGSTASH_CONF_FILE $LOGSTASH_SERVICE_DIR/config.conf
+##### ENV #####
+# add run scripts and configuration
+ADD logstash/ $LOGSTASH_SERVICE_DIR/
+
+RUN echo installing logstash dependencies && \
+    apt-get install -y {% for dep in logstash.reqs %} {{ dep }}{% endfor %} && \
+    \
+    echo download jar file && \
+    curl {{ logstash.package_url }} --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar
+
+# inject required env vars to run script
+RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/logstash.jar' \n|' $LOGSTASH_RUN_FILE && \
+    sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_RUN_FILE && \
+    sed -i '1s|^|#!/bin/bash \n|' $LOGSTASH_RUN_FILE && \
+    chmod +x $LOGSTASH_RUN_FILE

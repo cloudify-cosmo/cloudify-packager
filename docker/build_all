@@ -1,0 +1,9 @@
+#!/bin/sh
+generate_and_build()
+{
+    SERVICE=$1
+    sudo jocker -t ${SERVICE}/${SERVICE}.Dockerfile.template -o Dockerfile -f vars.py
+    sudo docker build  -t cloudify/${SERVICE} .
+}
+
+generate_and_build nginx

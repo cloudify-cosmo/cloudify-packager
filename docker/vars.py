@@ -1,7 +1,7 @@
 VARS = {
     "maintainer": {
-        "name": "adaml",
-        "email": "adaml@gigaspaces.com"
+        "name": "Cloudify",
+        "email": "cosmo-admin@gigaspaces.com"
     },
     "image": {
         "repository": "phusion/baseimage",
@@ -24,9 +24,9 @@ VARS = {
             "curl",
             "openjdk-7-jdk"
         ],
-        "package_url": "https://aphyr.com/riemann/riemann_0.2.6_all.deb",
-        "langohr_url": "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar",
-        "config_url": "https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config",
+        "package_url": "https://aphyr.com/riemann/riemann_0.2.6_all.deb",  # NOQA
+        "langohr_url": "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar",  # NOQA
+        "config_url": "https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config",  # NOQA
         "ports": [],
     },
     "nodejs": {
@@ -40,7 +40,7 @@ VARS = {
             "curl",
             "openjdk-7-jdk"
         ],
-        "package_url": "https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar",
+        "package_url": "https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar",  # NOQA
         "init_file": {
             "log_file": "/var/log/logstash.out",
         },
@@ -62,7 +62,7 @@ VARS = {
             "curl",
             "openjdk-7-jdk",
         ],
-        "elasticsearch_tar_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
+        "elasticsearch_tar_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",  # NOQA
         "ports": ["9200"],
         "min_mem": "1024m",
         "max_mem": "1024m",
@@ -72,7 +72,7 @@ VARS = {
         "reqs": [
             "curl",
         ],
-        "package_url": "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",
+        "package_url": "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",  # NOQA
         "ports": ["8086"],
     },
     "nginx": {
@@ -105,10 +105,10 @@ VARS = {
             "pyzmq==14.3.1"
         ],
         "modules": {
-                "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",
-                "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",
-                "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
-                "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
+                "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",  # NOQA
+                "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",  # NOQA
+                "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",  # NOQA
+                "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",  # NOQA
             },
         "workers_autoscale": "5,2",
         "ports": [],
@@ -120,9 +120,9 @@ VARS = {
             "python2.7"
         ],
         "modules": {
-            "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",
-            "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",
-            "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
+            "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",  # NOQA
+            "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",  # NOQA
+            "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",  # NOQA
         },
         "manager_rest_port": "8100",
     },
@@ -135,6 +135,6 @@ VARS = {
             "make"
         ],
         "nodejs_latest_url": "http://nodejs.org/dist/node-latest.tar.gz",
-        "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m2-RELEASE/cloudify-ui_3.2.0-m2-b171_amd64.deb",
+        "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m2-RELEASE/cloudify-ui_3.2.0-m2-b171_amd64.deb",  # NOQA
     }
 }
