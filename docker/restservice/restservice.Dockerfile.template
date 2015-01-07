@@ -42,8 +42,10 @@ RUN apt-get update && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_dsl_parser }} && \
     # installing rest-service
     /bin/bash -c 'git clone {{ manager.modules.cloudify_manager }} && \
-    pushd cloudify-manager/rest-service && \
+    cd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .' && \
+    cd ../../ && \
+    rm -rf cloudify-manager && \
     # injecting required params to run script
     sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $AMQPFLUX_RUN_FILE && \
     sed -i '1s|^|MANAGER_VIRTUALENV_DIR='$MANAGER_VIRTUAL_ENV_DIR' \n|' $REST_RUN_FILE && \
@@ -58,5 +60,9 @@ RUN apt-get update && \
     # granting run permissions to run file
     chmod +x $AMQPFLUX_RUN_FILE && \
     chmod +x $REST_RUN_FILE
+    # cleanup
+    # remove curl
+    apt-get remove git -y && \
+    apt-get autoremove -y
 
 EXPOSE 8100
