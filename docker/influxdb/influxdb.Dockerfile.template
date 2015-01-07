@@ -41,3 +41,6 @@ RUN apt-get update && \
 
 #influxdb persistence path
 VOLUME /opt/influxdb/shared/data
+
+EXPOSE 8086
+EXPOSE 8083
