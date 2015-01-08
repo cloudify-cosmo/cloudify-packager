@@ -35,3 +35,7 @@ RUN apt-get update && \
 EXPOSE 5672 15672 4369
 
 CMD rabbitmq-server
+
+
+# ALT IMPLEMENTATION
+# https://github.com/mikaelhg/docker-rabbitmq/blob/master/Dockerfile

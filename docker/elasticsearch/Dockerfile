@@ -28,6 +28,7 @@ RUN apt-get update && \
     curl https://dl.dropboxusercontent.com/u/407576/jre-7-linux-x64.tar.gz --create-dirs -o /opt/tmp/java/java.tar.gz && \
     mkdir /etc/java && \
     tar -xzvf /opt/tmp/java/java.tar.gz -C /etc/java --strip=1 && \
+    rm /opt/tmp/java/java.tar.gz && \
     # download elasticsearch binaries
     curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
     # extracting binaries to service dir
@@ -59,6 +60,7 @@ RUN apt-get update && \
     echo "printing mappings..." && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1 && \
     # cleanup
+    rm -rf /var/lib/apt/lists
     # remove curl
     apt-get remove curl -y && \
     apt-get autoremove -y

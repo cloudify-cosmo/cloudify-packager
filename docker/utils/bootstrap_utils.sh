@@ -58,9 +58,9 @@ function wait_for_port
     while ! echo exit | curl http://localhost:$1;
     do
             if [[ $c -gt 24 ]]; then
-                    state_error "failed to connect to elasticsearch..."
+                    state_error "failed to connect to service..."
             fi
-            echo "elasticsearch host not up yet... retrying... ($c/24)"
+            echo "host not up yet... retrying... ($c/24)"
             sleep 5;
             c=$((c+1))
     done
