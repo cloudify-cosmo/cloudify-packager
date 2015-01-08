@@ -4,6 +4,9 @@
 #   LOGSTASH_JAR_PATH - path to logstash service jar
 #   LOGSTASH_CONF_PATH - path to logstash configuration file
 #
+sed -i "s|ELASTICSEARCH_ADDR|$ELASTICSEARCH_PORT_9200_TCP_ADDR|g" $LOGSTASH_CONF_PATH
+sed -i "s|RABBITMQ_ADDR|$RABBITMQ_PORT_5672_TCP_ADDR|g" $LOGSTASH_CONF_PATH
+
 exec /usr/bin/java \
     -jar $LOGSTASH_JAR_PATH agent \
     -f $LOGSTASH_CONF_PATH

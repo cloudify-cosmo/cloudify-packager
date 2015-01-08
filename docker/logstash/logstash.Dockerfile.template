@@ -18,7 +18,7 @@ ENV LOGSTASH_SERVICE_DIR /etc/service/$LOGSTASH_SERVICE_NAME
 # logstash exec file
 ENV LOGSTASH_RUN_FILE $LOGSTASH_SERVICE_DIR/run
 # logstash conf file
-ENV LOGSTASH_CONF_FILE $LOGSTASH_SERVICE_DIR/config.conf
+ENV LOGSTASH_CONF_FILE $LOGSTASH_SERVICE_DIR/logstash.conf
 ##### ENV #####
 # add run scripts and configuration
 COPY logstash/ $LOGSTASH_SERVICE_DIR/
