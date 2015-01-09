@@ -36,8 +36,7 @@ RUN apt-get update && \
 # riemann persistence path
 # VOLUME /etc/service/riemann
 
-EXPOSE 5556
-EXPOSE 5555
+EXPOSE 5556 5555
 
 # run riemann service
 CMD /usr/bin/riemann -a $MANAGER_CONFIG_PATH
