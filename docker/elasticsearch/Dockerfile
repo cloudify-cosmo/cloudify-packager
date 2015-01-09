@@ -4,7 +4,7 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
-COPY utils/ /opt/tmp/utils/
+COPY utils.sh /opt/tmp/utils/utils.sh
 COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
@@ -38,7 +38,7 @@ RUN apt-get update && \
     # start elasticsearch as daemon for configuration purposes.
     # todo(adaml): move config to run script
     # config includes setting elasticsearch indexes.
-    /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    /bin/bash -c 'source /opt/tmp/utils/utils.sh && \
     $ELASTICSEARCH_SERVICE_DIR/bin/elasticsearch -d && \
     wait_for_port 9200' && \
     echo "deleting events index if exists..." && \

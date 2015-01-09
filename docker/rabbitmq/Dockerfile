@@ -1,24 +1,17 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - BASE
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# add utility functions
-COPY utils/ /opt/tmp/utils/
-COPY NOTICE.txt /root/NOTICE.txt
+
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
+# LICENSE
+COPY NOTICE.txt /root/NOTICE.txt
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - RABBITMQ, DependsOn: ~
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-##### ENV #####
 ENV RABBITMQ_SERVICE_NAME rabbitmq-server
 ENV RABBITMQ_SERVICE_DIR /etc/service/$RABBITMQ_SERVICE_NAME
 ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run
-
-# add run scripts and configuration
-COPY rabbitmq/ $RABBITMQ_SERVICE_DIR/
 
 RUN apt-get update && \
     # installing rabbitmq dependencies

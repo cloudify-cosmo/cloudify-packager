@@ -1,24 +1,19 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - BASE
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# add utility functions
-COPY utils/ /opt/tmp/utils/
-COPY NOTICE.txt /root/NOTICE.txt
+
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
+# LICENSE
+COPY NOTICE.txt /root/NOTICE.txt
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - LOGSTASH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-##### ENV #####
 ENV LOGSTASH_SERVICE_NAME=logstash
 ENV LOGSTASH_SERVICE_DIR=/etc/service/$LOGSTASH_SERVICE_NAME
 ENV LOGSTASH_CONF_FILE=$LOGSTASH_SERVICE_DIR/logstash.conf \
     JAVA_HOME=/etc/java
 
-# add run scripts and configuration
 COPY logstash/ $LOGSTASH_SERVICE_DIR/
 
 RUN apt-get update && \

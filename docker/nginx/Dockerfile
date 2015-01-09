@@ -1,13 +1,10 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - BASE
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# add utility functions
-COPY utils/ /opt/tmp/utils/
-COPY NOTICE.txt /root/NOTICE.txt
+
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
+# LICENSE
+COPY NOTICE.txt /root/NOTICE.txt
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - NGINX
@@ -18,7 +15,7 @@ ENV NGINX_SERVICE_DIR=/etc/service/$NGINX_SERVICE_NAME \
 ENV NGINX_RUN_FILE=$NGINX_SERVICE_DIR/run \
     NGINX_LOGS_DIR=$NGINX_SERVICE_DIR/logs
 
-# add run scripts and configuration
+# copy configuration
 COPY nginx/ $NGINX_SERVICE_DIR
 
 RUN apt-get update && \
@@ -44,7 +41,6 @@ RUN apt-get update && \
     apt-get remove curl -y && \
     apt-get autoremove -y
 
-EXPOSE 80
-EXPOSE 53229
+EXPOSE 80 53229
 
 CMD nginx -c $NGINX_CONF_FILE

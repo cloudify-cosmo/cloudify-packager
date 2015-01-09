@@ -1,26 +1,19 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - BASE
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# add utility functions
-COPY utils/ /opt/tmp/utils/
-COPY NOTICE.txt /root/NOTICE.txt
+
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
+# LICENSE
+COPY NOTICE.txt /root/NOTICE.txt
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - RIEMANN
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-##### ENV #####
 ENV RIEMANN_SERVICE_NAME=riemann
 ENV RIEMANN_SERVICE_DIR=/etc/service/$RIEMANN_SERVICE_NAME
 ENV RIEMANN_RUN_FILE=$RIEMANN_SERVICE_DIR/run \
     MANAGER_CONFIG_PATH=$RIEMANN_SERVICE_DIR/manager.config \
     EXTRA_CLASSPATH=$RIEMANN_SERVICE_DIR/langohr.jar
-
-# add run scripts and configuration
-COPY riemann/ $RIEMANN_SERVICE_DIR/
 
 RUN apt-get update && \
     # installing riemann dependencies

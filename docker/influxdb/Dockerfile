@@ -4,7 +4,7 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 # INSTALL - BASE
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
-COPY utils/ /opt/tmp/utils/
+COPY utils.sh /opt/tmp/utils/utils.sh
 COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
@@ -29,7 +29,7 @@ RUN apt-get update && \
     dpkg -i /opt/tmp/influxdb/influxdb.deb && \
     rm -rf /opt/tmp/influxdb/influxdb.deb && \
     # starting influxdb as daemon to create cloudify db && \
-    /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
+    /bin/bash -c 'source /opt/tmp/utils/utils.sh && \
     /usr/bin/influxdb-daemon -config=$INFLUXDB_CONFIG_FILE && \
     wait_for_port 8086' && \
     curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"

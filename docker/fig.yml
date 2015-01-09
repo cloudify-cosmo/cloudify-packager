@@ -1,38 +1,30 @@
-# nginx:
-#   image: cloudify/nginx
-#   command: /sbin/my_init
-#   ports:
-#     - "80:80"
+nginx:
+  build: nginx
+  ports:
+    - "80:80"
 elasticsearch:
-  image: cloudify/elasticsearch
-  command: /sbin/my_init
+  build: elasticsearch
   ports:
     - "9200:9200"
 logstash:
-  image: cloudify/logstash
-  command: /sbin/my_init
+  build: logstash
   ports:
     - "9999:9999"
   links:
     - elasticsearch
     - rabbitmq
-  logstash_config_one_liner:
-    'input {rabbitmq {queue => "cloudify-logs" host => "localhost" durable => "true" auto_delete => "true" exclusive => "false"} rabbitmq {queue => "cloudify-events" host => "localhost" durable => "true" auto_delete => "true" exclusive => "false"} tcp {port => "9999"}} filter {date {match => [ "timestamp", "YYYY-MM-dd HH:mm:ss.SSS" ]}} output {elasticsearch_http {host => "localhost" index => "cloudify_events"}}'
 rabbitmq:
-  image: cloudify/rabbitmq
-  command: /sbin/my_init
+  build: rabbitmq
   ports:
     - "5672:5672"
-# influxdb:
-#   image: cloudify/influxdb
-#   command: /sbin/my_init
-#   ports:
-#     - "8083:8083"
-#     - "8086:8086"
-#     - "8090:8090"
-#     - "8099:8099"
-# riemann:
-#   image: cloudify/riemann
-#   command: /sbin/my_init
-#   links:
-#     - rabbitmq
+influxdb:
+  build: influxdb
+  ports:
+    - "8083:8083"
+    - "8086:8086"
+    - "8090:8090"
+    - "8099:8099"
+riemann:
+  build: riemann
+  links:
+    - rabbitmq
