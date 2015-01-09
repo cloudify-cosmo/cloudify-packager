@@ -16,9 +16,11 @@ ENV NGINX_RUN_FILE=$NGINX_SERVICE_DIR/run \
     NGINX_LOGS_DIR=$NGINX_SERVICE_DIR/logs
 
 # copy configuration
-COPY nginx/ $NGINX_SERVICE_DIR
+COPY default.conf /tmp/default.conf
 
 RUN apt-get update && \
+    mkdir -p $NGINX_SERVICE_DIR && \
+    mv /tmp/default.conf $NGINX_SERVICE_DIR && \
     # adding nginx repositories to sources.list file and update repo
     echo "deb http://nginx.org/packages/mainline/ubuntu/ precise nginx" >> /etc/apt/sources.list && \
     echo "deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx" >> /etc/apt/sources.list && \

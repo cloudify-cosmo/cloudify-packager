@@ -17,9 +17,6 @@ ENV INFLUXDB_SERVICE_NAME=influxdb \
     INFLUXDB_CONFIG_FILE=/opt/influxdb/shared/config.toml
 ENV INFLUXDB_RUN_FILE=/etc/service/$INFLUXDB_SERVICE_NAME/run
 
-# add run scripts and configuration
-COPY influxdb/ /etc/service/$INFLUXDB_SERVICE_NAME/
-
 RUN apt-get update && \
     # installing influxdb dependencies
     apt-get install -y curl && \

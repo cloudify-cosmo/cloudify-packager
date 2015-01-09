@@ -18,10 +18,6 @@ ENV ELASTICSEARCH_SERVICE_DIR=/etc/service/$ELASTICSEARCH_SERVICE_NAME \
     ES_JAVA_OPTS="-Xmx1024m -Xms1024m" \
     JAVA_HOME=/etc/java/
 
-# add run scripts and configuration
-COPY elasticsearch/ $ELASTICSEARCH_SERVICE_DIR/
-
-
 RUN apt-get update && \
     # installing elasticsearch dependencies
     apt-get install -y curl && \
