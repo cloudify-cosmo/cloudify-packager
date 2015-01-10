@@ -15,15 +15,14 @@ ENV RABBITMQ_RUN_FILE $RABBITMQ_SERVICE_DIR/run
 
 RUN apt-get update && \
     # installing rabbitmq dependencies
-    apt-get install -y curl logrotate erlang-nox && \
+    apt-get install -y logrotate erlang-nox && \
     # installing rabbitmq-server and setting its properties
     apt-get -y install rabbitmq-server && \
     rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing && \
-    # cleanup
-    # remove curl
-    apt-get remove curl -y && \
-    apt-get autoremove -y
+    rabbitmq-server && \
+    sleep 5 && \
+    rabbitmqctl add_user cloudify rmqauth && \
 
 EXPOSE 5672 15672 4369
 
