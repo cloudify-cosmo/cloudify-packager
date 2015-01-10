@@ -20,9 +20,10 @@ RUN apt-get update && \
     apt-get -y install rabbitmq-server && \
     rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing && \
-    /bin/sh -c "rabbitmq-server &" && \
-    sleep 5 && \
+    rabbitmq-server -detached && sleep 5 && cd /tmp/ && \
+    rabbitmqctl start_app
     rabbitmqctl add_user cloudify rmqauth
+    rabbitmqctl stop_app
 
 EXPOSE 5672 15672 4369
 
@@ -31,3 +32,9 @@ CMD rabbitmq-server
 
 # ALT IMPLEMENTATION
 # https://github.com/mikaelhg/docker-rabbitmq/blob/master/Dockerfile
+# RUN rabbitmq-plugins enable rabbitmq_management && \
+#     rabbitmq-server -detached && sleep 5 &&  \
+#     cd /tmp/ && \
+#     rabbitmqctl start_app && \
+#     python buzz/scripts/setuprabbit.py && \
+#     rabbitmqctl stop_app
