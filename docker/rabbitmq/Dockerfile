@@ -20,9 +20,9 @@ RUN apt-get update && \
     apt-get -y install rabbitmq-server && \
     rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing && \
-    rabbitmq-server && \
+    /bin/sh -c "rabbitmq-server &" && \
     sleep 5 && \
-    rabbitmqctl add_user cloudify rmqauth && \
+    rabbitmqctl add_user cloudify rmqauth
 
 EXPOSE 5672 15672 4369
 
