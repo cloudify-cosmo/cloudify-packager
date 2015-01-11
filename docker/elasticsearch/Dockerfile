@@ -1,19 +1,12 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - BASE
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# add utility functions
-COPY utils.sh /opt/tmp/utils/utils.sh
-COPY NOTICE.txt /root/NOTICE.txt
-# Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV True
 
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - ELASTICSEARCH
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-##### ENV #####
-ENV ELASTICSEARCH_SERVICE_NAME=elasticsearch
+COPY NOTICE.txt /root/NOTICE.txt
+COPY utils.sh /opt/tmp/utils/utils.sh
+
+# Used by 'cfy status' impl to determine if running in container.
+ENV DOCKER_ENV=True
+    ELASTICSEARCH_SERVICE_NAME=elasticsearch
 ENV ELASTICSEARCH_SERVICE_DIR=/etc/service/$ELASTICSEARCH_SERVICE_NAME \
     ES_JAVA_OPTS="-Xmx1024m -Xms1024m" \
     JAVA_HOME=/etc/java/
@@ -56,10 +49,7 @@ RUN apt-get update && \
     echo "printing mappings..." && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1 && \
     # cleanup
-    rm -rf /var/lib/apt/lists
-    # remove curl
-    apt-get remove curl -y && \
-    apt-get autoremove -y
+    rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
 
 # elasticsearch persistence paths
 # VOLUME /etc/service/elasticsearch/data

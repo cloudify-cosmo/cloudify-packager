@@ -1,15 +1,11 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
-# Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV True
-# LICENSE
 COPY NOTICE.txt /root/NOTICE.txt
 
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - NGINX
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-ENV NGINX_SERVICE_NAME=nginx
+# Used by 'cfy status' impl to determine if running in container.
+ENV DOCKER_ENV=True
+    NGINX_SERVICE_NAME=nginx
 ENV NGINX_SERVICE_DIR=/etc/service/$NGINX_SERVICE_NAME \
     NGINX_CONF_FILE=/etc/nginx/nginx.conf
 ENV NGINX_RUN_FILE=$NGINX_SERVICE_DIR/run \
@@ -39,9 +35,7 @@ RUN apt-get update && \
     sed -i "s|/etc/nginx/conf.d/\*.conf|$NGINX_SERVICE_DIR/default.conf|g" $NGINX_CONF_FILE && \
     mkdir -p $NGINX_LOGS_DIR && \
     # cleanup
-    # remove curl
-    apt-get remove curl -y && \
-    apt-get autoremove -y
+    rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
 
 EXPOSE 80 53229
 

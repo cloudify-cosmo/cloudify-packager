@@ -1,19 +1,12 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - BASE
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# add utility functions
-COPY utils.sh /opt/tmp/utils/utils.sh
-COPY NOTICE.txt /root/NOTICE.txt
-# Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV True
 
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - INFLUXDB
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-##### ENV #####
-ENV INFLUXDB_SERVICE_NAME=influxdb \
+COPY NOTICE.txt /root/NOTICE.txt
+COPY utils.sh /opt/tmp/utils/utils.sh
+
+# Used by 'cfy status' impl to determine if running in container.
+ENV DOCKER_ENV=True
+    INFLUXDB_SERVICE_NAME=influxdb \
     INFLUXDB_CONFIG_FILE=/opt/influxdb/shared/config.toml
 ENV INFLUXDB_RUN_FILE=/etc/service/$INFLUXDB_SERVICE_NAME/run
 
@@ -30,6 +23,8 @@ RUN apt-get update && \
     /usr/bin/influxdb-daemon -config=$INFLUXDB_CONFIG_FILE && \
     wait_for_port 8086' && \
     curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"
+    # cleanup
+    rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
 
 # influxdb persistence path
 # VOLUME /opt/influxdb/shared/data

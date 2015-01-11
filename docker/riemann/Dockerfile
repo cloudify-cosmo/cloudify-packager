@@ -1,15 +1,11 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
-# Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV True
-# LICENSE
 COPY NOTICE.txt /root/NOTICE.txt
 
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - RIEMANN
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-ENV RIEMANN_SERVICE_NAME=riemann
+# Used by 'cfy status' impl to determine if running in container.
+ENV DOCKER_ENV=True
+    RIEMANN_SERVICE_NAME=riemann
 ENV RIEMANN_SERVICE_DIR=/etc/service/$RIEMANN_SERVICE_NAME
 ENV RIEMANN_RUN_FILE=$RIEMANN_SERVICE_DIR/run \
     MANAGER_CONFIG_PATH=$RIEMANN_SERVICE_DIR/manager.config \
@@ -32,6 +28,7 @@ RUN apt-get update && \
     # download riemann config
     curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config
     # sed -i "s|RABBITMQ_ADDR|$RABBITMQ_PORT_5672_TCP_ADDR|g" $MANAGER_CONFIG_PATH
+    rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
 
 # riemann persistence path
 # VOLUME /etc/service/riemann
