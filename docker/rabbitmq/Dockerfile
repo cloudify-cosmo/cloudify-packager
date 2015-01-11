@@ -12,8 +12,8 @@ RUN apt-get update && \
     rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing && \
     # enable guest user to access cluster not on localhost
-    echo "[{rabbit, [{loopback_users, []}]}]." > /etc/rabbitmq/rabbitmq.config && \
-    rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
+    echo "[{rabbit, [{loopback_users, []}]}]." > /etc/rabbitmq/rabbitmq.config
+    # rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
 
 EXPOSE 5672 15672 4369
 

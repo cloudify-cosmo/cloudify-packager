@@ -31,8 +31,8 @@ RUN apt-get update && \
     sed -i "s|/var/log/nginx/error.log warn|$NGINX_SERVICE_DIR/logs/error.log warn|g" $NGINX_CONF_FILE && \
     sed -i "s|/var/run/nginx.pid|$NGINX_SERVICE_DIR/logs/nginx.pid|g" $NGINX_CONF_FILE && \
     sed -i "s|/etc/nginx/conf.d/\*.conf|$NGINX_SERVICE_DIR/default.conf|g" $NGINX_CONF_FILE && \
-    mkdir -p $NGINX_LOGS_DIR && \
-    rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
+    mkdir -p $NGINX_LOGS_DIR
+    # rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
 
 EXPOSE 80 53229
 

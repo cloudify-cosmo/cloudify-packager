@@ -43,8 +43,8 @@ RUN apt-get update && \
     echo "creating node-instance mapping..." && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node_instance/_mapping -d '{ "node_instance": { "_id": { "path": "id" }, "properties": { "runtime_properties": { "enabled": false } } } }' && \
     echo "printing mappings..." && \
-    curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1 && \
-    rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
+    curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1
+    # rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
 
 # elasticsearch persistence paths
 # VOLUME /etc/service/elasticsearch/data

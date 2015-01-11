@@ -20,8 +20,8 @@ RUN apt-get update && \
     mkdir /etc/java && \
     tar -xzvf /opt/tmp/java/java.tar.gz -C /etc/java --strip=1 && \
     rm /opt/tmp/java/java.tar.gz && \
-    curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar && \
-    rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
+    curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar
+    # rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
 
 EXPOSE 9999
 

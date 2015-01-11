@@ -17,8 +17,8 @@ RUN apt-get update && \
     /bin/bash -c 'source /opt/tmp/utils/utils.sh && \
     /usr/bin/influxdb-daemon -config=$INFLUXDB_CONFIG_FILE && \
     wait_for_port 8086' && \
-    curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}" && \
-    rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
+    curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"
+    # rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
 
 # influxdb persistence path
 # VOLUME /opt/influxdb/shared/data
