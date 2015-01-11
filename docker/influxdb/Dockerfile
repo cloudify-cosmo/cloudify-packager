@@ -11,11 +11,8 @@ ENV DOCKER_ENV=True
 ENV INFLUXDB_RUN_FILE=/etc/service/$INFLUXDB_SERVICE_NAME/run
 
 RUN apt-get update && \
-    # installing influxdb dependencies
     apt-get install -y curl && \
-    # downloading influxdb binaries
     curl http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb --create-dirs -o /opt/tmp/influxdb/influxdb.deb && \
-    # installing influxdb
     dpkg -i /opt/tmp/influxdb/influxdb.deb && \
     rm -rf /opt/tmp/influxdb/influxdb.deb && \
     # starting influxdb as daemon to create cloudify db && \
