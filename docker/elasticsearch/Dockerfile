@@ -5,9 +5,8 @@ COPY NOTICE.txt /root/NOTICE.txt
 COPY utils.sh /opt/tmp/utils/utils.sh
 
 # Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV=True
-    ELASTICSEARCH_SERVICE_NAME=elasticsearch
-ENV ELASTICSEARCH_SERVICE_DIR=/etc/service/$ELASTICSEARCH_SERVICE_NAME \
+ENV DOCKER_ENV=True \
+    ELASTICSEARCH_SERVICE_DIR=/etc/service/elasticsearch \
     ES_JAVA_OPTS="-Xmx1024m -Xms1024m" \
     JAVA_HOME=/etc/java/
 
@@ -45,7 +44,6 @@ RUN apt-get update && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node_instance/_mapping -d '{ "node_instance": { "_id": { "path": "id" }, "properties": { "runtime_properties": { "enabled": false } } } }' && \
     echo "printing mappings..." && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1 && \
-    # cleanup
     rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
 
 # elasticsearch persistence paths

@@ -24,7 +24,7 @@ influxdb:
     - "8086:8086"
     - "8090:8090"
     - "8099:8099"
-riemann:
-  build: riemann
-  links:
-    - rabbitmq
+# riemann:
+#   build: riemann
+#   links:
+#     - rabbitmq

@@ -4,9 +4,8 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 COPY NOTICE.txt /root/NOTICE.txt
 
 # Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV=True
-    LOGSTASH_SERVICE_NAME=logstash
-ENV LOGSTASH_SERVICE_DIR=/etc/service/$LOGSTASH_SERVICE_NAME
+ENV DOCKER_ENV=True \
+    LOGSTASH_SERVICE_DIR=/etc/service/logstash
 ENV LOGSTASH_CONF_FILE=$LOGSTASH_SERVICE_DIR/logstash.conf \
     LOGSTASH_JAR_PATH=$LOGSTASH_SERVICE_DIR/logstash.jar \
     JAVA_HOME=/etc/java
@@ -21,8 +20,7 @@ RUN apt-get update && \
     mkdir /etc/java && \
     tar -xzvf /opt/tmp/java/java.tar.gz -C /etc/java --strip=1 && \
     rm /opt/tmp/java/java.tar.gz && \
-    curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar
-    # cleanup
+    curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar && \
     rm -rf /var/lib/apt/lists && apt-get remove curl -y && apt-get autoremove -y
 
 EXPOSE 9999
