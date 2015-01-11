@@ -1,27 +1,17 @@
-FROM {{ image.repository }}:{{ image.tag }}
-MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - BASE
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# add utility functions
-COPY utils/ /opt/tmp/utils/
+FROM debian:jessie
+MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
+
 COPY NOTICE.txt /root/NOTICE.txt
+
 # Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV True
-
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - RESTSERVICE
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-##### ENV #####
-ENV MANAGER_SERVICE_NAME {{ manager.service_name }}
-ENV MANAGER_SERVICES_DIR /opt/$MANAGER_SERVICE_NAME
-ENV MANAGER_VIRTUAL_ENV_DIR $MANAGER_SERVICES_DIR/env
-ENV SERVER_FILES_DIR $MANAGER_SERVICES_DIR/cloudify-manager*/rest-service/manager_rest
-
+ENV DOCKER_ENV=True \
+    MANAGER_SERVICE_DIR=/opt/manager
+ENV MANAGER_VIRTUAL_ENV_DIR=$MANAGER_SERVICE_DIR/env \
+    SERVER_FILES_DIR=$MANAGER_SERVICE_DIR/cloudify-manager*/rest-service/manager_rest
+    REST_CONFIG_PATH=/etc/service/rest-service/guni.conf
 ENV AMQPFLUX_RUN_FILE /etc/service/amqp-influx/run
 ENV REST_RUN_FILE /etc/service/rest-service/run
 
-ENV REST_CONFIG_PATH /etc/service/rest-service/guni.conf
 ##### ENV #####
 # add run scripts and configuration
 COPY amqp_influx/ /etc/service/amqp-influx/
@@ -30,7 +20,6 @@ COPY restservice/ /etc/service/rest-service/
 WORKDIR /opt/manager/
 
 RUN apt-get update && \
-    # install dependencies
     apt-get install -y {% for dep in manager.reqs %} {{ dep }}{% endfor %} && \
     # installing pip
     curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
