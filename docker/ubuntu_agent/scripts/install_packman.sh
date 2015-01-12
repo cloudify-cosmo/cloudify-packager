@@ -16,9 +16,9 @@ dpkg-deb -x /opt/tmp/manager/ubuntu_trusty_agent.deb /opt/tmp/manager/trusty && 
 mv /opt/tmp/manager/trusty/agents/Ubuntu*/Ubuntu-trusty-agent.tar.gz /tmp/Ubuntu-agent/
 
 # install ruby
-wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p547.tar.bz2
-tar -xjf ruby-1.9.3-p547.tar.bz2
-cd ruby-1.9.3-p547
+wget https://ftp.ruby-lang.org/pub/ruby/ruby-1.9.3-rc1.tar.bz2 --no-check-certificate
+tar -xjf ruby-1.9.3-rc1.tar.bz2
+cd ruby-1.9.3-rc1
 ./configure --disable-install-doc
 make
 make install
