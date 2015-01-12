@@ -29,7 +29,7 @@ RUN echo installing riemann dependencies && \
     rm -rf /opt/tmp/riemann/riemann.deb && \
     \
     echo download riemann config && \
-    curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config
+    curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/3.1/plugins/riemann-controller/riemann_controller/resources/manager.config
 
 # inject required env vars to run script
 RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_RUN_FILE && \

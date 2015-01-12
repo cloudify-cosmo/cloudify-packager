@@ -56,7 +56,7 @@ RUN echo installing riemann dependencies && \
     rm -rf /opt/tmp/riemann/riemann.deb && \
     \
     echo download riemann config && \
-    curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config
+    curl -o $MANAGER_CONFIG_PATH https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/3.1/plugins/riemann-controller/riemann_controller/resources/manager.config
 
 # inject required env vars to run script
 RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMANN_RUN_FILE && \
@@ -171,7 +171,8 @@ RUN echo starting influxdb as daemon to create cloudify db && \
     /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     /usr/bin/influxdb-daemon -config=$INFLUXDB_CONFIG_FILE && \
     wait_for_port 8086' && \
-    curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"
+    curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}" && \
+    rm -rf /opt/influxdb/shared/data/raft
 
 # set config path in run file
 RUN sed -i '1s|^|INFLUXDB_CONFIG_FILE='$INFLUXDB_CONFIG_FILE' \n|' $INFLUXDB_RUN_FILE && \
@@ -250,10 +251,10 @@ RUN echo installing celery dependencies && \
 ############################## install cloudify core components ##############################
 WORKDIR /etc/service/celeryd-cloudify-management/
 
-RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master && \
-    /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@3.1 && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@3.1 && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@3.1 && \
+    /bin/bash -c 'git clone -b 3.1 https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/plugins/plugin-installer && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
     popd && \
@@ -308,11 +309,11 @@ RUN echo install dependencies && \
     virtualenv $MANAGER_VIRTUAL_ENV_DIR && \
     \
     echo installing amqpinflux && \
-    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master && \
-    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@3.1 && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@3.1 && \
     \
     echo installing rest-service && \
-    /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    /bin/bash -c 'git clone -b 3.1 https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .' && \
     \
@@ -384,7 +385,7 @@ RUN echo installing web-ui dependencies && \
     echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc && \
     \
     echo downloading cloudify-webui package and extracting webui and grafana tar.gz && \
-    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-ui_3.1.0-rc1-b83_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
+    curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.1/ga-RELEASE/cloudify-ui_3.1.1-ga-b87_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
     dpkg-deb -x /opt/tmp/cloudify-webui/cloudify-webui.deb /opt/tmp/cloudify-webui/ && \
     mkdir -p $WEBUI_SERVICE_DIR/cosmo-ui && \
     tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/cosmo-ui* -C $WEBUI_SERVICE_DIR/cosmo-ui --strip-components=1 && \
