@@ -26,7 +26,7 @@ VARS = {
         ],
         "package_url": "http://aphyr.com/riemann/riemann_0.2.6_all.deb",
         "langohr_url": "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar",
-        "config_url": "https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config",
+        "config_url": "https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/3.1/plugins/riemann-controller/riemann_controller/resources/manager.config",
         "ports": [],
     },
     "nodejs": {
@@ -105,10 +105,10 @@ VARS = {
             "pyzmq==14.3.1"
         ],
         "modules": {
-                "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",
-                "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",
-                "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
-                "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
+                "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@3.1",
+                "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@3.1",
+                "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@3.1",
+                "cloudify_manager": "-b 3.1 https://github.com/cloudify-cosmo/cloudify-manager.git",
             },
         "workers_autoscale": "5,2",
         "ports": [],
@@ -120,9 +120,9 @@ VARS = {
             "python2.7"
         ],
         "modules": {
-            "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",
-            "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",
-            "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
+            "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@3.1",
+            "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@3.1",
+            "cloudify_manager": "-b 3.1 https://github.com/cloudify-cosmo/cloudify-manager.git",
         },
         "agents": {
           "ubuntu_precise_agent_deb": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/ga-RELEASE/cloudify-ubuntu-precise-agent_3.1.0-ga-b85_amd64.deb",
@@ -140,6 +140,6 @@ VARS = {
             "make"
         ],
         "nodejs_latest_url": "http://nodejs.org/dist/node-latest.tar.gz",
-        "cloudify_webui_tar_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.0/rc1-RELEASE/cloudify-ui_3.1.0-rc1-b83_amd64.deb",
+        "cloudify_webui_tar_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.1/ga-RELEASE/cloudify-ui_3.1.1-ga-b87_amd64.deb",
     }
 }
