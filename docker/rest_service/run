@@ -6,6 +6,7 @@
 #   SERVER_FILES_DIR - path to server.py main entry dir
 #
 export MANAGER_REST_CONFIG_PATH=$MANAGER_REST_CONFIG_PATH
+export DOCKER_ENV=True
 
 # calculate number of workers according to number of cores. (1-1 ratio)
 WORKERS=$(($(nproc)*2+1))
