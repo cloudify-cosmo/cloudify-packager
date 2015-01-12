@@ -14,9 +14,9 @@ sudo add-apt-repository -y ppa:git-core/ppa &&
 sudo apt-get install -y curl python-dev rubygems rpm git make gcc libyaml-dev &&
 
 # install ruby
-wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p547.tar.bz2
-tar -xjf ruby-1.9.3-p547.tar.bz2
-cd ruby-1.9.3-p547
+wget https://ftp.ruby-lang.org/pub/ruby/ruby-1.9.3-rc1.tar.bz2 --no-check-certificate
+tar -xjf ruby-1.9.3-rc1.tar.bz2
+cd ruby-1.9.3-rc1
 ./configure --disable-install-doc
 make
 sudo make install
