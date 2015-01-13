@@ -32,6 +32,7 @@ RUN echo installing rabbitmq dependencies && \
     echo granting exec permissions && \
     chmod +x $RABBITMQ_RUN_FILE
 
+EXPOSE {% for dep in rabbitmq.ports %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - RIEMANN
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -66,7 +67,9 @@ RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMA
     chmod +x $RIEMANN_RUN_FILE
 
 # riemann persistence path
-VOLUME /etc/service/riemann
+VOLUME {% for dep in riemann.persistence_path %} {{ dep }}{% endfor %}
+
+EXPOSE {% for dep in riemann.ports %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - LOGSTASH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -92,7 +95,6 @@ RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/logstash.jar' \n|' $LO
     sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $LOGSTASH_RUN_FILE && \
     chmod +x $LOGSTASH_RUN_FILE
-
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -143,9 +145,9 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     echo granting run permissions to run file && \
     chmod +x $ELASTICSEARCH_SERVICE_DIR/run
 
+EXPOSE {% for dep in elasticsearch.ports %} {{ dep }}{% endfor %}
 #elasticsearch persistence paths
-VOLUME /etc/service/elasticsearch/data
-VOLUME /etc/service/elasticsearch/logs
+VOLUME {% for dep in elasticsearch.persistence_path %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - INFLUXDB
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -181,7 +183,7 @@ RUN sed -i '1s|^|INFLUXDB_CONFIG_FILE='$INFLUXDB_CONFIG_FILE' \n|' $INFLUXDB_RUN
     chmod +x $INFLUXDB_RUN_FILE
 
 #influxdb persistence path
-VOLUME /opt/influxdb/shared/data
+VOLUME {% for dep in influxdb.persistence_path %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -223,6 +225,7 @@ RUN echo "daemon off;" >> $NGINX_CONF_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $NGINX_RUN_FILE && \
     chmod +x $NGINX_RUN_FILE
 
+EXPOSE {% for dep in nginx.ports %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - CELERY
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -335,6 +338,9 @@ RUN echo install dependencies && \
     chmod +x $AMQPFLUX_RUN_FILE && \
     chmod +x $REST_RUN_FILE
 
+EXPOSE {% for dep in manager.ports %} {{ dep }}{% endfor %}
+#manager persistence path
+VOLUME {% for dep in manager.persistence_path %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - WEB-UI
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -375,3 +381,5 @@ RUN echo installing web-ui dependencies && \
     cd /etc/service/cloudify-ui/cosmo-ui && \
     npm update
 #RUN apt-get -y install nodejs npm
+
+EXPOSE {% for dep in webui.ports %} {{ dep }}{% endfor %}
