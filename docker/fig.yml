@@ -34,3 +34,5 @@ restservice:
     - "8100:8100"
   # links:
   #   - elasticsearch
+mgmtworker:
+  build: mgmtworker
