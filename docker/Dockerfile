@@ -253,7 +253,7 @@ WORKDIR /etc/service/celeryd-cloudify-management/
 
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@3.1 && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@3.1 && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@3.1 && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@1.1 && \
     /bin/bash -c 'git clone -b 3.1 https://github.com/cloudify-cosmo/cloudify-manager.git && \
     pushd cloudify-manager/plugins/plugin-installer && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
