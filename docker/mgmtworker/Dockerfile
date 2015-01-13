@@ -9,8 +9,7 @@ COPY NOTICE.txt /root/NOTICE.txt
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - MGMTWORKER
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-ENV CELERY_SERVICE_NAME=mgmtworker
-ENV CELERY_SERVICE_DIR=/etc/service/$CELERY_SERVICE_NAME
+ENV CELERY_SERVICE_DIR=/etc/service/mgmtworker
 ENV CELERY_RUN_FILE=$CELERY_SERVICE_DIR/run && \
     CELERY_VIRTUAL_ENV_DIR=$CELERY_SERVICE_DIR/env && \
     CELERY_LOG_DIR=$CELERY_SERVICE_DIR/logs
@@ -22,13 +21,13 @@ RUN apt-get update && \
     mkdir -p $CELERY_SERVICE_DIR && \
     mv /tmp/run $CELERY_SERVICE_DIR && \
     # installing celery dependencies
-    apt-get install -y curl git g++ python-dev && \
+    apt-get install -y curl python2.7 git g++ python-dev && \
     # installing pip
     curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
     # installing virtualenv and creating one
     pip install virtualenv && \
     virtualenv $CELERY_VIRTUAL_ENV_DIR && \
-    # installing celery python requirements in virtualenv
+    # installing celery python requirements in virtualenv1
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install celery==3.0.24 && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master && \

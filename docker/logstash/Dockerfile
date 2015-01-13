@@ -20,6 +20,7 @@ RUN apt-get update && \
     mkdir /etc/java && \
     tar -xzvf /opt/tmp/java/java.tar.gz -C /etc/java --strip=1 && \
     rm /opt/tmp/java/java.tar.gz && \
+    # TODO: update logstash to latest version
     curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar
     # rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
 
@@ -27,6 +28,7 @@ EXPOSE 9999
 
 CMD sed -i "s|ELASTICSEARCH_ADDR|$ELASTICSEARCH_PORT_9200_TCP_ADDR|g" $LOGSTASH_CONF_FILE && \
     sed -i "s|RABBITMQ_ADDR|$RABBITMQ_PORT_5672_TCP_ADDR|g" $LOGSTASH_CONF_FILE && \
+    # sed -i "s|INFLUXDB_ADDR|$INFLUXDB_PORT_8086_TCP_ADDR|g" $LOGSTASH_CONF_FILE && \
     /etc/java/bin/java -jar $LOGSTASH_JAR_PATH agent -f $LOGSTASH_CONF_FILE
 # ONELINER FOR TESTING
 # sed -i "s|ELASTICSEARCH_ADDR|$ELASTICSEARCH_PORT_9200_TCP_ADDR|g" $LOGSTASH_CONF_FILE && sed -i "s|RABBITMQ_ADDR|$RABBITMQ_PORT_5672_TCP_ADDR|g" $LOGSTASH_CONF_FILE && /etc/java/bin/java -jar $LOGSTASH_JAR_PATH agent -f $LOGSTASH_CONF_FILE

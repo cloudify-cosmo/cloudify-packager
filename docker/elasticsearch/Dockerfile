@@ -16,6 +16,7 @@ RUN apt-get update && \
     mkdir /etc/java && \
     tar -xzvf /opt/tmp/java/java.tar.gz -C /etc/java --strip=1 && \
     rm /opt/tmp/java/java.tar.gz && \
+    # TODO: update elasticsearch to latest version
     curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
     mkdir -p $ELASTICSEARCH_SERVICE_DIR && \
     tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1 && \

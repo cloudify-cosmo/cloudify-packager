@@ -28,3 +28,9 @@ riemann:
   build: riemann
   links:
     - rabbitmq
+restservice:
+  build: restservice
+  ports:
+    - "8100:8100"
+  # links:
+  #   - elasticsearch
