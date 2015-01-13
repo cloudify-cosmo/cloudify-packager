@@ -2,10 +2,20 @@ nginx:
   build: nginx
   ports:
     - "80:80"
+  # links:
+    # currently the file server is hosted on the same container the restservice is in. This will change.
+    # - restservice
 elasticsearch:
   build: elasticsearch
   ports:
     - "9200:9200"
+  volumes_from:
+    - elasticsearch_data
+elasticsearch_data:
+  build: elasticsearch
+  volumes:
+    - /etc/service/elasticsearch/data
+    - /etc/service/elasticsearch/logs
 logstash:
   build: logstash
   ports:
@@ -24,19 +34,40 @@ influxdb:
     - "8086:8086"
     - "8090:8090"
     - "8099:8099"
+  # links:
+    # - ui
+  volumes_from:
+    - influxdb_data
+influxdb_data:
+  build: influxdb
+  volumes:
+    - /opt/influxdb/shared/data
 riemann:
   build: riemann
   links:
     - rabbitmq
+    - restservice
+  volumes_from:
+    - riemann_data
+riemann_data:
+  build: riemann
+  volumes:
+    - /etc/service/riemann
 restservice:
   build: restservice
   ports:
     - "8100:8100"
-  # links:
-  #   - elasticsearch
+  links:
+    - elasticsearch
+    - rabbitmq
 mgmtworker:
   build: mgmtworker
-  environment:
-    MANAGEMENT_IP: localhost
   links:
     - rabbitmq
+    - restservice
+
+                              # '-v ~/:{1} '
+                              # '-v /root '
+                              # '-v /opt/manager/resources/blueprints '
+                              # '-v /opt/manager/resources/uploaded-blueprints '
+                              # '-v /var/log/cloudify '
