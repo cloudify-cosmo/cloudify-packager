@@ -36,3 +36,7 @@ restservice:
   #   - elasticsearch
 mgmtworker:
   build: mgmtworker
+  environment:
+    MANAGEMENT_IP: localhost
+  links:
+    - rabbitmq
