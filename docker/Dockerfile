@@ -393,5 +393,7 @@ RUN echo installing web-ui dependencies && \
     tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/grafana* -C $WEBUI_SERVICE_DIR/grafana --strip-components=1 && \
     cp /opt/tmp/cloudify-webui/packages/cloudify-ui/config/grafana/config.js $WEBUI_SERVICE_DIR/grafana/ && \
     rm -rf /opt/tmp/cloudify-webui/cloudify-webui.deb && \
-    chmod +x $WEBUI_RUN_FILE
+    chmod +x $WEBUI_RUN_FILE && \
+    cd /etc/service/cloudify-ui/cosmo-ui && \
+    npm update
 #RUN apt-get -y install nodejs npm
