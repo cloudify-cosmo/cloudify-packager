@@ -11,18 +11,18 @@ ENV VERSION=0.8.8 \
 
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl http://s3.amazonaws.com/influxdb/influxdb_$VERSION_amd64.deb --create-dirs -o /opt/tmp/influxdb.deb && \
+    curl http://s3.amazonaws.com/influxdb/influxdb_${VERSION}_amd64.deb --create-dirs -o /opt/tmp/influxdb.deb && \
     dpkg -i /opt/tmp/influxdb.deb && \
     # starting influxdb as daemon to create cloudify db
     /bin/bash -c 'source /opt/tmp/utils.sh && \
-    /usr/bin/influxdb-daemon -config=$INFLUXDB_CONFIG_FILE && \
+    /usr/bin/influxdb-daemon -config=${INFLUXDB_CONFIG_FILE} && \
     wait_for_port 8086' && \
     curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}" && \
-    # rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl -y; apt-get autoremove -y
+    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl -y; apt-get autoremove -y
 
 # influxdb persistence path
 # VOLUME /opt/influxdb/shared/data
 
 EXPOSE 8086 8083
 
-CMD /usr/bin/influxdb -config=$INFLUXDB_CONFIG_FILE
+CMD /usr/bin/influxdb -config=${INFLUXDB_CONFIG_FILE}
