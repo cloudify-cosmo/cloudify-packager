@@ -4,7 +4,7 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 COPY NOTICE.txt /root/NOTICE.txt
 
 # Used by 'cfy status' impl to determine if running in container.
-ENV VERSION=3.1 \
+ENV VERSION=master \
     DOCKER_ENV=True \
     CELERY_SERVICE_DIR=/etc/service/mgmtworker
 ENV CELERY_RUN_FILE=${CELERY_SERVICE_DIR}/run \
@@ -36,7 +36,7 @@ RUN apt-get update && \
     sed -i '1s|^|CELERY_LOG_DIR='${CELERY_LOG_DIR}' \n|' ${CELERY_RUN_FILE} && \
     sed -i '1s|^|#!/bin/bash \n|' ${CELERY_RUN_FILE} && \
     mkdir -p ${CELERY_LOG_DIR} && \
-    chmod +x ${CELERY_RUN_FILE} && \
+    chmod +x ${CELERY_RUN_FILE}
     # rm -rf /var/lib/apt/lists; apt-get remove curl git python-dev g++ -y; apt-get autoremove -y
 
 CMD /etc/service/mgmtworker/run
