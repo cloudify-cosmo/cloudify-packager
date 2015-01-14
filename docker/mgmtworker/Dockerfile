@@ -4,7 +4,8 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 COPY NOTICE.txt /root/NOTICE.txt
 
 # Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV=True \
+ENV VERSION=master \
+    DOCKER_ENV=True \
     CELERY_SERVICE_DIR=/etc/service/mgmtworker
 ENV CELERY_RUN_FILE=$CELERY_SERVICE_DIR/run \
     CELERY_VIRTUALENV_DIR=$CELERY_SERVICE_DIR/env \
@@ -21,11 +22,11 @@ RUN apt-get update && \
     pip install virtualenv && \
     virtualenv $CELERY_VIRTUALENV_DIR && \
     $CELERY_VIRTUALENV_DIR/bin/pip install celery==3.0.24 && \
-    $CELERY_VIRTUALENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master && \
-    $CELERY_VIRTUALENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master && \
-    $CELERY_VIRTUALENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master && \
+    $CELERY_VIRTUALENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@$VERSION && \
+    $CELERY_VIRTUALENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@$VERSION && \
+    $CELERY_VIRTUALENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@$VERSION && \
     cd $CELERY_SERVICE_DIR && \
-    git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    git clone -b $VERSION https://github.com/cloudify-cosmo/cloudify-manager.git && \
     $CELERY_VIRTUALENV_DIR/bin/pip install cloudify-manager/plugins/plugin-installer && \
     $CELERY_VIRTUALENV_DIR/bin/pip install cloudify-manager/plugins/agent-installer && \
     $CELERY_VIRTUALENV_DIR/bin/pip install cloudify-manager/plugins/riemann-controller && \
@@ -35,7 +36,7 @@ RUN apt-get update && \
     sed -i '1s|^|CELERY_LOG_DIR='$CELERY_LOG_DIR' \n|' $CELERY_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $CELERY_RUN_FILE && \
     mkdir -p $CELERY_LOG_DIR && \
-    chmod +x $CELERY_RUN_FILE
-    # rm -rf /var/lib/apt/lists; apt-get remove curl git python-dev g++ -y; apt-get autoremove -y
+    chmod +x $CELERY_RUN_FILE && \
+    rm -rf /var/lib/apt/lists; apt-get remove curl git python-dev g++ -y; apt-get autoremove -y
 
 CMD /etc/service/mgmtworker/run

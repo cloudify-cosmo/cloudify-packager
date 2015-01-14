@@ -2,29 +2,27 @@ FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY NOTICE.txt /root/NOTICE.txt
-COPY utils.sh /opt/tmp/utils/utils.sh
+COPY utils.sh /opt/tmp/utils.sh
 
 # Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV=True \
+ENV VERSION=1.4.2 \
+    DOCKER_ENV=True \
     ELASTICSEARCH_SERVICE_DIR=/etc/service/elasticsearch \
     ES_JAVA_OPTS="-Xmx1024m -Xms1024m" \
     JAVA_HOME=/etc/java/
 
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl https://dl.dropboxusercontent.com/u/407576/jre-7-linux-x64.tar.gz --create-dirs -o /opt/tmp/java/java.tar.gz && \
-    mkdir /etc/java && \
-    tar -xzvf /opt/tmp/java/java.tar.gz -C /etc/java --strip=1 && \
-    rm /opt/tmp/java/java.tar.gz && \
+    curl https://dl.dropboxusercontent.com/u/407576/jre-7-linux-x64.tar.gz --create-dirs -o /opt/tmp/java.tar.gz && \
+    mkdir $JAVA_HOME && tar -xzvf /opt/tmp/java.tar.gz -C $JAVA_HOME --strip=1 && \
     # TODO: update elasticsearch to latest version
-    curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz --create-dirs -o /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
+    curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$VERSION.tar.gz --create-dirs -o /opt/tmp/elasticsearch.tar.gz && \
     mkdir -p $ELASTICSEARCH_SERVICE_DIR && \
-    tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch/elasticsearch.tar.gz --strip-components=1 && \
-    rm -rf /opt/tmp/elasticsearch/elasticsearch.tar.gz && \
+    tar -C $ELASTICSEARCH_SERVICE_DIR/ -xvf /opt/tmp/elasticsearch.tar.gz --strip-components=1 && \
     # start elasticsearch as daemon for configuration purposes.
     # todo(adaml): move config to run script
     # config includes setting elasticsearch indexes.
-    /bin/bash -c 'source /opt/tmp/utils/utils.sh && \
+    /bin/bash -c 'source /opt/tmp/utils.sh && \
     $ELASTICSEARCH_SERVICE_DIR/bin/elasticsearch -d && \
     wait_for_port 9200' && \
     echo "deleting events index if exists..." && \
@@ -44,8 +42,8 @@ RUN apt-get update && \
     echo "creating node-instance mapping..." && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node_instance/_mapping -d '{ "node_instance": { "_id": { "path": "id" }, "properties": { "runtime_properties": { "enabled": false } } } }' && \
     echo "printing mappings..." && \
-    curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1
-    # rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
+    curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1 && \
+    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl -y; apt-get autoremove -y
 
 # elasticsearch persistence paths
 # VOLUME /etc/service/elasticsearch/data

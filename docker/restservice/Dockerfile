@@ -4,7 +4,8 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 COPY NOTICE.txt /root/NOTICE.txt
 
 # Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV=True \
+ENV VERSION=master \
+    DOCKER_ENV=True \
     MANAGER_SERVICE_DIR=/opt/manager
 ENV MANAGER_VIRTUALENV_DIR=$MANAGER_SERVICE_DIR/env \
     MANAGER_REST_CONFIG_PATH=$MANAGER_SERVICE_DIR/guni.conf
@@ -21,8 +22,8 @@ RUN apt-get update && \
     curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
     pip install virtualenv && \
     virtualenv $MANAGER_VIRTUALENV_DIR && \
-    $MANAGER_VIRTUALENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master && \
-    git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    $MANAGER_VIRTUALENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@$VERSION && \
+    git clone -b $VERSION https://github.com/cloudify-cosmo/cloudify-manager.git && \
     cd cloudify-manager/rest-service && \
     $MANAGER_VIRTUALENV_DIR/bin/pip install . && \
     cd ../../ && \
@@ -30,7 +31,7 @@ RUN apt-get update && \
     # copying rest-service resources to resource folder
     cp -r /opt/manager/cloudify-manager/resources/rest-service/. /opt/manager/resources && \
     rm -rf cloudify-manager && \
-    # rm -rf /var/lib/apt/lists; apt-get remove curl git python-dev -y; apt-get autoremove -y
+    rm -rf /var/lib/apt/lists; apt-get remove curl git python-dev -y; apt-get autoremove -y
 
 EXPOSE 8100
 

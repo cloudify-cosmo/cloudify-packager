@@ -4,7 +4,8 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 COPY NOTICE.txt /root/NOTICE.txt
 
 # Used by 'cfy status' impl to determine if running in container.
-ENV DOCKER_ENV=True \
+ENV VERSION=1.3.2 \
+    DOCKER_ENV=True \
     LOGSTASH_SERVICE_DIR=/etc/service/logstash
 ENV LOGSTASH_CONF_FILE=$LOGSTASH_SERVICE_DIR/logstash.conf \
     LOGSTASH_JAR_PATH=$LOGSTASH_SERVICE_DIR/logstash.jar \
@@ -16,13 +17,11 @@ RUN apt-get update && \
     mkdir -p $LOGSTASH_SERVICE_DIR && \
     mv /tmp/logstash.conf $LOGSTASH_SERVICE_DIR && \
     apt-get install -y curl && \
-    curl https://dl.dropboxusercontent.com/u/407576/jre-7-linux-x64.tar.gz --create-dirs -o /opt/tmp/java/java.tar.gz && \
-    mkdir /etc/java && \
-    tar -xzvf /opt/tmp/java/java.tar.gz -C /etc/java --strip=1 && \
-    rm /opt/tmp/java/java.tar.gz && \
+    curl https://dl.dropboxusercontent.com/u/407576/jre-7-linux-x64.tar.gz --create-dirs -o /opt/tmp/java.tar.gz && \
+    mkdir $JAVA_HOME && tar -xzvf /opt/tmp/java.tar.gz -C $JAVA_HOME --strip=1 && \
     # TODO: update logstash to latest version
-    curl https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar
-    # rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
+    curl https://download.elasticsearch.org/logstash/logstash/logstash-$VERSION-flatjar.jar --create-dirs -o $LOGSTASH_SERVICE_DIR/logstash.jar && \
+    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl -y; apt-get autoremove -y
 
 EXPOSE 9999
 

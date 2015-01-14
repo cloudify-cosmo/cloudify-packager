@@ -6,7 +6,8 @@ COPY NOTICE.txt /root/NOTICE.txt
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV=True \
     NGINX_SERVICE_DIR=/etc/service/nginx \
-    NGINX_CONF_FILE=/etc/nginx/nginx.conf
+    NGINX_CONF_FILE=/etc/nginx/nginx.conf \
+    NGINX_FILESERVER_DIR=/fileserver
 ENV NGINX_LOGS_DIR=$NGINX_SERVICE_DIR/logs
 
 # copy configuration
@@ -15,6 +16,7 @@ COPY default.conf /tmp/default.conf
 RUN apt-get update && \
     mkdir -p $NGINX_SERVICE_DIR && \
     mv /tmp/default.conf $NGINX_SERVICE_DIR && \
+    mkdir -p $NGINX_FILESERVER_DIR && \
     # adding nginx repositories to sources.list file and update repo
     echo "deb http://nginx.org/packages/mainline/ubuntu/ precise nginx" >> /etc/apt/sources.list && \
     echo "deb-src http://nginx.org/packages/mainline/ubuntu/ precise nginx" >> /etc/apt/sources.list && \
@@ -28,11 +30,10 @@ RUN apt-get update && \
     apt-get install -y --force-yes nginx && \
     # turn-off daemon execution, set logging dir and default.conf location in conf file
     echo "daemon off;" >> $NGINX_CONF_FILE && \
-    sed -i "s|/var/log/nginx/error.log warn|$NGINX_SERVICE_DIR/logs/error.log warn|g" $NGINX_CONF_FILE && \
-    sed -i "s|/var/run/nginx.pid|$NGINX_SERVICE_DIR/logs/nginx.pid|g" $NGINX_CONF_FILE && \
+    sed -i "s|/var/log/nginx/|$NGINX_SERVICE_DIR/logs/|g" $NGINX_CONF_FILE && \
     sed -i "s|/etc/nginx/conf.d/\*.conf|$NGINX_SERVICE_DIR/default.conf|g" $NGINX_CONF_FILE && \
     mkdir -p $NGINX_LOGS_DIR
-    # rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
+    rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
 
 EXPOSE 80 53229
 
