@@ -356,17 +356,8 @@ RUN echo installing web-ui dependencies && \
     apt-get install -y {% for dep in webui.reqs %} {{ dep }}{% endfor %} && \
     \
     echo installing nodejs from source && \
-    cd /tmp && \
-    curl {{ webui.nodejs_latest_url }} -o /tmp/node-latest.tar.gz && \
-    tar xvzf node-latest.tar.gz && \
-    rm -f node-latest.tar.gz && \
-    cd node-v* && \
-    ./configure && \
-    CXX="g++ -Wno-unused-local-typedefs" make && \
-    CXX="g++ -Wno-unused-local-typedefs" make install && \
-    cd /tmp && \
-    rm -rf /tmp/node-v* && \
-    echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc && \
+    echo 'Installing NodeJS now ... wait' && \
+    apt-get -y install nodejs npm && \
     \
     echo downloading cloudify-webui package and extracting webui and grafana tar.gz && \
     curl {{ webui.ui_package_url }} --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
@@ -377,9 +368,7 @@ RUN echo installing web-ui dependencies && \
     tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/grafana* -C $WEBUI_SERVICE_DIR/grafana --strip-components=1 && \
     cp /opt/tmp/cloudify-webui/packages/cloudify-ui/config/grafana/config.js $WEBUI_SERVICE_DIR/grafana/ && \
     rm -rf /opt/tmp/cloudify-webui/cloudify-webui.deb && \
-    chmod +x $WEBUI_RUN_FILE && \
-    cd /etc/service/cloudify-ui/cosmo-ui && \
-    npm update
+    chmod +x $WEBUI_RUN_FILE
 #RUN apt-get -y install nodejs npm
 
 EXPOSE {% for dep in webui.ports %} {{ dep }}{% endfor %}
