@@ -252,6 +252,8 @@ RUN echo installing celery dependencies && \
     echo installing celery python requirements in virtualenv && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo {{ celery.python_install_requires }} | tr -d "',[]")
 
+VOLUME {% for dep in celery.persistence_path %} {{ dep }}{% endfor %}
+
 ############################## install cloudify core components ##############################
 WORKDIR /etc/service/celeryd-cloudify-management/
 
@@ -355,8 +357,7 @@ ADD cloudify-ui/ $WEBUI_SERVICE_DIR/
 RUN echo installing web-ui dependencies && \
     apt-get install -y {% for dep in webui.reqs %} {{ dep }}{% endfor %} && \
     \
-    echo installing nodejs from source && \
-    echo 'Installing NodeJS now ... wait' && \
+    echo installing nodejs && \
     apt-get -y install nodejs npm && \
     \
     echo downloading cloudify-webui package and extracting webui and grafana tar.gz && \

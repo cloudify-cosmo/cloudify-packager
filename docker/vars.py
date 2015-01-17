@@ -110,6 +110,7 @@ VARS = {
             },
         "workers_autoscale": "5,2",
         "ports": [],
+        "persistence_path": ["/root"],
     },
     "manager": {
         "service_name": "manager",
