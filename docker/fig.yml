@@ -1,33 +1,24 @@
 nginx:
   build: nginx
-  # restart_policy: always
   ports:
     - "80:80"
     - "53229:53229"
-  # links:
-    # currently the file server is hosted on the same container the restservice is in. This will change.
-    # - restservice
-  # volumes_from:
-  #   - fileserver_data
-# fileserver_data:
-#   build: nginx
-#   volumes:
-#     - /
+  volumes_from:
+   - fileserverdata
+fileserverdata:
+  image: docker_nginx
+  command: echo FileServer Data Container
 elasticsearch:
   build: elasticsearch
-  # restart_policy: always
   ports:
     - "9200:9200"
-  # volumes_from:
-  #   - elasticsearch_data
-# elasticsearch_data:
-#   build: elasticsearch
-#   volumes:
-#     - /etc/service/elasticsearch/data
-#     - /etc/service/elasticsearch/logs
+  volumes_from:
+   - elasticsearchdata
+elasticsearchdata:
+  image: docker_elasticsearch
+  command: echo Elasticsearch Data Container
 logstash:
   build: logstash
-  # restart_policy: always
   ports:
     - "9999:9999"
   links:
@@ -41,59 +32,53 @@ kibana:
     - elasticsearch
 rabbitmq:
   build: rabbitmq
-  # restart_policy: always
   ports:
     - "5672:5672"
 influxdb:
   build: influxdb
-  # restart_policy: always
   ports:
     - "8083:8083"
     - "8086:8086"
     - "8090:8090"
     - "8099:8099"
-  # links:
-    # - ui
-  # volumes_from:
-  #   - influxdb_data
-# influxdb_data:
-#   build: influxdb
-#   volumes:
-#     - /opt/influxdb/shared/data
+  volumes_from:
+   - influxdbdata
+influxdbdata:
+  image: docker_influxdb
+  command: echo InfluxDB Data Container
 riemann:
   build: riemann
-  # restart_policy: always
   links:
     - rabbitmq
     - restservice
-#   volumes_from:
-#     - riemann_data
-# riemann_data:
-#   build: riemann
-#   volumes:
-#     - /etc/service/riemann
+  volumes_from:
+   - riemanndata
+riemanndata:
+  image: docker_riemann
+  command: echo Riemann Data Container
 restservice:
   build: restservice
-  # restart_policy: always
   ports:
     - "8100:8100"
   links:
     - elasticsearch
     - rabbitmq
-#   volumes_from:
-#     - restservice_data
-# restservice_data:
-#   build: restservice
-#   volumes:
-#     - /opt/manager/resources/blueprints '
-#     - /opt/manager/resources/uploaded-blueprints '
+  volumes_from:
+   - restservicedata
+restservicedata:
+  image: docker_restservice
+  command: echo Rest Service Data Container
 mgmtworker:
   build: mgmtworker
-  # restart_policy: always
   links:
     - rabbitmq
     - restservice
+webui:
+  build: webui
+  ports:
+    - "9001:9001"
 
+# restart_policy: always
 # ~/:/tmp/home
 # /root
 # /var/log/cloudify

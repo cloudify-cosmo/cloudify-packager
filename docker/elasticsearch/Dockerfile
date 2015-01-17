@@ -45,10 +45,10 @@ RUN apt-get update && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1 && \
     rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl -y; apt-get autoremove -y
 
-# elasticsearch persistence paths
-# VOLUME /etc/service/elasticsearch/data
-# VOLUME /etc/service/elasticsearch/logs
+
+VOLUME ${ELASTICSEARCH_SERVICE_DIR}/data
+VOLUME ${ELASTICSEARCH_SERVICE_DIR}/logs
 
 EXPOSE 9200
 
-CMD /etc/service/elasticsearch/bin/elasticsearch
+CMD ${ELASTICSEARCH_SERVICE_DIR}/bin/elasticsearch

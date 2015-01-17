@@ -28,8 +28,7 @@ RUN apt-get update && \
     # curl -o ${MANAGER_CONFIG_PATH} https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config && \
     rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl -y; apt-get autoremove -y
 
-# riemann persistence path
-# VOLUME /etc/service/riemann
+VOLUME ${RIEMANN_SERVICE_DIR}
 
 EXPOSE 5556 5555
 

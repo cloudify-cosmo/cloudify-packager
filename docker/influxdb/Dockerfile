@@ -7,7 +7,8 @@ COPY utils.sh /opt/tmp/utils.sh
 # Used by 'cfy status' impl to determine if running in container.
 ENV VERSION=0.8.8 \
     DOCKER_ENV=True \
-    INFLUXDB_CONFIG_FILE=/opt/influxdb/shared/config.toml
+    INFLUXDB_SERVICE_DIR=/opt/influxdb
+ENV INFLUXDB_CONFIG_FILE=${INFLUXDB_SERVICE_DIR}/shared/config.toml
 
 RUN apt-get update && \
     apt-get install -y curl && \
@@ -20,8 +21,7 @@ RUN apt-get update && \
     curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}" && \
     rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl -y; apt-get autoremove -y
 
-# influxdb persistence path
-# VOLUME /opt/influxdb/shared/data
+VOLUME ${INFLUXDB_SERVICE_DIR}/shared/data
 
 EXPOSE 8086 8083
 
