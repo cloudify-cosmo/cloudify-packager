@@ -124,7 +124,7 @@ VARS = {
             "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
         },
         "ports": ["8100"],
-        "persistence_path": ["/opt/manager/resources/uploaded-blueprints", "/opt/manager/resources/blueprints", "/var/log/cloudify"],
+        "persistence_path": ["/opt/manager/resources", "/var/log/cloudify"],
     },
     "webui": {
         "service_name": "cloudify-ui",
