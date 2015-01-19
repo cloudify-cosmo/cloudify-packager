@@ -9,9 +9,10 @@ fi
 
 setup_jocker_env()
 {
+  pip install virtualenv
   virtualenv docker_build_env
   source docker_build_env/bin/activate && \
-  sudo pip install git+https://github.com/nir0s/jocker.git
+  pip install git+https://github.com/nir0s/jocker.git
 }
 
 # $1 - docker image name
@@ -26,7 +27,6 @@ build_image()
 {
   DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
   setup_jocker_env
-  source docker_build_env/bin/activate
   jocker -t $PACKAGER_DOCKER_PATH/Dockerfile.template -o $PACKAGER_DOCKER_PATH/Dockerfile -f $PACKAGER_DOCKER_PATH/vars.py
   echo Building cloudify stack image.
   build_cloudify_image cloudify:latest
