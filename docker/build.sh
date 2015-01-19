@@ -9,7 +9,7 @@ fi
 
 setup_jocker_env()
 {
-  pip install virtualenv
+  sudo pip install virtualenv
   virtualenv docker_build_env
   source docker_build_env/bin/activate && \
   pip install git+https://github.com/nir0s/jocker.git
