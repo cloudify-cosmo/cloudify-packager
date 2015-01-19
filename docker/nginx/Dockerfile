@@ -7,6 +7,7 @@ COPY NOTICE.txt /root/NOTICE.txt
 ENV DOCKER_ENV=True \
     NGINX_SERVICE_DIR=/etc/service/nginx \
     NGINX_CONF_FILE=/etc/nginx/nginx.conf \
+    NGINX_SERVER_CONF_FILE=/etc/service/nginx/default.conf \
     NGINX_FILESERVER_DIR=/fileserver
 ENV NGINX_LOGS_DIR=${NGINX_SERVICE_DIR}/logs
 
@@ -30,7 +31,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists; apt-get remove curl -y; apt-get autoremove -y
 
 VOLUME ${NGINX_FILESERVER_DIR}
-
 EXPOSE 80 53229
 
-CMD nginx -c ${NGINX_CONF_FILE}
+CMD sed -i "s|RESTSERVICE_ADDR|$RESTSERVICE_PORT_8100_TCP_ADDR|g" ${NGINX_SERVER_CONF_FILE} && \
+    sed -i "s|WEBUI_ADDR|${WEBUI_PORT_9001_TCP_ADDR}|g" ${NGINX_SERVER_CONF_FILE} && \
+    nginx -c ${NGINX_CONF_FILE}

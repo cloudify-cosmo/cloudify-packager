@@ -1,10 +1,11 @@
-FROM debian:jessie
+FROM docker_nginx:latest
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY NOTICE.txt /root/NOTICE.txt
 
 # Used by 'cfy status' impl to determine if running in container.
-ENV VERSION=0.10.35 \
+ENV NODEJS_VERSION=0.10.35 \
+    WEBUI_VERSION=3.1.1 \
     DOCKER_ENV=True \
     NODEJS_HOME=/etc/nodejs \
     WEBUI_SERVICE_DIR=/etc/service/cloudify-ui \
@@ -17,16 +18,19 @@ RUN apt-get update && \
     mkdir -p ${WEBUI_LOGS_DIR} && touch ${WEBUI_LOGS_DIR}/cloudify-ui.log && \
     mkdir -p ${WEBUI_SERVICE_DIR}/ui && \
     mkdir -p ${WEBUI_SERVICE_DIR}/grafana && \
-    curl http://nodejs.org/dist/v0.10.35/node-v${VERSION}-linux-x64.tar.gz  --create-dirs -o /opt/tmp/nodejs.tar.gz && \
+    curl http://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.gz  --create-dirs -o /opt/tmp/nodejs.tar.gz && \
     tar -xzvf /opt/tmp/nodejs.tar.gz -C ${NODEJS_HOME} --strip-components=1 && \
     curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.1/ga-RELEASE/cloudify-ui_3.1.1-ga-b87_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui.deb && \
     dpkg-deb -x /opt/tmp/cloudify-webui.deb /opt/tmp/cloudify-webui/ && \
     tar -xzvf /opt/tmp/cloudify-webui/packages/cloudify-ui/cosmo-ui* -C ${WEBUI_SERVICE_DIR} --strip-components=1 && \
     tar -xzvf /opt/tmp/cloudify-webui/packages/cloudify-ui/grafana* -C ${WEBUI_SERVICE_DIR}/grafana --strip-components=1 && \
     cp /opt/tmp/cloudify-webui/packages/cloudify-ui/config/grafana/config.js $WEBUI_SERVICE_DIR/grafana/ && \
-    cd ${WEBUI_SERVICE_DIR} && ${NODEJS_HOME}/bin/npm install -d && \
-    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl git bzip2 -y; apt-get autoremove -y
+    # current workaround for missing dependency
+    cd ${WEBUI_SERVICE_DIR} && ${NODEJS_HOME}/bin/npm install request && \
+    rm -rf /var/lib/apt/lists; rm -rf /opt/tmp/*; apt-get remove curl git bzip2 -y; apt-get autoremove -y
 
+VOLUME ${WEBUI_SERVICE_DIR}
 EXPOSE 9001
 
-CMD cd /etc/service/cloudify-ui && ${NODEJS_HOME}/bin/node cosmoui.js 0.0.0.0
+WORKDIR ${WEBUI_SERVICE_DIR}
+CMD ${NODEJS_HOME}/bin/node cosmoui.js localhost
