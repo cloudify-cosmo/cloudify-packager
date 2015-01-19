@@ -28,7 +28,9 @@ build_images()
   clone_packager $CLONE_LOCATION
   setup_jocker_env
   echo Building cloudify stack image.
-  ../../docker/build.sh $CLONE_LOCATION
+  pushd $CLONE_LOCATION
+  ./docker/build.sh $CLONE_LOCATION
+  popd
 }
 
 start_and_export_containers()
