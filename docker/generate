@@ -1,0 +1,20 @@
+#!/bin/sh
+generate()
+{
+    SERVICE=$1
+    sudo jocker -t ${SERVICE}/${SERVICE}.Dockerfile.template -o Dockerfile -f vars.py
+}
+
+if [ "$1" == "all" ]; then
+    generate nginx
+    generate ui
+    generate influxdb
+    generate elasticsearch
+    generate logstash
+    generate mgmtworker
+    generate rabbitmq
+    generate riemann
+    generate restservice
+else
+    generate $1
+fi
