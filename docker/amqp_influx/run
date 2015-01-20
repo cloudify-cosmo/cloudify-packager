@@ -8,4 +8,4 @@ sleep 30
 $MANAGER_VIRTUALENV_DIR/bin/python $MANAGER_VIRTUALENV_DIR/bin/cloudify-amqp-influxdb \
     --amqp-exchange cloudify-monitoring \
     --amqp-routing-key '*' \
-     --influx-database cloudifyvars
+     --influx-database cloudify
