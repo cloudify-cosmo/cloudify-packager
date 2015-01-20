@@ -371,18 +371,8 @@ ADD cloudify-ui/ $WEBUI_SERVICE_DIR/
 RUN echo installing web-ui dependencies && \
     apt-get install -y  curl g++ python2.7 make && \
     \
-    echo installing nodejs from source && \
-    cd /tmp && \
-    curl http://nodejs.org/dist/node-latest.tar.gz -o /tmp/node-latest.tar.gz && \
-    tar xvzf node-latest.tar.gz && \
-    rm -f node-latest.tar.gz && \
-    cd node-v* && \
-    ./configure && \
-    CXX="g++ -Wno-unused-local-typedefs" make && \
-    CXX="g++ -Wno-unused-local-typedefs" make install && \
-    cd /tmp && \
-    rm -rf /tmp/node-v* && \
-    echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc && \
+    echo installing nodejs && \
+    apt-get -y install nodejs npm && \
     \
     echo downloading cloudify-webui package and extracting webui and grafana tar.gz && \
     curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.1.1/ga-RELEASE/cloudify-ui_3.1.1-ga-b87_amd64.deb --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
