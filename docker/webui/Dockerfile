@@ -1,4 +1,4 @@
-FROM docker_nginx:latest
+FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY NOTICE.txt /root/NOTICE.txt

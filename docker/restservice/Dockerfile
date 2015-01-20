@@ -23,7 +23,7 @@ RUN apt-get update && \
     pip install virtualenv && \
     virtualenv ${MANAGER_VIRTUALENV_DIR} && \
     ${MANAGER_VIRTUALENV_DIR}/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@${VERSION} && \
-    git clone -b ${VERSION} https://github.com/cloudify-cosmo/cloudify-manager.git && \
+    git clone -b CFY-1838-separate-services-container-to-service-specific-containers https://github.com/cloudify-cosmo/cloudify-manager.git && \
     cd cloudify-manager/rest-service && \
     ${MANAGER_VIRTUALENV_DIR}/bin/pip install . && \
     cd ../../ && \

@@ -1,13 +1,13 @@
-nginx:
-  build: nginx
-  ports:
-    - "80:80"
-    - "53229:53229"
-  links:
-    - webui
-    - restservice
-  volumes_from:
-    - webui
+# nginx:
+#   build: nginx
+#   ports:
+#     - "80:80"
+#     - "53229:53229"
+#   links:
+#     - webui
+#     - restservice
+#   volumes_from:
+#     - webui
     # - fileserverdata
 # fileserverdata:
 #   image: docker_nginx
@@ -60,13 +60,13 @@ influxdb:
 # riemanndata:
 #   image: docker_riemann
 #   command: echo Riemann Data Container
-restservice:
-  build: restservice
-  ports:
-    - "8100:8100"
-  links:
-    - elasticsearch
-    - rabbitmq
+# restservice:
+#   build: restservice
+#   ports:
+#     - "8100:8100"
+#   links:
+#     - elasticsearch
+#     - rabbitmq
 #   volumes_from:
 #     - restservicedata
 # restservicedata:
@@ -77,10 +77,10 @@ restservice:
 #   links:
 #     - rabbitmq
 #     - restservice
-webui:
-  build: webui
-  ports:
-    - "9001:9001"
+# webui:
+#   build: webui
+#   ports:
+#     - "9001:9001"
 
 # restart_policy: always
 # ~/:/tmp/home
