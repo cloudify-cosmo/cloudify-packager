@@ -174,8 +174,7 @@ RUN echo starting influxdb as daemon to create cloudify db && \
     /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     /usr/bin/influxdb-daemon -config=$INFLUXDB_CONFIG_FILE && \
     wait_for_port {{ influxdb.ports[0] }}' && \
-    curl -s "http://localhost:{{ influxdb.ports[0] }}/db?u=root&p=root" -d "{\"name\": \"cloudify\"}" && \
-    rm -rf /opt/influxdb/shared/data/raft
+    curl -s "http://localhost:{{ influxdb.ports[0] }}/db?u=root&p=root" -d "{\"name\": \"cloudify\"}"
 
 # set config path in run file
 RUN sed -i '1s|^|INFLUXDB_CONFIG_FILE='$INFLUXDB_CONFIG_FILE' \n|' $INFLUXDB_RUN_FILE && \
