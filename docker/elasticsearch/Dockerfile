@@ -15,13 +15,10 @@ RUN apt-get update && \
     apt-get install -y curl && \
     curl https://dl.dropboxusercontent.com/u/407576/jre-7-linux-x64.tar.gz --create-dirs -o /opt/tmp/java.tar.gz && \
     mkdir ${JAVA_HOME} && tar -xzvf /opt/tmp/java.tar.gz -C ${JAVA_HOME} --strip=1 && \
-    # TODO: update elasticsearch to latest version
     curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-${VERSION}.tar.gz --create-dirs -o /opt/tmp/elasticsearch.tar.gz && \
     mkdir -p ${ELASTICSEARCH_SERVICE_DIR} && \
     tar -C ${ELASTICSEARCH_SERVICE_DIR}/ -xvf /opt/tmp/elasticsearch.tar.gz --strip-components=1 && \
     # start elasticsearch as daemon for configuration purposes.
-    # todo(adaml): move config to run script
-    # config includes setting elasticsearch indexes.
     /bin/bash -c 'source /opt/tmp/utils.sh && \
     ${ELASTICSEARCH_SERVICE_DIR}/bin/elasticsearch -d && \
     wait_for_port 9200' && \
