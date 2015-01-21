@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+function state_error
+{
+    echo "ERROR: ${1:-UNKNOWN} (status $?)" 1>&2
+    exit 1
+}
+
 function wait_for_port
 {
     c=0
