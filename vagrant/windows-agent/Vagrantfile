@@ -19,7 +19,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
-      aws.keypair_name = "vagrant_build"
+      aws.keypair_name = "windows_agent_packager"
       override.ssh.username = "Administrator"
       override.ssh.private_key_path = AWS_PK_PATH
 
