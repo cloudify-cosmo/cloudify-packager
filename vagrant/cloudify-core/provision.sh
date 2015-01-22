@@ -48,7 +48,7 @@ sudo pkm get -c celery
 
 echo '# GET PROCESS'
 
-sudo /opt/celery/bin/pip install celery==3.0.24
+sudo /opt/celery/bin/pip install celery==3.1.17
 
 git clone https://github.com/cloudify-cosmo/cloudify-dsl-parser.git
 pushd cloudify-dsl-parser

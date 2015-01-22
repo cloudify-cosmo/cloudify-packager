@@ -99,7 +99,7 @@ VARS = {
             "sudo"
         ],
         "python_install_requires": [
-            "celery==3.0.24",
+            "celery==3.1.17",
             "pyzmq==14.3.1"
         ],
         "modules": {
