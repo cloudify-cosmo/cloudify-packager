@@ -24,6 +24,7 @@ env CELERY_TASK_SERIALIZER="json"
 env CELERY_RESULT_SERIALIZER="json"
 env CELERY_RESULT_BACKEND="amqp://"
 env RIEMANN_CONFIGS_DIR="{{ config_templates.__params_init.work_dir }}/riemann"
+env C_FORCE_ROOT="true"
 
 exec {{ config_templates.__params_init.work_dir }}/env/bin/celery worker \
 -Ofair \

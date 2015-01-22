@@ -24,6 +24,8 @@ export CELERY_TASK_SERIALIZER="json"
 export CELERY_RESULT_SERIALIZER="json"
 export CELERY_RESULT_BACKEND="amqp://"
 export RIEMANN_CONFIGS_DIR="$CELERY_HOME_DIR/../riemann"
+# enable running celery as root
+export C_FORCE_ROOT="true"
 
 exec $CELERY_HOME_DIR/env/bin/celery worker \
     -Ofair \
