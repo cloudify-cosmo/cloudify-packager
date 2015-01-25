@@ -10,7 +10,7 @@ md C:\\CloudifyAgent\\nssm\
 copy C:\\Tools\\nssm.exe C:\\CloudifyAgent\\nssm\\nssm.exe
 cd CloudifyAgent
 call Scripts\\activate.bat
-pip install celery==3.0.24
+pip install celery==3.1.17
 pip install pyzmq==14.3.1
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 cd C:\\CloudifyAgent\\cloudify-rest-client

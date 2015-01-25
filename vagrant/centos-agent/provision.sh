@@ -39,7 +39,7 @@ echo '# create package resources'
 sudo pkm get -c centos-Final-agent
 
 echo '# GET PROCESS'
-sudo /centos-agent/env/bin/pip install celery==3.0.24
+sudo /centos-agent/env/bin/pip install celery==3.1.17
 sudo /centos-agent/env/bin/pip install pyzmq==14.3.1
 sudo git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 pushd cloudify-rest-client
