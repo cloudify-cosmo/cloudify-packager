@@ -35,7 +35,7 @@ exec $CELERY_HOME_DIR/env/bin/celery worker \
     --events \
     --app=cloudify \
     --loglevel=debug \
-    -Q=cloudify.management \
+    -Q cloudify.management \
     --logfile=$CELERY_LOG_DIR/cloudify.management_worker.log \
     --pidfile=$CELERY_LOG_DIR/cloudify.management_worker.pid \
     --autoscale=5,2
