@@ -22,7 +22,7 @@ def main():
     print('Starting nightly build: {}'.format(strftime("%Y-%m-%d %H:%M:%S")))
     print('Opening connection..')
     access_key = os.environ.get('AWS_ACCESS_KEY_ID')
-    secret_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    secret_key = os.environ.get('AWS_ACCESS_KEY')
     conn = boto.ec2.connect_to_region(settings['region'],
                                       aws_access_key_id=access_key,
                                       aws_secret_access_key=secret_key)
