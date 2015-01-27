@@ -53,7 +53,7 @@ This is input file for Packer.
 ### packerfile.json
 Packer template file. It contains number of user variables defined in the top of the file (`variables` section). `packer_inputs.json` is the inputs file for these variables. Note that some variables are not passed via that file:
 * `aws_access_key` - AWS key ID, taken from environment variable `AWS_ACCESS_KEY_ID`
-* `aws_secret_key` - AWS Secret key, taken from environment variable `AWS_SECRET_ACCESS_KEY`
+* `aws_secret_key` - AWS Secret key, taken from environment variable `AWS_ACCESS_KEY`
 * `instance_type` - Instance type for the provisioning machine
 * `virtualbox_source_image` - Source image (ovf) for when building local virtualbox image with Packer (without AWS)
 * `insecure_private_key` - Path of Vagrant's default insecure private key
