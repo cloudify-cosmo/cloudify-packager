@@ -4,8 +4,8 @@ PACKMAN_SHA=""
 
 echo downloading and preparing agent packages
 
-curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m3-RELEASE/cloudify-ubuntu-precise-agent_3.2.0-m3-b172_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_precise_agent.deb && \
-curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m3-RELEASE/cloudify-ubuntu-trusty-agent_3.2.0-m3-b172_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_trusty_agent.deb && \
+curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m4-RELEASE/cloudify-ubuntu-precise-agent_3.2.0-m4-b173_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_precise_agent.deb && \
+curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m4-RELEASE/cloudify-ubuntu-trusty-agent_3.2.0-m4-b173_amd64.deb --create-dirs -o /opt/tmp/manager/ubuntu_trusty_agent.deb && \
 mkdir -p /tmp/Ubuntu-agent/ && \
 dpkg-deb -x /opt/tmp/manager/ubuntu_precise_agent.deb /opt/tmp/manager/precise && \
 mv /opt/tmp/manager/precise/agents/Ubuntu*/config/Ubuntu-agent-disable-requiretty.sh /tmp/Ubuntu-agent/ && \
