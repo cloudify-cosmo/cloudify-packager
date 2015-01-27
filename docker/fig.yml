@@ -1,3 +1,5 @@
+java:
+  build: java
 # nginx:
 #   build: nginx
 #   ports:
