@@ -16,11 +16,11 @@ elasticsearch:
   build: elasticsearch
   ports:
     - "9200:9200"
-#   volumes_from:
-#     - elasticsearchdata
-# elasticsearchdata:
-#   image: docker_elasticsearch
-#   command: echo Elasticsearch Data Container
+  volumes_from:
+    - elasticsearchdata
+elasticsearchdata:
+  image: docker_elasticsearch
+  command: echo Elasticsearch Data Container
 logstash:
   build: logstash
   ports:
