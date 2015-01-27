@@ -108,20 +108,19 @@ pushd cloudify-manager-blueprints
 	fi
 popd
 
-
 # generate public/private key pair and add to authorized_keys
 ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -N ''
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 # configure inputs
 cp cloudify-manager-blueprints/simple/inputs.yaml.template inputs.yaml
-sed -i "s|public_ip: ''|public_ip: 127.0.0.1|g" inputs.yaml
-sed -i "s|private_ip: ''|private_ip: 127.0.0.1|g" inputs.yaml
-sed -i "s|ssh_user: ''|ssh_user: ${USERNAME}|g" inputs.yaml
-sed -i "s|ssh_key_filename: ''|ssh_key_filename: ~/.ssh/id_rsa|g" inputs.yaml
+sed -i "s|public_ip: ''|public_ip: \'127.0.0.1\'|g" inputs.yaml
+sed -i "s|private_ip: ''|private_ip: \'127.0.0.1\'|g" inputs.yaml
+sed -i "s|ssh_user: ''|ssh_user: \'${USERNAME}\'|g" inputs.yaml
+sed -i "s|ssh_key_filename: ''|ssh_key_filename: \'~/.ssh/id_rsa\'|g" inputs.yaml
 
 # bootstrap the manager locally
-cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.yaml --install-plugins
+cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple-docker.yaml -i inputs.yaml --install-plugins
 if [ "$?" -ne "0" ]; then
   echo "Bootstrap failed, stoping provision."
   exit 1
