@@ -142,7 +142,4 @@ echo "source /home/${USERNAME}/cloudify/bin/activate" >> /home/${USERNAME}/.bash
 # set shell login base dir
 echo "cd ~/cloudify" >> /home/${USERNAME}/.bashrc
 
-# amqpflux quickfix
-sudo sed -i 's/respawn limit.*/respawn limit unlimited/' /etc/init/amqpflux.conf
-
 echo bootstrap done.
