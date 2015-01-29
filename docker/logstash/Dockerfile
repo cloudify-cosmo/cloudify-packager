@@ -14,7 +14,6 @@ RUN apt-get update && \
     mkdir -p ${LOGSTASH_SERVICE_DIR}/logs && \
     mv /tmp/logstash.conf ${LOGSTASH_SERVICE_DIR} && \
     apt-get install -y curl && \
-    # TODO: update logstash to latest version
     curl https://download.elasticsearch.org/logstash/logstash/logstash-${LOGSTASH_VERSION}.tar.gz --create-dirs -o /opt/tmp/logstash.tar.gz && \
     tar -C ${LOGSTASH_SERVICE_DIR}/ -xzvf /opt/tmp/logstash.tar.gz --strip-components=1 && \
     rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get purge curl -y; apt-get autoremove -y
