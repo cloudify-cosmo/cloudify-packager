@@ -1,10 +1,9 @@
-FROM thinkops/light-jre:latest
+FROM docker_javabase:latest
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
-COPY NOTICE.txt /root/NOTICE.txt
+COPY RIEMANN_NOTICE.txt /root/RIEMANN_NOTICE.txt
 
-# Used by 'cfy status' impl to determine if running in container.
-ENV VERSION=0.2.6 \
+ENV RIEMANN_VERSION=0.2.6 \
     DOCKER_ENV=True \
     RIEMANN_SERVICE_DIR=/etc/service/riemann \
     PATH=$PATH:/etc/java/bin
@@ -26,11 +25,11 @@ RUN apt-get update && \
     dpkg -i /opt/tmp/riemann.deb && \
     # TODO: once all changes to the riemann config are done, they should be committed to this file and the local manager.config file should be removed
     # curl -o ${RIEMANN_CONFIG_PATH} https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config && \
-    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl -y; apt-get autoremove -y
+    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get purge curl -y; apt-get autoremove -y
 
 VOLUME ${RIEMANN_SERVICE_DIR}
 
 EXPOSE 5556 5555 5555/udp
 
 # Set the hostname in /etc/hosts so that Riemann doesn't die due to unknownHostException
-CMD echo 127.0.0.1 $(hostname) > /etc/hosts; /usr/bin/riemann -a ${RIEMANN_CONFIG_PATH}
+CMD /usr/bin/riemann -a ${RIEMANN_CONFIG_PATH}
