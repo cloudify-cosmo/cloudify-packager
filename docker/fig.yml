@@ -57,6 +57,8 @@ riemann:
     # - restservice
   volumes_from:
     - riemanndata
+  volumes:
+    - /var/log/cloudify/riemann:/etc/service/riemann/logs
 riemanndata:
   image: docker_riemann
   command: echo Riemann Data Container

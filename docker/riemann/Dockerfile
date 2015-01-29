@@ -11,13 +11,13 @@ ENV RIEMANN_VERSION=0.2.6 \
     # Riemann's config reads this env var to direct calls to the rest service.
     MANAGEMENT_IP='restservice'
 ENV RIEMANN_CONFIG_PATH=${RIEMANN_SERVICE_DIR}/manager.config \
-    RIEMANN_LOG_PATH=${RIEMANN_SERVICE_DIR}/riemann.log \
+    RIEMANN_LOG_PATH=${RIEMANN_SERVICE_DIR}/logs/riemann.log \
     EXTRA_CLASSPATH=${RIEMANN_SERVICE_DIR}/langohr.jar
 
 COPY config/ ${RIEMANN_SERVICE_DIR}/
 
 RUN apt-get update && \
-    mkdir -p ${RIEMANN_SERVICE_DIR} && \
+    mkdir -p ${RIEMANN_SERVICE_DIR}/logs && \
     apt-get install -y curl && \
     curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o ${RIEMANN_SERVICE_DIR}/langohr.jar && \
     chmod 644 ${RIEMANN_SERVICE_DIR}/langohr.jar && \
