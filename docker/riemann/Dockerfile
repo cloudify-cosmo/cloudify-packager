@@ -6,7 +6,7 @@ COPY RIEMANN_NOTICE.txt /root/RIEMANN_NOTICE.txt
 ENV RIEMANN_VERSION=0.2.6 \
     DOCKER_ENV=True \
     RIEMANN_SERVICE_DIR=/etc/service/riemann \
-    PATH=$PATH:/etc/java/bin
+    PATH=$PATH:/etc/java/bin \
     # this is the host name, as seen in /etc/hosts, for the restservice container`
     # Riemann's config reads this env var to direct calls to the rest service.
     MANAGEMENT_IP='restservice'
