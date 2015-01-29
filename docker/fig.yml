@@ -28,6 +28,8 @@ logstash:
   links:
     - elasticsearch
     - rabbitmq
+  volumes:
+    - /etc/service/logstash/logs:/var/log/cloudify/logstash/
 kibana:
   build: kibana
   ports:
