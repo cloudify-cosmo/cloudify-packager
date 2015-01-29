@@ -1,25 +1,23 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
-COPY NOTICE.txt /root/NOTICE.txt
-COPY utils.sh /opt/tmp/utils.sh
+COPY INFLUXDB_NOTICE.txt /root/INFLUXDB_NOTICE.txt
+COPY scripts/* /opt/scripts/
 
-# Used by 'cfy status' impl to determine if running in container.
-ENV VERSION=0.8.8 \
+ENV INFLUXDB_VERSION=0.8.8 \
     DOCKER_ENV=True \
     INFLUXDB_SERVICE_DIR=/opt/influxdb
 ENV INFLUXDB_CONFIG_FILE=${INFLUXDB_SERVICE_DIR}/shared/config.toml
 
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl http://s3.amazonaws.com/influxdb/influxdb_${VERSION}_amd64.deb --create-dirs -o /opt/tmp/influxdb.deb && \
+    curl http://s3.amazonaws.com/influxdb/influxdb_${INFLUXDB_VERSION}_amd64.deb --create-dirs -o /opt/tmp/influxdb.deb && \
     dpkg -i /opt/tmp/influxdb.deb && \
     # starting influxdb as daemon to create cloudify db
-    /bin/bash -c 'source /opt/tmp/utils.sh && \
     /usr/bin/influxdb-daemon -config=${INFLUXDB_CONFIG_FILE} && \
-    wait_for_port 8086' && \
+    chmod +x /opt/scripts/wait_for_port && sleep 3 && /opt/scripts/wait_for_port 8086 && \
     curl -s "http://localhost:8086/db?u=root&p=root" -d "{\"name\": \"cloudify\"}" && \
-    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl -y; apt-get autoremove -y
+    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get purge curl -y; apt-get autoremove -y
 
 VOLUME ${INFLUXDB_SERVICE_DIR}/shared/data
 
