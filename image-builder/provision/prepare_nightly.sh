@@ -6,10 +6,8 @@ sudo apt-get install -y uuid
 sudo tune2fs /dev/xvda1 -U `uuid`
 
 # disable cloud-init datasource retries
-printf "%s\t%s\t%s\t%s\n" \
-    cloud-init cloud-init/datasources multiselect "None" | \
-       sudo debconf-set-selections
-DEBIAN_FRONTEND=noninteractive sudo -E dpkg-reconfigure cloud-init
+echo 'datasource_list: [ None ]' | sudo -s tee /etc/cloud/cloud.cfg.d/90_dpkg.cfg
+sudo dpkg-reconfigure -f noninteractive cloud-init
 
 # disable ttyS0
 echo manual | sudo tee /etc/init/ttyS0.override
