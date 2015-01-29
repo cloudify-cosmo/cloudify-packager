@@ -1,4 +1,4 @@
-FROM docker_logstash:latest
+FROM docker_javabase:latest
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY LOGSTASH_NOTICE.txt /root/LOGSTASH_NOTICE.txt
