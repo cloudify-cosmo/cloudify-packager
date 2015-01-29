@@ -18,6 +18,8 @@ elasticsearch:
     - "9200:9200"
   volumes_from:
     - elasticsearchdata
+  volumes:
+    - /var/log/cloudify/elasticsearch:/etc/service/elasticsearch/logs
 elasticsearchdata:
   image: docker_elasticsearch
   command: echo Elasticsearch Data Container
