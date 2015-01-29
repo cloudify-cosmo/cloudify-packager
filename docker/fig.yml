@@ -54,16 +54,18 @@ influxdb:
 # influxdbdata:
 #   image: docker_influxdb
 #   command: echo InfluxDB Data Container
-# riemann:
-#   build: riemann
-#   links:
-#     - rabbitmq
-#     - restservice
-#   volumes_from:
-#     - riemanndata
-# riemanndata:
-#   image: docker_riemann
-#   command: echo Riemann Data Container
+riemann:
+  build: riemann
+  links:
+    - rabbitmq
+    # - restservice
+  volumes_from:
+    - riemanndata
+  volumes:
+    - /var/log/cloudify/riemann:/etc/service/riemann/logs
+riemanndata:
+  image: docker_riemann
+  command: echo Riemann Data Container
 # restservice:
 #   build: restservice
 #   ports:

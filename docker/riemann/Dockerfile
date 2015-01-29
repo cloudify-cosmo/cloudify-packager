@@ -1,35 +1,35 @@
-FROM debian:jessie
+FROM docker_javabase:latest
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
-COPY NOTICE.txt /root/NOTICE.txt
+COPY RIEMANN_NOTICE.txt /root/RIEMANN_NOTICE.txt
 
-# Used by 'cfy status' impl to determine if running in container.
-ENV VERSION=0.2.6 \
+ENV RIEMANN_VERSION=0.2.6 \
     DOCKER_ENV=True \
-    RIEMANN_SERVICE_DIR=/etc/service/riemann
-ENV MANAGER_CONFIG_PATH=${RIEMANN_SERVICE_DIR}/manager.config \
-    EXTRA_CLASSPATH=${RIEMANN_SERVICE_DIR}/langohr.jar \
-    JAVA_HOME=/etc/java \
-    PATH=$PATH:/etc/java/bin
+    RIEMANN_SERVICE_DIR=/etc/service/riemann \
+    PATH=$PATH:/etc/java/bin \
+    # this is the host name, as seen in /etc/hosts, for the restservice container`
+    # Riemann's config reads this env var to direct calls to the rest service.
+    MANAGEMENT_IP='restservice'
+ENV RIEMANN_CONFIG_PATH=${RIEMANN_SERVICE_DIR}/manager.config \
+    RIEMANN_LOG_PATH=${RIEMANN_SERVICE_DIR}/logs/riemann.log \
+    EXTRA_CLASSPATH=${RIEMANN_SERVICE_DIR}/langohr.jar
 
-COPY manager.config /tmp/manager.config
+COPY config/ ${RIEMANN_SERVICE_DIR}/
 
 RUN apt-get update && \
-    mkdir -p ${RIEMANN_SERVICE_DIR} && \
-    mv /tmp/manager.config ${RIEMANN_SERVICE_DIR} && \
+    mkdir -p ${RIEMANN_SERVICE_DIR}/logs && \
     apt-get install -y curl && \
-    curl https://dl.dropboxusercontent.com/u/407576/jre-7-linux-x64.tar.gz --create-dirs -o /opt/tmp/java.tar.gz && \
-    mkdir ${JAVA_HOME} && tar -xzvf /opt/tmp/java.tar.gz -C ${JAVA_HOME} --strip=1 && \
     curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o ${RIEMANN_SERVICE_DIR}/langohr.jar && \
     chmod 644 ${RIEMANN_SERVICE_DIR}/langohr.jar && \
     curl https://aphyr.com/riemann/riemann_${VERSION}_all.deb --create-dirs -o /opt/tmp/riemann.deb && \
     dpkg -i /opt/tmp/riemann.deb && \
-    # download riemann config
-    # curl -o ${MANAGER_CONFIG_PATH} https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config && \
-    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get remove curl -y; apt-get autoremove -y
+    # TODO: once all changes to the riemann config are done, they should be committed to this file and the local manager.config file should be removed
+    # curl -o ${RIEMANN_CONFIG_PATH} https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config && \
+    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get purge curl -y; apt-get autoremove -y
 
 VOLUME ${RIEMANN_SERVICE_DIR}
 
-EXPOSE 5556 5555
+EXPOSE 5556 5555 5555/udp
 
-CMD /usr/bin/riemann -a ${MANAGER_CONFIG_PATH}
+# Set the hostname in /etc/hosts so that Riemann doesn't die due to unknownHostException
+CMD /usr/bin/riemann -a ${RIEMANN_CONFIG_PATH}
