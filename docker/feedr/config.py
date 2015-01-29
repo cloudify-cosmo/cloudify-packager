@@ -2,16 +2,16 @@
 
 # installing feedr
 # run pip install feedr
-# testing feeder->rabbitmq->logstash->elasticsearch(->kibana) flow
+# testing feedr->rabbitmq->logstash->elasticsearch(->kibana) flow
 # run fig up -d rabbitmq elasticsearch kibana logstash
 # to test the logs queue
-# run mouth feed -c feeder/config.py -f Log -t AMQP_LOGS -m 100 -b 10 -g 0.5 -v
+# mouth feed -c feedr/config.py -f Log -t AMQP_LOGS -m 100 -b 10 -g 0.5 -v
 # to test the events queue
-# run mouth feed -c feeder/config.py -f Log -t AMQP_EVENTS -m 100 -b 10 -g 0.5 -v
+# mouth feed -c feedr/config.py -f Log -t AMQP_EVENTS -m 100 -b 10 -g 0.5 -v
 # go to http://ELATICSEARCH_CONTAINER_IP_ADDR:9200/cloudify_events/_search?pretty=true&q=*:*&size=100 to check that documents were posted
 
-# testing feeder->rabbitmq->logstash->influxdb flow
-# run mouth feed -c feeder/config.py -f Metric -t AMQP_METRICS -m 100 -b 10 -g 0.5 -v
+# testing feedr->rabbitmq->logstash->influxdb flow
+# run mouth feed -c feedr/config.py -f Metric -t AMQP_METRICS -m 100 -b 10 -g 0.5 -v
 
 
 import uuid
@@ -54,7 +54,7 @@ GENERATOR = {
     'transports': {
         'AMQP_Logs': {
             'type': 'AMQP',
-            'host': '172.17.0.20',
+            'host': '172.17.0.123',
             'queue': 'cloudify-logs',
             'exchange': '',
             'routing_key': 'cloudify-logs',
