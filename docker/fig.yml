@@ -1,3 +1,5 @@
+javabase:
+  build: javabase
 # nginx:
 #   build: nginx
 #   ports:
