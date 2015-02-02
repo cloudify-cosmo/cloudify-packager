@@ -1,6 +1,7 @@
 pythonbase:
   build: pythonbase
-
+javabase:
+  build: javabase
 # nginx:
 #   build: nginx
 #   ports:
@@ -22,8 +23,13 @@ elasticsearch:
   build: elasticsearch
   ports:
     - "9200:9200"
-  # volumes_from:
-  # - elasticsearchdata
+  volumes_from:
+    - elasticsearchdata
+  volumes:
+    - /var/log/cloudify/elasticsearch:/etc/service/elasticsearch/logs
+elasticsearchdata:
+  image: docker_elasticsearch
+  command: echo Elasticsearch Data Container
 logstash:
   build: logstash
   ports:
@@ -31,6 +37,8 @@ logstash:
   links:
     - elasticsearch
     - rabbitmq
+  volumes:
+    - /var/log/cloudify/logstash:/etc/service/logstash/logs
 kibana:
   build: kibana
   ports:
@@ -58,16 +66,18 @@ amqpinflux:
   links:
     - rabbitmq
     - influxdb
-# riemann:
-#   build: riemann
-#   links:
-#     - rabbitmq
-#     - restservice
-#   volumes_from:
-#     - riemanndata
-# riemanndata:
-#   image: docker_riemann
-#   command: echo Riemann Data Container
+riemann:
+  build: riemann
+  links:
+    - rabbitmq
+    # - restservice
+  volumes_from:
+    - riemanndata
+  volumes:
+    - /var/log/cloudify/riemann:/etc/service/riemann/logs
+riemanndata:
+  image: docker_riemann
+  command: echo Riemann Data Container
 # restservice:
 #   build: restservice
 #   ports:
