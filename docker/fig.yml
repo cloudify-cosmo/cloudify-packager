@@ -1,3 +1,6 @@
+pythonbase:
+  build: pythonbase
+
 # nginx:
 #   build: nginx
 #   ports:
@@ -12,15 +15,15 @@
 # fileserverdata:
 #   image: docker_nginx
 #   command: echo FileServer Data Container
+# elasticsearchdata:
+#   image: docker_elasticsearch
+#   command: echo Elasticsearch Data Container
 elasticsearch:
   build: elasticsearch
   ports:
     - "9200:9200"
-#   volumes_from:
-#     - elasticsearchdata
-# elasticsearchdata:
-#   image: docker_elasticsearch
-#   command: echo Elasticsearch Data Container
+  # volumes_from:
+  # - elasticsearchdata
 logstash:
   build: logstash
   ports:
@@ -50,6 +53,11 @@ influxdb:
 # influxdbdata:
 #   image: docker_influxdb
 #   command: echo InfluxDB Data Container
+amqpinflux:
+  build: amqpinflux
+  links:
+    - rabbitmq
+    - influxdb
 # riemann:
 #   build: riemann
 #   links:
@@ -72,10 +80,10 @@ influxdb:
 # restservicedata:
 #   image: docker_restservice
 #   command: echo Rest Service Data Container
-# mgmtworker:
-#   build: mgmtworker
-#   links:
-#     - rabbitmq
+mgmtworker:
+  build: mgmtworker
+  links:
+    - rabbitmq
 #     - restservice
 # webui:
 #   build: webui
