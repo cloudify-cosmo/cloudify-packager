@@ -1,3 +1,5 @@
+pythonbase:
+  build: pythonbase
 javabase:
   build: javabase
 # nginx:
@@ -14,6 +16,9 @@ javabase:
 # fileserverdata:
 #   image: docker_nginx
 #   command: echo FileServer Data Container
+# elasticsearchdata:
+#   image: docker_elasticsearch
+#   command: echo Elasticsearch Data Container
 elasticsearch:
   build: elasticsearch
   ports:
@@ -56,6 +61,11 @@ influxdb:
 influxdbdata:
   image: docker_influxdb
   command: echo InfluxDB Data Container
+amqpinflux:
+  build: amqpinflux
+  links:
+    - rabbitmq
+    - influxdb
 riemann:
   build: riemann
   links:
@@ -80,10 +90,10 @@ riemanndata:
 # restservicedata:
 #   image: docker_restservice
 #   command: echo Rest Service Data Container
-# mgmtworker:
-#   build: mgmtworker
-#   links:
-#     - rabbitmq
+mgmtworker:
+  build: mgmtworker
+  links:
+    - rabbitmq
 #     - restservice
 # webui:
 #   build: webui
