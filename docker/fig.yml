@@ -2,23 +2,6 @@ pythonbase:
   build: pythonbase
 javabase:
   build: javabase
-# nginx:
-#   build: nginx
-#   ports:
-#     - "80:80"
-#     - "53229:53229"
-#   links:
-#     - webui
-#     - restservice
-#   volumes_from:
-#     - webui
-    # - fileserverdata
-# fileserverdata:
-#   image: docker_nginx
-#   command: echo FileServer Data Container
-# elasticsearchdata:
-#   image: docker_elasticsearch
-#   command: echo Elasticsearch Data Container
 elasticsearch:
   build: elasticsearch
   ports:
@@ -78,32 +61,23 @@ riemann:
 riemanndata:
   image: docker_riemann
   command: echo Riemann Data Container
-restservice:
-  build: restservice
-#   ports:
-#     - "8100:8100"
-#   links:
-#     - elasticsearch
-#     - rabbitmq
-#   volumes_from:
-#     - restservicedata
-# restservicedata:
-#   image: docker_restservice
-#   command: echo Rest Service Data Container
 mgmtworker:
   build: mgmtworker
   links:
     - rabbitmq
-#     - restservice
-webui:
-  build: webui
-#   ports:
-#     - "9001:9001"
-
+    - frontend
 frontend:
   build: frontend
-
-# restart_policy: always
-# ~/:/tmp/home
-# /root
-# /var/log/cloudify
+  links:
+    - elasticsearch
+    - rabbitmq
+  ports:
+    - "80:80"
+    - "53229:53229"
+    - "8100:8100"
+    - "9001:9001"
+  volumes_from:
+    - frontenddata
+frontenddata:
+  image: docker_frontend
+  command: echo Frontend Data Container
