@@ -1,7 +1,7 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
-COPY NOTICE.txt /root/NOTICE.txt
+COPY RABBITMQ_NOTICE.txt /root/RABBITMQ_NOTICE.txt
 
 # Used by 'cfy status' impl to determine if running in container.
 ENV VERSION=NOT_HARDCODED \
