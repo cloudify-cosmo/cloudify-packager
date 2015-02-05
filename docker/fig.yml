@@ -78,8 +78,8 @@ riemann:
 riemanndata:
   image: docker_riemann
   command: echo Riemann Data Container
-# restservice:
-#   build: restservice
+restservice:
+  build: restservice
 #   ports:
 #     - "8100:8100"
 #   links:
@@ -95,10 +95,13 @@ mgmtworker:
   links:
     - rabbitmq
 #     - restservice
-# webui:
-#   build: webui
+webui:
+  build: webui
 #   ports:
 #     - "9001:9001"
+
+frontend:
+  build: frontend
 
 # restart_policy: always
 # ~/:/tmp/home

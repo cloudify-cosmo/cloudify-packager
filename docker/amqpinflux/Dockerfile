@@ -3,7 +3,7 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY NOTICE.txt /root/NOTICE.txt
 
-ENV VERSION=add_command_line_parameters \
+ENV VERSION=master \
     DOCKER_ENV=True \
     AMQP_HOST=rabbitmq
     INFLUXDB_HOST=influxdb

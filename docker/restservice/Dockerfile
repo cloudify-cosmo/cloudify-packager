@@ -1,10 +1,11 @@
-FROM debian:jessie
+FROM docker_pythonbase
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY NOTICE.txt /root/NOTICE.txt
 
 # Used by 'cfy status' impl to determine if running in container.
 ENV VERSION=master \
+    MANAGER_VERSION=CFY-1838-separate-services-container-to-service-specific-containers \
     DOCKER_ENV=True \
     MANAGER_SERVICE_DIR=/opt/manager
 ENV MANAGER_VIRTUALENV_DIR=${MANAGER_SERVICE_DIR}/env \
@@ -16,22 +17,20 @@ COPY guni.conf /tmp/guni.conf
 WORKDIR ${MANAGER_SERVICE_DIR}
 
 RUN apt-get update && \
+    apt-get install -y curl gcc python-dev && \
     mkdir -p ${MANAGER_SERVICE_DIR} && \
-    mv /tmp/guni.conf ${MANAGER_SERVICE_DIR} && \
-    apt-get install -y curl git python2.7 python-dev && \
-    curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
-    pip install virtualenv && \
-    virtualenv ${MANAGER_VIRTUALENV_DIR} && \
-    ${MANAGER_VIRTUALENV_DIR}/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@${VERSION} && \
-    git clone -b CFY-1838-separate-services-container-to-service-specific-containers https://github.com/cloudify-cosmo/cloudify-manager.git && \
-    cd cloudify-manager/rest-service && \
-    ${MANAGER_VIRTUALENV_DIR}/bin/pip install . && \
-    cd ../../ && \
     mkdir -p /var/log/cloudify && \
+    mv /tmp/guni.conf ${MANAGER_SERVICE_DIR} && \
+    virtualenv ${MANAGER_VIRTUALENV_DIR} && \
+    ${MANAGER_VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/${VERSION}.zip && \
+    curl --silent -L -o /tmp/cloudify-manager/manager.tar.gz --create-dirs https://github.com/cloudify-cosmo/cloudify-manager/archive/${MANAGER_VERSION}.tar.gz && \
+    tar -xzf /tmp/cloudify-manager/manager.tar.gz --strip-components=1 -C /tmp/cloudify-manager/ && \
+    ${MANAGER_VIRTUALENV_DIR}/bin/pip install /tmp/cloudify-manager/rest-service && \
     # copying rest-service resources to resource folder
-    cp -r /opt/manager/cloudify-manager/resources/rest-service/. /opt/manager/resources && \
-    rm -rf cloudify-manager && \
-    rm -rf /var/lib/apt/lists; apt-get remove curl git python-dev -y; apt-get autoremove -y
+    cp -r /tmp/cloudify-manager/resources/rest-service/* /opt/manager/resources && \
+    rm -rf /var/lib/apt/lists /tmp/* && \
+    apt-get purge -y curl gcc python-dev && \
+    apt-get autoremove -y
 
 VOLUME /opt/manager/resources/blueprints
 VOLUME /opt/manager/resources/uploaded-blueprints
