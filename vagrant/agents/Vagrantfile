@@ -73,7 +73,7 @@ Vagrant.configure('2') do |config|
       override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
 
       aws.tags = {
-          "Name" => "vagrant agent ubuntu trusty build",
+          "Name" => "vagrant agent ubuntu precise build",
       }
         aws.security_groups = "vagrant_cfy_build"
     end
@@ -103,7 +103,7 @@ Vagrant.configure('2') do |config|
       override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
 
       aws.tags = {
-          "Name" => "vagrant agent ubuntu trusty build",
+          "Name" => "vagrant agent centos build",
       }
         aws.security_groups = "vagrant_linux_build"
     end
