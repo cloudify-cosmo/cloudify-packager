@@ -29,6 +29,4 @@ RUN apt-get update && \
 
 VOLUME ${RIEMANN_SERVICE_DIR}
 
-EXPOSE 5556 5555 5555/udp
-
 CMD /usr/bin/riemann -a ${RIEMANN_CONFIG_PATH}
