@@ -53,7 +53,7 @@ riemann:
   build: riemann
   links:
     - rabbitmq
-    # - restservice
+    - frontend
   volumes_from:
     - riemanndata
   volumes:
