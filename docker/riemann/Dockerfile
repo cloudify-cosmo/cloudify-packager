@@ -21,15 +21,14 @@ RUN apt-get update && \
     apt-get install -y curl && \
     curl https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar --create-dirs -o ${RIEMANN_SERVICE_DIR}/langohr.jar && \
     chmod 644 ${RIEMANN_SERVICE_DIR}/langohr.jar && \
-    curl https://aphyr.com/riemann/riemann_${VERSION}_all.deb --create-dirs -o /opt/tmp/riemann.deb && \
-    dpkg -i /opt/tmp/riemann.deb && \
+    curl https://aphyr.com/riemann/riemann_${VERSION}_all.deb --create-dirs -o /tmp/riemann.deb && \
+    dpkg -i /tmp/riemann.deb && \
     # TODO: once all changes to the riemann config are done, they should be committed to this file and the local manager.config file should be removed
     # curl -o ${RIEMANN_CONFIG_PATH} https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config && \
-    rm -rf /var/lib/apt/lists; rm /opt/tmp/*; apt-get purge curl -y; apt-get autoremove -y
+    rm -rf /var/lib/apt/lists; rm /tmp/*; apt-get purge curl -y; apt-get autoremove -y
 
 VOLUME ${RIEMANN_SERVICE_DIR}
 
 EXPOSE 5556 5555 5555/udp
 
-# Set the hostname in /etc/hosts so that Riemann doesn't die due to unknownHostException
 CMD /usr/bin/riemann -a ${RIEMANN_CONFIG_PATH}
