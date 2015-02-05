@@ -5,8 +5,8 @@ COPY NOTICE.txt /root/NOTICE.txt
 
 ENV VERSION=master \
     DOCKER_ENV=True \
-    AMQP_HOST=rabbitmq
-    INFLUXDB_HOST=influxdb
+    AMQP_HOST=rabbitmq \
+    INFLUXDB_HOST=influxdb \
     SERVICE_DIR=/opt/amqpinflux \
     VIRTUALENV_DIR=${SERVICE_DIR}/env
 
