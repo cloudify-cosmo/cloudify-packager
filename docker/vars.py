@@ -110,7 +110,7 @@ VARS = {
             },
         "workers_autoscale": "5,2",
         "ports": [],
-        "persistence_path": ["/root"],
+        "persistence_path": ["/root", "/etc/init.d", "/etc/default"],
     },
     "manager": {
         "service_name": "manager",
