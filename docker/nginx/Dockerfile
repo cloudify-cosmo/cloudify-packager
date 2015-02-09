@@ -33,6 +33,6 @@ RUN apt-get update && \
 VOLUME ${NGINX_FILESERVER_DIR}
 EXPOSE 80 53229
 
-CMD sed -i "s|RESTSERVICE_ADDR|$RESTSERVICE_PORT_8100_TCP_ADDR|g" ${NGINX_SERVER_CONF_FILE} && \
-    sed -i "s|WEBUI_ADDR|${WEBUI_PORT_9001_TCP_ADDR}|g" ${NGINX_SERVER_CONF_FILE} && \
+CMD echo "restservice   $(/sbin/ip route|awk '/default/ { print $3 }')" >> /etc/hosts && \
+    echo "webui   $(/sbin/ip route|awk '/default/ { print $3 }')" >> /etc/hosts && \
     nginx -c ${NGINX_CONF_FILE}
