@@ -84,7 +84,8 @@ RUN apt-get update && \
     tar -xzf /tmp/cloudify-manager/manager.tar.gz --strip-components=1 -C /tmp/cloudify-manager/ && \
     ${MANAGER_VIRTUALENV_DIR}/bin/pip install /tmp/cloudify-manager/rest-service && \
     # copying rest-service resources to resource folder
-    cp -r /tmp/cloudify-manager/resources/rest-service/* /opt/manager/resources && \
+    mkdir ${MANAGER_HOME_DIR}/resources && \
+    cp -r /tmp/cloudify-manager/resources/rest-service/* ${MANAGER_HOME_DIR}/resources && \
     rm -rf /var/lib/apt/lists /tmp/* && \
     apt-get purge -y curl gcc python-dev && \
     apt-get autoremove -y
