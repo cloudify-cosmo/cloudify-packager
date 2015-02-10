@@ -61,7 +61,7 @@ RUN apt-get update && \
 ###
 ENV DOCKER_ENV=True \
     DSL_VERSION=master \
-    MANAGER_VERSION=CFY-1838-separate-services-container-to-service-specific-containers \
+    MANAGER_VERSION=master \
     MANAGER_HOME_DIR=/opt/manager
 ENV MANAGER_VIRTUALENV_DIR=${MANAGER_HOME_DIR}/env \
     MANAGER_REST_CONFIG_PATH=${MANAGER_HOME_DIR}/guni.conf
