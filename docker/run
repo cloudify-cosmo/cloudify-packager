@@ -36,8 +36,8 @@ docker run --name="influxdbdata" \
            echo INFLUXDBDATA
 
 # logstash
-docker run --add-host="elasticsearch:${HOSTING_VM_IP}" \
-           --add-host="rabbitmq:${HOSTING_VM_IP}" \
+docker run --add-host=elasticsearch:${HOSTING_VM_IP} \
+           --add-host=rabbitmq:${HOSTING_VM_IP} \
            --hostname="logstash" \
            --name="logstash" \
            --publish=9999:9999 \
@@ -46,7 +46,7 @@ docker run --add-host="elasticsearch:${HOSTING_VM_IP}" \
            docker_logstash
 
 # kibana
-docker run --add-host="elasticsearch:${HOSTING_VM_IP}" \
+docker run --add-host=elasticsearch:${HOSTING_VM_IP} \
            --hostname="kibana" \
            --name="kibana" \
            --publish=5601:5601 \
@@ -54,16 +54,16 @@ docker run --add-host="elasticsearch:${HOSTING_VM_IP}" \
            docker_kibana
 
 # amqpinflux
-docker run --add-host="influxdb:${HOSTING_VM_IP}" \
-           --add-host="rabbitmq:${HOSTING_VM_IP}" \
+docker run --add-host=influxdb:${HOSTING_VM_IP} \
+           --add-host=rabbitmq:${HOSTING_VM_IP} \
            --hostname="amqpinflux" \
            --name="amqpinflux" \
            --restart="always" \
            docker_amqpinflux
 
 # ui+rest+nginx
-docker run --add-host="rabbitmq:${HOSTING_VM_IP}" \
-           --add-host="elasticsearch:${HOSTING_VM_IP}" \
+docker run --add-host=rabbitmq:${HOSTING_VM_IP} \
+           --add-host=elasticsearch:${HOSTING_VM_IP} \
            --hostname="frontend" \
            --name="frontend" \
            --publish=80:80 \
@@ -78,8 +78,8 @@ docker run --name="frontenddata" \
            echo FRONTENDDATA
 
 # riemann
-docker run --add-host="rabbitmq:${HOSTING_VM_IP}" \
-           --add-host="frontend:${HOSTING_VM_IP}" \
+docker run --add-host=rabbitmq:${HOSTING_VM_IP} \
+           --add-host=frontend:${HOSTING_VM_IP} \
            --hostname="riemann" \
            --name="riemann" \
            --restart="always" \
@@ -92,8 +92,8 @@ docker run --name="riemanndata" \
            echo RIEMANNDATA
 
 # mgmtworker
-docker run --add-host="rabbitmq:${HOSTING_VM_IP}" \
-           --add-host="frontend:${HOSTING_VM_IP}" \
+docker run --add-host=rabbitmq:${HOSTING_VM_IP} \
+           --add-host=frontend:${HOSTING_VM_IP} \
            --hostname="mgmtworker" \
            --name="mgmtworker" \
            --restart="always" \
