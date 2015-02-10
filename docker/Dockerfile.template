@@ -143,7 +143,7 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1 && \
     \
     echo changing the default es discovery port to 54329 && \
-    echo 'discovery.zen.ping.multicast.port: 54329' >> /etc/service/elasticsearch/config/elasticsearch.yml && \
+    echo 'discovery.zen.ping.multicast.port: 54329' >> $ELASTICSEARCH_SERVICE_DIR/config/elasticsearch.yml && \
     echo granting run permissions to run file && \
     chmod +x $ELASTICSEARCH_SERVICE_DIR/run
 
