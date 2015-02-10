@@ -37,6 +37,4 @@ VOLUME /opt/manager/resources/uploaded-blueprints
 
 EXPOSE 8100
 
-CMD echo "fileserver   $(/sbin/ip route|awk '/default/ { print $3 }')" >> /etc/hosts && \
-    echo "elasticsearch   $(/sbin/ip route|awk '/default/ { print $3 }')" >> /etc/hosts && \
-    ${MANAGER_VIRTUALENV_DIR}/bin/gunicorn  -w $(($(nproc)*2+1)) -b 0.0.0.0:8100 --timeout 300 manager_rest.server:app --log-file /var/log/cloudify/gunicorn.log --access-logfile /var/log/cloudify/gunicorn-access.log
+CMD ${MANAGER_VIRTUALENV_DIR}/bin/gunicorn  -w $(($(nproc)*2+1)) -b 0.0.0.0:8100 --timeout 300 manager_rest.server:app --log-file /var/log/cloudify/gunicorn.log --access-logfile /var/log/cloudify/gunicorn-access.log

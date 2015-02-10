@@ -33,6 +33,4 @@ RUN apt-get update && \
 VOLUME ${NGINX_FILESERVER_DIR}
 EXPOSE 80 53229
 
-CMD echo "restservice   $(/sbin/ip route|awk '/default/ { print $3 }')" >> /etc/hosts && \
-    echo "webui   $(/sbin/ip route|awk '/default/ { print $3 }')" >> /etc/hosts && \
-    nginx -c ${NGINX_CONF_FILE}
+CMD nginx -c ${NGINX_CONF_FILE}
