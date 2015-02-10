@@ -25,6 +25,4 @@ EXPOSE 9999
 # TODO: check whether we need --verbose or --debug
 # To run manually:
 # docker run -it --link docker_elasticsearch_1:elasticsearch --link docker_rabbitmq_1:rabbitmq docker_logstash /bin/bash
-CMD sed -i "rabbitmq   $(/sbin/ip route|awk '/default/ { print $3 }')" /etc/hosts && \
-    sed -i "elasticsearch   $(/sbin/ip route|awk '/default/ { print $3 }')" /etc/hosts && \
-    ${LOGSTASH_SERVICE_DIR}/bin/logstash -f ${LOGSTASH_CONF_FILE} -l ${LOGSTASH_SERVICE_DIR}/logs/logstash.log --verbose
+CMD ${LOGSTASH_SERVICE_DIR}/bin/logstash -f ${LOGSTASH_CONF_FILE} -l ${LOGSTASH_SERVICE_DIR}/logs/logstash.log --verbose

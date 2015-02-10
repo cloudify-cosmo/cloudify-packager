@@ -15,8 +15,8 @@ ENV VIRTUALENV_DIR=${SERVICE_DIR}/env \
     MANAGEMENT_USER=root \
     MANAGER_REST_PORT=8100 \
     IS_MANAGEMENT_NODE=True \
-    MANAGER_FILE_SERVER_URL=http://rabbitmq:53229 \
-    MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL=http://rabbitmq:53229/blueprints \
+    MANAGER_FILE_SERVER_URL=http://fileserver:53229 \
+    MANAGER_FILE_SERVER_BLUEPRINTS_ROOT_URL=http://fileserver:53229/blueprints \
     CELERY_TASK_SERIALIZER=json \
     CELERY_RESULT_SERIALIZER=json \
     CELERY_RESULT_BACKEND=amqp://
@@ -25,7 +25,7 @@ RUN apt-get update && \
     apt-get install -y python-dev curl unzip g++ && \
     mkdir -p ${CELERY_LOG_DIR} && \
     virtualenv ${VIRTUALENV_DIR} && \
-    ${VIRTUALENV_DIR}/bin/pip install celery==3.0.24 && \
+    ${VIRTUALENV_DIR}/bin/pip install celery==3.1.17 && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-rest-client/archive/${VERSION}.zip && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/${VERSION}.zip && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/${VERSION}.zip && \

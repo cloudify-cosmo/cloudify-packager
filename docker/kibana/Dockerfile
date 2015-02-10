@@ -16,5 +16,5 @@ RUN apt-get update && \
 
 EXPOSE 5601
 
-CMD sed -i "s|localhost|?(/sbin/ip route|awk '/default/ { print $3 }')|g" /etc/service/kibana/config/kibana.yml && \
+CMD sed -i "s|localhost|elasticsearch|g" /etc/service/kibana/config/kibana.yml && \
     /etc/service/kibana/bin/kibana

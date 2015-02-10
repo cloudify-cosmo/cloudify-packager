@@ -17,6 +17,6 @@ RUN mkdir -p ${SERVICE_DIR} && \
 CMD ${VIRTUALENV_DIR}/bin/python ${VIRTUALENV_DIR}/bin/cloudify-amqp-influxdb \
     --amqp-exchange cloudify-monitoring \
     --amqp-routing-key '*' \
-    --amqp-hostname $(/sbin/ip route|awk '/default/ { print $3 }') \
+    --amqp-hostname rabbitmq \
     --influx-database cloudify \
-    --influx-hostname $(/sbin/ip route|awk '/default/ { print $3 }')
+    --influx-hostname influxdb
