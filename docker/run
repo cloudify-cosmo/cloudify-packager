@@ -82,7 +82,7 @@ docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
 docker run -d --name="riemanndata" \
               docker_riemann \
               echo RIEMANNDATA
-riemann
+# riemann
 docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
               --add-host=frontend:${HOSTING_VM_IP} \
               --hostname="riemann" \
