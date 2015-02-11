@@ -1,0 +1,101 @@
+#!/bin/bash
+
+HOSTING_VM_IP=$(ip route | awk '/docker0/ { print $NF }')
+
+# elasticsearchdata
+docker run -d --name="elasticsearchdata" \
+              docker_elasticsearch \
+              echo ELASTICSEARCHDATA
+# elasticsearch
+docker run -d --hostname="elasticsearch" \
+              --name="elasticsearch" \
+              --publish=9200:9200 \
+              --restart="always" \
+              --volume=/var/log/cloudify/elasticsearch:/etc/service/elasticsearch/logs \
+              --volumes-from elasticsearchdata \
+              docker_elasticsearch
+
+# rabbitmq
+docker run -d --hostname="rabbitmq" \
+              --name="rabbitmq" \
+              --publish=5672:5672 \
+              --restart="always" \
+              docker_rabbitmq
+
+# influxdbdata
+docker run -d --name="influxdbdata" \
+              docker_influxdb \
+              echo INFLUXDBDATA
+# influxdb
+docker run -d --hostname="influxdb" \
+              --name="influxdb" \
+              --publish=8083:8083 \
+              --publish=8086:8086 \
+              --restart="always" \
+              --volumes-from influxdbdata \
+              docker_influxdb
+
+# logstash
+docker run -d --add-host=elasticsearch:${HOSTING_VM_IP} \
+              --add-host=rabbitmq:${HOSTING_VM_IP} \
+              --hostname="logstash" \
+              --name="logstash" \
+              --publish=9999:9999 \
+              --restart="always" \
+              --volume=/var/log/cloudify/logstash:/etc/service/logstash/logs \
+              docker_logstash
+
+# kibana
+docker run -d --add-host=elasticsearch:${HOSTING_VM_IP} \
+              --hostname="kibana" \
+              --name="kibana" \
+              --publish=5601:5601 \
+              --restart="always" \
+              docker_kibana
+
+# amqpinflux
+docker run -d --add-host=influxdb:${HOSTING_VM_IP} \
+              --add-host=rabbitmq:${HOSTING_VM_IP} \
+              --hostname="amqpinflux" \
+              --name="amqpinflux" \
+              --restart="always" \
+              docker_amqpinflux
+
+# frontenddata
+docker run -d --name="frontenddata" \
+              docker_frontend \
+              echo FRONTENDDATA
+# frontend
+docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
+              --add-host=elasticsearch:${HOSTING_VM_IP} \
+              --hostname="frontend" \
+              --name="frontend" \
+              --publish=80:80 \
+              --publish=53229:53229 \
+              --publish=9001:9001 \
+              --publish=8100:8100 \
+              --restart="always" \
+              --volumes-from frontenddata \
+              docker_frontend
+
+# riemanndata
+docker run -d --name="riemanndata" \
+              docker_riemann \
+              echo RIEMANNDATA
+riemann
+docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
+              --add-host=frontend:${HOSTING_VM_IP} \
+              --hostname="riemann" \
+              --name="riemann" \
+              --restart="always" \
+              --volume=/var/log/cloudify/riemann:/etc/service/riemann/logs \
+              --volumes-from riemannhdata \
+              docker_riemann
+
+# mgmtworker
+docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
+              --add-host=frontend:${HOSTING_VM_IP} \
+              --hostname="mgmtworker" \
+              --name="mgmtworker" \
+              --restart="always" \
+              docker_mgmtworker
