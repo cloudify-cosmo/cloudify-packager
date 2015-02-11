@@ -3,9 +3,9 @@
 HOSTING_VM_IP=$(ip route | awk '/docker0/ { print $NF }')
 
 # elasticsearchdata
-docker run -d --name="elasticsearchdata" \
-              docker_elasticsearch \
-              echo ELASTICSEARCHDATA
+docker run --name="elasticsearchdata" \
+           docker_elasticsearch \
+           echo ELASTICSEARCHDATA
 # elasticsearch
 docker run -d --hostname="elasticsearch" \
               --name="elasticsearch" \
@@ -23,9 +23,9 @@ docker run -d --hostname="rabbitmq" \
               docker_rabbitmq
 
 # influxdbdata
-docker run -d --name="influxdbdata" \
-              docker_influxdb \
-              echo INFLUXDBDATA
+docker run --name="influxdbdata" \
+           docker_influxdb \
+           echo INFLUXDBDATA
 # influxdb
 docker run -d --hostname="influxdb" \
               --name="influxdb" \
@@ -62,9 +62,9 @@ docker run -d --add-host=influxdb:${HOSTING_VM_IP} \
               docker_amqpinflux
 
 # frontenddata
-docker run -d --name="frontenddata" \
-              docker_frontend \
-              echo FRONTENDDATA
+docker run --name="frontenddata" \
+           docker_frontend \
+           echo FRONTENDDATA
 # frontend
 docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
               --add-host=elasticsearch:${HOSTING_VM_IP} \
@@ -79,9 +79,9 @@ docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
               docker_frontend
 
 # riemanndata
-docker run -d --name="riemanndata" \
-              docker_riemann \
-              echo RIEMANNDATA
+docker run --name="riemanndata" \
+           docker_riemann \
+           echo RIEMANNDATA
 # riemann
 docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
               --add-host=frontend:${HOSTING_VM_IP} \
@@ -91,6 +91,13 @@ docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
               --volume=/var/log/cloudify/riemann:/etc/service/riemann/logs \
               --volumes-from riemannhdata \
               docker_riemann
+
+# mgmtworkerdata
+docker run --name="mgmtdata" \
+           --volume ~/:/tmp/home \
+           --volume /root \
+           docker_mgmtworker \
+           echo mgmt data container
 
 # mgmtworker
 docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
