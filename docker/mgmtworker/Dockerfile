@@ -36,7 +36,7 @@ RUN apt-get update && \
     ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/plugins/agent-installer && \
     ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/plugins/riemann-controller && \
     ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/workflows && \
-    apt-get purge -y python-dev curl unzip g++ && \
+    apt-get purge -y python-dev unzip g++ && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /root/.cache /var/lib/apt/lists/* /tmp/* /var/log/apt/*
