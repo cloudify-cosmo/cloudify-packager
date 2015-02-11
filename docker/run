@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HOSTING_VM_IP="172.17.42.1"
+HOSTING_VM_IP=$(ip route | awk '/docker0/ { print $NF }')
 
 # elasticsearchdata
 docker run --name="elasticsearchdata" \
