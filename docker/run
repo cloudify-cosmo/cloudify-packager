@@ -89,7 +89,7 @@ docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
               --name="riemann" \
               --restart="always" \
               --volume=/var/log/cloudify/riemann:/etc/service/riemann/logs \
-              --volumes-from riemannhdata \
+              --volumes-from riemanndata \
               docker_riemann
 
 # mgmtworkerdata
