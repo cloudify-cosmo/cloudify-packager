@@ -22,7 +22,7 @@ ENV VIRTUALENV_DIR=${SERVICE_DIR}/env \
     CELERY_RESULT_BACKEND=amqp://
 
 RUN apt-get update && \
-    apt-get install -y python-dev curl unzip g++ && \
+    apt-get install -y python-dev unzip g++ && \
     mkdir -p ${CELERY_LOG_DIR} && \
     virtualenv ${VIRTUALENV_DIR} && \
     ${VIRTUALENV_DIR}/bin/pip install celery==3.1.17 && \
