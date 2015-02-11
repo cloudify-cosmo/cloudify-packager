@@ -61,41 +61,41 @@ docker run -d --add-host=influxdb:${HOSTING_VM_IP} \
               --restart="always" \
               docker_amqpinflux
 
-# # frontenddata
-# docker run -d --name="frontenddata" \
-#               docker_frontend \
-#               echo FRONTENDDATA
-# # frontend
-# docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
-#               --add-host=elasticsearch:${HOSTING_VM_IP} \
-#               --hostname="frontend" \
-#               --name="frontend" \
-#               --publish=80:80 \
-#               --publish=53229:53229 \
-#               --publish=9001:9001 \
-#               --publish=8100:8100 \
-#               --restart="always" \
-#               --volumes-from frontenddata \
-#               docker_frontend
+# frontenddata
+docker run -d --name="frontenddata" \
+              docker_frontend \
+              echo FRONTENDDATA
+# frontend
+docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
+              --add-host=elasticsearch:${HOSTING_VM_IP} \
+              --hostname="frontend" \
+              --name="frontend" \
+              --publish=80:80 \
+              --publish=53229:53229 \
+              --publish=9001:9001 \
+              --publish=8100:8100 \
+              --restart="always" \
+              --volumes-from frontenddata \
+              docker_frontend
 
-# # riemanndata
-# docker run -d --name="riemanndata" \
-#               docker_riemann \
-#               echo RIEMANNDATA
-# riemann
-# docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
-#               --add-host=frontend:${HOSTING_VM_IP} \
-#               --hostname="riemann" \
-#               --name="riemann" \
-#               --restart="always" \
-#               --volume=/var/log/cloudify/riemann:/etc/service/riemann/logs \
-#               --volumes-from riemannhdata \
-#               docker_riemann
+# riemanndata
+docker run -d --name="riemanndata" \
+              docker_riemann \
+              echo RIEMANNDATA
+riemann
+docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
+              --add-host=frontend:${HOSTING_VM_IP} \
+              --hostname="riemann" \
+              --name="riemann" \
+              --restart="always" \
+              --volume=/var/log/cloudify/riemann:/etc/service/riemann/logs \
+              --volumes-from riemannhdata \
+              docker_riemann
 
-# # mgmtworker
-# docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
-#               --add-host=frontend:${HOSTING_VM_IP} \
-#               --hostname="mgmtworker" \
-#               --name="mgmtworker" \
-#               --restart="always" \
-#               docker_mgmtworker
+# mgmtworker
+docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
+              --add-host=frontend:${HOSTING_VM_IP} \
+              --hostname="mgmtworker" \
+              --name="mgmtworker" \
+              --restart="always" \
+              docker_mgmtworker
