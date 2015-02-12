@@ -1,6 +1,12 @@
 #!/bin/bash
 
-HOSTING_VM_IP=$(ip route | awk '/docker0/ { print $NF }')
+if [[ "$(uname)" == 'Darwin' ]]; then
+    HOSTING_VM_IP=$(boot2docker ssh ip route | awk '/docker0/ { print $NF }')
+  else
+    HOSTING_VM_IP=$(ip route | awk '/docker0/ { print $NF }')
+fi
+
+printf "docker bridge ip: $HOSTING_VM_IP\n"
 
 # elasticsearchdata
 docker run --name="elasticsearchdata" \
@@ -68,6 +74,7 @@ docker run --name="frontenddata" \
 # frontend
 docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
               --add-host=elasticsearch:${HOSTING_VM_IP} \
+              --add-host=fileserver:${HOSTING_VM_IP} \
               --hostname="frontend" \
               --name="frontend" \
               --publish=80:80 \
@@ -97,7 +104,10 @@ docker run --name="mgmtdata" \
            --volume ~/:/tmp/home \
            --volume /root \
            docker_mgmtworker \
-           echo mgmt data container
+           /bin/sh -c "apt-get update && apt-get install -y curl sudo && \
+           curl -L --fail -o /tmp/blah.deb http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m3-RELEASE/cloudify-ubuntu-agent_3.2.0-m3-b172_amd64.deb && \
+           dpkg -i /tmp/blah.deb && \
+           echo mgmt data container"
 
 # mgmtworker
 docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
