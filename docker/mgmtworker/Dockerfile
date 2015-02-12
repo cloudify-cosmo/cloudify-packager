@@ -4,7 +4,7 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 COPY NOTICE.txt /root/NOTICE.txt
 
 # Used by 'cfy status' impl to determine if running in container.
-ENV VERSION=master \
+ENV VERSION=CFY-1838-separate-services-container \
     REST_VERSION=master \
     COMMON_VERSION=CFY-1838-separate-services-container \
     SCRIPT_VERSION=master \
@@ -25,21 +25,20 @@ ENV VIRTUALENV_DIR=${SERVICE_DIR}/env \
     C_FORCE_ROOT=true
 
 RUN apt-get update && \
-    apt-get install -y python-dev unzip g++ && \
+    apt-get install -y python-dev curl g++ && \
     mkdir -p ${CELERY_LOG_DIR} && \
     virtualenv ${VIRTUALENV_DIR} && \
     ${VIRTUALENV_DIR}/bin/pip install celery==3.1.17 && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-rest-client/archive/${REST_VERSION}.zip && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/${COMMON_VERSION}.zip && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/${SCRIPT_VERSION}.zip && \
-    cd /tmp && \
-    curl -O -L https://github.com/cloudify-cosmo/cloudify-manager/archive/${VERSION}.zip && \
-    unzip ${VERSION}.zip && \
-    ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/plugins/plugin-installer && \
-    ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/plugins/agent-installer && \
-    ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/plugins/riemann-controller && \
-    ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/workflows && \
-    apt-get purge -y python-dev unzip g++ && \
+    curl --silent -L https://github.com/cloudify-cosmo/cloudify-manager/archive/${VERSION}.tar.gz -o /tmp/cloudify-manager.tar.gz && \
+    tar -xzf /tmp/cloudify-manager.tar.gz -C /tmp --strip-components=1 && \
+    ${VIRTUALENV_DIR}/bin/pip install /tmp/plugins/plugin-installer && \
+    ${VIRTUALENV_DIR}/bin/pip install /tmp/plugins/agent-installer && \
+    ${VIRTUALENV_DIR}/bin/pip install /tmp/plugins/riemann-controller && \
+    ${VIRTUALENV_DIR}/bin/pip install /tmp/workflows && \
+    apt-get purge -y python-dev g++ && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /root/.cache /var/lib/apt/lists/* /tmp/* /var/log/apt/*
