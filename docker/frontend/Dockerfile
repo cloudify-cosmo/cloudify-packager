@@ -61,6 +61,8 @@ RUN apt-get update && \
 ###
 ENV DOCKER_ENV=True \
     DSL_VERSION=master \
+    REST_CLIENT_VERSION=master \
+    COMMON_VERSION=CFY-1838-separate-services-container \
     MANAGER_VERSION=CFY-1838-separate-services-container \
     MANAGER_HOME_DIR=/opt/manager
 ENV MANAGER_VIRTUALENV_DIR=${MANAGER_HOME_DIR}/env \
@@ -80,6 +82,8 @@ RUN apt-get update && \
     mv /tmp/guni.conf ${MANAGER_HOME_DIR} && \
     virtualenv ${MANAGER_VIRTUALENV_DIR} && \
     ${MANAGER_VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/${DSL_VERSION}.zip && \
+    ${MANAGER_VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-rest-client/archive/${REST_CLIENT_VERSION}.zip && \
+    ${MANAGER_VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/${COMMON_VERSION}.zip && \
     curl --silent -L -o /tmp/cloudify-manager/manager.tar.gz --create-dirs https://github.com/cloudify-cosmo/cloudify-manager/archive/${MANAGER_VERSION}.tar.gz && \
     tar -xzf /tmp/cloudify-manager/manager.tar.gz --strip-components=1 -C /tmp/cloudify-manager/ && \
     ${MANAGER_VIRTUALENV_DIR}/bin/pip install /tmp/cloudify-manager/rest-service && \
