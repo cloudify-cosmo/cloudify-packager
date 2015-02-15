@@ -9,12 +9,12 @@ ENV RIEMANN_VERSION=0.2.6 \
     PATH=$PATH:/etc/java/bin \
     # this is the host name, as seen in /etc/hosts, for the restservice container`
     # Riemann's config reads this env var to direct calls to the rest service.
-    MANAGEMENT_IP='restservice'
+    MANAGEMENT_IP='frontend'
 ENV RIEMANN_CONFIG_PATH=${RIEMANN_SERVICE_DIR}/manager.config \
     RIEMANN_LOG_PATH=${RIEMANN_SERVICE_DIR}/logs/riemann.log \
     EXTRA_CLASSPATH=${RIEMANN_SERVICE_DIR}/langohr.jar
 
-COPY config/ ${RIEMANN_SERVICE_DIR}/
+# COPY config/ ${RIEMANN_SERVICE_DIR}/
 
 RUN apt-get update && \
     mkdir -p ${RIEMANN_SERVICE_DIR}/logs && \
@@ -25,6 +25,7 @@ RUN apt-get update && \
     dpkg -i /tmp/riemann.deb && \
     # TODO: once all changes to the riemann config are done, they should be committed to this file and the local manager.config file should be removed
     # curl -o ${RIEMANN_CONFIG_PATH} https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config && \
+    curl -o ${RIEMANN_CONFIG_PATH} https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/CFY-2173-configure-riemann-for-external-hosts/plugins/riemann-controller/riemann_controller/resources/manager.config && \
     rm -rf /var/lib/apt/lists; rm /tmp/*; apt-get purge curl -y; apt-get autoremove -y
 
 VOLUME ${RIEMANN_SERVICE_DIR}
