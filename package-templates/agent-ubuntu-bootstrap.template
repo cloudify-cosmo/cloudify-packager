@@ -55,14 +55,14 @@ function check_file
 function check_upstart
 {
 	echo "checking to see if $1 daemon is running..."
-	sudo status $1 || state_error "daemon $1 is not running"
+	status $1 || state_error "daemon $1 is not running"
 	echo "daemon $1 is running"
 }
 
 function check_service
 {
     echo "checking to see if $1 service is running..."
-    sudo service $1 status || state_error "service $1 is not running"
+    service $1 status || state_error "service $1 is not running"
     echo "service $1 is running"
 }
 
@@ -81,16 +81,16 @@ DST_SCRIPT_LOCATION={{ bootstrap_params.dst_script_location }}
 
 echo -e "\nInstalling ${PKG_NAME} version ${VERSION}...\n" | tee -a ${BOOTSTRAP_LOG}
 
-sudo mkdir -p ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-sudo mkdir -p ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-sudo mkdir -p ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+mkdir -p ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+mkdir -p ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+mkdir -p ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 
 check_dir ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 check_dir ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 check_dir ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 
-sudo cp -R ${PKG_DIR}/*.tar.gz ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-sudo cp -R ${PKG_DIR}/config/*.template ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-sudo cp -R ${PKG_DIR}/config/Ubuntu-agent-disable-requiretty.sh ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+cp -R ${PKG_DIR}/*.tar.gz ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+cp -R ${PKG_DIR}/config/*.template ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+cp -R ${PKG_DIR}/config/Ubuntu-agent-disable-requiretty.sh ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 
 echo -e "${PKG_NAME} ${VERSION} installation completed successfully!\n" | tee -a ${BOOTSTRAP_LOG}
