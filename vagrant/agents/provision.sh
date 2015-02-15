@@ -63,6 +63,7 @@ function create_virtualenv
 function install_pip
 {
 	curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
+	pip install boto
 }
 
 function install_agent_packager
