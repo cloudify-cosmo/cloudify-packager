@@ -25,4 +25,8 @@ rm VBoxGuestAdditions_4.3.20.iso
 
 # change hostname
 echo cloudify | sudo -S tee /etc/hostname
-echo 127.0.0.1 cloudify | sudo -S tee /etc/hosts
+echo 127.0.0.1 cloudify | sudo -S tee -a /etc/hosts
+
+# change dns resolver to 8.8.8.8
+# this is done so docker won't start with AWS dns resolver
+echo nameserver 8.8.8.8 | sudo -S tee /etc/resolv.conf
