@@ -1,12 +1,15 @@
 #!/bin/bash
 
 if [[ "$(uname)" == 'Darwin' ]]; then
-    HOSTING_VM_IP=$(boot2docker ssh ip route | awk '/docker0/ { print $NF }')
+    DOCKER_BR_IP=$(boot2docker ssh ip route | awk '/docker0/ { print $NF }')
+    DOCKER_EXT_IP=$(boot2docker ip)
   else
-    HOSTING_VM_IP=$(ip route | awk '/docker0/ { print $NF }')
+    DOCKER_BR_IP=$(ip route | awk '/docker0/ { print $NF }')
+    DOCKER_EXT_IP="127.0.0.1"
 fi
 
-printf "docker bridge ip: $HOSTING_VM_IP\n"
+printf "docker bridge ip: $DOCKER_BR_IP\n"
+printf "docker external ip: $DOCKER_EXT_IP\n"
 
 function run_elasticsearch
 {
@@ -51,8 +54,8 @@ function run_influxdb
 
 function run_logstash
 {
-  docker run -d --add-host=elasticsearch:${HOSTING_VM_IP} \
-                --add-host=rabbitmq:${HOSTING_VM_IP} \
+  docker run -d --add-host=elasticsearch:${DOCKER_BR_IP} \
+                --add-host=rabbitmq:${DOCKER_BR_IP} \
                 --hostname="logstash" \
                 --name="logstash" \
                 --publish=9999:9999 \
@@ -63,7 +66,7 @@ function run_logstash
 
 function run_kibana
 {
-  docker run -d --add-host=elasticsearch:${HOSTING_VM_IP} \
+  docker run -d --add-host=elasticsearch:${DOCKER_BR_IP} \
                 --hostname="kibana" \
                 --name="kibana" \
                 --publish=5601:5601 \
@@ -73,8 +76,8 @@ function run_kibana
 
 function run_metrics_broker
 {
-  docker run -d --add-host=influxdb:${HOSTING_VM_IP} \
-                --add-host=rabbitmq:${HOSTING_VM_IP} \
+  docker run -d --add-host=influxdb:${DOCKER_BR_IP} \
+                --add-host=rabbitmq:${DOCKER_BR_IP} \
                 --hostname="amqpinflux" \
                 --name="amqpinflux" \
                 --restart="always" \
@@ -88,9 +91,9 @@ function run_frontend
              docker_frontend \
              echo FRONTENDDATA
   # frontend
-  docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
-                --add-host=elasticsearch:${HOSTING_VM_IP} \
-                --add-host=fileserver:${HOSTING_VM_IP} \
+  docker run -d --add-host=rabbitmq:${DOCKER_BR_IP} \
+                --add-host=elasticsearch:${DOCKER_BR_IP} \
+                --add-host=fileserver:${DOCKER_BR_IP} \
                 --hostname="frontend" \
                 --name="frontend" \
                 --publish=80:80 \
@@ -109,8 +112,8 @@ function run_riemann
              docker_riemann \
              echo RIEMANNDATA
   # riemann
-  docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
-                --add-host=frontend:${HOSTING_VM_IP} \
+  docker run -d --add-host=rabbitmq:${DOCKER_BR_IP} \
+                --add-host=frontend:${DOCKER_BR_IP} \
                 --hostname="riemann" \
                 --name="riemann" \
                 --restart="always" \
@@ -131,12 +134,22 @@ function run_mgmtworker
              dpkg -i /tmp/blah.deb && \
              echo mgmt data container"
   # mgmtworker
-  docker run -d --add-host=rabbitmq:${HOSTING_VM_IP} \
-                --add-host=frontend:${HOSTING_VM_IP} \
+  docker run -d --add-host=rabbitmq:${DOCKER_BR_IP} \
+                --add-host=frontend:${DOCKER_BR_IP} \
                 --hostname="mgmtworker" \
                 --name="mgmtworker" \
                 --restart="always" \
                 docker_mgmtworker
+}
+
+function upload_context
+{
+  type curl >/dev/null 2>&1 || { echo >&2 "Curl not installed.  Aborting."; exit 1; }
+  if [[ -a "provider_context" ]] ; then
+    curl --fail --request POST --data @provider_context http://${DOCKER_EXT_IP}/provider/context --header "Content-Type:application/json"
+  else
+    printf "provider_context not found, Aborting.\n"; exit 1;
+  fi
 }
 
 if [ "$1" == "elk" ]; then
@@ -163,4 +176,5 @@ else
   run_frontend
   run_riemann
   run_mgmtworker
+  upload_context
 fi
