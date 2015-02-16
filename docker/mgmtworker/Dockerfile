@@ -26,7 +26,7 @@ ENV MANAGEMENT_IP=frontend \
     C_FORCE_ROOT=true
 
 RUN apt-get update && \
-    apt-get install -y python-dev curl g++ && \
+    apt-get install -y python-dev curl g++ sudo && \
     mkdir -p ${CELERY_LOG_DIR} && \
     virtualenv ${VIRTUALENV_DIR} && \
     ${VIRTUALENV_DIR}/bin/pip install celery==3.1.17 && \
