@@ -9,7 +9,7 @@ ENV JAVABASE_VERSION=7u76 \
 
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl --fail --location --header "Cookie: oraclelicense=accept-securebackup-cookie" --create-dirs -o /tmp/java.tar.gz http://download.oracle.com/otn-pub/java/jdk/${JAVABASE_VERSION}-b13/jre-${JAVABASE_VERSION}-linux-x64.tar.gz
+    curl --fail --location --header "Cookie: oraclelicense=accept-securebackup-cookie" --create-dirs -o /tmp/java.tar.gz http://download.oracle.com/otn-pub/java/jdk/${JAVABASE_VERSION}-b13/jre-${JAVABASE_VERSION}-linux-x64.tar.gz && \
     mkdir ${JAVA_HOME} && tar -xzvf /tmp/java.tar.gz -C ${JAVA_HOME} --strip=1 && \
     rm -rf /var/lib/apt/lists && \
     rm /tmp/* && \

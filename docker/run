@@ -139,6 +139,7 @@ function run_mgmtworker
                 --hostname="mgmtworker" \
                 --name="mgmtworker" \
                 --restart="always" \
+                --volumes-from mgmtdata \
                 docker_mgmtworker
 }
 
