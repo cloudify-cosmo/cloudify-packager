@@ -22,7 +22,7 @@ function run_elasticsearch
                 --name="elasticsearch" \
                 --publish=9200:9200 \
                 --restart="always" \
-                --volume=/var/log/cloudify/elasticsearch:/etc/service/elasticsearch/logs \
+                --volume=/var/log/cloudify/elasticsearch:/opt/elasticsearch/logs \
                 --volumes-from elasticsearchdata \
                 docker_elasticsearch
 }
@@ -33,6 +33,7 @@ function run_rabbitmq
                 --name="rabbitmq" \
                 --publish=5672:5672 \
                 --restart="always" \
+                --volume=/var/log/cloudify/rabbitmq:/var/log/rabbitmq \
                 docker_rabbitmq
 }
 
@@ -101,6 +102,8 @@ function run_frontend
                 --publish=9001:9001 \
                 --publish=8100:8100 \
                 --restart="always" \
+                --volume=/var/log/cloudify/rest:/var/log/cloudify \
+                --volume=/var/log/cloudify/nginx:/var/log/nginx \
                 --volumes-from frontenddata \
                 docker_frontend
 }
@@ -124,23 +127,33 @@ function run_riemann
 
 function run_mgmtworker
 {
-  # mgmtworkerdata
-  docker run --name="mgmtdata" \
-             --volume ~/:/tmp/home \
-             --volume /root \
-             docker_mgmtworker \
-             /bin/sh -c "apt-get update && apt-get install -y curl sudo && \
-             curl -L --fail -o /tmp/blah.deb http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m3-RELEASE/cloudify-ubuntu-agent_3.2.0-m3-b172_amd64.deb && \
-             dpkg -i /tmp/blah.deb && \
-             echo mgmt data container"
+  # # mgmtworkerdata
+  # docker run --name="mgmtdata" \
+  #            --volume ~/:/tmp/home \
+  #            --volume /root \
+  #            docker_mgmtworker \
+  #            /bin/sh -c "apt-get update && apt-get install -y curl sudo && \
+  #            curl -L --fail -o /tmp/blah.deb http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m3-RELEASE/cloudify-ubuntu-agent_3.2.0-m3-b172_amd64.deb && \
+  #            dpkg -i /tmp/blah.deb && \
+  #            echo mgmt data container"
   # mgmtworker
   docker run -d --add-host=rabbitmq:${DOCKER_BR_IP} \
                 --add-host=frontend:${DOCKER_BR_IP} \
                 --hostname="mgmtworker" \
                 --name="mgmtworker" \
                 --restart="always" \
-                --volumes-from mgmtdata \
+                --volume=/var/log/cloudify/mgmtworker:/opt/mgmtworker/logs \
                 docker_mgmtworker
+                # --volumes-from mgmtdata \
+                # docker_mgmtworker
+}
+
+function run_logio
+{
+  docker run -d --name="logio" \
+             --volume=/var/log/cloudify:/var/log/cloudify \
+             --publish=28778:28778 \
+             docker_logio
 }
 
 function upload_context
@@ -168,6 +181,7 @@ elif [ "$1" == "frontend" ]; then
   run_frontend
   run_mgmtworker
 else
+  run_logio
   run_elasticsearch
   run_rabbitmq
   run_influxdb

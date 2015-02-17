@@ -81,3 +81,5 @@ frontend:
 frontenddata:
   image: docker_frontend
   command: echo Frontend Data Container
+logio:
+  build: logio
