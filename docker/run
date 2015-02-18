@@ -89,8 +89,13 @@ function run_frontend
 {
   # frontenddata
   docker run --name="frontenddata" \
+             --volume /opt/manager/resources/packages \
              docker_frontend \
-             echo FRONTENDDATA
+             /bin/sh -c "apt-get update && apt-get install -y curl sudo && \
+             curl -L --fail -o /tmp/agent.deb http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m3-RELEASE/cloudify-ubuntu-agent_3.2.0-m3-b172_amd64.deb && \
+             dpkg -i /tmp/agent.deb && rm -rf /tmp/* && \
+             echo FRONTENDDATA"
+
   # frontend
   docker run -d --add-host=rabbitmq:${DOCKER_BR_IP} \
                 --add-host=elasticsearch:${DOCKER_BR_IP} \
@@ -122,20 +127,19 @@ function run_riemann
                 --restart="always" \
                 --volume=/var/log/cloudify/riemann:/etc/service/riemann/logs \
                 --volumes-from riemanndata \
+                --volumes-from mgmtdata \
                 docker_riemann
 }
 
 function run_mgmtworker
 {
-  # # mgmtworkerdata
-  # docker run --name="mgmtdata" \
-  #            --volume ~/:/tmp/home \
-  #            --volume /root \
-  #            docker_mgmtworker \
-  #            /bin/sh -c "apt-get update && apt-get install -y curl sudo && \
-             # curl -L --fail -o /tmp/blah.deb http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m3-RELEASE/cloudify-ubuntu-agent_3.2.0-m3-b172_amd64.deb && \
-             # dpkg -i /tmp/blah.deb && \
-  #            echo mgmt data container"
+  # mgmtworkerdata
+  docker run --name="mgmtdata" \
+             --volume /root \
+             --volume /opt/riemann \
+             docker_mgmtworker \
+             echo mgmt data container
+
   # mgmtworker
   docker run -d --add-host=rabbitmq:${DOCKER_BR_IP} \
                 --add-host=frontend:${DOCKER_BR_IP} \
@@ -144,9 +148,8 @@ function run_mgmtworker
                 --name="mgmtworker" \
                 --restart="always" \
                 --volume=/var/log/cloudify/mgmtworker:/opt/mgmtworker/logs \
+                --volumes-from mgmtdata \
                 docker_mgmtworker
-                # --volumes-from mgmtdata \
-                # docker_mgmtworker
 }
 
 function run_logio
@@ -190,7 +193,7 @@ else
   run_kibana
   run_metrics_broker
   run_frontend
-  run_riemann
   run_mgmtworker
+  run_riemann
   upload_context
 fi
