@@ -133,12 +133,13 @@ function run_mgmtworker
   #            --volume /root \
   #            docker_mgmtworker \
   #            /bin/sh -c "apt-get update && apt-get install -y curl sudo && \
-  #            curl -L --fail -o /tmp/blah.deb http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m3-RELEASE/cloudify-ubuntu-agent_3.2.0-m3-b172_amd64.deb && \
-  #            dpkg -i /tmp/blah.deb && \
+             # curl -L --fail -o /tmp/blah.deb http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m3-RELEASE/cloudify-ubuntu-agent_3.2.0-m3-b172_amd64.deb && \
+             # dpkg -i /tmp/blah.deb && \
   #            echo mgmt data container"
   # mgmtworker
   docker run -d --add-host=rabbitmq:${DOCKER_BR_IP} \
                 --add-host=frontend:${DOCKER_BR_IP} \
+                --add-host=fileserver:${DOCKER_BR_IP} \
                 --hostname="mgmtworker" \
                 --name="mgmtworker" \
                 --restart="always" \

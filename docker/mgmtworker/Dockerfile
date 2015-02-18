@@ -1,4 +1,4 @@
-FROM docker_pythonbase
+FROM phusion/baseimage
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY NOTICE.txt /root/NOTICE.txt
@@ -26,7 +26,9 @@ ENV MANAGEMENT_IP=frontend \
     C_FORCE_ROOT=true
 
 RUN apt-get update && \
-    apt-get install -y python-dev curl g++ sudo && \
+    apt-get install -y python-dev curl g++ sudo wget && \
+    curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
+    pip install virtualenv && \
     mkdir -p ${CELERY_LOG_DIR} && \
     virtualenv ${VIRTUALENV_DIR} && \
     ${VIRTUALENV_DIR}/bin/pip install celery==3.1.17 && \
