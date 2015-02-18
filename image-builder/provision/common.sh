@@ -131,9 +131,9 @@ mkdir -p ~/cloudify/blueprints/inputs
 
 # create inputs.yaml for the nodecellar blueprint
 echo """
-host_ip: localhost
+host_ip: 10.10.1.10
 agent_user: vagrant
-agent_private_key_path: /home/vagrant/.ssh/id_rsa
+agent_private_key_path: /root/.ssh/id_rsa
 """ > ~/cloudify/blueprints/inputs/nodecellar-singlehost.yaml
 
 # source virtualenv on login
