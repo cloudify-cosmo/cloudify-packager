@@ -115,7 +115,7 @@ def do_work():
     sudo('mkdir -p /mnt/image')
     sudo('mount /dev/xvdf1 /mnt/image')
 
-    run('dd if=/dev/zero of=image.raw bs=1M count=5120')
+    run('dd if=/dev/zero of=image.raw bs=1M count=8192')
     sudo('losetup --find --show image.raw')
     sudo('parted -s -a optimal /dev/loop0 mklabel msdos'
          ' -- mkpart primary ext4 1 -1')
