@@ -83,3 +83,5 @@ frontenddata:
   command: echo Frontend Data Container
 logio:
   build: logio
+targethost:
+  build: targethost
