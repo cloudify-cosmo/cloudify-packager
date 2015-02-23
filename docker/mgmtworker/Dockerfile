@@ -3,7 +3,7 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY MANAGMENT_WORKER_NOTICE.txt /root/MANAGMENT_WORKER_NOTICE.txt
 
-ENV MANAGER_VERSION=CFY-1838-separate-services-container \
+ENV MANAGER_VERSION=master \
     REST_VERSION=master \
     COMMON_VERSION=master \
     SCRIPT_VERSION=master \
