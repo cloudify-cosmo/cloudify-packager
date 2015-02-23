@@ -1,19 +1,19 @@
 FROM phusion/baseimage
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
-COPY NOTICE.txt /root/NOTICE.txt
+COPY MANAGMENT_WORKER_NOTICE.txt /root/MANAGMENT_WORKER_NOTICE.txt
 
-# Used by 'cfy status' impl to determine if running in container.
 ENV MANAGER_VERSION=CFY-1838-separate-services-container \
     REST_VERSION=master \
     COMMON_VERSION=master \
     SCRIPT_VERSION=master \
     DOCKER_ENV=True \
-    SERVICE_DIR=/opt/mgmtworker
+    MGMTWORKER_HOME=/opt/mgmtworker
+
 ENV MANAGEMENT_IP=frontend \
-    VIRTUALENV_DIR=${SERVICE_DIR}/env \
-    CELERY_LOG_DIR=${SERVICE_DIR}/logs \
-    CELERY_WORK_DIR=${SERVICE_DIR}/work \
+    VIRTUALENV_DIR=${MGMTWORKER_HOME}/env \
+    CELERY_LOG_DIR=${MGMTWORKER_HOME}/logs \
+    CELERY_WORK_DIR=${MGMTWORKER_HOME}/work \
     RIEMANN_CONFIGS_DIR=/opt/riemann \
     BROKER_URL=amqp://guest:guest@rabbitmq:5672/ \
     MANAGEMENT_USER=root \
