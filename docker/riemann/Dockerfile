@@ -9,7 +9,8 @@ ENV RIEMANN_VERSION=0.2.6 \
     PATH=$PATH:/opt/java/bin \
     # this is the host name, as seen in /etc/hosts, for the restservice container`
     # Riemann's config reads this env var to direct calls to the rest service.
-    MANAGEMENT_IP='frontend'
+    MANAGEMENT_IP='frontend' \
+    RABBITMQ_HOST='rabbitmq'
 ENV RIEMANN_CONFIG_PATH=${RIEMANN_SERVICE_DIR}/manager.config \
     RIEMANN_LOG_PATH=${RIEMANN_SERVICE_DIR}/logs/riemann.log \
     EXTRA_CLASSPATH=${RIEMANN_SERVICE_DIR}/langohr.jar
