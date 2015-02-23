@@ -56,13 +56,15 @@ RUN apt-get update && \
     apt-get purge -y curl && \
     apt-get autoremove -y
 
+COPY webui/gsPresets.json /opt/cloudify-ui/backend/gsPresets.json
+
 ###
 # REST
 ###
 ENV DOCKER_ENV=True \
     DSL_VERSION=master \
     REST_CLIENT_VERSION=master \
-    COMMON_VERSION=CFY-1838-separate-services-container \
+    COMMON_VERSION=master \
     MANAGER_VERSION=CFY-1838-separate-services-container \
     MANAGER_HOME_DIR=/opt/manager
 ENV MANAGER_VIRTUALENV_DIR=${MANAGER_HOME_DIR}/env \

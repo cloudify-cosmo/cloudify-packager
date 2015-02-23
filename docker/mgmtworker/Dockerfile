@@ -4,9 +4,9 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 COPY NOTICE.txt /root/NOTICE.txt
 
 # Used by 'cfy status' impl to determine if running in container.
-ENV VERSION=CFY-1838-separate-services-container \
+ENV MANAGER_VERSION=CFY-1838-separate-services-container \
     REST_VERSION=master \
-    COMMON_VERSION=CFY-1838-separate-services-container \
+    COMMON_VERSION=master \
     SCRIPT_VERSION=master \
     DOCKER_ENV=True \
     SERVICE_DIR=/opt/mgmtworker
@@ -35,7 +35,7 @@ RUN apt-get update && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-rest-client/archive/${REST_VERSION}.zip && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/${COMMON_VERSION}.zip && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/${SCRIPT_VERSION}.zip && \
-    curl --silent -L https://github.com/cloudify-cosmo/cloudify-manager/archive/${VERSION}.tar.gz -o /tmp/cloudify-manager.tar.gz && \
+    curl --silent -L https://github.com/cloudify-cosmo/cloudify-manager/archive/${MANAGER_VERSION}.tar.gz -o /tmp/cloudify-manager.tar.gz && \
     tar -xzf /tmp/cloudify-manager.tar.gz -C /tmp --strip-components=1 && \
     ${VIRTUALENV_DIR}/bin/pip install /tmp/plugins/plugin-installer && \
     ${VIRTUALENV_DIR}/bin/pip install /tmp/plugins/agent-installer && \

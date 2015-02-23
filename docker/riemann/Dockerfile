@@ -22,8 +22,7 @@ RUN apt-get update && \
     curl --fail https://aphyr.com/riemann/riemann_${RIEMANN_VERSION}_all.deb --create-dirs -o /tmp/riemann.deb && \
     dpkg -i /tmp/riemann.deb && \
     # TODO: use this instead of the one below it
-    # curl -o ${RIEMANN_CONFIG_PATH} https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config && \
-    curl --fail -o ${RIEMANN_CONFIG_PATH} https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/CFY-2173-configure-riemann-for-external-hosts/plugins/riemann-controller/riemann_controller/resources/manager.config && \
+    curl -o ${RIEMANN_CONFIG_PATH} https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config && \
     rm -rf /var/lib/apt/lists && \
     rm /tmp/* && \
     apt-get purge curl -y && \
