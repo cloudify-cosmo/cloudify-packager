@@ -11,7 +11,7 @@ DIAMOND_PLUGIN_SHA=""
 sudo apt-get -y update &&
 sudo apt-get install -y python-software-properties
 sudo add-apt-repository -y ppa:git-core/ppa &&
-sudo apt-get install -y curl python-dev rubygems rpm git make gcc libyaml-dev &&
+sudo apt-get install -y curl python-dev rubygems rpm git make gcc libyaml-dev g++ &&
 
 # install ruby
 wget https://ftp.ruby-lang.org/pub/ruby/ruby-1.9.3-rc1.tar.bz2 --no-check-certificate
@@ -48,7 +48,7 @@ sudo pkm get -c Ubuntu-precise-agent
 
 echo '# GET PROCESS'
 sudo /Ubuntu-agent/env/bin/pip install celery==3.1.17
-sudo /Ubuntu-agent/env/bin/pip install pyzmq==14.3.1
+sudo /Ubuntu-agent/env/bin/pip install pyzmq==14.4.0
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 pushd cloudify-rest-client
 	if [ -n "$REST_CLIENT_SHA" ]; then

@@ -11,7 +11,7 @@ echo bootstrapping...
 
 # update and install prereqs
 sudo yum -y update &&
-sudo yum install yum-downloadonly wget mlocate yum-utils python-devel libyaml-devel ruby rubygems ruby-devel make gcc git  -y
+sudo yum install yum-downloadonly wget mlocate yum-utils python-devel libyaml-devel ruby rubygems ruby-devel make gcc git g++ -y
 
 # install fpm
 sudo gem install fpm --no-rdoc --no-ri
@@ -40,7 +40,7 @@ sudo pkm get -c centos-Final-agent
 
 echo '# GET PROCESS'
 sudo /centos-agent/env/bin/pip install celery==3.1.17
-sudo /centos-agent/env/bin/pip install pyzmq==14.3.1
+sudo /centos-agent/env/bin/pip install pyzmq==14.4.0
 sudo git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 pushd cloudify-rest-client
 	if [ -n "$REST_CLIENT_SHA" ]; then
