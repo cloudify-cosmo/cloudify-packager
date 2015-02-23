@@ -64,7 +64,7 @@ COPY webui/gsPresets.json /opt/cloudify-ui/backend/gsPresets.json
 ENV DOCKER_ENV=True \
     DSL_VERSION=master \
     REST_CLIENT_VERSION=master \
-    COMMON_VERSION=master \
+    COMMON_VERSION=master` \
     MANAGER_VERSION=CFY-1838-separate-services-container \
     MANAGER_HOME_DIR=/opt/manager
 ENV MANAGER_VIRTUALENV_DIR=${MANAGER_HOME_DIR}/env \
