@@ -65,7 +65,7 @@ ENV DOCKER_ENV=True \
     MANAGER_VERSION=master \
     MANAGER_HOME=/opt/manager
 ENV MANAGER_VIRTUALENV=${MANAGER_HOME}/env \
-    MANAGER_REST_CONFIG=${MANAGER_HOME}/guni.conf
+    MANAGER_REST_CONFIG_PATH=${MANAGER_HOME}/guni.conf
 
 # add run scripts and configuration
 COPY restservice/guni.conf /tmp/guni.conf
