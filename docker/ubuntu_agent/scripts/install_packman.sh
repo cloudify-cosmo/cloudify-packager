@@ -15,22 +15,6 @@ mv /opt/tmp/manager/precise/agents/Ubuntu*/Ubuntu-precise-agent.tar.gz /tmp/Ubun
 dpkg-deb -x /opt/tmp/manager/ubuntu_trusty_agent.deb /opt/tmp/manager/trusty && \
 mv /opt/tmp/manager/trusty/agents/Ubuntu*/Ubuntu-trusty-agent.tar.gz /tmp/Ubuntu-agent/
 
-# install ruby
-wget https://ftp.ruby-lang.org/pub/ruby/ruby-1.9.3-rc1.tar.bz2 --no-check-certificate
-tar -xjf ruby-1.9.3-rc1.tar.bz2
-cd ruby-1.9.3-rc1
-./configure --disable-install-doc
-make
-make install
-cd ~
-
-# install fpm and configure gem/bundler
-gem install fpm --no-ri --no-rdoc
-echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc --no-ri' >> ~/.gemrc
-
-# install pip
-curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python
-
 # install packman
 git clone https://github.com/cloudify-cosmo/packman.git
 pushd packman
@@ -39,9 +23,6 @@ if [ -n "$PACKMAN_SHA" ]; then
 fi
 pip install .
 popd
-
-# install virtualenv
-pip install virtualenv==1.11.4
 
 # clone custom packager branch containing package config
 git clone https://github.com/cloudify-cosmo/cloudify-packager.git
