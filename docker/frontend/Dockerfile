@@ -53,7 +53,6 @@ RUN apt-get update && \
     ${NODEJS_HOME}/bin/npm install --prefix ${WEBUI_HOME} request && \
     rm -rf /var/lib/apt/lists && \
     rm -rf /tmp/* && \
-    apt-get purge -y curl && \
     apt-get autoremove -y
 
 ###
@@ -71,7 +70,7 @@ COPY restservice/guni.conf /tmp/guni.conf
 COPY restservice/run /etc/service/restservice/run
 
 RUN apt-get update && \
-    apt-get install -y curl gcc python-dev && \
+    apt-get install -y gcc python-dev && \
     chmod +x /etc/service/restservice/run && \
     curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
     pip install virtualenv && \
@@ -87,7 +86,7 @@ RUN apt-get update && \
     mkdir ${MANAGER_HOME_DIR}/resources && \
     cp -r /tmp/cloudify-manager/resources/rest-service/* ${MANAGER_HOME_DIR}/resources && \
     rm -rf /var/lib/apt/lists /tmp/* && \
-    apt-get purge -y curl gcc python-dev && \
+    apt-get purge -y gcc python-dev && \
     apt-get autoremove -y
 
 VOLUME /opt/manager/resources/blueprints
