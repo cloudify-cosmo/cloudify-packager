@@ -1,7 +1,7 @@
 FROM debian:jessie
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
-COPY NOTICE.txt /root/PYTHONBASE_NOTICE.txt
+COPY PYTHONBASE_NOTICE.txt /root/PYTHONBASE_NOTICE.txt
 
 RUN apt-get update && \
     apt-get install -y curl python python-dev && \

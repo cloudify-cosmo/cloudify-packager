@@ -1,19 +1,20 @@
-FROM docker_pythonbase
+FROM phusion/baseimage
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
-COPY NOTICE.txt /root/NOTICE.txt
+COPY MANAGMENT_WORKER_NOTICE.txt /root/MANAGMENT_WORKER_NOTICE.txt
 
-# Used by 'cfy status' impl to determine if running in container.
-ENV VERSION=master \
+ENV MANAGER_VERSION=master \
     REST_VERSION=master \
-    COMMON_VERSION=CFY-1838-separate-services-container \
+    COMMON_VERSION=master \
     SCRIPT_VERSION=master \
     DOCKER_ENV=True \
-    SERVICE_DIR=/opt/mgmtworker
-ENV VIRTUALENV_DIR=${SERVICE_DIR}/env \
-    CELERY_LOG_DIR=${SERVICE_DIR}/logs \
-    CELERY_WORK_DIR=${SERVICE_DIR}/work \
-    RIEMANN_CONFIGS_DIR=${SERVICE_DIR}/../riemann \
+    MGMTWORKER_HOME=/opt/mgmtworker
+
+ENV MANAGEMENT_IP=frontend \
+    VIRTUALENV_DIR=${MGMTWORKER_HOME}/env \
+    CELERY_LOG_DIR=${MGMTWORKER_HOME}/logs \
+    CELERY_WORK_DIR=${MGMTWORKER_HOME}/work \
+    RIEMANN_CONFIGS_DIR=/opt/riemann \
     BROKER_URL=amqp://guest:guest@rabbitmq:5672/ \
     MANAGEMENT_USER=root \
     MANAGER_REST_PORT=8100 \
@@ -25,21 +26,22 @@ ENV VIRTUALENV_DIR=${SERVICE_DIR}/env \
     C_FORCE_ROOT=true
 
 RUN apt-get update && \
-    apt-get install -y python-dev unzip g++ && \
+    apt-get install -y python-dev curl g++ sudo wget && \
+    curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
+    pip install virtualenv && \
     mkdir -p ${CELERY_LOG_DIR} && \
     virtualenv ${VIRTUALENV_DIR} && \
     ${VIRTUALENV_DIR}/bin/pip install celery==3.1.17 && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-rest-client/archive/${REST_VERSION}.zip && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/${COMMON_VERSION}.zip && \
     ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/${SCRIPT_VERSION}.zip && \
-    cd /tmp && \
-    curl -O -L https://github.com/cloudify-cosmo/cloudify-manager/archive/${VERSION}.zip && \
-    unzip ${VERSION}.zip && \
-    ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/plugins/plugin-installer && \
-    ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/plugins/agent-installer && \
-    ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/plugins/riemann-controller && \
-    ${VIRTUALENV_DIR}/bin/pip install cloudify-manager-${VERSION}/workflows && \
-    apt-get purge -y python-dev unzip g++ && \
+    curl --silent -L https://github.com/cloudify-cosmo/cloudify-manager/archive/${MANAGER_VERSION}.tar.gz -o /tmp/cloudify-manager.tar.gz && \
+    tar -xzf /tmp/cloudify-manager.tar.gz -C /tmp --strip-components=1 && \
+    ${VIRTUALENV_DIR}/bin/pip install /tmp/plugins/plugin-installer && \
+    ${VIRTUALENV_DIR}/bin/pip install /tmp/plugins/agent-installer && \
+    ${VIRTUALENV_DIR}/bin/pip install /tmp/plugins/riemann-controller && \
+    ${VIRTUALENV_DIR}/bin/pip install /tmp/workflows && \
+    apt-get purge -y python-dev g++ && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /root/.cache /var/lib/apt/lists/* /tmp/* /var/log/apt/*
