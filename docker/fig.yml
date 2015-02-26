@@ -22,12 +22,12 @@ logstash:
     - rabbitmq
   volumes:
     - /var/log/cloudify/logstash:/etc/service/logstash/logs
-kibana:
-  build: kibana
-  ports:
-    - "5601:5601"
-  links:
-    - elasticsearch
+# kibana:
+#   build: kibana
+#   ports:
+#     - "5601:5601"
+#   links:
+#     - elasticsearch
 rabbitmq:
   build: rabbitmq
   ports:
@@ -81,7 +81,13 @@ frontend:
 frontenddata:
   image: docker_frontend
   command: echo Frontend Data Container
+webui:
+  build: webui
+restservice:
+  build: restservice
 logio:
   build: logio
 targethost:
   build: targethost
+fileserver:
+  build: fileserver

@@ -22,7 +22,6 @@ function run_elasticsearch
                 --name="elasticsearch" \
                 --publish=9200:9200 \
                 --restart="always" \
-                --volume=/var/log/cloudify/elasticsearch:/opt/elasticsearch/logs \
                 --volumes-from elasticsearchdata \
                 docker_elasticsearch
 }
@@ -33,7 +32,6 @@ function run_rabbitmq
                 --name="rabbitmq" \
                 --publish=5672:5672 \
                 --restart="always" \
-                --volume=/var/log/cloudify/rabbitmq:/var/log/rabbitmq \
                 docker_rabbitmq
 }
 
@@ -61,7 +59,6 @@ function run_logstash
                 --name="logstash" \
                 --publish=9999:9999 \
                 --restart="always" \
-                --volume=/var/log/cloudify/logstash:/etc/service/logstash/logs \
                 docker_logstash
 }
 
@@ -87,31 +84,53 @@ function run_metrics_broker
 
 function run_frontend
 {
-  # frontenddata
-  docker run --name="frontenddata" \
-             --volume /opt/manager/resources/packages \
-             docker_frontend \
-             /bin/sh -c "apt-get update && apt-get install -y curl sudo && \
-             curl -L --fail -o /tmp/agent.deb http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m3-RELEASE/cloudify-ubuntu-agent_3.2.0-m3-b172_amd64.deb && \
-             dpkg -i /tmp/agent.deb && rm -rf /tmp/* && \
-             echo FRONTENDDATA"
-
   # frontend
-  docker run -d --add-host=rabbitmq:${DOCKER_HOST_IP} \
-                --add-host=elasticsearch:${DOCKER_HOST_IP} \
-                --add-host=fileserver:${DOCKER_HOST_IP} \
-                --add-host=influxdb:${DOCKER_HOST_IP} \
+  docker run -d --add-host=fileserver:${DOCKER_HOST_IP} \
+                --add-host=restservice:${DOCKER_HOST_IP} \
+                --add-host=webui:${DOCKER_HOST_IP} \
                 --hostname="frontend" \
                 --name="frontend" \
                 --publish=80:80 \
                 --publish=53229:53229 \
+                --restart="always" \
+                --volumes-from fileserver \
+                --volumes-from webui \
+                docker_frontend
+}
+
+function run_webui
+{
+  # webui
+  docker run -d --name="webui" \
+                --hostname="webui" \
                 --publish=9001:9001 \
+                --add-host=frontend:${DOCKER_HOST_IP} \
+                --add-host=influxdb:${DOCKER_HOST_IP} \
+                --restart="always" \
+                --volume=/opt/cloudify-ui \
+                docker_webui
+}
+
+function run_restservice
+{
+  # restservice
+  docker run -d --name="restservice" \
+                --hostname="restservice" \
+                --add-host=rabbitmq:${DOCKER_HOST_IP} \
+                --add-host=elasticsearch:${DOCKER_HOST_IP} \
+                --add-host=fileserver:${DOCKER_HOST_IP} \
                 --publish=8100:8100 \
                 --restart="always" \
-                --volume=/var/log/cloudify/rest:/var/log/cloudify \
-                --volume=/var/log/cloudify/nginx:/var/log/nginx \
-                --volumes-from frontenddata \
-                docker_frontend
+                --volumes-from fileserver \
+                docker_restservice
+}
+
+function run_fileserver
+{
+  # fileserver
+  docker run -d --name="fileserver" \
+                --volume=/opt/manager/resources \
+                docker_fileserver
 }
 
 function run_riemann
@@ -126,7 +145,6 @@ function run_riemann
                 --hostname="riemann" \
                 --name="riemann" \
                 --restart="always" \
-                --volume=/var/log/cloudify/riemann:/etc/service/riemann/logs \
                 --volumes-from riemanndata \
                 --volumes-from mgmtdata \
                 docker_riemann
@@ -149,7 +167,6 @@ function run_mgmtworker
                 --hostname="mgmtworker" \
                 --name="mgmtworker" \
                 --restart="always" \
-                --volume=/var/log/cloudify/mgmtworker:/opt/mgmtworker/logs \
                 --volumes-from mgmtdata \
                 docker_mgmtworker
 }
@@ -157,7 +174,6 @@ function run_mgmtworker
 function run_logio
 {
   docker run -d --name="logio" \
-             --volume=/var/log/cloudify:/var/log/cloudify \
              --publish=28778:28778 \
              docker_logio
 }
@@ -193,13 +209,14 @@ elif [ "$1" == "frontend" ]; then
   run_frontend
   run_mgmtworker
 else
-  run_logio
   run_elasticsearch
   run_rabbitmq
   run_influxdb
   run_logstash
-  run_kibana
   run_metrics_broker
+  run_webui
+  run_fileserver
+  run_restservice
   run_frontend
   run_mgmtworker
   run_riemann
