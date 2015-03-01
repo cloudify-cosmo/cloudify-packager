@@ -143,6 +143,31 @@ PACKAGES = {
             },
         }
     },
+    "cloudify-debian-jessie-agent": {
+        "name": "cloudify-debian-jessie-agent",
+        "version": "3.1.0",
+        "package_path": "/cloudify",
+        "sources_path": "{0}/debian-agent".format(AGENT_PACKAGES_PATH),
+        "src_package_type": "dir",
+        "dst_package_types": ["deb"],
+        "bootstrap_script": "{0}/agent-debian-bootstrap.sh".format(SCRIPTS_PATH),
+        "bootstrap_template": "agent-debian-bootstrap.template",
+        "bootstrap_params": {
+            "file_server_path": "{0}/manager/resources".format(VIRTUALENVS_PATH),
+            "dst_agent_location": "packages/agents",
+            "dst_template_location": "packages/templates",
+            "dst_script_location": "packages/scripts"
+        },
+        "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+        # TODO: CREATE INIT AND DEFAULTS FILES FROM TEMPLATES!
+        "config_templates": {
+            "__config_dir": {
+                "files": "{0}/debian-agent".format(CONFIGS_PATH),
+                "config_dir": "config",
+                "dst_dir": "{0}/manager/resources/packages/agents/templates/".format(VIRTUALENVS_PATH),
+            },
+        },
+    },
     "cloudify-ubuntu-trusty-agent": {
         "name": "cloudify-ubuntu-trusty-agent",
         "version": "3.1.0",
@@ -232,6 +257,24 @@ PACKAGES = {
             "dst_agent_location": "packages/agents",
         },
         "bootstrap_log": "/var/log/cloudify3-bootstrap.log",
+    },
+    "debian-jessie-agent": {
+        "name": "debian--agent",
+        "version": "3.1.0",
+        "source_urls": [
+            "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
+        ],
+        "package_path": "{0}/debian-agent".format(AGENT_PACKAGES_PATH),
+        "sources_path": "/debian-agent/env",
+        "modules": ['billiard==2.7.3.28', 'celery==3.1.17', 'pika',
+                    'https://github.com/cloudify-cosmo/cloudify-rest-client/archive/{0}.tar.gz'.format(REST_CLIENT_BRANCH),
+                    'https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/{0}.tar.gz'.format(PLUGINS_COMMON_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/agent-installer/'.format(MANAGER_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/plugin-installer/'.format(MANAGER_BRANCH),
+                    '/Ubuntu-agent/env/cloudify-manager-{0}/plugins/windows-agent-installer/'.format(MANAGER_BRANCH),
+        ],
+        "src_package_type": "dir",
+        "dst_package_types": ["tar.gz"],
     },
     "Ubuntu-trusty-agent": {
         "name": "Ubuntu-trusty-agent",
