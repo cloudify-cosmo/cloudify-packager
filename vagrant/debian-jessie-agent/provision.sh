@@ -9,7 +9,7 @@ DIAMOND_PLUGIN_SHA=""
 
 # update and install prereqs
 sudo apt-get -y update &&
-sudo apt-get install -y software-properties-common
+sudo apt-get install -y python-software-properties &&
 sudo add-apt-repository -y ppa:git-core/ppa &&
 sudo apt-get install -y curl python-dev rpm git make gcc libyaml-dev zlib1g-dev g++ &&
 
@@ -44,38 +44,38 @@ sudo pip install virtualenv==1.11.4 &&
 cd /cloudify-packager/ &&
 
 # create package resources
-sudo pkm get -c Ubuntu-trusty-agent &&
+sudo pkm get -c debian-jessie-agent &&
 
 echo '# GET PROCESS'
-sudo /Ubuntu-agent/env/bin/pip install celery==3.1.17 &&
-sudo /Ubuntu-agent/env/bin/pip install pyzmq==14.4.0
+sudo /debian-agent/env/bin/pip install celery==3.1.17 &&
+sudo /debian-agent/env/bin/pip install pyzmq==14.4.0
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 pushd cloudify-rest-client
 	if [ -n "$REST_CLIENT_SHA" ]; then
 		git reset --hard $REST_CLIENT_SHA
 	fi
-	sudo /Ubuntu-agent/env/bin/pip install .
+	sudo /debian-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 pushd cloudify-plugins-common
 	if [ -n "$COMMON_PLUGIN_SHA" ]; then
 		git reset --hard $COMMON_PLUGIN_SHA
 	fi
-	sudo /Ubuntu-agent/env/bin/pip install .
+	sudo /debian-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 pushd cloudify-script-plugin
 	if [ -n "$SCRIPTS_PLUGIN_SHA" ]; then
 		git reset --hard $SCRIPTS_PLUGIN_SHA
 	fi
-	sudo /Ubuntu-agent/env/bin/pip install .
+	sudo /debian-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-diamond-plugin.git
 pushd cloudify-diamond-plugin
 	if [ -n "$DIAMOND_PLUGIN_SHA" ]; then
 		git reset --hard $DIAMOND_PLUGIN_SHA
 	fi
-	sudo /Ubuntu-agent/env/bin/pip install .
+	sudo /debian-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
 pushd cloudify-manager
@@ -83,22 +83,22 @@ pushd cloudify-manager
 		git reset --hard $MANAGER_SHA
 	fi
 	pushd plugins/plugin-installer
-	  sudo /Ubuntu-agent/env/bin/pip install .
+	  sudo /debian-agent/env/bin/pip install .
 	popd
 	pushd plugins/agent-installer
-	  sudo /Ubuntu-agent/env/bin/pip install .
+	  sudo /debian-agent/env/bin/pip install .
 	popd
 	pushd plugins/windows-agent-installer
-	  sudo /Ubuntu-agent/env/bin/pip install .
+	  sudo /debian-agent/env/bin/pip install .
 	popd
 	pushd plugins/windows-plugin-installer
-	  sudo /Ubuntu-agent/env/bin/pip install .
+	  sudo /debian-agent/env/bin/pip install .
 	popd
 popd
 
 # create package
-sudo pkm pack -c Ubuntu-trusty-agent &&
-sudo pkm pack -c cloudify-ubuntu-trusty-agent &&
+sudo pkm pack -c debian-jessie-agent &&
+sudo pkm pack -c cloudify-debian-jessie-agent &&
 
 echo bootstrap done
 echo "NOTE: currently, using some of the packman's features requires that it's run as sudo."
