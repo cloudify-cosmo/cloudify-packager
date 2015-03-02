@@ -9,7 +9,7 @@ DIAMOND_PLUGIN_SHA=""
 
 # update and install prereqs
 sudo apt-get -y update &&
-sudo apt-get install -y python-software-properties &&
+sudo apt-get install -y software-properties-common &&
 sudo add-apt-repository -y ppa:git-core/ppa &&
 sudo apt-get install -y curl python-dev rpm git make gcc libyaml-dev zlib1g-dev g++ &&
 

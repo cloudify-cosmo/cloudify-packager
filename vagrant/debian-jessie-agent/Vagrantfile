@@ -21,7 +21,8 @@ AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
 
 # BASE_BOX_NAME = 'debian/jessie64'
 # BASE_BOX_URL = 'https://downloads.sourceforge.net/project/vagrantboxjessie/debian80.box'
-BASE_BOX_NAME = 'puphpet/debian75-x64'
+# BASE_BOX_NAME = 'puphpet/debian75-x64'
+BASE_BOX_NAME = 'binarydata/debian-jessie'
 
 Vagrant.configure('2') do |config|
   config.vm.define "ubuntu" do |ubuntu|
