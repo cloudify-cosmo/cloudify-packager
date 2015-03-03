@@ -7,8 +7,8 @@ ENV VERSION=master \
     DOCKER_ENV=True \
     AMQP_HOST=rabbitmq \
     INFLUXDB_HOST=influxdb \
-    AMQPINFLUX_HOME=/opt/amqpinflux \
-    VIRTUALENV_DIR=${AMQPINFLUX_HOME}/env
+    AMQPINFLUX_HOME=/opt/amqpinflux
+ENV VIRTUALENV_DIR=${AMQPINFLUX_HOME}/env
 
 RUN mkdir -p ${AMQPINFLUX_HOME} && \
     virtualenv ${VIRTUALENV_DIR} && \
