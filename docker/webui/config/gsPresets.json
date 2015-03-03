@@ -9,7 +9,7 @@
                 { "type":"console" },
                 {
                     "type": "file",
-                    "filename": "logs/application.log",
+                    "filename": "/var/log/cloudify/uibackend/application.log",
                     "maxLogSize": 20480,
                     "backups": 3
                 }

@@ -12,7 +12,7 @@ ENV MANAGER_VERSION=master \
 
 ENV MANAGEMENT_IP=frontend \
     VIRTUALENV_DIR=${MGMTWORKER_HOME}/env \
-    CELERY_LOG_DIR=${MGMTWORKER_HOME}/logs \
+    CELERY_LOG_DIR=/var/log/cloudify/mgmtworker \
     CELERY_WORK_DIR=${MGMTWORKER_HOME}/work \
     RIEMANN_CONFIGS_DIR=/opt/riemann \
     BROKER_URL=amqp://guest:guest@rabbitmq:5672/ \

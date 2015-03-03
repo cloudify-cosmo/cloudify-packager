@@ -10,7 +10,7 @@ ENV DOCKER_ENV=True \
 RUN apt-get update && \
     apt-get install curl -y --no-install-recommends && \
     mkdir -p ${NODEJS_HOME} && \
-    mkdir -p /var/log/cloudify-ui && \
+    mkdir -p /var/log/cloudify/uibackend && \
     mkdir -p ${WEBUI_HOME}/grafana && \
     curl --fail --silent http://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.gz -o /tmp/nodejs.tar.gz && \
     tar -xzvf /tmp/nodejs.tar.gz -C ${NODEJS_HOME} --strip-components=1 && \
@@ -26,7 +26,7 @@ RUN apt-get update && \
     apt-get purge -y curl && \
     apt-get autoremove -y
 
-COPY gsPresets.json /opt/cloudify-ui/backend/gsPresets.json
+COPY config/gsPresets.json /opt/cloudify-ui/backend/gsPresets.json
 
 EXPOSE 9001
 VOLUME ${WEBUI_HOME}

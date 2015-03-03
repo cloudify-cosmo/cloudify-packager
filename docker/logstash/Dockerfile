@@ -6,7 +6,7 @@ COPY LOGSTASH_NOTICE.txt /root/LOGSTASH_NOTICE.txt
 ENV LOGSTASH_VERSION=1.4.2 \
     DOCKER_ENV=True \
     LOGSTASH_HOME=/opt/logstash \
-    LOGSTASH_LOG=/var/log/logstash
+    LOGSTASH_LOG=/var/log/cloudify/logstash
 
 
 RUN apt-get update && \
@@ -20,7 +20,7 @@ RUN apt-get update && \
     apt-get purge curl -y && \
     apt-get autoremove -y
 
-COPY logstash.conf ${LOGSTASH_HOME}/logstash.conf
+COPY config/logstash.conf ${LOGSTASH_HOME}/logstash.conf
 
 EXPOSE 9999
 

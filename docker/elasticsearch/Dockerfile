@@ -4,7 +4,6 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 COPY ELASTICSEARCH_NOTICE.txt /root/ELASTICSEARCH_NOTICE.txt
 COPY scripts/* /opt/scripts/
 
-# Used by 'cfy status' impl to determine if running in container.
 ENV ELASTICSEARCH_VERSION=1.4.3 \
     DOCKER_ENV=True \
     ELASTICSEARCH_HOME=/opt/elasticsearch \
@@ -19,14 +18,16 @@ RUN apt-get update && \
     ${ELASTICSEARCH_HOME}/bin/elasticsearch -d && \
     chmod +x /opt/scripts/wait_for_port && sleep 3 && /opt/scripts/wait_for_port 9200 && \
     chmod +x /opt/scripts/configure_es && sleep 3 && /opt/scripts/configure_es && \
+    mkdir -p /var/log/cloudify/elasticsearch && \
     rm -rf /var/lib/apt/lists && \
     rm -rf /tmp/* && \
     apt-get purge curl -y && \
     apt-get autoremove -y
 
 
+COPY config/elasticsearch.yml ${ELASTICSEARCH_HOME}/config/elasticsearch.yml
+
 VOLUME ${ELASTICSEARCH_HOME}/data
-VOLUME ${ELASTICSEARCH_HOME}/logs
 
 EXPOSE 9200
 

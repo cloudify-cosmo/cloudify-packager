@@ -13,7 +13,7 @@ ENV MANAGER_VIRTUALENV=${MANAGER_HOME}/env \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl && \
     mkdir -p ${MANAGER_HOME} && \
-    mkdir -p /var/log/cloudify && \
+    mkdir -p /var/log/cloudify/rest && \
     virtualenv ${MANAGER_VIRTUALENV} && \
     ${MANAGER_VIRTUALENV}/bin/pip install https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/${DSL_VERSION}.zip && \
     ${MANAGER_VIRTUALENV}/bin/pip install https://github.com/cloudify-cosmo/cloudify-rest-client/archive/${REST_CLIENT_VERSION}.zip && \
@@ -25,7 +25,7 @@ RUN apt-get update && \
     apt-get purge -y curl && \
     apt-get autoremove -y
 
-COPY guni.conf ${MANAGER_HOME}/guni.conf
+COPY config/guni.conf ${MANAGER_HOME}/guni.conf
 
 EXPOSE 8100
 

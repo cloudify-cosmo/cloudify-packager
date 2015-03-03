@@ -1,3 +1,0 @@
-#!/bin/bash
-
-${NODEJS_HOME}/bin/node ${WEBUI_HOME}/cosmoui.js localhost
