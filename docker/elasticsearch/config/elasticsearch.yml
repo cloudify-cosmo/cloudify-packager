@@ -1,1 +1,2 @@
 path.logs: /var/log/cloudify/elasticsearch
+discovery.zen.ping.multicast.port: 54329
