@@ -52,7 +52,7 @@ server {
   }
 
   # Serves the Rest Service (backed by the cloudify-rest upstream).
-  location ~ ^/(blueprints|executions|deployments|nodes|events|search|status|provider|api|node-instances|version|evaluate) {
+  location ~ ^/(blueprints|executions|deployments|nodes|events|search|status|provider|api|node-instances|version|evaluate|deployment-modifications) {
     proxy_pass         http://cloudify-rest;
     proxy_redirect     off;
 
