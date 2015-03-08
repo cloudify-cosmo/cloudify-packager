@@ -66,6 +66,11 @@ def get_centos_final_agent(download=False):
     create_agent(package, download)
 
 
+def get_debian_jessie_agent(download=False):
+    package = get_conf('debian-jessie-agent')
+    create_agent(package, download)
+
+
 def get_celery(download=False):
     package = get_conf('celery')
 
