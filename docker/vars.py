@@ -121,6 +121,7 @@ VARS = {
         "modules": {
             "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",
             "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",
+            "flask_securest": "git+git://github.com/cloudify-cosmo/flask-securest.git@0.5",
             "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
         },
         "ports": ["8100"],
