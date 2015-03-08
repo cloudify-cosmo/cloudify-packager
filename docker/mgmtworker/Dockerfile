@@ -25,10 +25,11 @@ ENV MANAGEMENT_IP=frontend \
     CELERY_RESULT_BACKEND=amqp \
     C_FORCE_ROOT=true
 
+COPY /config/startup.sh /root/startup.sh
+
 RUN apt-get update && \
     apt-get install -y python-dev curl g++ sudo wget && \
-    #curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python && \
-    #pip install virtualenv && \
+    chmod +x /root/startup.sh && \
     mkdir -p ${CELERY_LOG_DIR} && \
     virtualenv ${VIRTUALENV_DIR} && \
     ${VIRTUALENV_DIR}/bin/pip install celery==3.1.17 && \
@@ -46,14 +47,4 @@ RUN apt-get update && \
     apt-get clean -y && \
     rm -rf /root/.cache /var/lib/apt/lists/* /tmp/* /var/log/apt/*
 
-CMD ${VIRTUALENV_DIR}/bin/celery worker \
-    --include=cloudify_system_workflows.deployment_environment,plugin_installer.tasks,worker_installer.tasks,riemann_controller.tasks,cloudify.plugins.workflows \
-    --broker=${BROKER_URL} \
-    --hostname celery.cloudify.management \
-    --events \
-    --app=cloudify \
-    --loglevel=debug \
-    --queues=cloudify.management \
-    --logfile=${CELERY_LOG_DIR}/cloudify.management_worker.log \
-    --pidfile=${CELERY_LOG_DIR}/cloudify.management_worker.pid \
-    --autoscale=5,2
+CMD /root/startup.sh
