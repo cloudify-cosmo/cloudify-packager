@@ -51,7 +51,7 @@ Vagrant.configure('2') do |config|
     end
 
     #need to sync folders
-    ubuntu.vm.synced_folder "../../", "/cloudify-packager", create: true
+    ubuntu.vm.synced_folder "../../", "/cloudify-packager", create: true, type: "rsync"
     ubuntu.vm.provision "shell", path: "provision.sh", privileged: false
   end
 
