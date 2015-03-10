@@ -28,6 +28,8 @@ modify_dockerfiles()
     sed -i 's/COMMON_VERSION=master/COMMON_VERSION='"$CORE_BRANCH"'/g' $file
     sed -i 's/MANAGER_VERSION=master/MANAGER_VERSION='"$CORE_BRANCH"'/g' $file
     sed -i 's/REST_VERSION=master/REST_VERSION='"$CORE_BRANCH"'/g' $file
+    sed -i 's/AMQP_INFLUX_VERSION=master/AMQP_INFLUX_VERSION='"$CORE_BRANCH"'/g' $file
+    sed -i 's/WEBUI_VERSION=master/WEBUI_VERSION='"$CORE_BRANCH"'/g' $file
     sed -i 's/SCRIPT_VERSION=master/SCRIPT_VERSION='"$PLUGINS_BRANCH"'/g' $file
   done
 
