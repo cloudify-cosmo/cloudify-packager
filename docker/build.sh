@@ -13,9 +13,21 @@ fi
 # $1 - docker image name
 build_cloudify_image()
 {
-  # docker build sometimes failes for no reason. Retry
+  echo building javabase image
   for i in 1 2 3 4 5
-  do sudo docker build -t $1 $PACKAGER_DOCKER_PATH && break || sleep 2; done
+  do
+    sudo docker-compose build javabase
+  done
+  echo building pythonbase image
+  for i in 1 2 3 4 5
+  do
+    sudo docker-compose build pythonbase
+  done
+  # docker build sometimes fails. Retry
+  for i in 1 2 3 4 5
+  do
+    sudo docker-compose build
+  done
 }
 
 modify_dockerfiles()
@@ -35,10 +47,18 @@ modify_dockerfiles()
 
 }
 
+enable_docker_api()
+{
+  sudo /bin/sh -c 'echo DOCKER_OPTS=\"-H tcp://127.0.0.1:4243 -H unix:///var/run/docker.sock\" >> /etc/default/docker'
+  sudo restart docker
+  export DOCKER_HOST=tcp://localhost:4243
+}
+
 build_image()
 {
   DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
   modify_dockerfiles $PLUGINS_BRANCH $CORE_BRANCH
+  enable_docker_api
   echo Building cloudify stack image.
   build_cloudify_image cloudify_images:latest
 }
