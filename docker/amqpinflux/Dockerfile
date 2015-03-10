@@ -3,7 +3,7 @@ MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY NOTICE.txt /root/NOTICE.txt
 
-ENV VERSION=master \
+ENV AMQP_INFLUX_VERSION=master \
     DOCKER_ENV=True \
     AMQP_HOST=rabbitmq \
     INFLUXDB_HOST=influxdb \
@@ -12,7 +12,7 @@ ENV VERSION=master \
 
 RUN mkdir -p ${SERVICE_DIR} && \
     virtualenv ${VIRTUALENV_DIR} && \
-    ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-amqp-influxdb/archive/${VERSION}.zip
+    ${VIRTUALENV_DIR}/bin/pip install https://github.com/cloudify-cosmo/cloudify-amqp-influxdb/archive/${AMQP_INFLUX_VERSION}.zip
 
 CMD ${VIRTUALENV_DIR}/bin/python ${VIRTUALENV_DIR}/bin/cloudify-amqp-influxdb \
     --amqp-exchange cloudify-monitoring \
