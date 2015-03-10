@@ -9,11 +9,6 @@ install_docker()
   curl -sSL https://get.docker.com/ubuntu/ | sudo sh
 }
 
-setup_jocker_env()
-{
-  sudo apt-get install -y python-pip
-}
-
 clone_packager()
 {
   git clone https://github.com/cloudify-cosmo/cloudify-packager.git $1
@@ -28,7 +23,6 @@ build_images()
 {
   CLONE_LOCATION=/tmp/cloudify-packager
   clone_packager $CLONE_LOCATION
-  setup_jocker_env
   echo Building cloudify stack image.
   pushd $CLONE_LOCATION
   ./docker/build.sh $CLONE_LOCATION $PLUGINS_BRANCH $CORE_BRANCH
