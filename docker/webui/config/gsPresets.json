@@ -1,0 +1,25 @@
+{
+    "localhost": {
+        "bindIp" : "0.0.0.0",
+        "bindPort" : 9001,
+        "cosmoServer": "frontend",
+        "cosmoPort": 80,
+        "log4js": {
+            "appenders": [
+                { "type":"console" },
+                {
+                    "type": "file",
+                    "filename": "/var/log/cloudify/uibackend/application.log",
+                    "maxLogSize": 20480,
+                    "backups": 3
+                }
+            ]
+        },
+        "influx": {
+            "host": "influxdb",
+            "user": "root",
+            "pass": "root",
+            "dbname": "cloudify"
+        }
+    }
+}

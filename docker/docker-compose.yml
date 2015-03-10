@@ -1,3 +1,4 @@
+# links are currently irrelevant. Once docker-compose supports --add-host, the links should be replaced.
 pythonbase:
   build: pythonbase
 javabase:
@@ -81,3 +82,13 @@ frontend:
 frontenddata:
   image: docker_frontend
   command: echo Frontend Data Container
+webui:
+  build: webui
+restservice:
+  build: restservice
+logio:
+  build: logio
+targethost:
+  build: targethost
+fileserver:
+  build: fileserver
