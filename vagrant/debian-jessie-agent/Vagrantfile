@@ -41,7 +41,7 @@ Vagrant.configure('2') do |config|
       aws.instance_type = "m3.medium"
 
       aws.keypair_name = "vagrant_build"
-      override.ssh.username = "ubuntu"
+      override.ssh.username = "admin"
       override.ssh.private_key_path = "/home/.ssh/aws/vagrant_build.pem"
 
       aws.tags = {
