@@ -24,7 +24,7 @@ build_cloudify_image()
     sudo docker-compose build pythonbase
   done
   # docker build sometimes fails. Retry
-  for i in 1 2 3 4 5
+  for i in 1 2 3 4 5 6 7 8 9 10 11 12
   do
     sudo docker-compose build
   done

@@ -9,6 +9,24 @@ install_docker()
   curl -sSL https://get.docker.com/ubuntu/ | sudo sh
 }
 
+prepare_env()
+{
+  echo installing pip and virtualenv
+  sudo apt-get install -y python-pip virtualenv
+
+  echo create new virtualenv
+  virtualenv /tmp/env
+  source /tmp/env/bin/activate
+
+  echo installing docker compose
+  pip install docker-compose
+
+  echo exposing docker api
+  sudo /bin/sh -c 'echo DOCKER_OPTS=\"-H tcp://127.0.0.1:4243 -H unix:///var/run/docker.sock\" >> /etc/default/docker'
+  sudo restart docker
+  export DOCKER_HOST=tcp://localhost:4243
+}
+
 clone_packager()
 {
   git clone https://github.com/cloudify-cosmo/cloudify-packager.git $1
@@ -23,13 +41,14 @@ build_images()
 {
   CLONE_LOCATION=/tmp/cloudify-packager
   clone_packager $CLONE_LOCATION
+  prepare_env
   echo Building cloudify stack image.
   pushd $CLONE_LOCATION
   ./docker/build.sh $CLONE_LOCATION $PLUGINS_BRANCH $CORE_BRANCH
   popd
 }
 
-main() 
+main()
 {
   install_docker
   build_images
