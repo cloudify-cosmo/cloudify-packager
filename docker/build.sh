@@ -13,6 +13,7 @@ fi
 # $1 - docker image name
 build_cloudify_image()
 {
+  pushd ../../docker
   echo building javabase image
   for i in 1 2 3 4 5
   do
@@ -28,11 +29,14 @@ build_cloudify_image()
   do
     sudo docker-compose -p cloudify build
   done
+  popd
 }
 
 modify_dockerfiles()
 {
-  FILES=$(find cloudify-packager/ -name "Dockerfile" -print)
+  echo I am here!!!!!!
+  pwd
+  FILES=$(find /tmp/cloudify-packager -name "Dockerfile" -print)
   for file in $FILES
   do
     sed -i 's/DSL_VERSION=master/DSL_VERSION='"$CORE_BRANCH"'/g' $file
@@ -60,7 +64,7 @@ build_image()
   modify_dockerfiles $PLUGINS_BRANCH $CORE_BRANCH
   enable_docker_api
   echo Building cloudify stack image.
-  build_cloudify_image cloudify_images:latest
+  build_cloudify_image
 }
 
 main() 
