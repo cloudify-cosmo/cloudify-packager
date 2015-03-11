@@ -12,7 +12,7 @@ install_docker()
 prepare_env()
 {
   echo installing pip and virtualenv
-  sudo apt-get install -y python-pip virtualenv
+  sudo apt-get install -y python-pip python-virtualenv
 
   echo create new virtualenv
   virtualenv /tmp/env
