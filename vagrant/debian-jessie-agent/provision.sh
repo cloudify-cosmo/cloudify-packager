@@ -1,30 +1,22 @@
-REST_CLIENT_SHA=""
-COMMON_PLUGIN_SHA=""
-MANAGER_SHA=""
-PACKMAN_SHA=""
-SCRIPTS_PLUGIN_SHA=""
-DIAMOND_PLUGIN_SHA=""
+#installed in debian image
+#   update and install prereqs
+#sudo apt-get -y update &&
+#sudo apt-get install -y software-properties-common &&
+#sudo add-apt-repository -y ppa:git-core/ppa &&
+#sudo apt-get install -y rsync curl python-dev rpm git make gcc libyaml-dev zlib1g-dev g++ &&
 
-# echo bootstrapping packman...
+#   install ruby
+#wget https://ftp.ruby-lang.org/pub/ruby/ruby-1.9.3-rc1.tar.bz2 --no-check-certificate
+#tar -xjf ruby-1.9.3-rc1.tar.bz2
+#cd ruby-1.9.3-rc1
+#./configure --disable-install-doc
+#make
+#sudo make install
+#cd ~
 
-# update and install prereqs
-sudo apt-get -y update &&
-sudo apt-get install -y software-properties-common &&
-sudo add-apt-repository -y ppa:git-core/ppa &&
-sudo apt-get install -y curl python-dev rpm git make gcc libyaml-dev zlib1g-dev g++ &&
-
-# install ruby
-wget https://ftp.ruby-lang.org/pub/ruby/ruby-1.9.3-rc1.tar.bz2 --no-check-certificate
-tar -xjf ruby-1.9.3-rc1.tar.bz2
-cd ruby-1.9.3-rc1
-./configure --disable-install-doc
-make
-sudo make install
-cd ~
-
-# install fpm and configure gem/bundler
-sudo gem install fpm --no-ri --no-rdoc &&
-echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc --no-ri' >> ~/.gemrc
+#    install fpm and configure gem/bundler
+#sudo gem install fpm --no-ri --no-rdoc &&
+#echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc --no-ri' >> ~/.gemrc
 
 # install pip
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python &&
