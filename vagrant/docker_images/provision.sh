@@ -48,10 +48,26 @@ build_images()
   popd
 }
 
+save_images()
+{
+  sudo docker save docker_restservice \
+                   docker_amqpinflux \
+                   docker_riemann \
+                   docker_mgmtworker \
+                   docker_frontend \
+                   docker_logstash \
+                   docker_elasticsearch \
+                   docker_rabbitmq \
+                   docker_influxdb \
+                   docker_webui \
+                   docker_fileserver > $1
+}
+
 main()
 {
   install_docker
   build_images
+  save_images /tmp/cloudify_images.tar
 }
 
 main
