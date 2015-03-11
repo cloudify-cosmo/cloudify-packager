@@ -49,7 +49,7 @@ build_images()
   echo Building cloudify stack image.
   pushd $CLONE_LOCATION
     git checkout CFY-1838-separate-services-container-to-service-specific-containers
-    source /docker/build.sh $CLONE_LOCATION $PLUGINS_BRANCH $CORE_BRANCH
+    source docker/build.sh $CLONE_LOCATION $PLUGINS_BRANCH $CORE_BRANCH
   popd
 }
 
