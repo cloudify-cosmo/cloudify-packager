@@ -6,6 +6,7 @@ ENV DOCKER_ENV=True \
     REST_CLIENT_VERSION=master \
     COMMON_VERSION=master \
     MANAGER_VERSION=master \
+    SECUREST_VERSION=0.5 \
     MANAGER_HOME=/opt/manager
 ENV MANAGER_VIRTUALENV=${MANAGER_HOME}/env \
     MANAGER_REST_CONFIG_PATH=${MANAGER_HOME}/guni.conf
@@ -18,6 +19,7 @@ RUN apt-get update && \
     ${MANAGER_VIRTUALENV}/bin/pip install https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/${DSL_VERSION}.zip && \
     ${MANAGER_VIRTUALENV}/bin/pip install https://github.com/cloudify-cosmo/cloudify-rest-client/archive/${REST_CLIENT_VERSION}.zip && \
     ${MANAGER_VIRTUALENV}/bin/pip install https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/${COMMON_VERSION}.zip && \
+    ${MANAGER_VIRTUALENV}/bin/pip install https://github.com/cloudify-cosmo/flask-securest/archive/${SECUREST_VERSION}.zip  && \
     curl --fail --insecure --silent -L -o /tmp/cloudify-manager/manager.tar.gz --create-dirs https://github.com/cloudify-cosmo/cloudify-manager/archive/${MANAGER_VERSION}.tar.gz && \
     tar -xzf /tmp/cloudify-manager/manager.tar.gz --strip-components=1 -C /tmp/cloudify-manager/ && \
     ${MANAGER_VIRTUALENV}/bin/pip install /tmp/cloudify-manager/rest-service && \
