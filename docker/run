@@ -14,22 +14,22 @@ printf "docker external ip: $DOCKER_EXT_IP\n"
 function run_elasticsearch
 {
   # elasticsearchdata
-  docker run --name="elasticsearchdata" \
+  docker run --name="cloudify_elasticsearchdata" \
              docker_elasticsearch \
              echo ELASTICSEARCHDATA
   # elasticsearch
   docker run -d --hostname="elasticsearch" \
-                --name="elasticsearch" \
+                --name="cloudify_elasticsearch" \
                 --publish=9200:9200 \
                 --restart="always" \
-                --volumes-from elasticsearchdata \
+                --volumes-from cloudify_elasticsearchdata \
                 docker_elasticsearch
 }
 
 function run_rabbitmq
 {
   docker run -d --hostname="rabbitmq" \
-                --name="rabbitmq" \
+                --name="cloudify_rabbitmq" \
                 --publish=5672:5672 \
                 --restart="always" \
                 docker_rabbitmq
@@ -38,16 +38,16 @@ function run_rabbitmq
 function run_influxdb
 {
   # influxdbdata
-  docker run --name="influxdbdata" \
+  docker run --name="cloudify_influxdbdata" \
              docker_influxdb \
              echo INFLUXDBDATA
   # influxdb
   docker run -d --hostname="influxdb" \
-                --name="influxdb" \
+                --name="cloudify_influxdb" \
                 --publish=8083:8083 \
                 --publish=8086:8086 \
                 --restart="always" \
-                --volumes-from influxdbdata \
+                --volumes-from cloudify_influxdbdata \
                 docker_influxdb
 }
 
@@ -56,7 +56,7 @@ function run_logstash
   docker run -d --add-host=elasticsearch:${DOCKER_HOST_IP} \
                 --add-host=rabbitmq:${DOCKER_HOST_IP} \
                 --hostname="logstash" \
-                --name="logstash" \
+                --name="cloudify_logstash" \
                 --publish=9999:9999 \
                 --restart="always" \
                 docker_logstash
@@ -66,7 +66,7 @@ function run_kibana
 {
   docker run -d --add-host=elasticsearch:${DOCKER_HOST_IP} \
                 --hostname="kibana" \
-                --name="kibana" \
+                --name="cloudify_kibana" \
                 --publish=5601:5601 \
                 --restart="always" \
                 docker_kibana
@@ -77,7 +77,7 @@ function run_metrics_broker
   docker run -d --add-host=influxdb:${DOCKER_HOST_IP} \
                 --add-host=rabbitmq:${DOCKER_HOST_IP} \
                 --hostname="amqpinflux" \
-                --name="amqpinflux" \
+                --name="cloudify_amqpinflux" \
                 --restart="always" \
                 docker_amqpinflux
 }
@@ -89,19 +89,19 @@ function run_frontend
                 --add-host=restservice:${DOCKER_HOST_IP} \
                 --add-host=webui:${DOCKER_HOST_IP} \
                 --hostname="frontend" \
-                --name="frontend" \
+                --name="cloudify_frontend" \
                 --publish=80:80 \
                 --publish=53229:53229 \
                 --restart="always" \
-                --volumes-from fileserver \
-                --volumes-from webui \
+                --volumes-from cloudify_fileserver \
+                --volumes-from cloudify_webui \
                 docker_frontend
 }
 
 function run_webui
 {
   # webui
-  docker run -d --name="webui" \
+  docker run -d --name="cloudify_webui" \
                 --hostname="webui" \
                 --publish=9001:9001 \
                 --add-host=frontend:${DOCKER_HOST_IP} \
@@ -114,21 +114,21 @@ function run_webui
 function run_restservice
 {
   # restservice
-  docker run -d --name="restservice" \
+  docker run -d --name="cloudify_restservice" \
                 --hostname="restservice" \
                 --add-host=rabbitmq:${DOCKER_HOST_IP} \
                 --add-host=elasticsearch:${DOCKER_HOST_IP} \
                 --add-host=fileserver:${DOCKER_HOST_IP} \
                 --publish=8100:8100 \
                 --restart="always" \
-                --volumes-from fileserver \
+                --volumes-from cloudify_fileserver \
                 docker_restservice
 }
 
 function run_fileserver
 {
   # fileserver
-  docker run -d --name="fileserver" \
+  docker run -d --name="cloudify_fileserver" \
                 --volume=/opt/manager/resources \
                 docker_fileserver
 }
@@ -136,24 +136,24 @@ function run_fileserver
 function run_riemann
 {
   # riemanndata
-  docker run --name="riemanndata" \
+  docker run --name="cloudify_riemanndata" \
              docker_riemann \
              echo RIEMANNDATA
   # riemann
   docker run -d --add-host=rabbitmq:${DOCKER_HOST_IP} \
                 --add-host=frontend:${DOCKER_HOST_IP} \
                 --hostname="riemann" \
-                --name="riemann" \
+                --name="cloudify_riemann" \
                 --restart="always" \
-                --volumes-from riemanndata \
-                --volumes-from mgmtdata \
+                --volumes-from cloudify_riemanndata \
+                --volumes-from cloudify_mgmtdata \
                 docker_riemann
 }
 
 function run_mgmtworker
 {
   # mgmtworkerdata
-  docker run --name="mgmtdata" \
+  docker run --name="cloudify_mgmtdata" \
              --volume /root \
              --volume /opt/riemann \
              docker_mgmtworker \
@@ -165,27 +165,28 @@ function run_mgmtworker
                 --add-host=fileserver:${DOCKER_HOST_IP} \
                 --env="MANAGEMENT_IP=${DOCKER_HOST_IP}" \
                 --hostname="mgmtworker" \
-                --name="mgmtworker" \
+                --name="cloudify_mgmtworker" \
                 --restart="always" \
-                --volumes-from mgmtdata \
+                --volumes-from cloudify_mgmtdata \
                 docker_mgmtworker
 }
 
 function run_logio
 {
-  docker run -d --name="logio" \
+  docker run -d --name="cloudify_logio" \
              --publish=28778:28778 \
              docker_logio
 }
 
 function run_targethost
 {
-  docker run -d --name="targethost" \
+  docker run -d --name="cloudify_targethost" \
             docker_targethost
 }
 
 function upload_context
 {
+  sleep 5 &&
   type curl >/dev/null 2>&1 || { echo >&2 "Curl not installed.  Aborting."; exit 1; }
   if [[ -a "provider_context" ]] ; then
     curl --fail --request POST --data @provider_context http://${DOCKER_EXT_IP}/provider/context --header "Content-Type:application/json"
