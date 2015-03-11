@@ -1,4 +1,4 @@
-FROM docker_pythonbase
+FROM cloudify_pythonbase
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY MANAGMENT_WORKER_NOTICE.txt /root/MANAGMENT_WORKER_NOTICE.txt
