@@ -51,17 +51,17 @@ build_images()
 
 save_images()
 {
-  sudo docker save docker_restservice \
-                   docker_amqpinflux \
-                   docker_riemann \
-                   docker_mgmtworker \
-                   docker_frontend \
-                   docker_logstash \
-                   docker_elasticsearch \
-                   docker_rabbitmq \
-                   docker_influxdb \
-                   docker_webui \
-                   docker_fileserver > $1
+  sudo docker save cloudify_restservice \
+                   cloudify_amqpinflux \
+                   cloudify_riemann \
+                   cloudify_mgmtworker \
+                   cloudify_frontend \
+                   cloudify_logstash \
+                   cloudify_elasticsearch \
+                   cloudify_rabbitmq \
+                   cloudify_influxdb \
+                   cloudify_webui \
+                   cloudify_fileserver > $1
 }
 
 main()
