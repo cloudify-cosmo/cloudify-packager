@@ -40,12 +40,16 @@ clone_packager()
 build_images()
 {
   CLONE_LOCATION=/tmp/cloudify-packager
+  echo cloning packager to $CLONE_LOCATION
   clone_packager $CLONE_LOCATION
+
+  echo preparing environment, installing all components
   prepare_env
+
   echo Building cloudify stack image.
   pushd $CLONE_LOCATION
-  git checkout CFY-1838-separate-services-container-to-service-specific-containers
-  ./docker/build.sh $CLONE_LOCATION $PLUGINS_BRANCH $CORE_BRANCH
+    git checkout CFY-1838-separate-services-container-to-service-specific-containers
+    source /docker/build.sh $CLONE_LOCATION $PLUGINS_BRANCH $CORE_BRANCH
   popd
 }
 
