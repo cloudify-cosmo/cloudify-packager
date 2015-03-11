@@ -37,7 +37,7 @@ modify_dockerfiles()
   for file in $FILES
   do
     sed -i 's/DSL_VERSION=master/DSL_VERSION='"$CORE_BRANCH"'/g' $file
-    sed -i 's/REST_CLIENT_VERSION=master/DSL_REST_CLIENT_VERSION='"$CORE_BRANCH"'/g' $file
+    sed -i 's/REST_CLIENT_VERSION=master/REST_CLIENT_VERSION='"$CORE_BRANCH"'/g' $file
     sed -i 's/COMMON_VERSION=master/COMMON_VERSION='"$CORE_BRANCH"'/g' $file
     sed -i 's/MANAGER_VERSION=master/MANAGER_VERSION='"$CORE_BRANCH"'/g' $file
     sed -i 's/REST_VERSION=master/REST_VERSION='"$CORE_BRANCH"'/g' $file
