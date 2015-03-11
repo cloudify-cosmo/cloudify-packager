@@ -1,3 +1,6 @@
+core_tag_name="master"
+plugins_tag_name="master"
+
 #installed in debian image
 #   update and install prereqs
 #sudo apt-get -y update &&
@@ -24,9 +27,7 @@ curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo
 # install packman
 git clone https://github.com/cloudify-cosmo/packman.git
 pushd packman
-	if [ -n "$PACKMAN_SHA" ]; then
-		git reset --hard $PACKMAN_SHA
-	fi
+	git checkout -b tmp_branch $core_tag_name
 	sudo pip install .
 popd
 
@@ -43,37 +44,27 @@ sudo /debian-agent/env/bin/pip install celery==3.1.17 &&
 sudo /debian-agent/env/bin/pip install pyzmq==14.4.0
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 pushd cloudify-rest-client
-	if [ -n "$REST_CLIENT_SHA" ]; then
-		git reset --hard $REST_CLIENT_SHA
-	fi
+	git checkout -b tmp_branch $core_tag_name
 	sudo /debian-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 pushd cloudify-plugins-common
-	if [ -n "$COMMON_PLUGIN_SHA" ]; then
-		git reset --hard $COMMON_PLUGIN_SHA
-	fi
+	git checkout -b tmp_branch $core_tag_name
 	sudo /debian-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 pushd cloudify-script-plugin
-	if [ -n "$SCRIPTS_PLUGIN_SHA" ]; then
-		git reset --hard $SCRIPTS_PLUGIN_SHA
-	fi
+	git checkout -b tmp_branch $plugins_tag_name
 	sudo /debian-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-diamond-plugin.git
 pushd cloudify-diamond-plugin
-	if [ -n "$DIAMOND_PLUGIN_SHA" ]; then
-		git reset --hard $DIAMOND_PLUGIN_SHA
-	fi
+	git checkout -b tmp_branch $plugins_tag_name
 	sudo /debian-agent/env/bin/pip install .
 popd
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
 pushd cloudify-manager
-	if [ -n "$MANAGER_SHA" ]; then
-		git reset --hard $MANAGER_SHA
-	fi
+	git checkout -b tmp_branch $core_tag_name
 	pushd plugins/plugin-installer
 	  sudo /debian-agent/env/bin/pip install .
 	popd
