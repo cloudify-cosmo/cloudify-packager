@@ -13,6 +13,8 @@ fi
 # $1 - docker image name
 build_cloudify_image()
 {
+  echo HEERRREE
+  pwd
   pushd ../../docker
   echo building javabase image
   for i in 1 2 3 4 5
