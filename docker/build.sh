@@ -16,17 +16,17 @@ build_cloudify_image()
   echo building javabase image
   for i in 1 2 3 4 5
   do
-    sudo docker-compose -p cloudify build javabase
+    sudo docker-compose -p cloudify build javabase && break || sleep 2;
   done
   echo building pythonbase image
   for i in 1 2 3 4 5
   do
-    sudo docker-compose -p cloudify build pythonbase
+    sudo docker-compose -p cloudify build pythonbase && break || sleep 2;
   done
   # docker build sometimes fails. Retry
-  for i in 1 2 3 4 5 6 7 8 9 10 11 12
+  for i in 1 2 3 4 5 6
   do
-    sudo docker-compose -p cloudify build
+    sudo docker-compose -p cloudify build && break || sleep 2;
   done
   popd
 }
