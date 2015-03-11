@@ -25,7 +25,7 @@ build_cloudify_images()
       sudo docker-compose -p cloudify build pythonbase && break || sleep 2;
     done
     echo building cloudify images
-    for i in 1 2 3 4 5 6
+    for i in 1 2 3 4 5 6 7 8 9 10 11 12
     do
       sudo docker-compose -p cloudify build && break || sleep 2;
     done
@@ -56,7 +56,7 @@ enable_docker_api()
   export DOCKER_HOST=tcp://localhost:4243
 }
 
-build_image()
+build_images()
 {
   DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
@@ -72,7 +72,7 @@ build_image()
 
 main() 
 {
-  build_image
+  build_images
 }
 
 main
