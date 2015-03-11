@@ -11,15 +11,14 @@ install_docker()
 
 prepare_env()
 {
-  echo installing pip and virtualenv
-  sudo apt-get install -y python-pip python-virtualenv
+  echo installing Docker
+  install_docker
 
-  echo create new virtualenv
-  virtualenv /tmp/env
-  source /tmp/env/bin/activate
+  echo installing pip
+  sudo apt-get install -y python-pip
 
   echo installing docker compose
-  pip install docker-compose
+  sudo pip install docker-compose
 
   echo exposing docker api
   sudo /bin/sh -c 'echo DOCKER_OPTS=\"-H tcp://127.0.0.1:4243 -H unix:///var/run/docker.sock\" >> /etc/default/docker'
@@ -42,9 +41,6 @@ build_images()
   CLONE_LOCATION=/tmp/cloudify-packager
   echo cloning packager to $CLONE_LOCATION
   clone_packager $CLONE_LOCATION
-
-  echo preparing environment, installing all components
-  prepare_env
 
   echo Building cloudify stack image.
   pushd $CLONE_LOCATION
@@ -70,7 +66,8 @@ save_images()
 
 main()
 {
-  install_docker
+  echo preparing environment, installing all required components.
+  prepare_env
   build_images
   save_images /tmp/cloudify_images.tar
 }

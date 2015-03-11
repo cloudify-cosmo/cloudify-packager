@@ -10,24 +10,25 @@ if [ -z $1 ]
     PACKAGER_DOCKER_PATH=$(pwd)
 fi
 
-build_cloudify_image()
+build_cloudify_images()
 {
   pushd $PACKAGER_DOCKER_PATH
-  echo building javabase image
-  for i in 1 2 3 4 5
-  do
-    sudo docker-compose -p cloudify build javabase && break || sleep 2;
-  done
-  echo building pythonbase image
-  for i in 1 2 3 4 5
-  do
-    sudo docker-compose -p cloudify build pythonbase && break || sleep 2;
-  done
-  # docker build sometimes fails. Retry
-  for i in 1 2 3 4 5 6
-  do
-    sudo docker-compose -p cloudify build && break || sleep 2;
-  done
+    # docker build sometimes fails. Retry
+    echo building javabase image
+    for i in 1 2 3 4 5 6
+    do
+      sudo docker-compose -p cloudify build javabase && break || sleep 2;
+    done
+    echo building pythonbase image
+    for i in 1 2 3 4 5 6
+    do
+      sudo docker-compose -p cloudify build pythonbase && break || sleep 2;
+    done
+    echo building cloudify images
+    for i in 1 2 3 4 5 6
+    do
+      sudo docker-compose -p cloudify build && break || sleep 2;
+    done
   popd
 }
 
@@ -58,10 +59,15 @@ enable_docker_api()
 build_image()
 {
   DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+  echo setting plugin version to $PLUGINS_BRANCH and core version to $CORE_BRANCH
   modify_dockerfiles $PLUGINS_BRANCH $CORE_BRANCH
+
+  echo enabling Docker API
   enable_docker_api
+
   echo Building cloudify stack image.
-  build_cloudify_image
+  build_cloudify_images
 }
 
 main() 
