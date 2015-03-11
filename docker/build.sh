@@ -10,12 +10,9 @@ if [ -z $1 ]
     PACKAGER_DOCKER_PATH=$(pwd)
 fi
 
-# $1 - docker image name
 build_cloudify_image()
 {
-  echo HEERRREE
-  pwd
-  pushd docker
+  pushd $PACKAGER_DOCKER_PATH
   echo building javabase image
   for i in 1 2 3 4 5
   do
@@ -36,8 +33,6 @@ build_cloudify_image()
 
 modify_dockerfiles()
 {
-  echo I am here!!!!!!
-  pwd
   FILES=$(find /tmp/cloudify-packager -name "Dockerfile" -print)
   for file in $FILES
   do

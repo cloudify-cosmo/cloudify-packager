@@ -1,4 +1,4 @@
-FROM docker_javabase:latest
+FROM cloudify_javabase:latest
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY KIBANA_NOTICE.txt /root/KIBANA_NOTICE.txt

@@ -1,4 +1,4 @@
-FROM docker_javabase:latest
+FROM cloudify_javabase:latest
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY ELASTICSEARCH_NOTICE.txt /root/ELASTICSEARCH_NOTICE.txt

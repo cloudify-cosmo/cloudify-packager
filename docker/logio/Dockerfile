@@ -1,4 +1,4 @@
-FROM docker_javabase:latest
+FROM cloudify_javabase:latest
 
 RUN apt-get update && \
     apt-get install -y curl make g++ && \

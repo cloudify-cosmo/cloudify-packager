@@ -1,4 +1,4 @@
-FROM docker_javabase:latest
+FROM cloudify_javabase:latest
 MAINTAINER Gigaspaces, cosmo-admin@gigaspaces.com
 
 COPY RIEMANN_NOTICE.txt /root/RIEMANN_NOTICE.txt
