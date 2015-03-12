@@ -24,8 +24,8 @@ server {
   listen              *:80;
   server_name         _;
 
-  access_log          /var/log/cloudify/nginx/cloudify.access.log;
-  error_log           /var/log/cloudify/nginx/cloudify.error.log;
+  access_log          /var/log/nginx/access.log;
+  error_log           /var/log/nginx/error.log;
 
   # Statically serves grafana for the UI.
   location /grafana {
@@ -79,7 +79,7 @@ server {
   listen        *:53229;
   server_name   fileserver;
 
-  access_log    /var/log/cloudify/nginx/cloudify-files.log;
+  access_log    /var/log/nginx/cloudify-files.log;
   location / {
     root              /opt/manager/resources;
     autoindex on;
