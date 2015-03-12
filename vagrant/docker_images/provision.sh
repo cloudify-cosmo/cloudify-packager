@@ -66,9 +66,13 @@ save_images()
 
 main()
 {
-  echo preparing environment, installing all required components.
+  echo preparing environment. installing all required components...
   prepare_env
+
+  echo building cloudify service images
   build_images
+
+  echo saving images to /tmp/cloudify_images.tar
   save_images /tmp/cloudify_images.tar
 }
 
