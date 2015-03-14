@@ -57,6 +57,11 @@ else
 		fi
 		pip install .
 	popd
+	
+	git clone https://github.com/cloudify-cosmo/flask-securest.git
+	pushd flask-securest
+		pip install .
+	popd
 
 	git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 	pushd cloudify-rest-client
