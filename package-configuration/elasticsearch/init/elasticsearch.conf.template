@@ -24,5 +24,5 @@ script
     . /etc/default/elasticsearch
   fi
 
-  su -s /bin/sh -c 'exec "$0" "$@"' {{ config_templates.__params_init.user }} -- {{ config_templates.__params_init.run_dir }}/bin/elasticsearch -f -Xms${ES_MIN_MEM} -Xmx${ES_MAX_MEM}
+  su -s /bin/sh -c 'exec "$0" "$@"' {{ config_templates.params_init.user }} -- {{ config_templates.params_init.run_dir }}/bin/elasticsearch -f -Xms${ES_MIN_MEM} -Xmx${ES_MAX_MEM}
 end script
