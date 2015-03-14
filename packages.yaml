@@ -26,10 +26,10 @@ packages:
     version: "3.1.0"
     package_path: "/cloudify"
     sources_path: "/cloudify-components"
-    src_package_type: "dir"
-    dst_package_type:
+    source_package_type: "dir"
+    destination_package_types:
       - "deb"
-    bootstrap_script_in_pkg: "package-scripts/cloudify-components-bootstrap.sh"
+    bootstrap_script: "package-scripts/cloudify-components-bootstrap.sh"
     bootstrap_template: "cloudify-components-bootstrap.template"
     bootstrap_log: "/var/log/cloudify-bootstrap.log"
     overwrite_package: false
@@ -83,8 +83,8 @@ packages:
       - "nodejs"
     package_path: "/cloudify"
     sources_path: "/packages/cloudify-ui"
-    src_package_type: "dir"
-    dst_package_type:
+    source_package_type: "dir"
+    destination_package_types:
       - "deb"
     bootstrap_script: "package-scripts/cloudify-ui-bootstrap.sh"
     bootstrap_template: "cloudify-ui-bootstrap.template"
@@ -111,8 +111,8 @@ packages:
       version: "3.1.0"
       package_path: "/cloudify"
       sources_path: "/agents/debian-agent"
-      src_package_type: "dir"
-      dst_package_types:
+      source_package_type: "dir"
+      destination_package_typess:
         - "deb"
       bootstrap_script: "package-scripts/agent-debian-bootstrap.sh"
       bootstrap_template: "agent-debian-bootstrap.template"
@@ -133,8 +133,8 @@ packages:
     version: "3.1.0"
     package_path: "/cloudify"
     sources_path: "/agents/Ubuntu-agent"
-    src_package_type: "dir"
-    dst_package_types:
+    source_package_type: "dir"
+    destination_package_typess:
       - "deb"
     bootstrap_script: "package-scripts/agent-ubuntu-bootstrap.sh"
     bootstrap_template: "agent-ubuntu-bootstrap.template"
@@ -155,8 +155,8 @@ packages:
     version: "3.1.0"
     package_path: "/cloudify"
     sources_path: "/agents/Ubuntu-agent"
-    src_package_type: "dir"
-    dst_package_types:
+    source_package_type: "dir"
+    destination_package_typess:
       - "deb"
     bootstrap_script: "package-scripts/agent-ubuntu-bootstrap.sh"
     bootstrap_template: "agent-ubuntu-bootstrap.template"
@@ -176,8 +176,8 @@ packages:
     version: "3.1.0"
     package_path: "/cloudify"
     sources_path: "/tmp/Ubuntu-agent"
-    src_package_type: "dir"
-    dst_package_types:
+    source_package_type: "dir"
+    destination_package_typess:
       - "deb"
     bootstrap_script: "package-scripts/agent-ubuntu-bootstrap.sh"
     bootstrap_template: "agent-ubuntu-bootstrap.template"
@@ -197,8 +197,8 @@ packages:
     version: "3.1.0"
     package_path: "/cloudify"
     sources_path: "/agents/windows-agent"
-    src_package_type: "dir"
-    dst_package_types:
+    source_package_type: "dir"
+    destination_package_typess:
       - "deb"
     bootstrap_script: "package-scripts/agent-windows-bootstrap.sh"
     bootstrap_template: "agent-windows-bootstrap.template"
@@ -213,7 +213,7 @@ packages:
         - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
       package_path: "/agents/debian-agent"
       sources_path: "/debian-agent/env"
-      modules:
+      python_modules:
         - "billiard==2.7.3.28"
         - "celery==3.1.17"
         - "pika"
@@ -222,8 +222,8 @@ packages:
         - "/Ubuntu-agent/env/cloudify-manager-master/plugins/agent-installer/"
         - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
         - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
-      src_package_type: "dir"
-      dst_package_types:
+      source_package_type: "dir"
+      destination_package_typess:
         - "tar.gz"
   Ubuntu-trusty-agent:
     name: "Ubuntu-trusty-agent"
@@ -232,7 +232,7 @@ packages:
       - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
     package_path: "/agents/Ubuntu-agent"
     sources_path: "/Ubuntu-agent/env"
-    modules:
+    python_modules:
       - "billiard==2.7.3.28"
       - "celery==3.1.17"
       - "pika"
@@ -241,8 +241,8 @@ packages:
       - "/Ubuntu-agent/env/cloudify-manager-master/plugins/agent-installer/"
       - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
       - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
-    src_package_type: "dir"
-    dst_package_types:
+    source_package_type: "dir"
+    destination_package_typess:
       - "tar.gz"
   Ubuntu-precise-agent:
     name: "Ubuntu-precise-agent"
@@ -251,7 +251,7 @@ packages:
       - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
     package_path: "/agents/Ubuntu-agent"
     sources_path: "/Ubuntu-agent/env"
-    modules:
+    python_modules:
       - "billiard==2.7.3.28"
       - "celery==3.1.17"
       - "pika"
@@ -260,16 +260,16 @@ packages:
       - "/Ubuntu-agent/env/cloudify-manager-master/plugins/agent-installer/"
       - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
       - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
-    src_package_type: "dir"
-    dst_package_types:
+    source_package_type: "dir"
+    destination_package_typess:
       - "tar.gz"
   cloudify-centos-final-agent:
     name: "cloudify-centos-final-agent"
     version: "3.1.0"
     package_path: "/cloudify"
     sources_path: "/agents/centos-agent"
-    src_package_type: "dir"
-    dst_package_types:
+    source_package_type: "dir"
+    destination_package_typess:
       - "deb"
     bootstrap_script: "package-scripts/agent-centos-bootstrap.sh"
     bootstrap_template: "agent-centos-bootstrap.template"
@@ -291,7 +291,7 @@ packages:
       - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
     package_path: "/agents/centos-agent"
     sources_path: "/centos-agent/env"
-    modules:
+    python_modules:
       - "billiard==2.7.3.28"
       - "celery==3.1.17"
       - "bernhard"
@@ -299,6 +299,6 @@ packages:
       - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
       - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
       - "/centos-agent/env/cloudify-manager-master/plugins/plugin-installer/"
-    src_package_type: "dir"
-    dst_package_types:
+    source_package_type: "dir"
+    destination_package_typess:
       - "tar.gz"
