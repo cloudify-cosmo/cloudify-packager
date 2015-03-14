@@ -1,0 +1,107 @@
+packages:
+  cloudify-core:
+    name: cloudify-core
+    version: 3.1.0
+    depends:
+      - cloudify-components
+    package_path: /cloudify
+    sources_path: /cloudify-core
+    source_package_type: dir
+    destination_package_types:
+      - deb
+    bootstrap_script: package-scripts/cloudify-core-bootstrap.sh
+    bootstrap_template: cloudify-core-bootstrap.template
+    bootstrap_log: /var/log/cloudify-core-bootstrap.log
+    overwrite_package: false
+    config_templates:
+      params_celery:
+        init_path: /etc/init/celeryd-cloudify-management.conf
+        run_dir: /opt/celery
+      params_manager:
+        port: 8100
+        cloudify_logs_base: /var/log/cloudify
+
+  cloudify-components:
+    name: "cloudify-components"
+    version: "3.1.0"
+    package_path: "/cloudify"
+    sources_path: "/cloudify-components"
+    src_package_type: "dir"
+    dst_package_type:
+      - "deb"
+    bootstrap_script_in_pkg: "package-scripts/cloudify-components-bootstrap.sh"
+    bootstrap_template: "cloudify-components-bootstrap.template"
+    bootstrap_log: "/var/log/cloudify-bootstrap.log"
+    overwrite_package: false
+    bootstrap_params:
+      req_free_mem: "10000"
+      req_free_disk: "5"
+      req_cpu_cores: "1"
+      req_arch: "x86_64"
+      req_os: "precise"
+    config_templates:
+      template_file_nginx:
+        template: "package-configuration/nginx/conf/default.conf.template"
+        output_file: "default.conf"
+        config_dir: "config/nginx"
+        dst_dir: "/etc/nginx/conf.d"
+      params_nginx:
+        kibana_run_dir: "/opt/kibana3"
+        kibana_port: "3000"
+        grafana_run_dir: "/opt"
+        ui_run_dir: "/opt/cloudify-ui"
+        rest_and_ui_port: "80"
+        file_server_port: "53229"
+        file_server_dir: "/opt/manager/resources"
+      template_file_nginx_init:
+        template: "package-configuration/nginx/init/nginx.conf.template"
+        config_dir: "config/nginx"
+        output_file: "nginx.conf"
+        dst_dir: "/etc/init"
+      params_rabbitmq:
+        port: "5672"
+      params_logstash:
+        port: "9999"
+      params_elasticsearch:
+        port: "9200"
+      params_riemann:
+        langohr_jar: "/cloudify-components/riemann/langohr/langohr.jar"
+        manager_config: "/opt/manager/cloudify-manager-master/plugins/riemann-controller/riemann_controller/resources/manager.config"
+      template_file_riemann:
+        template: "package-configuration/riemann/init/riemann.conf.template"
+        config_dir: "config/riemann/init"
+        dst_dir: "/etc/init/riemann.conf"
+      template_file_rabbitmq:
+        template: "package-configuration/rabbitmq/init/rabbitmq-server.conf.template"
+        config_dir: "config/rabbitmq"
+        dst_dir: "/etc/init/rabbitmq-server.conf"
+
+  cloudify-ui:
+    name: "cloudify-ui"
+    version: "1.0.0"
+    depends:
+      - "nodejs"
+    package_path: "/cloudify"
+    sources_path: "/packages/cloudify-ui"
+    src_package_type: "dir"
+    dst_package_type:
+      - "deb"
+    bootstrap_script: "package-scripts/cloudify-ui-bootstrap.sh"
+    bootstrap_template: "cloudify-ui-bootstrap.template"
+    bootstrap_log: "/var/log/cloudify-bootstrap.log"
+    config_templates:
+      template_file_init:
+        template: "package-configuration/cloudify-ui/init/cloudify-ui.conf.template"
+        output_file: "cloudify-ui.conf"
+        config_dir: "config/init"
+        dst_dir: "/etc/init"
+      params_init:
+        log_file: "/var/log/cloudify-ui/cosmo-ui.log"
+        user: "root"
+        run_dir: "/opt/cloudify-ui"
+      params_ui:
+        port: "9001"
+      config_dir_grafana:
+        files: "package-configuration/cloudify-ui/grafana"
+        config_dir: "config/grafana"
+        dst_dir: "/opt/grafana"
