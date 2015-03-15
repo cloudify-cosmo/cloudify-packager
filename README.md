@@ -17,11 +17,13 @@ We use [docker-compose](https://docs.docker.com/compose/) to generate our images
 Configuration for all images can be found under the `docker` directory in a corresponding sub-directory.
 `docker-compose.yml` contains the configuration for the build.
 
-`build.sh` is for internal purposes. Please ignore.
-
-To build, execute the following:
+To build, install `docker-compose` and execute the following:
 
 ```shell
+virtualenv cloudify
+source cloudify/bin/activate
+pip install docker-compose
+
 sudo docker-compose -p cloudify build javabase pythonbase
 sudo docker-compose -p cloudify build
 ```
