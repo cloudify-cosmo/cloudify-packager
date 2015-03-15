@@ -30,7 +30,13 @@ echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc 
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python &&
 
 # install packman
-sud pip install https://github.com/cloudify-cosmo/packman/archive/pkm-overhaul.zip
+git clone https://github.com/cloudify-cosmo/packman.git
+pushd packman
+	if [ -n "$PACKMAN_SHA" ]; then
+		git reset --hard $PACKMAN_SHA
+	fi
+	sudo pip install .
+popd
 
 # install virtualenv
 sudo pip install virtualenv==1.11.4 &&
