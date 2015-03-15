@@ -29,27 +29,69 @@ packages:
         config_dir: "config/grafana"
         dst_dir: "/opt/grafana"
 
-    cloudify-debian-jessie-agent:
-      name: "cloudify-debian-jessie-agent"
-      version: "3.1.0"
-      package_path: "/cloudify"
-      sources_path: "/agents/debian-agent"
-      source_package_type: "dir"
-      destination_package_types:
-        - "deb"
-      bootstrap_script: "package-scripts/agent-debian-bootstrap.sh"
-      bootstrap_template: "agent-debian-bootstrap.template"
-      bootstrap_params:
-        file_server_path: "/opt/manager/resources"
-        dst_agent_location: "packages/agents"
-        dst_template_location: "packages/templates"
-        dst_script_location: "packages/scripts"
-      bootstrap_log: "/var/log/cloudify3-bootstrap.log"
-      config_templates:
-        config_dir:
-          files: "package-configuration/debian-agent"
-          config_dir: "config"
-          dst_dir: "/opt/manager/resources/packages/agents/templates/"
+  cloudify-ubuntu-agent:
+    name: "cloudify-trusty-agent"
+    version: "3.1.0"
+    package_path: "/cloudify"
+    sources_path: "/tmp/Ubuntu-agent"
+    source_package_type: "dir"
+    destination_package_types:
+      - "deb"
+    bootstrap_script: "package-scripts/agent-ubuntu-bootstrap.sh"
+    bootstrap_template: "agent-ubuntu-bootstrap.template"
+    bootstrap_params:
+      file_server_path: "/opt/manager/resources"
+      dst_agent_location: "packages/agents"
+      dst_template_location: "packages/templates"
+      dst_script_location: "packages/scripts"
+    bootstrap_log: "/var/log/cloudify3-bootstrap.log"
+    config_templates:
+      config_dir:
+        files: "package-configuration/ubuntu-agent"
+        config_dir: "config"
+        dst_dir: "/opt/manager/resources/packages/agents/templates/"
+
+  cloudify-debian-jessie-agent:
+    name: "cloudify-debian-jessie-agent"
+    version: "3.1.0"
+    package_path: "/cloudify"
+    sources_path: "/agents/debian-agent"
+    source_package_type: "dir"
+    destination_package_types:
+      - "deb"
+    bootstrap_script: "package-scripts/agent-debian-bootstrap.sh"
+    bootstrap_template: "agent-debian-bootstrap.template"
+    bootstrap_params:
+      file_server_path: "/opt/manager/resources"
+      dst_agent_location: "packages/agents"
+      dst_template_location: "packages/templates"
+      dst_script_location: "packages/scripts"
+    bootstrap_log: "/var/log/cloudify3-bootstrap.log"
+    config_templates:
+      config_dir:
+        files: "package-configuration/debian-agent"
+        config_dir: "config"
+        dst_dir: "/opt/manager/resources/packages/agents/templates/"
+
+  debian-jessie-agent:
+    name: "debian--agent"
+    version: "3.1.0"
+    source_urls:
+      - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
+    package_path: "/agents/debian-agent"
+    sources_path: "/debian-agent/env"
+    python_modules:
+      - "billiard==2.7.3.28"
+      - "celery==3.1.17"
+      - "pika"
+      - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
+      - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
+      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/agent-installer/"
+      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
+      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
+    source_package_type: "dir"
+    destination_package_types:
+      - "tar.gz"
 
   cloudify-ubuntu-trusty-agent:
     name: "cloudify-ubuntu-trusty-agent"
@@ -73,6 +115,26 @@ packages:
         config_dir: "config"
         dst_dir: "/opt/manager/resources/packages/agents/templates/"
 
+  Ubuntu-trusty-agent:
+    name: "Ubuntu-trusty-agent"
+    version: "3.1.0"
+    source_urls:
+      - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
+    package_path: "/agents/Ubuntu-agent"
+    sources_path: "/Ubuntu-agent/env"
+    python_modules:
+      - "billiard==2.7.3.28"
+      - "celery==3.1.17"
+      - "pika"
+      - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
+      - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
+      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/agent-installer/"
+      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
+      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
+    source_package_type: "dir"
+    destination_package_types:
+      - "tar.gz"
+
   cloudify-ubuntu-precise-agent:
     name: "cloudify-ubuntu-precise-agent"
     version: "3.1.0"
@@ -94,83 +156,6 @@ packages:
         files: "package-configuration/ubuntu-agent"
         config_dir: "config"
         dst_dir: "/opt/manager/resources/packages/agents/templates/"
-
-  cloudify-ubuntu-agent:
-    name: "cloudify-trusty-agent"
-    version: "3.1.0"
-    package_path: "/cloudify"
-    sources_path: "/tmp/Ubuntu-agent"
-    source_package_type: "dir"
-    destination_package_types:
-      - "deb"
-    bootstrap_script: "package-scripts/agent-ubuntu-bootstrap.sh"
-    bootstrap_template: "agent-ubuntu-bootstrap.template"
-    bootstrap_params:
-      file_server_path: "/opt/manager/resources"
-      dst_agent_location: "packages/agents"
-      dst_template_location: "packages/templates"
-      dst_script_location: "packages/scripts"
-    bootstrap_log: "/var/log/cloudify3-bootstrap.log"
-    config_templates:
-      config_dir:
-        files: "package-configuration/ubuntu-agent"
-        config_dir: "config"
-        dst_dir: "/opt/manager/resources/packages/agents/templates/"
-
-  cloudify-windows-agent:
-    name: "cloudify-windows-agent"
-    version: "3.1.0"
-    package_path: "/cloudify"
-    sources_path: "/agents/windows-agent"
-    source_package_type: "dir"
-    destination_package_types:
-      - "deb"
-    bootstrap_script: "package-scripts/agent-windows-bootstrap.sh"
-    bootstrap_template: "agent-windows-bootstrap.template"
-    bootstrap_params:
-      file_server_path: "/opt/manager/resources"
-      dst_agent_location: "packages/agents"
-    bootstrap_log: "/var/log/cloudify3-bootstrap.log"
-
-  debian-jessie-agent:
-    name: "debian--agent"
-    version: "3.1.0"
-    source_urls:
-      - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
-    package_path: "/agents/debian-agent"
-    sources_path: "/debian-agent/env"
-    python_modules:
-      - "billiard==2.7.3.28"
-      - "celery==3.1.17"
-      - "pika"
-      - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
-      - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
-      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/agent-installer/"
-      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
-      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
-    source_package_type: "dir"
-    destination_package_types:
-      - "tar.gz"
-
-  Ubuntu-trusty-agent:
-    name: "Ubuntu-trusty-agent"
-    version: "3.1.0"
-    source_urls:
-      - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
-    package_path: "/agents/Ubuntu-agent"
-    sources_path: "/Ubuntu-agent/env"
-    python_modules:
-      - "billiard==2.7.3.28"
-      - "celery==3.1.17"
-      - "pika"
-      - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
-      - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
-      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/agent-installer/"
-      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
-      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
-    source_package_type: "dir"
-    destination_package_types:
-      - "tar.gz"
 
   Ubuntu-precise-agent:
     name: "Ubuntu-precise-agent"
@@ -232,3 +217,18 @@ packages:
     source_package_type: "dir"
     destination_package_types:
       - "tar.gz"
+
+  cloudify-windows-agent:
+    name: "cloudify-windows-agent"
+    version: "3.1.0"
+    package_path: "/cloudify"
+    sources_path: "/agents/windows-agent"
+    source_package_type: "dir"
+    destination_package_types:
+      - "deb"
+    bootstrap_script: "package-scripts/agent-windows-bootstrap.sh"
+    bootstrap_template: "agent-windows-bootstrap.template"
+    bootstrap_params:
+      file_server_path: "/opt/manager/resources"
+      dst_agent_location: "packages/agents"
+    bootstrap_log: "/var/log/cloudify3-bootstrap.log"
