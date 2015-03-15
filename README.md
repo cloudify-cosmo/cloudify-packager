@@ -3,12 +3,11 @@ Cloudify-Packager
 
 Cloudify's configuration objects we use to build Cloudify's Management environments, agents and demo images.
 
-### Current Architecture
+### [Docker](http://www.docker.com) Images
+
+#### Current Implementation of default Management Environment Architecture
 
 ![Cloudify's Containerized Architecture](current_architecture.png)
-
-
-### [Docker](http://www.docker.com) Images
 
 Please see [Bootstrapping using Docker](http://getcloudify.org/guide/3.2/installation-bootstrapping.html#bootstrapping-using-docker) for information on our transition from packages to container-based installations.
 
