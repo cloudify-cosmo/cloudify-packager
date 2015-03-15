@@ -33,14 +33,20 @@ In addition, each image receives a [SERVICE]-NOTICE.txt file with the relevant l
 
 #### Running the containers locally
 
-A `run` file is provided which allows anyone to run all containers on a local machine.
-The `run` file contains everything that's necessary to run Cloudify's Management Environment.
+A `run` shell script is provided which allows anyone to run all containers on a local machine.
+The script contains everything that's necessary to run Cloudify's Management Environment on a local machine using a local Docker daemon.
+
+When bootstrapping Cloudify, Cloudify's CLI actually uses the same logic to run the containers using a single method that implements that logic.
+In Cloudify 3.3, this implementation will be removed and replaced with a logic in the Manager Blueprints.
 
 
 ### [packman](http://packman.readthedocs.org) configuration
 
 Packman is used to generate Cloudify's Agent Packages.
 This repository contains packman's configuration for creating the packages.
+
+In Cloudify 3.3, Packman will no longer be used to generate the agent tar files but rather only to package them into deb/rpm binaries.
+Instead, our [agent-packager](https://github.com/cloudify-cosmo/cloudify-agent-packager) will be used to generate the agent tar files providing a much more streamlined, easy to use interface to create a Cloudify agent.
 
 #### package-configuration
 
@@ -57,11 +63,11 @@ The packages.py file is the base packman configuration file containing the confi
 
 ### [Vagrant](http://www.vagrantup.com)
 
-Cloudify's packages are created using vagrant VM's (currently on AWS).
+Cloudify's packages are created using Vagrant generated VM's (currently on AWS).
 
-The Vagrant folder contains vagrant configuration for different components that are generated using packman:
+The Vagrant folder contains Vagrant configuration for different components that are generated using packman:
 
-- A Vagrant VM is initialized.
+- A VM is initialized.
 - Packman is installed on the machine alongside its requirements.
 - If a virtualenv is required, it is created and the relevant modules are installed in it.
 - Packman is used to create the environment into which the components are retrieved.
