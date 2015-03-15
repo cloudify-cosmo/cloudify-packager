@@ -1,32 +1,58 @@
 Cloudify-Packager
 =================
 
-Cloudify's packager provides tools and configuration objects we use to build Cloudify's Management environments, agents and demo images.
+Cloudify's configuration objects we use to build Cloudify's Management environments, agents and demo images.
 
-### [Docker](http://www.docker.com)
+### Current Architecture
 
-Please see [Bootstrapping using Docker](http://getcloudify.org/guide/3.1/installation-bootstrapping.html#bootstrapping-using-docker) for information on our transition from packages to container-based installations.
+![Cloudify's Containerized Architecture](current_architecture.png)
 
-To generate our [Dockerfile.template](https://github.com/cloudify-cosmo/cloudify-packager/raw/master/docker/Dockerfile.template) file, we're using [Jocker](https://github.com/nir0s/jocker).
+
+### [Docker](http://www.docker.com) Images
+
+Please see [Bootstrapping using Docker](http://getcloudify.org/guide/3.2/installation-bootstrapping.html#bootstrapping-using-docker) for information on our transition from packages to container-based installations.
+
+#### Building Cloudify's Docker Images
+
+We use [docker-compose](https://docs.docker.com/compose/) to generate our images.
+Configuration for all images can be found under the `docker` directory in a corresponding sub-directory.
+`docker-compose.yml` contains the configuration for the build.
+
+`build.sh` is for internal purposes. Please ignore.
+
+To build, execute the following:
+
+```shell
+sudo docker-compose -p cloudify build javabase pythonbase
+sudo docker-compose -p cloudify build
+```
+
+Port exposure, commands, volumes and environment variables are contained within the Dockerfiles.
+In addition, each image receives a [SERVICE]-NOTICE.txt file with the relevant licensing information.
+
+#### Running the containers locally
+
+A `run` file is provided which allows anyone to run all containers on a local machine.
+The `run` file contains everything that's necessary to run Cloudify's Management Environment.
+
 
 ### [packman](http://packman.readthedocs.org) configuration
 
-Package based provisioning will be deprecated in Cloudify 3.2!
-
-Packman is used to generate Cloudify's packages.
+Packman is used to generate Cloudify's Agent Packages.
 This repository contains packman's configuration for creating the packages.
 
 #### package-configuration
 
-The package-configuration folder contains the init scripts and configuration files for Cloudify's management environment components.
+The package-configuration folder contains the init scripts and configuration files for Cloudify's packages.
 
 #### package-templates
 
-The package-templates folder contains the bootstrap scripts that are used to install Cloudify's management environment.
+The package-templates folder contains the bootstrap scripts that are used to install Cloudify's packages.
 
 #### packages.py
 
 The packages.py file is the base packman configuration file containing the configuration of the entire stack (including agents).
+
 
 ### [Vagrant](http://www.vagrantup.com)
 
@@ -44,4 +70,4 @@ NOTE: the Windows Agent Vagrantfile uses a premade image already containing the 
 
 #### image-builder
 
-Create Vagrant box with Cloudify Manager installed for Virtualbox, AWS, HPCloud
+Creates a Vagrant box with a Cloudify Manager preinstalled for Virtualbox, AWS and HPCloud. This provides our Quickstart.
