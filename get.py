@@ -38,7 +38,7 @@ def create_agent(package, download=False):
     common = utils.Handler()
     py_handler = python.Handler()
     _prepare(package)
-    py_handler.venv(package['sources_path'])
+    py_handler.make_venv(package['sources_path'])
     if download:
         tar_file = '{0}/{1}.tar.gz'.format(
             package['sources_path'], package['name'])
@@ -76,7 +76,7 @@ def get_celery(download=False):
     common = utils.Handler()
     py_handler = python.Handler()
     _prepare(package)
-    py_handler.venv(package['sources_path'])
+    py_handler.make_venv(package['sources_path'])
     tar_file = '{0}/{1}.tar.gz'.format(
         package['sources_path'], package['name'])
     for url in package['source_urls']:
@@ -94,7 +94,7 @@ def get_manager(download=False):
     common = utils.Handler()
     py_handler = python.Handler()
     _prepare(package)
-    py_handler.venv(package['sources_path'])
+    py_handler.make_venv(package['sources_path'])
     tar_file = '{0}/{1}.tar.gz'.format(
         package['sources_path'], package['name'])
     for url in package['source_urls']:
