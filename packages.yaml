@@ -1,81 +1,4 @@
 packages:
-  cloudify-core:
-    name: cloudify-core
-    version: 3.1.0
-    depends:
-      - cloudify-components
-    package_path: /cloudify
-    sources_path: /cloudify-core
-    source_package_type: dir
-    destination_package_types:
-      - deb
-    bootstrap_script: package-scripts/cloudify-core-bootstrap.sh
-    bootstrap_template: cloudify-core-bootstrap.template
-    bootstrap_log: /var/log/cloudify-core-bootstrap.log
-    overwrite_package: false
-    config_templates:
-      params_celery:
-        init_path: /etc/init/celeryd-cloudify-management.conf
-        run_dir: /opt/celery
-      params_manager:
-        port: 8100
-        cloudify_logs_base: /var/log/cloudify
-
-  cloudify-components:
-    name: "cloudify-components"
-    version: "3.1.0"
-    package_path: "/cloudify"
-    sources_path: "/cloudify-components"
-    source_package_type: "dir"
-    destination_package_types:
-      - "deb"
-    bootstrap_script: "package-scripts/cloudify-components-bootstrap.sh"
-    bootstrap_template: "cloudify-components-bootstrap.template"
-    bootstrap_log: "/var/log/cloudify-bootstrap.log"
-    overwrite_package: false
-    bootstrap_params:
-      req_free_mem: "10000"
-      req_free_disk: "5"
-      req_cpu_cores: "1"
-      req_arch: "x86_64"
-      req_os: "precise"
-    config_templates:
-      template_file_nginx:
-        template: "package-configuration/nginx/conf/default.conf.template"
-        output_file: "default.conf"
-        config_dir: "config/nginx"
-        dst_dir: "/etc/nginx/conf.d"
-      params_nginx:
-        kibana_run_dir: "/opt/kibana3"
-        kibana_port: "3000"
-        grafana_run_dir: "/opt"
-        ui_run_dir: "/opt/cloudify-ui"
-        rest_and_ui_port: "80"
-        file_server_port: "53229"
-        file_server_dir: "/opt/manager/resources"
-      template_file_nginx_init:
-        template: "package-configuration/nginx/init/nginx.conf.template"
-        config_dir: "config/nginx"
-        output_file: "nginx.conf"
-        dst_dir: "/etc/init"
-      params_rabbitmq:
-        port: "5672"
-      params_logstash:
-        port: "9999"
-      params_elasticsearch:
-        port: "9200"
-      params_riemann:
-        langohr_jar: "/cloudify-components/riemann/langohr/langohr.jar"
-        manager_config: "/opt/manager/cloudify-manager-master/plugins/riemann-controller/riemann_controller/resources/manager.config"
-      template_file_riemann:
-        template: "package-configuration/riemann/init/riemann.conf.template"
-        config_dir: "config/riemann/init"
-        dst_dir: "/etc/init/riemann.conf"
-      template_file_rabbitmq:
-        template: "package-configuration/rabbitmq/init/rabbitmq-server.conf.template"
-        config_dir: "config/rabbitmq"
-        dst_dir: "/etc/init/rabbitmq-server.conf"
-
   cloudify-ui:
     name: "cloudify-ui"
     version: "1.0.0"
@@ -112,7 +35,7 @@ packages:
       package_path: "/cloudify"
       sources_path: "/agents/debian-agent"
       source_package_type: "dir"
-      destination_package_typess:
+      destination_package_types:
         - "deb"
       bootstrap_script: "package-scripts/agent-debian-bootstrap.sh"
       bootstrap_template: "agent-debian-bootstrap.template"
@@ -134,7 +57,7 @@ packages:
     package_path: "/cloudify"
     sources_path: "/agents/Ubuntu-agent"
     source_package_type: "dir"
-    destination_package_typess:
+    destination_package_types:
       - "deb"
     bootstrap_script: "package-scripts/agent-ubuntu-bootstrap.sh"
     bootstrap_template: "agent-ubuntu-bootstrap.template"
@@ -156,7 +79,7 @@ packages:
     package_path: "/cloudify"
     sources_path: "/agents/Ubuntu-agent"
     source_package_type: "dir"
-    destination_package_typess:
+    destination_package_types:
       - "deb"
     bootstrap_script: "package-scripts/agent-ubuntu-bootstrap.sh"
     bootstrap_template: "agent-ubuntu-bootstrap.template"
@@ -178,7 +101,7 @@ packages:
     package_path: "/cloudify"
     sources_path: "/tmp/Ubuntu-agent"
     source_package_type: "dir"
-    destination_package_typess:
+    destination_package_types:
       - "deb"
     bootstrap_script: "package-scripts/agent-ubuntu-bootstrap.sh"
     bootstrap_template: "agent-ubuntu-bootstrap.template"
@@ -200,7 +123,7 @@ packages:
     package_path: "/cloudify"
     sources_path: "/agents/windows-agent"
     source_package_type: "dir"
-    destination_package_typess:
+    destination_package_types:
       - "deb"
     bootstrap_script: "package-scripts/agent-windows-bootstrap.sh"
     bootstrap_template: "agent-windows-bootstrap.template"
@@ -208,25 +131,26 @@ packages:
       file_server_path: "/opt/manager/resources"
       dst_agent_location: "packages/agents"
     bootstrap_log: "/var/log/cloudify3-bootstrap.log"
-    debian-jessie-agent:
-      name: "debian--agent"
-      version: "3.1.0"
-      source_urls:
-        - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
-      package_path: "/agents/debian-agent"
-      sources_path: "/debian-agent/env"
-      python_modules:
-        - "billiard==2.7.3.28"
-        - "celery==3.1.17"
-        - "pika"
-        - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
-        - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
-        - "/Ubuntu-agent/env/cloudify-manager-master/plugins/agent-installer/"
-        - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
-        - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
-      source_package_type: "dir"
-      destination_package_typess:
-        - "tar.gz"
+
+  debian-jessie-agent:
+    name: "debian--agent"
+    version: "3.1.0"
+    source_urls:
+      - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
+    package_path: "/agents/debian-agent"
+    sources_path: "/debian-agent/env"
+    python_modules:
+      - "billiard==2.7.3.28"
+      - "celery==3.1.17"
+      - "pika"
+      - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
+      - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
+      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/agent-installer/"
+      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
+      - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
+    source_package_type: "dir"
+    destination_package_types:
+      - "tar.gz"
 
   Ubuntu-trusty-agent:
     name: "Ubuntu-trusty-agent"
@@ -245,7 +169,7 @@ packages:
       - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
       - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
     source_package_type: "dir"
-    destination_package_typess:
+    destination_package_types:
       - "tar.gz"
 
   Ubuntu-precise-agent:
@@ -265,7 +189,7 @@ packages:
       - "/Ubuntu-agent/env/cloudify-manager-master/plugins/plugin-installer/"
       - "/Ubuntu-agent/env/cloudify-manager-master/plugins/windows-agent-installer/"
     source_package_type: "dir"
-    destination_package_typess:
+    destination_package_types:
       - "tar.gz"
 
   cloudify-centos-final-agent:
@@ -274,7 +198,7 @@ packages:
     package_path: "/cloudify"
     sources_path: "/agents/centos-agent"
     source_package_type: "dir"
-    destination_package_typess:
+    destination_package_types:
       - "deb"
     bootstrap_script: "package-scripts/agent-centos-bootstrap.sh"
     bootstrap_template: "agent-centos-bootstrap.template"
@@ -306,5 +230,5 @@ packages:
       - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
       - "/centos-agent/env/cloudify-manager-master/plugins/plugin-installer/"
     source_package_type: "dir"
-    destination_package_typess:
+    destination_package_types:
       - "tar.gz"
