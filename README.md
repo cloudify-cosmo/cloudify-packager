@@ -9,8 +9,6 @@ Cloudify's configuration objects we use to build Cloudify's Management environme
 
 ![Cloudify's Containerized Architecture](current_architecture.png)
 
-Please see [Bootstrapping using Docker](http://getcloudify.org/guide/3.2/installation-bootstrapping.html#bootstrapping-using-docker) for information on our transition from packages to container-based installations.
-
 #### Building Cloudify's Docker Images
 
 We use [docker-compose](https://docs.docker.com/compose/) to generate our images.
