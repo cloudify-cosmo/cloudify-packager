@@ -20,8 +20,6 @@ from packman import utils
 from packman import python
 from packman import retrieve
 
-from fabric.api import *  # NOQA
-
 lgr = logger.init()
 
 

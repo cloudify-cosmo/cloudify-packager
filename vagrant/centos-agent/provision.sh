@@ -17,18 +17,22 @@ sudo yum install yum-downloadonly wget mlocate yum-utils python-devel libyaml-de
 sudo gem install fpm --no-rdoc --no-ri
 
 # install pip
-sudo wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py &&
-sudo /usr/bin/python get-pip.py &&
+function install_pip
+{
+	# sudo wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py &&
+	# sudo /usr/bin/python get-pip.py &&
+	curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
+}
 
 # install packman
-git clone https://github.com/cloudify-cosmo/packman.git
-pushd packman
-	if [ -n "$PACKMAN_SHA" ]; then
-		git reset --hard $PACKMAN_SHA
-	fi
-	sudo pip install .
-popd
-
+# git clone https://github.com/cloudify-cosmo/packman.git
+# pushd packman
+# 	if [ -n "$PACKMAN_SHA" ]; then
+# 		git reset --hard $PACKMAN_SHA
+# 	fi
+# 	sudo pip install .
+# popd
+sudo pip install https://github.com/cloudify-cosmo/packman/archive/pkm-overhaul.zip
 
 # install virtualenv
 sudo pip install virtualenv==1.11.4 &&
