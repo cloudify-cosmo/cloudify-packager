@@ -1,18 +1,12 @@
 #! /bin/bash -e
 
-PACKAGER_DOCKER_PATH=$1/docker
+CURR_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 PLUGINS_BRANCH=$2
 CORE_BRANCH=$3
 
-if [ -z $1 ]
-  then
-    echo "No arguments supplied. Using default"
-    PACKAGER_DOCKER_PATH=$(pwd)
-fi
-
 build_cloudify_images()
 {
-  pushd $PACKAGER_DOCKER_PATH
+  pushd $CURR_DIR
     # docker build sometimes fails. Retry
     echo building javabase image
     for i in 1 2 3 4 5 6
@@ -34,7 +28,7 @@ build_cloudify_images()
 
 modify_dockerfiles()
 {
-  FILES=$(find /tmp/cloudify-packager -name "Dockerfile" -print)
+  FILES=$(find $CURR_DIR -name "Dockerfile" -print)
   for file in $FILES
   do
     sed -i 's/DSL_VERSION=master/DSL_VERSION='"$CORE_BRANCH"'/g' $file
