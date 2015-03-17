@@ -14,6 +14,7 @@ function install_prereqs
 		sudo yum -y update &&
 		sudo yum install -y yum-downloadonly wget mlocate yum-utils &&
 		sudo yum install -y python-devel libyaml-devel ruby rubygems ruby-devel make gcc git g++
+		sudo yum install -y zeromq-devel -c http://download.opensuse.org/repositories/home:/fengshuo:/zeromq/CentOS_CentOS-6/home:fengshuo:zeromq.repo
 	else
 		echo 'unsupported package manager, exiting'
 		exit 1
@@ -116,9 +117,9 @@ echo '# create package resources'
 sudo pkm get -c ${1}-agent &&
 
 echo '# GET PROCESS'
+# AGENT_VENV="/agent/env"
 # we might not need this. it might suffice considering the current implementation to do /agent/env since
 # the agent installer untars using --strip==1 anyway
-# AGENT_VENV=/agent/env
 if [ "${AGENT}" == "Ubuntu-trusty" ]; then
 	AGENT_VENV="/Ubuntu-agent/env"
 elif [ "${AGENT}" == "Ubuntu-precise" ]; then
@@ -136,11 +137,12 @@ install_module "cloudify-script-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
 install_module "cloudify-diamond-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
 install_manager_modules "cloudify-manager" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 
-# create package
+# create agent tar file
 sudo pkm pack -c ${1}-agent &&
+# convert agent name to lower case and create deb/rpm
+AGENT_ID=$(echo ${AGENT} | tr '[:upper:]' '[:lower:]')
+sudo pkm pack -c cloudify-${AGENT_ID}-agent
 # there is a nicer way to do this by greping and ignoring the case but... whatever.
-# echo ${AGENT} | tr '[:upper:]' '[:lower:]' | pkm pack -c cloudify-${1}-agent
-X=$(echo ${AGENT} | tr '[:upper:]' '[:lower:]') | sudo pkm pack -c cloudify-${X}-agent
 # if [ "${AGENT}" == "Ubuntu-trusty" ]; then
 # 	sudo pkm pack -c cloudify-ubuntu-trusty-agent
 # elif [ "${AGENT}" == "Ubuntu-precise" ]; then
