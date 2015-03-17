@@ -3,10 +3,10 @@ function install_prereqs
 	if which apt-get; then
 		# ubuntu
 		sudo apt-get -y update &&
-		# trusty
-		sudo apt-get install -y software-properties-common ||
 		# precise
-		sudo apt-get install -y python-software-properties &&
+		sudo apt-get install -y python-software-properties ||
+		# trusty
+		sudo apt-get install -y software-properties-common &&
 		sudo add-apt-repository -y ppa:git-core/ppa &&
 		sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev g++
 	elif which yum; then
@@ -40,12 +40,7 @@ function install_fpm
 
 function install_pip
 {
-	# if which yum; then
-	# sudo wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py &&
-	# sudo /usr/bin/python get-pip.py &&
-	# elif which apt-get; then
 	curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
-	# fi
 }
 
 function install_module
@@ -123,6 +118,7 @@ sudo pkm get -c ${1}-agent &&
 echo '# GET PROCESS'
 # we might not need this. it might suffice considering the current implementation to do /agent/env since
 # the agent installer untars using --strip==1 anyway
+# AGENT_VENV=/agent/env
 if [ "${AGENT}" == "Ubuntu-trusty" ]; then
 	AGENT_VENV="/Ubuntu-agent/env"
 elif [ "${AGENT}" == "Ubuntu-precise" ]; then
@@ -143,12 +139,14 @@ install_manager_modules "cloudify-manager" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 # create package
 sudo pkm pack -c ${1}-agent &&
 # there is a nicer way to do this by greping and ignoring the case but... whatever.
-if [ "${AGENT}" == "Ubuntu-trusty" ]; then
-	sudo pkm pack -c cloudify-ubuntu-trusty-agent
-elif [ "${AGENT}" == "Ubuntu-precise" ]; then
-	sudo pkm pack -c cloudify-ubuntu-precise-agent
-elif [ "${AGENT}" == "centos-Final" ]; then
-	sudo pkm pack -c cloudify-centos-final-agent
-elif [ "${AGENT}" == "debian-jessie" ]; then
-	sudo pkm pack -c cloudify-debian-jessie-agent
-fi
+# echo ${AGENT} | tr '[:upper:]' '[:lower:]' | pkm pack -c cloudify-${1}-agent
+X=$(echo ${AGENT} | tr '[:upper:]' '[:lower:]') | sudo pkm pack -c cloudify-${X}-agent
+# if [ "${AGENT}" == "Ubuntu-trusty" ]; then
+# 	sudo pkm pack -c cloudify-ubuntu-trusty-agent
+# elif [ "${AGENT}" == "Ubuntu-precise" ]; then
+# 	sudo pkm pack -c cloudify-ubuntu-precise-agent
+# elif [ "${AGENT}" == "centos-Final" ]; then
+# 	sudo pkm pack -c cloudify-centos-final-agent
+# elif [ "${AGENT}" == "debian-jessie" ]; then
+# 	sudo pkm pack -c cloudify-debian-jessie-agent
+# fi
