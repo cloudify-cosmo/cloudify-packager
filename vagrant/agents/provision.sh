@@ -14,6 +14,7 @@ function install_prereqs
 		sudo yum -y update &&
 		sudo yum install -y yum-downloadonly wget mlocate yum-utils &&
 		sudo yum install -y python-devel libyaml-devel ruby rubygems ruby-devel make gcc git g++
+		# this is required to build pyzmq under centos/RHEL
 		sudo yum install -y zeromq-devel -c http://download.opensuse.org/repositories/home:/fengshuo:/zeromq/CentOS_CentOS-6/home:fengshuo:zeromq.repo
 	else
 		echo 'unsupported package manager, exiting'
