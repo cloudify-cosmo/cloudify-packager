@@ -184,7 +184,7 @@ Vagrant.configure('2') do |config|
 
     # shell provisioning uses bash, so use cmd to run batch script
     windows.vm.provision "shell" do |shell|
-      shell.inline = 'cmd /c "c:\\cygwin64\\home\\vagrant\\provision.windows.bat"'
+      shell.inline = 'cmd /c "c:\\cygwin64\\home\\vagrant\\provision.bat"'
       shell.privileged = false
     end
   end

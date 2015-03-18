@@ -103,7 +103,7 @@ CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
 
 install_prereqs &&
-if which apt-get; then
+if ! which ruby; then
 	install_ruby
 fi
 install_fpm &&
@@ -143,13 +143,3 @@ sudo pkm pack -c ${1}-agent &&
 # convert agent name to lower case and create deb/rpm
 AGENT_ID=$(echo ${AGENT} | tr '[:upper:]' '[:lower:]')
 sudo pkm pack -c cloudify-${AGENT_ID}-agent
-# there is a nicer way to do this by greping and ignoring the case but... whatever.
-# if [ "${AGENT}" == "Ubuntu-trusty" ]; then
-# 	sudo pkm pack -c cloudify-ubuntu-trusty-agent
-# elif [ "${AGENT}" == "Ubuntu-precise" ]; then
-# 	sudo pkm pack -c cloudify-ubuntu-precise-agent
-# elif [ "${AGENT}" == "centos-Final" ]; then
-# 	sudo pkm pack -c cloudify-centos-final-agent
-# elif [ "${AGENT}" == "debian-jessie" ]; then
-# 	sudo pkm pack -c cloudify-debian-jessie-agent
-# fi
