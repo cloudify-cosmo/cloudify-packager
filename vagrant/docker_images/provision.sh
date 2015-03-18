@@ -19,6 +19,8 @@ prepare_env()
 
   echo installing docker compose
   sudo pip install docker-compose
+  # docker-compose requires requests in version 2.2.1. will probably change.
+  sudo pip install requests==2.2.1
 
   echo exposing docker api
   sudo /bin/sh -c 'echo DOCKER_OPTS=\"-H tcp://127.0.0.1:4243 -H unix:///var/run/docker.sock\" >> /etc/default/docker'
