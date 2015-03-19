@@ -43,6 +43,7 @@ function install_fpm
 function install_pip
 {
 	curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
+	sudo pip install boto
 }
 
 function install_module
