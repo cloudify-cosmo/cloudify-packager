@@ -391,6 +391,7 @@ PACKAGES = {
                 "gunicorn_conf_path": "{0}/manager/config/conf/guni.conf".format(VIRTUALENVS_PATH),
                 "unicorn_user": "root",
                 "rest_port": "8100",
+                "rest_internal_port": "8101",
                 "gunicorn_log_path": "{0}/gunicorn.log".format(CLOUDIFY_LOGS_PATH),
                 "gunicorn_access_log_path": "{0}/gunicorn-access.log".format(CLOUDIFY_LOGS_PATH),
                 "rest_service_log_path": "{0}/cloudify-rest-service.log".format(CLOUDIFY_LOGS_PATH),
