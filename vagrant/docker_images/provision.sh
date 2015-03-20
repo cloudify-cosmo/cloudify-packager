@@ -16,6 +16,9 @@ prepare_env()
 
   echo installing pip
   sudo apt-get install -y python-pip
+  
+  echo installing boto
+  sudo pip install boto
 
   echo installing docker compose
   sudo pip install docker-compose
