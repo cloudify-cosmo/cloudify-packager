@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+function state_error
+{
+    echo "ERROR: ${1:-UNKNOWN} (status $?)" 1>&2
+    exit 1
+}
+
+PKG_NAME="{{ name }}"
+PKG_DIR="{{ sources_path }}"
+VERSION="{{ version }}"
+
+# PKG_NAME="cloudify-ubuntu-trusty-cli"
+# PKG_DIR="/home/nir0s/Dropbox/Gigaspaces/cloudify/wheelhouse"
+# VERSION="3.1.0"
+
+echo -e "\nInstalling ${PKG_NAME} version ${VERSION}...\n"
+
+if ! which pip >> /dev/null; then
+    state_error "pip not in path. Failed to install Cloudify."
+fi
+if ! which virtualenv >> /dev/null; then
+    echo "Installing Virtualenv..."
+    pip install --use-wheel --no-index --find-links=${PKG_DIR} virtualenv
+fi
+echo "Creating Virtualenv /cloudify..."
+virtualenv /cloudify
+if ! which cfy >> /dev/null; then
+    /cloudify/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR} cloudify
+else
+    state_error "Cloudify's CLI appears to be installed already."
+fi
+
+# echo "Cleaning up..."
+# rm -rf /cfy
+echo -e "${PKG_NAME} ${VERSION} Installation completed successfully!\n"
