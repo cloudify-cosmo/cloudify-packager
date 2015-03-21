@@ -14,8 +14,6 @@ function install_prereqs
         sudo yum -y update &&
         sudo yum install -y yum-downloadonly wget mlocate yum-utils &&
         sudo yum install -y python-devel libyaml-devel ruby rubygems ruby-devel make gcc git g++
-        # this is required to build pyzmq under centos/RHEL
-        sudo yum install -y zeromq-devel -c http://download.opensuse.org/repositories/home:/fengshuo:/zeromq/CentOS_CentOS-6/home:fengshuo:zeromq.repo
     else
         echo 'unsupported package manager, exiting'
         exit 1
@@ -43,7 +41,6 @@ function install_fpm
 function install_pip
 {
     curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
-    sudo pip install boto
 }
 
 function install_module
@@ -75,33 +72,8 @@ function install_module
     fi
 }
 
-function install_manager_modules
-{
-    module=$1
-    venv=$2
-    tag=$3
-    git clone https://github.com/cloudify-cosmo/${module}.git
-    pushd cloudify-manager
-        git checkout -b tmp_branch ${tag}
-        git log -1
-        pushd plugins/plugin-installer
-          sudo ${venv}/bin/pip install .
-        popd
-        pushd plugins/agent-installer
-          sudo ${venv}/bin/pip install .
-        popd
-        pushd plugins/windows-agent-installer
-          sudo ${venv}/bin/pip install .
-        popd
-        pushd plugins/windows-plugin-installer
-          sudo ${venv}/bin/pip install .
-        popd
-    popd
-}
-
-AGENT=$1
-CORE_TAG_NAME="master"
-PLUGINS_TAG_NAME="master"
+CORE_TAG_NAME="3.2m6"
+PLUGINS_TAG_NAME="1.2m6"
 
 install_prereqs &&
 if ! which ruby; then
@@ -110,37 +82,17 @@ fi
 install_fpm &&
 install_pip &&
 install_module "https://github.com/cloudify-cosmo/packman/archive/pkm-overhaul.zip" &&
-install_module "virtualenv==12.0.7" &&
+install_module "wheel==0.24.0" &&
 
-cd /cloudify-packager/ &&
-
-# create package resources
-echo '# create package resources'
-sudo pkm get -c ${1}-agent &&
+sudo mkdir -p /cfy && cd /cfy &&
 
 echo '# GET PROCESS'
-# AGENT_VENV="/agent/env"
-# we might not need this. it might suffice considering the current implementation to do /agent/env since
-# the agent installer untars using --strip==1 anyway
-if [ "${AGENT}" == "Ubuntu-trusty" ]; then
-    AGENT_VENV="/Ubuntu-agent/env"
-elif [ "${AGENT}" == "Ubuntu-precise" ]; then
-    AGENT_VENV="/Ubuntu-agent/env"
-elif [ "${AGENT}" == "centos-Final" ]; then
-    AGENT_VENV="/centos-agent/env"
-elif [ "${AGENT}" == "debian-jessie" ]; then
-    AGENT_VENV="/debian-agent/env"
-fi
-install_module "celery==3.1.17" "${AGENT_VENV}" &&
-install_module "pyzmq==14.4.0" "${AGENT_VENV}" &&
-install_module "cloudify-rest-client" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
-install_module "cloudify-plugins-common" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
-install_module "cloudify-script-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
-install_module "cloudify-diamond-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
-install_manager_modules "cloudify-manager" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
+sudo pip wheel virtualenv==12.0.7 &&
+sudo pip wheel https://github.com/cloudify-cosmo/cloudify-cli/archive/${CORE_TAG_NAME}.tar.gz &&
+sudo pip wheel https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/${PLUGINS_TAG_NAME}.tar.gz &&
+sudo pip wheel https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/${CORE_TAG_NAME}.tar.gz &&
+sudo pip wheel https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/${CORE_TAG_NAME}.tar.gz &&
+sudo pip wheel https://github.com/cloudify-cosmo/cloudify-rest-client/archive/${CORE_TAG_NAME}.tar.gz &&
 
-# create agent tar file
-sudo pkm pack -c ${1}-agent &&
-# convert agent name to lower case and create deb/rpm
-AGENT_ID=$(echo ${AGENT} | tr '[:upper:]' '[:lower:]')
-sudo pkm pack -c cloudify-${AGENT_ID}-agent
+cd /cloudify-packager/ &&
+sudo pkm pack -c cloudify-linux-cli
