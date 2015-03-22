@@ -94,7 +94,7 @@ server {
     proxy_set_header   Host             $http_host;
   }
 
-  include "cloudify-rest-location.conf";
+  include "/etc/service/nginx/cloudify-rest-location.conf";
 
   location ~ ^/resources {
     rewrite            /resources/(.*) /$1 break;
@@ -116,7 +116,7 @@ server {
   access_log          /var/log/nginx/cloudify-internal.access.log;
   error_log           /var/log/nginx/cloudify-internal.error.log;
 
-  include "cloudify-rest-location.conf";
+  include "/etc/service/nginx/cloudify-rest-location.conf";
 
 }
 
