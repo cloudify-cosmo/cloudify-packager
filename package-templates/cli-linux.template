@@ -7,7 +7,11 @@ function state_error
 }
 
 PKG_NAME="{{ name }}"
-PKG_DIR="{{ sources_path }}"
+if [ "$1" == "local" ]; then
+    PKG_DIR="."
+else
+    PKG_DIR="{{ sources_path }}"
+fi
 VERSION="{{ version }}"
 
 echo -e "\nInstalling ${PKG_NAME} version ${VERSION}...\n"
@@ -32,7 +36,7 @@ function install_cloudify
     echo "Creating Virtualenv /cloudify..."
     virtualenv /cloudify &&
     if ! which cfy >> /dev/null; then
-        /cloudify/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR} cloudify
+        /cloudify/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR} cloudify --pre
         # when the cli is built for py2.6, unless argparse is put within `install_requires`, we'll have to enable this:
         # if which yum; then
         #   /cloudify/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR} argparse=#SOME_VERSION#

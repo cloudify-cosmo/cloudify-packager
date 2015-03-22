@@ -8,7 +8,7 @@ function install_prereqs
         # trusty
         sudo apt-get install -y software-properties-common &&
         sudo add-apt-repository -y ppa:git-core/ppa &&
-        sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev g++
+        sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev g++ rpm
     elif which yum; then
         # centos/REHL
         sudo yum -y update &&
@@ -40,7 +40,11 @@ function install_fpm
 
 function install_pip
 {
-    curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
+    if which apt-get; then
+        curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
+    else
+        curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python2.7
+    fi
 }
 
 function install_module
@@ -72,12 +76,33 @@ function install_module
     fi
 }
 
-CORE_TAG_NAME="3.2m6"
-PLUGINS_TAG_NAME="1.2m6"
+function install_py27
+{
+    # install python and additions
+    # http://bicofino.io/blog/2014/01/16/installing-python-2-dot-7-6-on-centos-6-dot-5/
+    sudo yum groupinstall -y 'development tools'
+    sudo yum install -y zlib-devel bzip2-devel openssl-devel xz-libs
+    sudo mkdir /py27
+    cd /py27
+    sudo wget http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tar.xz
+    sudo xz -d Python-2.7.6.tar.xz
+    sudo tar -xvf Python-2.7.6.tar
+    cd Python-2.7.6
+    sudo ./configure --prefix=/usr
+    sudo make
+    sudo make altinstall
+}
+
+
+CORE_TAG_NAME="master"
+PLUGINS_TAG_NAME="master"
 
 install_prereqs &&
-if ! which ruby; then
+if which apt-get; then
     install_ruby
+fi
+if which yum; then
+    install_py27
 fi
 install_fpm &&
 install_pip &&
@@ -92,11 +117,11 @@ sudo pip wheel virtualenv==12.0.7 &&
 # if which yum; then
 #   pip wheel argparse==#SOME_VERSION#
 # fi
-sudo pip wheel https://github.com/cloudify-cosmo/cloudify-cli/archive/${CORE_TAG_NAME}.tar.gz &&
-sudo pip wheel https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/${PLUGINS_TAG_NAME}.tar.gz &&
-sudo pip wheel https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/${CORE_TAG_NAME}.tar.gz &&
-sudo pip wheel https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/${CORE_TAG_NAME}.tar.gz &&
-sudo pip wheel https://github.com/cloudify-cosmo/cloudify-rest-client/archive/${CORE_TAG_NAME}.tar.gz &&
 
-cd /cloudify-packager/ &&
-sudo pkm pack -c cloudify-linux-cli -v
+sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-rest-client@${CORE_TAG_NAME} --find-links=wheelhouse &&
+sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-dsl-parser@${CORE_TAG_NAME} --find-links=wheelhouse &&
+sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-plugins-common@${CORE_TAG_NAME} --find-links=wheelhouse &&
+sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-script-plugin@${PLUGINS_TAG_NAME} --find-links=wheelhouse &&
+sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-cli@${CORE_TAG_NAME} --find-links=wheelhouse
+
+cd /cloudify-packager/ && sudo pkm pack -c cloudify-linux-cli -v
