@@ -124,7 +124,7 @@ VARS = {
             "flask_securest": "git+git://github.com/cloudify-cosmo/flask-securest.git@0.5",
             "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
         },
-        "ports": ["8100"],
+        "ports": ["8100", "8101"],
         "persistence_path": ["/opt/manager/resources", "/var/log/cloudify"],
     },
     "webui": {
