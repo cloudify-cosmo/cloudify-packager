@@ -236,11 +236,12 @@ packages:
   cloudify-linux-cli:
     name: "cloudify-linux-cli"
     version: "3.1.0"
-    package_path: "/cfy"
+    package_path: "/cloudify"
     sources_path: "/cfy/wheelhouse"
     source_package_type: "dir"
     destination_package_types:
       - "deb"
       - "rpm"
+      - "tar.gz"
     bootstrap_script: "package-scripts/cli-linux-bootstrap.sh"
     bootstrap_template: "cli-linux.template"

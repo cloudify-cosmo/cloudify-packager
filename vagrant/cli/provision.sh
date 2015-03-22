@@ -13,7 +13,7 @@ function install_prereqs
         # centos/REHL
         sudo yum -y update &&
         sudo yum install -y yum-downloadonly wget mlocate yum-utils &&
-        sudo yum install -y python-devel libyaml-devel ruby rubygems ruby-devel make gcc git g++
+        sudo yum install -y python-devel libyaml-devel ruby rubygems ruby-devel make gcc git g++ rpm-build
     else
         echo 'unsupported package manager, exiting'
         exit 1
@@ -88,6 +88,10 @@ sudo mkdir -p /cfy && cd /cfy &&
 
 echo '# GET PROCESS'
 sudo pip wheel virtualenv==12.0.7 &&
+# when the cli is built for py2.6, unless argparse is put within `install_requires`, we'll have to enable this:
+# if which yum; then
+#   pip wheel argparse==#SOME_VERSION#
+# fi
 sudo pip wheel https://github.com/cloudify-cosmo/cloudify-cli/archive/${CORE_TAG_NAME}.tar.gz &&
 sudo pip wheel https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/${PLUGINS_TAG_NAME}.tar.gz &&
 sudo pip wheel https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/${CORE_TAG_NAME}.tar.gz &&
