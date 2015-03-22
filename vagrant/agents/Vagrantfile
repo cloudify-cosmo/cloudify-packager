@@ -171,7 +171,7 @@ Vagrant.configure('2') do |config|
 
       aws.keypair_name = "windows_agent_packager"
       override.ssh.username = "Administrator"
-      override.ssh.private_key_path = AWS_PK_PATH
+      override.ssh.private_key_path = "/home/.ssh/aws/windows_agent_packager.pem"
 
       aws.tags = {
           "Name" => "windows agent packager",
