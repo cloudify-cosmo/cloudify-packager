@@ -99,4 +99,4 @@ sudo pip wheel https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/${C
 sudo pip wheel https://github.com/cloudify-cosmo/cloudify-rest-client/archive/${CORE_TAG_NAME}.tar.gz &&
 
 cd /cloudify-packager/ &&
-sudo pkm pack -c cloudify-linux-cli
+sudo pkm pack -c cloudify-linux-cli -v
