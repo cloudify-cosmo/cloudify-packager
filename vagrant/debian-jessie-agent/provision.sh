@@ -25,7 +25,7 @@ plugins_tag_name=""
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python &&
 
 # install packman
-sudo pip install repex==0.1.0
+sudo pip install packman==0.5.0
 
 # install virtualenv
 sudo pip install virtualenv==1.11.4 &&
