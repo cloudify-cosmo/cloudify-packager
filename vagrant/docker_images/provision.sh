@@ -15,15 +15,15 @@ prepare_env()
   install_docker
 
   echo installing pip
-  sudo apt-get install -y python-pip
-  
+  curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
+
   echo installing boto
-  sudo pip install boto
+  sudo pip install boto==2.36.0
 
   echo installing docker compose
-  sudo pip install docker-compose
   # docker-compose requires requests in version 2.2.1. will probably change.
-  sudo pip install requests==2.2.1
+  sudo pip install requests==2.2.1 --upgrade
+  sudo pip install docker-compose==1.1.0
 
   echo exposing docker api
   sudo /bin/sh -c 'echo DOCKER_OPTS=\"-H tcp://127.0.0.1:4243 -H unix:///var/run/docker.sock\" >> /etc/default/docker'
@@ -54,7 +54,7 @@ build_images()
   popd
 }
 
-save_images()
+save_commerical()
 {
   sudo docker save cloudify_restservice \
                    cloudify_amqpinflux \
@@ -67,6 +67,21 @@ save_images()
                    cloudify_influxdb \
                    cloudify_webui \
                    cloudify_fileserver > $1
+                   # TODO: add UI license file to tar
+}
+
+save_oss()
+{
+    sudo docker save cloudify_restservice \
+                   cloudify_amqpinflux \
+                   cloudify_riemann \
+                   cloudify_mgmtworker \
+                   cloudify_frontend \
+                   cloudify_logstash \
+                   cloudify_elasticsearch \
+                   cloudify_rabbitmq \
+                   cloudify_influxdb \
+                   cloudify_fileserver > $1
 }
 
 main()
@@ -78,7 +93,8 @@ main()
   build_images
 
   echo saving images to /tmp/cloudify_images.tar
-  save_images /tmp/cloudify_images.tar
+  save_commercial /tmp/cloudify_commercial.tar
+  save_oss /tmp/cloudify_oss.tar
 }
 
 main

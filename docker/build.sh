@@ -64,7 +64,7 @@ build_images()
   build_cloudify_images
 }
 
-main() 
+main()
 {
   build_images
 }
