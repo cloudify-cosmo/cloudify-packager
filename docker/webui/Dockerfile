@@ -14,12 +14,11 @@ RUN apt-get update && \
     mkdir -p ${WEBUI_HOME}/grafana && \
     curl --fail --silent http://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.gz -o /tmp/nodejs.tar.gz && \
     tar -xzvf /tmp/nodejs.tar.gz -C ${NODEJS_HOME} --strip-components=1 && \
-    curl --fail --silent http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/${WEBUI_VERSION}/m4-RELEASE/cloudify-ui_${WEBUI_VERSION}-m4-b173_amd64.deb -o /tmp/cloudify-webui.deb && \
-    dpkg-deb -x /tmp/cloudify-webui.deb /tmp/cloudify-webui/ && \
-    tar -xzvf /tmp/cloudify-webui/packages/cloudify-ui/cosmo-ui* -C ${WEBUI_HOME} --strip-components=1 && \
-    tar -xzvf /tmp/cloudify-webui/packages/cloudify-ui/grafana* -C ${WEBUI_HOME}/grafana --strip-components=1 && \
-    cp /tmp/cloudify-webui/packages/cloudify-ui/config/grafana/config.js ${WEBUI_HOME}/grafana/ && \
-    # current workaround for missing dependency
+    curl --fail --silent http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/.../ui.tar.gz -o /tmp/ui.tar.gz && \
+    curl --fail --silent http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/.../grafana.tar.gz -o /tmp/grafana.tar.gz && \
+    tar -xzvf /tmp/ui.tar.gz -C ${WEBUI_HOME} --strip-components=1 && \
+    tar -xzvf /tmp/grafana.tar.gz -C ${WEBUI_HOME}/grafana --strip-components=1 && \
+    # Current workaround for missing dependencies. This should be removed to reflect problems with the build process.
     ${NODEJS_HOME}/bin/npm install --prefix ${WEBUI_HOME} request tar && \
     rm -rf /var/lib/apt/lists && \
     rm -rf /tmp/* && \
@@ -27,6 +26,7 @@ RUN apt-get update && \
     apt-get autoremove -y
 
 COPY config/gsPresets.json /opt/cloudify-ui/backend/gsPresets.json
+COPY config/grafanaConfig.js ${WEBUI_HOME}/grafana/config.js
 
 EXPOSE 9001
 VOLUME ${WEBUI_HOME}
