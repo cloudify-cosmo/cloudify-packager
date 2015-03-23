@@ -1,7 +1,6 @@
 REST_CLIENT_SHA=""
 COMMON_PLUGIN_SHA=""
 MANAGER_SHA=""
-PACKMAN_SHA=""
 SCRIPTS_PLUGIN_SHA=""
 DIAMOND_PLUGIN_SHA=""
 
@@ -30,13 +29,7 @@ echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc 
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
 
 # install packman
-git clone https://github.com/cloudify-cosmo/packman.git
-pushd packman
-	if [ -n "$PACKMAN_SHA" ]; then
-		git reset --hard $PACKMAN_SHA
-	fi
-	sudo pip install .
-popd
+sudo pip install packman==0.5.0
 
 # install virtualenv
 sudo pip install virtualenv==1.11.4 &&
