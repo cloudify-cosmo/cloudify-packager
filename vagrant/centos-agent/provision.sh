@@ -20,7 +20,7 @@ sudo wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py &&
 sudo /usr/bin/python get-pip.py &&
 
 # install packman
-sudo pip install repex==0.1.0
+sudo pip install packman==0.5.0
 
 
 # install virtualenv
