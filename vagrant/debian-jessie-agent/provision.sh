@@ -25,7 +25,12 @@ plugins_tag_name=""
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python &&
 
 # install packman
-sudo pip install packman==0.5.0
+git clone https://github.com/cloudify-cosmo/packman.git
+pushd packman
+	git checkout -b tmp_branch $core_tag_name
+	git log -1
+	sudo pip install .
+popd
 
 # install virtualenv
 sudo pip install virtualenv==1.11.4 &&
