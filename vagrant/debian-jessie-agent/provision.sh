@@ -1,5 +1,5 @@
-core_tag_name="master"
-plugins_tag_name="master"
+core_tag_name=""
+plugins_tag_name=""
 
 #installed in debian image
 #   update and install prereqs
@@ -25,12 +25,7 @@ plugins_tag_name="master"
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python &&
 
 # install packman
-git clone https://github.com/cloudify-cosmo/packman.git
-pushd packman
-	git checkout -b tmp_branch $core_tag_name
-	git log -1
-	sudo pip install .
-popd
+sudo pip install repex==0.1.0
 
 # install virtualenv
 sudo pip install virtualenv==1.11.4 &&
