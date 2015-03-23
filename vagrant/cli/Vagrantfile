@@ -25,7 +25,7 @@ DEBIAN_JESSIE_BOX_NAME = 'binarydata/debian-jessie'
 CENTOS_FINAL_BOX_NAME = 'chef/centos-6.5'
 
 Vagrant.configure('2') do |config|
-  config.vm.define "debian_jessie_aws" do |debian_jessie|
+  config.vm.define "debian_jessie_cli_aws" do |debian_jessie|
     # dummy box, will be overriden
     config.nfs.functional = false
     debian_jessie.vm.box = "dummy"
@@ -56,11 +56,10 @@ Vagrant.configure('2') do |config|
     rsync__args: ["--verbose", "--rsync-path='sudo rsync'"]
     debian_jessie.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "debian-jessie"
       s.privileged = false
     end
   end
-  config.vm.define "ubuntu_trusty_aws" do |ubuntu_trusty|
+  config.vm.define "ubuntu_trusty_cli_aws" do |ubuntu_trusty|
     # dummy box, will be overriden
     ubuntu_trusty.vm.box = "dummy"
     ubuntu_trusty.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
@@ -88,11 +87,10 @@ Vagrant.configure('2') do |config|
     ubuntu_trusty.vm.synced_folder "../../", "/cloudify-packager", create: true
     ubuntu_trusty.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-trusty"
       s.privileged = false
     end
   end
-  config.vm.define "ubuntu_precise_aws" do |ubuntu_precise|
+  config.vm.define "ubuntu_precise_cli_aws" do |ubuntu_precise|
     # dummy box, will be overriden
     ubuntu_precise.vm.box = "dummy"
     ubuntu_precise.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
@@ -120,11 +118,10 @@ Vagrant.configure('2') do |config|
     ubuntu_precise.vm.synced_folder "../../", "/cloudify-packager", create: true
     ubuntu_precise.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-precise"
       s.privileged = false
     end
   end
-  config.vm.define "centos_final_aws" do |centos_final|
+  config.vm.define "centos_final_cli_aws" do |centos_final|
     #dummy box, will be overriden
     centos_final.vm.box = "dummy"
     centos_final.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
@@ -152,7 +149,6 @@ Vagrant.configure('2') do |config|
     centos_final.vm.synced_folder "../../", "/cloudify-packager", create: true, type: "rsync", rsync__exclude: ".git/"
     centos_final.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "centos-Final"
       s.privileged = false
     end
   end
@@ -190,7 +186,7 @@ Vagrant.configure('2') do |config|
   end
 
 
-  config.vm.define :debian_jessie do |local|
+  config.vm.define :debian_jessie_cli do |local|
     local.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', '1024']
     end
@@ -199,11 +195,10 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "debian-jessie"
       s.privileged = false
     end
   end
-  config.vm.define :ubuntu_precise do |local|
+  config.vm.define :ubuntu_precise_cli do |local|
     local.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', '1024']
     end
@@ -212,7 +207,6 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-precise"
       s.privileged = false
     end
   end
