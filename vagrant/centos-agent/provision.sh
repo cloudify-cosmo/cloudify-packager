@@ -3,7 +3,6 @@
 REST_CLIENT_SHA=""
 COMMON_PLUGIN_SHA=""
 MANAGER_SHA=""
-PACKMAN_SHA=""
 SCRIPTS_PLUGIN_SHA=""
 DIAMOND_PLUGIN_SHA=""
 
@@ -21,13 +20,7 @@ sudo wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py &&
 sudo /usr/bin/python get-pip.py &&
 
 # install packman
-git clone https://github.com/cloudify-cosmo/packman.git
-pushd packman
-	if [ -n "$PACKMAN_SHA" ]; then
-		git reset --hard $PACKMAN_SHA
-	fi
-	sudo pip install .
-popd
+sudo pip install repex==0.1.0
 
 
 # install virtualenv
