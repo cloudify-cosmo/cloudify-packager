@@ -109,7 +109,7 @@ if ! which ruby; then
 fi
 install_fpm &&
 install_pip &&
-install_module "https://github.com/cloudify-cosmo/packman/archive/pkm-overhaul.zip" &&
+install_module "packman==0.5.0" &&
 install_module "virtualenv==12.0.7" &&
 
 cd /cloudify-packager/ &&
