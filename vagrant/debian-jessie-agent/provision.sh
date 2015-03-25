@@ -1,5 +1,5 @@
-core_tag_name=""
-plugins_tag_name=""
+core_tag_name="master"
+plugins_tag_name="master"
 
 #installed in debian image
 #   update and install prereqs
