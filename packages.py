@@ -20,7 +20,7 @@ from user_definitions import *
 PACKAGES = {
     "cloudify-core": {
         "name": "cloudify-core",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "depends": [
             'cloudify-components'
         ],
@@ -45,7 +45,7 @@ PACKAGES = {
     },
     "cloudify-components": {
         "name": "cloudify-components",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "package_path": "/cloudify",
         "sources_path": COMPONENT_PACKAGES_PATH,
         "src_package_type": "dir",
@@ -111,7 +111,7 @@ PACKAGES = {
     },
     "cloudify-ui": {
         "name": "cloudify-ui",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "depends": [
             'nodejs'
         ],
@@ -146,7 +146,7 @@ PACKAGES = {
     },
     "cloudify-debian-jessie-agent": {
         "name": "cloudify-debian-jessie-agent",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "package_path": "/cloudify",
         "sources_path": "{0}/debian-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
@@ -171,7 +171,7 @@ PACKAGES = {
     },
     "cloudify-ubuntu-trusty-agent": {
         "name": "cloudify-ubuntu-trusty-agent",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "package_path": "/cloudify",
         "sources_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
@@ -196,7 +196,7 @@ PACKAGES = {
     },
     "cloudify-ubuntu-precise-agent": {
         "name": "cloudify-ubuntu-precise-agent",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "package_path": "/cloudify",
         "sources_path": "{0}/Ubuntu-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
@@ -221,7 +221,7 @@ PACKAGES = {
     },
     "cloudify-ubuntu-agent": {
         "name": "cloudify-trusty-agent",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "package_path": "/cloudify",
         "sources_path": "/tmp/Ubuntu-agent",
         "src_package_type": "dir",
@@ -246,7 +246,7 @@ PACKAGES = {
     },
     "cloudify-windows-agent": {
         "name": "cloudify-windows-agent",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "package_path": "/cloudify",
         "sources_path": "{0}/windows-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
@@ -261,7 +261,7 @@ PACKAGES = {
     },
     "debian-jessie-agent": {
         "name": "debian--agent",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
         ],
@@ -279,7 +279,7 @@ PACKAGES = {
     },
     "Ubuntu-trusty-agent": {
         "name": "Ubuntu-trusty-agent",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
         ],
@@ -297,7 +297,7 @@ PACKAGES = {
     },
     "Ubuntu-precise-agent": {
         "name": "Ubuntu-precise-agent",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
         ],
@@ -315,7 +315,7 @@ PACKAGES = {
     },
     "cloudify-centos-final-agent": {
         "name": "cloudify-centos-final-agent",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "package_path": "/cloudify",
         "sources_path": "{0}/centos-agent".format(AGENT_PACKAGES_PATH),
         "src_package_type": "dir",
@@ -340,7 +340,7 @@ PACKAGES = {
     },
     "centos-Final-agent": {
         "name": "centos-Final-agent",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MAIN_BRANCH),
         ],
@@ -356,7 +356,7 @@ PACKAGES = {
     },
     "manager": {
         "name": "manager",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
         ],
@@ -414,7 +414,7 @@ PACKAGES = {
     },
     "celery": {
         "name": "celery",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "https://github.com/cloudify-cosmo/cloudify-manager/archive/{0}.tar.gz".format(MANAGER_BRANCH),
         ],
@@ -451,7 +451,7 @@ PACKAGES = {
     },
     "logstash": {
         "name": "logstash",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar",
         ],
@@ -494,7 +494,7 @@ PACKAGES = {
     },
     "elasticsearch": {
         "name": "elasticsearch",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.2.tar.gz"
         ],
@@ -548,7 +548,7 @@ PACKAGES = {
     },
     "nginx": {
         "name": "nginx",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "reqs": [
             "nginx"
         ],
@@ -563,7 +563,7 @@ PACKAGES = {
     },
     "influxdb": {
         "name": "influxdb",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",
         ],
@@ -573,7 +573,7 @@ PACKAGES = {
     },
     "rabbitmq-server": {
         "name": "rabbitmq-server",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.4/rabbitmq-server_3.2.4-1_all.deb",
         ],
@@ -586,7 +586,7 @@ PACKAGES = {
     },
     "langohr": {
         "name": "langohr",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar"
         ],
@@ -597,7 +597,7 @@ PACKAGES = {
     },
     "riemann": {
         "name": "riemann",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "source_urls": [
             "http://aphyr.com/riemann/riemann_0.2.6_all.deb",
         ],
@@ -611,7 +611,7 @@ PACKAGES = {
     },
     "nodejs": {
         "name": "nodejs",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "reqs": [
             "nodejs"
         ],
@@ -623,7 +623,7 @@ PACKAGES = {
     },
     "openjdk-7-jdk": {
         "name": "openjdk-7-jdk",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "reqs": [
             "openjdk-7-jdk"
         ],
@@ -633,7 +633,7 @@ PACKAGES = {
     },
     "virtualenv": {
         "name": "virtualenv",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "package_path": "{0}/virtualenv/".format(COMPONENT_PACKAGES_PATH),
         "sources_path": "{0}/virtualenv".format(PACKAGES_PATH),
         "modules": [
@@ -646,7 +646,7 @@ PACKAGES = {
     },
     "curl": {
         "name": "curl",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "reqs": [
             "curl",
             "libcurl3",
@@ -657,7 +657,7 @@ PACKAGES = {
     },
     "make": {
         "name": "make",
-        "version": "3.2.0-m7",
+        "version": "3.2.0-m8",
         "reqs": [
             "make"
         ],
