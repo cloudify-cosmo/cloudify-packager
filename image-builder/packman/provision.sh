@@ -43,7 +43,6 @@ function install_fpm
 function install_pip
 {
     curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
-    sudo pip install boto
 }
 
 function install_module
@@ -83,3 +82,4 @@ install_fpm &&
 install_pip &&
 install_module "packman==0.5.0" &&
 install_module "virtualenv==12.0.7" &&
+install_module "boto==2.36.0"
