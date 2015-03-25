@@ -1,0 +1,63 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_ACCESS_KEY`}}",
+    "aws_debian_jessie_source_ami": "ami-699f021e",
+    "aws_ubuntu_trusty_source_ami": "ami-f0b11187",
+    "aws_ubuntu_precise_source_ami": "ami-036eaa74",
+    "aws_centos_64_source_ami": "ami-3b39ee4c",
+    "instance_type": "m3.medium"
+    },
+  "builders": [
+    {
+      "name": "debian_jessie_packman",
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "eu-west-1",
+      "source_ami": "{{user `aws_debian_jessie_source_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "admin",
+      "ami_name": "cloudify {{timestamp}}"
+    },
+    {
+      "name": "ubuntu_trusty_packman",
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "eu-west-1",
+      "source_ami": "{{user `aws_ubuntu_trusty_source_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "ubuntu",
+      "ami_name": "cloudify {{timestamp}}"
+    },
+    {
+      "name": "ubuntu_precise_packman",
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "eu-west-1",
+      "source_ami": "{{user `aws_ubuntu_precise_source_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "ubuntu",
+      "ami_name": "cloudify {{timestamp}}"
+    },
+    {
+      "name": "ubuntu_precise_packman",
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "eu-west-1",
+      "source_ami": "{{user `aws_centos_64_source_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "root",
+      "ami_name": "cloudify {{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "provision.sh"
+    }
+  ]
+}
