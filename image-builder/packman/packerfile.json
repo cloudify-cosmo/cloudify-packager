@@ -6,7 +6,8 @@
     "aws_ubuntu_trusty_source_ami": "ami-f0b11187",
     "aws_ubuntu_precise_source_ami": "ami-036eaa74",
     "aws_centos_64_source_ami": "ami-3b39ee4c",
-    "instance_type": "m3.medium"
+    "instance_type": "m3.medium",
+    "region": "eu-west-1"
     },
   "builders": [
     {
@@ -14,44 +15,56 @@
       "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
-      "region": "eu-west-1",
+      "region": "{{user `region`}}",
       "source_ami": "{{user `aws_debian_jessie_source_ami`}}",
       "instance_type": "{{user `instance_type`}}",
       "ssh_username": "admin",
-      "ami_name": "cloudify {{timestamp}}"
+      "ami_name": "debian-jessie-packman {{timestamp}}",
+      "run_tags": {
+        "Name": "debian jessie packman image generator"
+      }
     },
     {
       "name": "ubuntu_trusty_packman",
       "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
-      "region": "eu-west-1",
+      "region": "{{user `region`}}",
       "source_ami": "{{user `aws_ubuntu_trusty_source_ami`}}",
       "instance_type": "{{user `instance_type`}}",
       "ssh_username": "ubuntu",
-      "ami_name": "cloudify {{timestamp}}"
+      "ami_name": "ubuntu-trusty-packman {{timestamp}}",
+      "run_tags": {
+        "Name": "ubuntu trusty packman image generator"
+      }
     },
     {
       "name": "ubuntu_precise_packman",
       "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
-      "region": "eu-west-1",
+      "region": "{{user `region`}}",
       "source_ami": "{{user `aws_ubuntu_precise_source_ami`}}",
       "instance_type": "{{user `instance_type`}}",
       "ssh_username": "ubuntu",
-      "ami_name": "cloudify {{timestamp}}"
+      "ami_name": "ubuntu-precise-packman {{timestamp}}",
+      "run_tags": {
+        "Name": "ubuntu precise packman image generator"
+      }
     },
     {
-      "name": "ubuntu_precise_packman",
+      "name": "centos_64_packman",
       "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
-      "region": "eu-west-1",
+      "region": "{{user `region`}}",
       "source_ami": "{{user `aws_centos_64_source_ami`}}",
       "instance_type": "{{user `instance_type`}}",
       "ssh_username": "root",
-      "ami_name": "cloudify {{timestamp}}"
+      "ami_name": "centos-64-packman {{timestamp}}",
+      "run_tags": {
+        "Name": "centos 64 packman image generator"
+      }
     }
   ],
   "provisioners": [
