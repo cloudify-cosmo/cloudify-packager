@@ -3,10 +3,14 @@ function install_prereqs
     if which apt-get; then
         # ubuntu
         sudo apt-get -y update &&
-        # precise
-        sudo apt-get install -y python-software-properties
-        # trusty
-        sudo apt-get install -y software-properties-common
+        . /etc/lsb-release
+        # precise - python-software-properties
+        # trusty - software-properties-common
+        if [ "$DISTRIB_RELEASE" == "14.04" ]; then
+            sudo apt-get install -y software-properties-common
+        elif [ "$DISTRIB_RELEASE" == "12.04" ]; then
+            sudo apt-get install -y python-software-properties
+        fi
         sudo add-apt-repository -y ppa:git-core/ppa &&
         sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev g++
     elif which yum; then
