@@ -4,9 +4,9 @@ function install_prereqs
         # ubuntu
         sudo apt-get -y update &&
         # precise
-        sudo apt-get install -y python-software-properties ||
+        sudo apt-get install -y python-software-properties
         # trusty
-        sudo apt-get install -y software-properties-common &&
+        sudo apt-get install -y software-properties-common
         sudo add-apt-repository -y ppa:git-core/ppa &&
         sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev g++ rpm
     elif which yum; then
@@ -106,7 +106,7 @@ if which yum; then
 fi
 install_fpm &&
 install_pip &&
-install_module "https://github.com/cloudify-cosmo/packman/archive/pkm-overhaul.zip" &&
+install_module "packman==0.5.0" &&
 install_module "wheel==0.24.0" &&
 
 sudo mkdir -p /cfy && cd /cfy &&
@@ -122,6 +122,7 @@ sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-rest-client@${CORE
 sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-dsl-parser@${CORE_TAG_NAME} --find-links=wheelhouse &&
 sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-plugins-common@${CORE_TAG_NAME} --find-links=wheelhouse &&
 sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-script-plugin@${PLUGINS_TAG_NAME} --find-links=wheelhouse &&
+# TODO: wheel vSphere and SoftLayer plugins
 sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-cli@${CORE_TAG_NAME} --find-links=wheelhouse
 
 cd /cloudify-packager/ && sudo pkm pack -c cloudify-linux-cli -v
