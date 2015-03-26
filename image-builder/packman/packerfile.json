@@ -2,9 +2,9 @@
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_ACCESS_KEY`}}",
-    "aws_debian_jessie_source_ami": "ami-699f021e",
+    "aws_debian_jessie_source_ami": "ami-f9a9238e",
     "aws_ubuntu_trusty_source_ami": "ami-f0b11187",
-    "aws_ubuntu_precise_source_ami": "ami-036eaa74",
+    "aws_ubuntu_precise_source_ami": "ami-00d12677",
     "aws_centos_64_source_ami": "ami-3b39ee4c",
     "instance_type": "m3.medium",
     "region": "eu-west-1"
@@ -22,49 +22,6 @@
       "ami_name": "debian-jessie-packman {{timestamp}}",
       "run_tags": {
         "Name": "debian jessie packman image generator"
-      }
-    },
-    {
-      "name": "ubuntu_trusty_packman",
-      "type": "amazon-ebs",
-      "access_key": "{{user `aws_access_key`}}",
-      "secret_key": "{{user `aws_secret_key`}}",
-      "region": "{{user `region`}}",
-      "source_ami": "{{user `aws_ubuntu_trusty_source_ami`}}",
-      "instance_type": "{{user `instance_type`}}",
-      "ssh_username": "ubuntu",
-      "ami_name": "ubuntu-trusty-packman {{timestamp}}",
-      "run_tags": {
-        "Name": "ubuntu trusty packman image generator"
-      }
-    },
-    {
-      "name": "ubuntu_precise_packman",
-      "type": "amazon-ebs",
-      "access_key": "{{user `aws_access_key`}}",
-      "secret_key": "{{user `aws_secret_key`}}",
-      "region": "{{user `region`}}",
-      "source_ami": "{{user `aws_ubuntu_precise_source_ami`}}",
-      "instance_type": "{{user `instance_type`}}",
-      "ssh_username": "ubuntu",
-      "ami_name": "ubuntu-precise-packman {{timestamp}}",
-      "run_tags": {
-        "Name": "ubuntu precise packman image generator"
-      }
-    },
-    {
-      "name": "centos_64_packman",
-      "type": "amazon-ebs",
-      "access_key": "{{user `aws_access_key`}}",
-      "secret_key": "{{user `aws_secret_key`}}",
-      "region": "{{user `region`}}",
-      "source_ami": "{{user `aws_centos_64_source_ami`}}",
-      "instance_type": "{{user `instance_type`}}",
-      "ssh_username": "root",
-      "ssh_private_key_file": "~/.ssh/aws/vagrant_centos_build.pem",
-      "ami_name": "centos-64-packman {{timestamp}}",
-      "run_tags": {
-        "Name": "centos 64 packman image generator"
       }
     }
   ],
