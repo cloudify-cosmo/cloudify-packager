@@ -24,8 +24,8 @@ function install_prereqs
 
 function install_ruby
 {
-    wget https://ftp.ruby-lang.org/pub/ruby/ruby-1.9.3-rc1.tar.bz2 --no-check-certificate
-    tar -xjf ruby-1.9.3-rc1.tar.bz2
+    wget http://mirrors.ibiblio.org/ruby/1.9/ruby-1.9.3-rc1.tar.gz --no-check-certificate
+    tar -xzvf ruby-1.9.3-rc1.tar.gz
     cd ruby-1.9.3-rc1
     ./configure --disable-install-doc
     make
