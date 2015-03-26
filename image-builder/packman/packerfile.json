@@ -6,7 +6,7 @@
     "aws_ubuntu_trusty_source_ami": "ami-f0b11187",
     "aws_ubuntu_precise_source_ami": "ami-73cb5a04",
     "aws_centos_64_source_ami": "ami-3b39ee4c",
-    "instance_type": "m3.medium",
+    "instance_type": "m3.large",
     "region": "eu-west-1"
     },
   "builders": [
