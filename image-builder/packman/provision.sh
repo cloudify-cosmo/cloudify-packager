@@ -45,34 +45,6 @@ function install_pip
     curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
 }
 
-function install_module
-{
-
-    module=$1
-    venv=${2:-""}
-    tag=${3:-""}
-    if [[ ! -z "$tag" ]]; then
-        org=${4:-cloudify-cosmo}
-        url=https://github.com/${org}/${module}.git
-        echo cloning ${url}
-        git clone ${url}
-        pushd ${module}
-            git checkout -b tmp_branch ${tag}
-            git log -1
-            sudo ${venv}/bin/pip install .
-        popd
-    else
-        if [[ ! -z "$venv" ]]; then
-            # if [[ ! -z "$tag" ]]; then
-            #   pip install git+git://github.com/${org}/${module}.git@${tag}#egg=${module}
-            # else
-            sudo ${venv}/bin/pip install ${module}
-            # fi
-        else
-            sudo pip install ${module}
-        fi
-    fi
-}
 
 install_prereqs &&
 if ! which ruby; then
@@ -80,6 +52,6 @@ if ! which ruby; then
 fi
 install_fpm &&
 install_pip &&
-install_module "packman==0.5.0" &&
-install_module "virtualenv==12.0.7" &&
-install_module "boto==2.36.0"
+sudo pip install "packman==0.5.0" &&
+sudo pip install "virtualenv==12.0.7" &&
+sudo pip install "boto==2.36.0"

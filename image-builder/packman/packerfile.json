@@ -4,7 +4,7 @@
     "aws_secret_key": "{{env `AWS_ACCESS_KEY`}}",
     "aws_debian_jessie_source_ami": "ami-f9a9238e",
     "aws_ubuntu_trusty_source_ami": "ami-f0b11187",
-    "aws_ubuntu_precise_source_ami": "ami-73cb5a04​",
+    "aws_ubuntu_precise_source_ami": "ami-73cb5a04",
     "aws_centos_64_source_ami": "ami-3b39ee4c",
     "instance_type": "m3.medium",
     "region": "eu-west-1"
