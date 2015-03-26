@@ -61,6 +61,7 @@
       "source_ami": "{{user `aws_centos_64_source_ami`}}",
       "instance_type": "{{user `instance_type`}}",
       "ssh_username": "root",
+      "ssh_private_key_file": "~/.ssh/aws/vagrant_centos_build.pem",
       "ami_name": "centos-64-packman {{timestamp}}",
       "run_tags": {
         "Name": "centos 64 packman image generator"
