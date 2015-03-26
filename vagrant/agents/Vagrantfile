@@ -174,7 +174,7 @@ Vagrant.configure('2') do |config|
       override.ssh.private_key_path = "~/.ssh/aws/windows_agent_packager.pem"
 
       aws.tags = {
-          "Name" => "windows agent packager",
+          "Name" => "windows agent packager build",
       }
       aws.security_groups = "vagrant_windows"
     end
