@@ -113,6 +113,13 @@ function get_wheels
     sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-cli@${CORE_TAG_NAME} --find-links=wheelhouse
 }
 
+# sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-rest-client@master --find-links=wheelhouse
+# sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-dsl-parser@master --find-links=wheelhouse
+# sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-plugins-common@master --find-links=wheelhouse
+# sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-script-plugin@master --find-links=wheelhouse
+# sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-fabric-plugin@master --find-links=wheelhouse
+# sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-cli@master --find-links=wheelhouse
+
 function get_manager_blueprints
 {
     echo "Retrieving Manager Blueprints"
