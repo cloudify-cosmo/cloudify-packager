@@ -22,8 +22,8 @@ function install_prereqs
 
 function install_ruby
 {
-    wget https://ftp.ruby-lang.org/pub/ruby/ruby-1.9.3-rc1.tar.bz2 --no-check-certificate
-    tar -xjf ruby-1.9.3-rc1.tar.bz2
+    wget http://mirrors.ibiblio.org/ruby/1.9/ruby-1.9.3-rc1.tar.gz --no-check-certificate
+    tar -xzvf ruby-1.9.3-rc1.tar.gz
     cd ruby-1.9.3-rc1
     ./configure --disable-install-doc
     make
@@ -93,6 +93,30 @@ function install_py27
     sudo make altinstall
 }
 
+function get_wheels
+{
+    echo "Retrieving Wheels"
+    sudo pip wheel virtualenv==12.0.7 &&
+    # when the cli is built for py2.6, unless argparse is put within `install_requires`, we'll have to enable this:
+    # if which yum; then
+    #   pip wheel argparse==#SOME_VERSION#
+    # fi
+
+    sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-rest-client@${CORE_TAG_NAME} --find-links=wheelhouse &&
+    sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-dsl-parser@${CORE_TAG_NAME} --find-links=wheelhouse &&
+    sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-plugins-common@${CORE_TAG_NAME} --find-links=wheelhouse &&
+    sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-script-plugin@${PLUGINS_TAG_NAME} --find-links=wheelhouse &&
+    sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-fabric-plugin@${PLUGINS_TAG_NAME} --find-links=wheelhouse &&
+    # sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-aws-plugin@${PLUGINS_TAG_NAME} --find-links=wheelhouse &&
+    # sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-openstack-plugin@${PLUGINS_TAG_NAME} --find-links=wheelhouse &&
+    # TODO: wheel vSphere and SoftLayer plugins
+    sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-cli@${CORE_TAG_NAME} --find-links=wheelhouse
+}
+
+function get_manager_blueprints
+{
+    echo "Retrieving Manager Blueprints"
+}
 
 CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
@@ -112,17 +136,7 @@ install_module "wheel==0.24.0" &&
 sudo mkdir -p /cfy && cd /cfy &&
 
 echo '# GET PROCESS'
-sudo pip wheel virtualenv==12.0.7 &&
-# when the cli is built for py2.6, unless argparse is put within `install_requires`, we'll have to enable this:
-# if which yum; then
-#   pip wheel argparse==#SOME_VERSION#
-# fi
-
-sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-rest-client@${CORE_TAG_NAME} --find-links=wheelhouse &&
-sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-dsl-parser@${CORE_TAG_NAME} --find-links=wheelhouse &&
-sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-plugins-common@${CORE_TAG_NAME} --find-links=wheelhouse &&
-sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-script-plugin@${PLUGINS_TAG_NAME} --find-links=wheelhouse &&
-# TODO: wheel vSphere and SoftLayer plugins
-sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-cli@${CORE_TAG_NAME} --find-links=wheelhouse
+get_wheels &&
+get_manager_blueprints &&
 
 cd /cloudify-packager/ && sudo pkm pack -c cloudify-linux-cli -v

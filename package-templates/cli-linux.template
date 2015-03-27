@@ -33,16 +33,16 @@ function install_virtualenv
 
 function install_cloudify
 {
-    echo "Creating Virtualenv /cloudify..."
-    virtualenv /cloudify &&
+    echo "Creating Virtualenv /cfy..."
+    virtualenv /cfy &&
     if ! which cfy >> /dev/null; then
-        /cloudify/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR} cloudify --pre
+        /cfy/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR} cloudify --pre
         # when the cli is built for py2.6, unless argparse is put within `install_requires`, we'll have to enable this:
         # if which yum; then
-        #   /cloudify/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR} argparse=#SOME_VERSION#
+        #   /cfy/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR} argparse=#SOME_VERSION#
         # fi
     else
-        state_error "Cloudify's CLI appears to be installed already."
+        state_error "Cloudify's CLI appears to be installed already and is in your path."
     fi
 }
 
@@ -52,6 +52,6 @@ install_virtualenv &&
 install_cloudify &&
 
 echo "Cleaning up..."
-rm -rf /cfy &&
+rm -rf /cfy/wheelhouse &&
 
 echo -e "${PKG_NAME} ${VERSION} Installation completed successfully!\n"
