@@ -46,12 +46,12 @@ if [ "$INSTALL_FROM_PYPI" = "true" ]; then
 	pip install cloudify
 else
 	echo installing cli from github
-	pip install -e git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@$CORE_TAG_NAME
-	pip install -e git://github.com/cloudify-cosmo/flask-securest.git@master
-	pip install -e git://github.com/cloudify-cosmo/cloudify-rest-client.git@$CORE_TAG_NAME
-	pip install -e git://github.com/cloudify-cosmo/cloudify-plugins-common.git@$CORE_TAG_NAME	
-	pip install -e git://github.com/cloudify-cosmo/cloudify-script-plugin.git@$PLUGINS_TAG_NAME
-	pip install -e git://github.com/cloudify-cosmo/cloudify-cli.git@$CORE_TAG_NAME
+	pip install git+https://github.com/cloudify-cosmo/cloudify-dsl-parser.git@$CORE_TAG_NAME
+	pip install git+https://github.com/cloudify-cosmo/flask-securest.git@master
+	pip install git+https://github.com/cloudify-cosmo/cloudify-rest-client.git@$CORE_TAG_NAME
+	pip install git+https://github.com/cloudify-cosmo/cloudify-plugins-common.git@$CORE_TAG_NAME	
+	pip install git+https://github.com/cloudify-cosmo/cloudify-script-plugin.git@$PLUGINS_TAG_NAME
+	pip install git+https://github.com/cloudify-cosmo/cloudify-cli.git@$CORE_TAG_NAME
 fi
 
 # add cfy bash completion
@@ -66,9 +66,8 @@ cfy init
 # clone manager blueprints
 git clone https://github.com/cloudify-cosmo/cloudify-manager-blueprints.git
 pushd cloudify-manager-blueprints
-	if [ -n "$MANAGER_BLUEPRINTS_SHA" ]; then
-		git reset --hard $MANAGER_BLUEPRINTS_SHA
-	fi
+	git checkout -b tmp_branch $CORE_TAG_NAME
+  	git log -1
 popd
 
 # generate public/private key pair and add to authorized_keys
