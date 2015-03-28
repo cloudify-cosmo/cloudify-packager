@@ -4,24 +4,25 @@
     "aws_secret_key": "{{env `AWS_ACCESS_KEY`}}",
     "aws_debian_jessie_source_ami": "ami-f9a9238e",
     "aws_ubuntu_trusty_source_ami": "ami-f0b11187",
-    "aws_ubuntu_precise_source_ami": "ami-73cb5a04",
+    "aws_ubuntu_precise_source_ami": "ami-00d12677",
+    "aws_ubuntu_precise_official_ami": "ami-73cb5a04",
     "aws_centos_64_source_ami": "ami-3b39ee4c",
     "instance_type": "m3.large",
     "region": "eu-west-1"
     },
   "builders": [
     {
-      "name": "debian_jessie_packman",
+      "name": "ubuntu_precise_packman",
       "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
       "region": "{{user `region`}}",
-      "source_ami": "{{user `aws_debian_jessie_source_ami`}}",
+      "source_ami": "{{user `aws_ubuntu_precise_source_ami`}}",
       "instance_type": "{{user `instance_type`}}",
-      "ssh_username": "admin",
-      "ami_name": "debian-jessie-packman {{timestamp}}",
+      "ssh_username": "ubuntu",
+      "ami_name": "ubuntu-precise-packman {{timestamp}}",
       "run_tags": {
-        "Name": "debian jessie packman image generator"
+        "Name": "ubuntu precise packman image generator"
       }
     },
     {
@@ -39,17 +40,17 @@
       }
     },
     {
-      "name": "ubuntu_precise_packman",
+      "name": "debian_jessie_packman",
       "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
       "region": "{{user `region`}}",
-      "source_ami": "{{user `aws_ubuntu_precise_source_ami`}}",
+      "source_ami": "{{user `aws_debian_jessie_source_ami`}}",
       "instance_type": "{{user `instance_type`}}",
-      "ssh_username": "ubuntu",
-      "ami_name": "ubuntu-precise-packman {{timestamp}}",
+      "ssh_username": "admin",
+      "ami_name": "debian-jessie-packman {{timestamp}}",
       "run_tags": {
-        "Name": "ubuntu precise packman image generator"
+        "Name": "debian jessie packman image generator"
       }
     },
     {
