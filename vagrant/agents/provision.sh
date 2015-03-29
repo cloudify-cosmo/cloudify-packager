@@ -52,9 +52,15 @@ function install_module
 	module=$1
 	venv=${2:-""}
 	tag=${3:-""}
+	user=${4:-""}
+	pass=${5:-""}
 	if [[ ! -z "$tag" ]]; then
-		org=${4:-cloudify-cosmo}
-		url=https://github.com/${org}/${module}.git
+		org=${6:-cloudify-cosmo}
+		if [[ ! -z "$user" ]]; then
+			url=https://${user}:${pass}@github.com/${org}/${module}.git
+		else
+			url=https://github.com/${org}/${module}.git
+		fi
 		echo cloning ${url}
 		git clone ${url}
 		pushd ${module}
@@ -101,6 +107,8 @@ function install_manager_modules
 
 AGENT=$1
 COMMERCIAL=$2
+GITHUB_USERNAME=$3
+GITHUB_PASSWORD=$4
 CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
 
@@ -139,8 +147,8 @@ install_module "cloudify-plugins-common" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 install_module "cloudify-script-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
 install_module "cloudify-diamond-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
 if [ "${COMMERCIAL}" == "True" ]; then
-	install_module "cloudify-vsphere-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
-	install_module "cloudify-softlayer-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
+	install_module "cloudify-vsphere-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" "${GITHUB_USERNAME}" "${GITHUB_PASSWORD}" &&
+	install_module "cloudify-softlayer-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" "${GITHUB_USERNAME}" "${GITHUB_PASSWORD}" &&
 fi
 install_manager_modules "cloudify-manager" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 
