@@ -100,6 +100,7 @@ function install_manager_modules
 }
 
 AGENT=$1
+COMMERCIAL=$2
 CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
 
@@ -137,6 +138,10 @@ install_module "cloudify-rest-client" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 install_module "cloudify-plugins-common" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 install_module "cloudify-script-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
 install_module "cloudify-diamond-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
+if [ "${COMMERCIAL}" == "True" ]; then
+	install_module "cloudify-vsphere-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
+	install_module "cloudify-softlayer-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
+fi
 install_manager_modules "cloudify-manager" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 
 # create agent tar file
