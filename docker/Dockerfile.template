@@ -352,33 +352,3 @@ RUN echo install dependencies && \
 EXPOSE {% for dep in manager.ports %} {{ dep }}{% endfor %}
 #manager persistence path
 VOLUME {% for dep in manager.persistence_path %} {{ dep }}{% endfor %}
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - WEB-UI
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-##### ENV #####
-ENV WEBUI_SERVICE_NAME {{ webui.service_name }}
-ENV WEBUI_SERVICE_DIR /etc/service/$WEBUI_SERVICE_NAME
-ENV WEBUI_RUN_FILE $WEBUI_SERVICE_DIR/run
-ENV WEBUI_VIRTUAL_ENV_DIR $WEBUI_SERVICE_DIR/env
-##### ENV #####
-ADD cloudify-ui/ $WEBUI_SERVICE_DIR/
-
-RUN echo installing web-ui dependencies && \
-    apt-get install -y {% for dep in webui.reqs %} {{ dep }}{% endfor %} && \
-    \
-    echo installing nodejs && \
-    apt-get -y install nodejs npm && \
-    \
-    echo downloading cloudify-webui package and extracting webui and grafana tar.gz && \
-    curl {{ webui.ui_package_url }} --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
-    dpkg-deb -x /opt/tmp/cloudify-webui/cloudify-webui.deb /opt/tmp/cloudify-webui/ && \
-    mkdir -p $WEBUI_SERVICE_DIR/cosmo-ui && \
-    tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/cosmo-ui* -C $WEBUI_SERVICE_DIR/cosmo-ui --strip-components=1 && \
-    mkdir -p $WEBUI_SERVICE_DIR/grafana && \
-    tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/grafana* -C $WEBUI_SERVICE_DIR/grafana --strip-components=1 && \
-    cp /opt/tmp/cloudify-webui/packages/cloudify-ui/config/grafana/config.js $WEBUI_SERVICE_DIR/grafana/ && \
-    rm -rf /opt/tmp/cloudify-webui/cloudify-webui.deb && \
-    chmod +x $WEBUI_RUN_FILE
-#RUN apt-get -y install nodejs npm
-
-EXPOSE {% for dep in webui.ports %} {{ dep }}{% endfor %}
