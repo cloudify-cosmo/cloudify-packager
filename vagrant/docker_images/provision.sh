@@ -39,7 +39,7 @@ start_and_export_containers()
   sudo docker export cloudify > /tmp/cloudify-docker_.tar
 }
 
-main() 
+main()
 {
   install_docker
   build_images
