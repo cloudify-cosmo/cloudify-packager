@@ -125,11 +125,11 @@ cd /cloudify-packager/ &&
 
 # create package resources
 echo '# create package resources'
-sudo pkm get -c ${1}-agent &&
+sudo pkm get -c ${AGENT}-agent &&
 
 echo '# GET PROCESS'
 # AGENT_VENV="/agent/env"
-# we might not need this. it might suffice considering the current implementation to do /agent/env since
+# we might not need this. it might suffice (considering the current implementation) to do /agent/env since
 # the agent installer untars using --strip==1 anyway
 if [ "${AGENT}" == "Ubuntu-trusty" ]; then
 	AGENT_VENV="/Ubuntu-agent/env"
@@ -153,7 +153,7 @@ fi
 install_manager_modules "cloudify-manager" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 
 # create agent tar file
-sudo pkm pack -c ${1}-agent &&
+sudo pkm pack -c ${AGENT}-agent &&
 # convert agent name to lower case and create deb/rpm
 AGENT_ID=$(echo ${AGENT} | tr '[:upper:]' '[:lower:]')
 sudo pkm pack -c cloudify-${AGENT_ID}-agent
