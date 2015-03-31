@@ -1,15 +1,13 @@
-python_path: '/usr/bin/python'
-cloudify_agent_module: /tmp/cloudify-agent
+python_path: /usr/bin/python
+cloudify_agent_module: git+https://github.com/nir0s/cloudify-agent@master
 core_modules:
-    cloudify_plugins_common: /tmp/cloudify-plugins-common
-    cloudify_rest_client: /tmp/cloudify-rest-client
-    # an alternative to clone. Use SHA id directly.
-    # cloudify_rest_client: https://github.com/cloudify-cosmo/cloudify-rest-client/archive/6b2081c7b9b32d3760cbb2a6655c02e604d296a6.zip
+    cloudify_plugins_common: git+https://github.com/cloudify-cosmo/cloudify-plugins-common@3.1
+    cloudify_rest_client: git+https://github.com/cloudify-cosmo/cloudify-rest-client@3.1
 core_plugins:
-    cloudify_script_plugin: /tmp/cloudify-script-plugin
-    cloudify_diamond_plugin: /tmp/cloudify-diamond-plugin
-    cloudify_agent_installer_plugin: /tmp/cloudify-agent-installer-plugin
-    cloudify_plugin_installer_plugin: /tmp/cloudify-plugin-installer-plugin
-    cloudify_windows_agent_installer_plugin: /tmp/cloudify-windows-agent-installer-plugin
-    cloudify_windows_plugin_installer_plugin: /tmp/cloudify-windows-plugin-installer-plugin
+    cloudify_script_plugin: git+https://github.com/cloudify-cosmo/cloudify-script-plugin@1.1
+    cloudify_diamond_plugin: git+https://github.com/cloudify-cosmo/cloudify-diamond-plugin@1.1
+    cloudify_agent_installer_plugin: git+https://github.com/iliapolo/cloudify-agent-installer-plugin@master
+    cloudify_plugin_installer_plugin: git+https://github.com/ilia-polo/cloudify-plugin-installer-plugin@master
+    cloudify_windows_agent_installer_plugin: git+https://github.com/iliapolo/cloudify-windows-agent-installer-plugin@master
+    cloudify_windows_plugin_installer_plugin: git+https://github.com/iliapolo/cloudify-windows-plugin-installer-plugin@master
 keep_virtualenv: true
