@@ -38,4 +38,6 @@ exec {{ config_templates.params_init.work_dir }}/env/bin/celery worker \
 --logfile={{ config_templates.params_init.work_dir }}/work/cloudify.management_worker.log \
 --pidfile={{ config_templates.params_init.work_dir }}/work/cloudify.management_worker.pid \
 --autoscale={{ config_templates.params_init.workers_autoscale }} \
---maxtasksperchild=10
+--maxtasksperchild=10 \
+--without-gossip \
+--without-mingle​

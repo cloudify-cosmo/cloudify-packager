@@ -26,5 +26,5 @@ CELERY_RESULT_SERIALIZER="json"
 CELERY_RESULT_BACKEND="$BROKER_URL"
 DEFAULT_PID_FILE="${CELERY_WORK_DIR}/celery.pid"
 DEFAULT_LOG_FILE="${CELERY_WORK_DIR}/celery.log"
-CELERYD_OPTS="-Ofair --events --loglevel=debug --app=cloudify --include=${INCLUDES} -Q ${WORKER_MODIFIER} --broker=${BROKER_URL} --hostname=${WORKER_MODIFIER} --autoscale={{ worker_autoscale }} --maxtasksperchild=10"
+CELERYD_OPTS="-Ofair --events --loglevel=debug --app=cloudify --include=${INCLUDES} -Q ${WORKER_MODIFIER} --broker=${BROKER_URL} --hostname=${WORKER_MODIFIER} --autoscale={{ worker_autoscale }} --maxtasksperchild=10 --without-gossip --without-mingle​"
 
