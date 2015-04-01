@@ -27,6 +27,10 @@ export RIEMANN_CONFIGS_DIR="$CELERY_HOME_DIR/../riemann"
 # enable running celery as root
 export C_FORCE_ROOT="true"
 
+if [ -f "$CELERY_LOG_DIR/cloudify.management_worker.pid" ]; then
+    rm $CELERY_LOG_DIR/cloudify.management_worker.pid
+fi
+
 exec $CELERY_HOME_DIR/env/bin/celery worker \
     -Ofair \
     --include=cloudify_system_workflows.deployment_environment,plugin_installer.tasks,worker_installer.tasks,riemann_controller.tasks,cloudify.plugins.workflows \
