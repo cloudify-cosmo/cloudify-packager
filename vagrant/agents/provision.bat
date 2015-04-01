@@ -11,32 +11,32 @@ pip install celery==3.1.17
 pip install pyzmq==14.3.1
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 cd C:\\CloudifyAgent\\cloudify-rest-client
-  git checkout -b tmp_branch $CORE_TAG_NAME
-	git log -1
+  git checkout -b tmp_branch %CORE_TAG_NAME%
+  git log -1
   pip install .
 cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 cd C:\\CloudifyAgent\\cloudify-plugins-common
-  git checkout -b tmp_branch $CORE_TAG_NAME
-	git log -1
+  git checkout -b tmp_branch %CORE_TAG_NAME%
+  git log -1
   pip install .
 cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 cd C:\\CloudifyAgent\\cloudify-script-plugin
-  git checkout -b tmp_branch $PLUGINS_TAG_NAME
-	git log -1
+  git checkout -b tmp_branch %PLUGINS_TAG_NAME%
+  git log -1
   pip install .
 cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-diamond-plugin.git
 cd C:\\CloudifyAgent\\cloudify-diamond-plugin
-  git checkout -b tmp_branch $PLUGINS_TAG_NAME
-	git log -1 
+  git checkout -b tmp_branch %PLUGINS_TAG_NAME%
+  git log -1 
   pip install .
 cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
 cd C:\\CloudifyAgent\\cloudify-manager
-  git checkout -b tmp_branch $CORE_TAG_NAME
-	git log -1
+  git checkout -b tmp_branch %CORE_TAG_NAME%
+  git log -1
 cd plugins\\windows-plugin-installer
 pip install .
 cd c:\\
