@@ -20,6 +20,8 @@ RUN apt-get update && \
     apt-get purge curl -y && \
     apt-get autoremove -y
 
+RUN echo whatever && apt-get install what
+
 COPY config/logstash.conf ${LOGSTASH_HOME}/logstash.conf
 
 EXPOSE 9999
