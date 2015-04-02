@@ -1,6 +1,5 @@
 #!/bin/bash
 
-PACKMAN_SHA=""
 
 echo downloading and preparing agent packages
 
@@ -16,13 +15,7 @@ dpkg-deb -x /opt/tmp/manager/ubuntu_trusty_agent.deb /opt/tmp/manager/trusty && 
 mv /opt/tmp/manager/trusty/agents/Ubuntu*/Ubuntu-trusty-agent.tar.gz /tmp/Ubuntu-agent/
 
 # install packman
-git clone https://github.com/cloudify-cosmo/packman.git
-pushd packman
-if [ -n "$PACKMAN_SHA" ]; then
-    git reset --hard $PACKMAN_SHA
-fi
-pip install .
-popd
+pip install packman==0.5.0
 
 # clone custom packager branch containing package config
 git clone https://github.com/cloudify-cosmo/cloudify-packager.git
