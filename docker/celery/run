@@ -44,4 +44,4 @@ exec $CELERY_HOME_DIR/env/bin/celery worker \
     --pidfile=$CELERY_LOG_DIR/cloudify.management_worker.pid \
     --autoscale=5,2 \
     --without-gossip \
-    --without-mingle​
+    --without-mingle

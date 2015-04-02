@@ -40,4 +40,4 @@ exec {{ config_templates.params_init.work_dir }}/env/bin/celery worker \
 --autoscale={{ config_templates.params_init.workers_autoscale }} \
 --maxtasksperchild=10 \
 --without-gossip \
---without-mingle​
+--without-mingle
