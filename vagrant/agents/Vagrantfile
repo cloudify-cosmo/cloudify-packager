@@ -36,7 +36,7 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # debian-jessie 64bit box
-      aws.ami = "ami-699f021e"
+      aws.ami = "ami-47640130"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
@@ -70,7 +70,7 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # official ubuntu 14.04 64bit box
-      aws.ami = "ami-f0b11187"
+      aws.ami = "ami-77244000"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
@@ -102,7 +102,7 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # official ubuntu 12.04 64bit box
-      aws.ami = "ami-036eaa74"
+      aws.ami = "ami-a16500d6"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
@@ -134,7 +134,7 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # unofficial centos6.4 64bit box
-      aws.ami = "ami-3b39ee4c"
+      aws.ami = "ami-85dbbef2"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
