@@ -39,43 +39,48 @@ import struct
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
-Windows (with Python32 AND 64), and OS X.
+Windows (with Python32 AND 64), and OS X (Darwin).
 On the linux front, it supports Debian/Ubuntu, CentOS/RHEL and Arch.
+
 Installations are supported for both system python and virtualenv
 (using the --virtualenv flag).
+
 If you're already running the script from within a virtualenv and you're not
 providing a --virtualenv path, Cloudify will be installed within the virtualenv
 you're in.
+
 Passing the --wheelspath allows for an offline installation of Cloudify
 from predownloaded Cloudify dependency wheels. Note that if wheels are found
-within the default wheels directory, they will be used instead of performing
-an online installation.
+within the default wheels directory or within --wheelspath, they will (unless
+the --forceonline flag is set) be used instead of performing an online
+installation.
+
 A --nosudo flag can be supplied (If not on Windows) so that prerequisites can
 be installed on machines/containers without the sudo execuable
 (must be run by root user). Sudo for relevant prerequisites is on by default.
+
 By default, the script assumes that the Python executable is in the
 path and is called 'Python' on Linux and 'c:\python27\python.exe on Windows.
 The Python path can be overriden by using the --pythonpath flag.
+
 The script will attempt to install all necessary requirements including
 python-dev and gcc (for Fabric on Linux), pycrypto (for Fabric on Windows),
 pip and virtualenv depending on the OS and Distro you're running on.
+
 Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
 
 QUIET = False
 VERBOSE = False
+# TODO: put these in a private storage
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
-# http://www.voidspace.org.uk/python/modules.shtml#pycrypto
 PYCR64_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win-amd64-py2.7.exe'  # NOQA
 PYCR32_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win32-py2.7.exe'  # NOQA
 
-WHEELS_LOOKUP_PATHS = [
-    'wheelhouse',
-    'cfy/wheelhouse'
-]
-
 
 def prn(what):
+    """Print, yo! Oh wait.. unless QUIET.
+    """
     if QUIET:
         return
     print(what)
@@ -100,7 +105,7 @@ def run(cmd, sudo=False):
     return proc
 
 
-def make_virtualenv(virtualenv_dir, python_path=False):
+def make_virtualenv(virtualenv_dir, python_path):
     """This will create a virtualenv. If no `python_path` is supplied,
     will assume that `python` is in path. This default assumption is provided
     with the argument parser.
@@ -118,9 +123,10 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     Can specify a prerelease.
     Can specify a virtualenv to install in.
     Can specify a local wheelspath to use for offline installation.
-
     In a Windows envrinoment, a virtualenv bin dir would be declared under
     'VIRTUALENV\\scripts\\'.
+    a `sudo` run will be performed if not running within a virtualenv
+    and an explicit --nosudo isn't provided.
     """
     prn('Installing {0}...'.format(module))
     if version:
@@ -139,8 +145,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     # sudo will be used only when not installing into a virtualenv and sudo
     # is enabled
     result = run(pip_cmd, sudo=True) \
-        if (not IS_VIRTUALENV and not virtualenv_path) \
-        and SUDO else run(pip_cmd)
+        if not IS_VIRTUALENV and not virtualenv_path and SUDO else run(pip_cmd)
     if not result.returncode == 0:
         sys.exit('Could not install module: {0}'.format(module))
 
@@ -165,7 +170,11 @@ class CloudifyInstaller():
 
     def install(self):
         """Installation Logic
-        --force argument forces installation of all prerequisites
+        --force argument forces installation of all prerequisites.
+        If a wheels directory is found, it will be used for offline
+        installation unless explicitly prevented using the --forceonline flag.
+        If an offline installation fails (for instance, not all wheels were
+        found), an online installation process will commence.
         """
         # TODO: check if there are any darwin dependencies to handle
         if self.args.force or self.args.installpip:
@@ -173,26 +182,34 @@ class CloudifyInstaller():
         if self.args.virtualenv and (
                 self.args.force or self.args.installvirtualenv):
             self.install_virtualenv()
+        # TODO: check if self.args hasattr installpythondev instead.
         if OS == 'linux' and (self.args.force or self.args.installpythondev):
-                self.install_pythondev()
+            self.install_pythondev()
         if self.args.virtualenv:
             if not os.path.isfile(
                     self.args.virtualenv + ENV_BIN_RELATIVE_PATH +
                     ('activate.exe' if OS == 'windows' else 'activate')):
                 make_virtualenv(self.args.virtualenv, self.args.pythonpath)
+        # TODO: check if self.args hasattr installpycrypto instead.
         if OS == 'windows' and (self.args.force or self.args.installpycrypto):
             self.install_pycrypto(self.args.virtualenv)
         if self.args.forceonline or not os.path.isdir(self.args.wheelspath):
             install_module('cloudify', self.args.version, self.args.pre,
                            self.args.virtualenv)
-        else:
-            WHEELS_LOOKUP_PATHS.append(self.args.wheelspath)
-            for wheelspath in WHEELS_LOOKUP_PATHS:
-                if os.path.isdir(wheelspath):
-                    install_module('cloudify', pre=True,
-                                   virtualenv_path=self.args.virtualenv,
-                                   wheelspath=wheelspath)
-                    return
+        elif os.path.isdir(self.args.wheelspath):
+            prn('Wheels directory found: "{0}". '
+                'Attemping offline installation...'.format(
+                    self.args.wheelspath))
+            try:
+                install_module('cloudify', pre=True,
+                               virtualenv_path=self.args.virtualenv,
+                               wheelspath=self.args.wheelspath)
+            except:
+                prn('Offline installation failed. Please verify that '
+                    'the wheels path contains the required wheels. '
+                    'Attemping online installation process.')
+                install_module('cloudify', self.args.version,
+                               self.args.pre, self.args.virtualenv)
 
     def install_virtualenv(self):
         # TODO: use `install_module` function instead.
@@ -210,6 +227,8 @@ class CloudifyInstaller():
         download_file(PIP_URL, 'get-pip.py')
         cmd = '{0} get-pip.py'.format(self.args.pythonpath)
         result = run(cmd, sudo=True) if SUDO else run(cmd)
+        # TEST remove get-pip.py file
+        # os.remove('get-pip.py')
         if not result.returncode == 0:
             sys.exit('Could not install pip')
 
@@ -225,6 +244,9 @@ class CloudifyInstaller():
             cmd = 'pacman -S gcc --noconfirm'
         elif os == 'darwin':
             prn('python-dev package not required on Darwin.')
+        else:
+            sys.exit('python-dev package installation not supported '
+                     'in current distribution.')
         run(cmd, sudo=True) if SUDO else run(cmd)
 
     # Windows only
@@ -236,8 +258,12 @@ class CloudifyInstaller():
         Python version installed.
         """
         prn('Installing PyCrypto {0}bit...'.format('32' if IS_PYX32 else '64'))
+        # easy install is used instead of pip as pip doesn't handle windows
+        # executables.
         cmd = 'easy_install {0}'.format(PYCR32_URL if IS_PYX32 else PYCR64_URL)
         if venv:
+            # why not use join on all 3 parameters? hmm...
+            # there was a problem here.
             cmd = '{0}\\{1}'.format(os.path.join(venv, 'scripts'), cmd)
         run(cmd)
 
@@ -247,8 +273,10 @@ def parse_args():
     default_group = parser.add_mutually_exclusive_group()
     version_group = parser.add_mutually_exclusive_group()
     online_group = parser.add_mutually_exclusive_group()
-    default_group.add_argument('-v', '--verbose', action='store_true')
-    default_group.add_argument('-q', '--quiet', action='store_true')
+    default_group.add_argument('-v', '--verbose', action='store_true',
+                               help='Verbose level logging to shell.')
+    default_group.add_argument('-q', '--quiet', action='store_true',
+                               help='Only print errors.')
     parser.add_argument(
         '-f', '--force', action='store_true',
         help='Force install any requirements (USE WITH CARE!).')
@@ -288,7 +316,7 @@ def parse_args():
         parser.add_argument(
             '--installpythondev', action='store_true',
             help='Attempt to install Python Developers Package')
-    if OS == 'windows':
+    elif OS == 'windows':
         parser.add_argument(
             '--installpycrypto', action='store_true',
             help='Attempt to install PyCrypto')
@@ -299,25 +327,25 @@ if __name__ == '__main__':
     OS = os_props[0].lower() if os_props[0] else 'Unknown'
     DISTRO = os_props[1].lower() if os_props[1] else 'Unknown'
     RELEASE = os_props[2].lower() if os_props[2] else 'Unknown'
-    # check 32/64bit to choose the correct PyCrypto installation (windows only)
-    IS_PYX32 = True if struct.calcsize("P") == 4 else False
     args = parse_args()
     if args.quiet:
         QUIET = True
     elif args.verbose:
         VERBOSE = True
-    # if OS is windows, we want to make sure sudo will not be used
-    if hasattr(args, 'nosudo'):
-        SUDO = False if args.nosudo or OS == 'windows' else True
-    else:
-        SUDO = False
-    # are we running within a virtualenv when executing the script?
-    IS_VIRTUALENV = os.environ.get('VIRTUAL_ENV')
-    ENV_BIN_RELATIVE_PATH = '\\scripts\\' if OS == 'windows' else '/bin/'
     if VERBOSE:
         prn('Identified OS: {0}'.format(OS))
         prn('Identified Distribution: {0}'.format(DISTRO))
         prn('Identified Release: {0}'.format(RELEASE))
+    # if OS is windows, we want to make sure sudo will not be used
+    SUDO = False if not hasattr(args, 'nosudo') or args.nosudo else True
+    # are we running within a virtualenv? This will potentially affect the
+    # destination installation directory
+    IS_VIRTUALENV = os.environ.get('VIRTUAL_ENV')
+    # check 32/64bit to choose the correct PyCrypto installation (windows only)
+    IS_PYX32 = True if struct.calcsize("P") == 4 else False
+    # need to check if os.path.join works as expected on windows when
+    # declaring these as it seems to provide some problems.
+    ENV_BIN_RELATIVE_PATH = '\\scripts\\' if OS == 'windows' else '/bin/'
     if OS in ('windows', 'linux', 'darwin'):
         installer = CloudifyInstaller(args)
         installer.install()
