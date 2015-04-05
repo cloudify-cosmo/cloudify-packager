@@ -24,6 +24,9 @@ UBUNTU_PRECISE_BOX_NAME = 'hashicorp/precise64'
 DEBIAN_JESSIE_BOX_NAME = 'binarydata/debian-jessie'
 CENTOS_FINAL_BOX_NAME = 'chef/centos-6.5'
 
+GITHUB_USERNAME = ENV['GITHUB_USERNAME']
+GITHUB_PASSWORD = ENV['GITHUB_PASSWORD']
+
 Vagrant.configure('2') do |config|
   config.vm.define "debian_jessie_cli_aws" do |debian_jessie|
     # dummy box, will be overriden
@@ -219,6 +222,7 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
