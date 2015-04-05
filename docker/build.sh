@@ -28,11 +28,14 @@ build_image()
   DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
   setup_jocker_env
   jocker -t $PACKAGER_DOCKER_PATH/Dockerfile.template -o $PACKAGER_DOCKER_PATH/Dockerfile -f $PACKAGER_DOCKER_PATH/vars.py
-  echo Building cloudify stack image.
+  echo Building cloudify OSS stack image.
   build_cloudify_image cloudify:latest
+  jocker -t $PACKAGER_DOCKER_PATH/Dockerfile-commercial.template -o $PACKAGER_DOCKER_PATH/Dockerfile -f $PACKAGER_DOCKER_PATH/vars.py
+  echo Building cloudify commercial stack image.
+  build_cloudify_image cloudify-commercial:latest
 }
 
-main() 
+main()
 {
   build_image
 }
