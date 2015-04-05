@@ -18,6 +18,8 @@
 
 AWS_ACCESS_KEY_ID = ENV['AWS_ACCESS_KEY_ID']
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
+GITHUB_USERNAME = ENV['GITHUB_USERNAME']
+GITHUB_PASSWORD = ENV['GITHUB_PASSWORD']
 
 UBUNTU_TRUSTY_BOX_NAME = 'ubuntu/trusty64'
 UBUNTU_PRECISE_BOX_NAME = 'hashicorp/precise64'
@@ -89,6 +91,38 @@ Vagrant.configure('2') do |config|
     ubuntu_trusty.vm.provision "shell" do |s|
       s.path = "provision.sh"
       s.args = "Ubuntu-trusty"
+      s.privileged = false
+    end
+  end
+  config.vm.define "ubuntu_trusty_commercial_aws" do |ubuntu_trusty|
+    # dummy box, will be overriden
+    ubuntu_trusty.vm.box = "dummy"
+    ubuntu_trusty.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+
+    ubuntu_trusty.vm.provider :aws do |aws, override|
+      aws.access_key_id = AWS_ACCESS_KEY_ID
+      aws.secret_access_key = AWS_ACCESS_KEY
+
+      # official ubuntu 14.04 64bit box
+      aws.ami = "ami-f0b11187"
+      aws.region = "eu-west-1"
+      aws.instance_type = "m3.medium"
+
+      aws.keypair_name = "vagrant_build"
+      override.ssh.username = "ubuntu"
+      override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
+
+      aws.tags = {
+          "Name" => "vagrant ubuntu trusty agent build",
+      }
+        aws.security_groups = "vagrant_cfy_build"
+    end
+
+    # need to sync folders
+    ubuntu_trusty.vm.synced_folder "../../", "/cloudify-packager", create: true
+    ubuntu_trusty.vm.provision "shell" do |s|
+      s.path = "provision.sh"
+      s.args = "Ubuntu-trusty True GITHUB_USERNAME GITHUB_PASSWORD"
       s.privileged = false
     end
   end
@@ -226,6 +260,19 @@ Vagrant.configure('2') do |config|
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
       s.args = "Ubuntu-trusty"
+      s.privileged = false
+    end
+  end
+  config.vm.define :ubuntu_trusty_commercial do |local|
+    local.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', '1024']
+    end
+    local.vm.box = UBUNTU_TRUSTY_BOX_NAME
+    local.vm.hostname = 'local'
+    local.vm.synced_folder "../../", "/cloudify-packager", create: true
+    local.vm.provision "shell" do |s|
+      s.path = "provision.sh"
+      s.args = "Ubuntu-trusty True GITHUB_USERNAME GITHUB_PASSWORD"
       s.privileged = false
     end
   end
