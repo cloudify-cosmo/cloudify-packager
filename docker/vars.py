@@ -119,12 +119,14 @@ VARS = {
             "python2.7"
         ],
         "modules": {
+            "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",
+            "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",
             "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",
             "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",
             "flask_securest": "git+git://github.com/cloudify-cosmo/flask-securest.git@0.5",
             "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
         },
-        "ports": ["8100"],
+        "ports": ["8100", "8101"],
         "persistence_path": ["/opt/manager/resources", "/var/log/cloudify"],
     },
     "webui": {
@@ -136,7 +138,7 @@ VARS = {
             "make"
         ],
         "nodejs_latest_url": "http://nodejs.org/dist/node-latest.tar.gz",
-        "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m7-RELEASE/cloudify-ui_3.2.0-m7-b177_amd64.deb",
+        "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/m8-RELEASE/cloudify-ui_3.2.0-m8-b178_amd64.deb",
         "ports": ["80"],
     }
 }
