@@ -1,6 +1,7 @@
 #! /bin/bash -e
 
-PACKAGER_SHA=""
+CORE_TAG_NAME="master"
+
 
 install_docker()
 {
@@ -16,9 +17,8 @@ clone_packager()
 {
   git clone https://github.com/cloudify-cosmo/cloudify-packager.git $1
   pushd $1
-          if [ -n "PACKAGER_SHA" ]; then
-                  git reset --hard $PACKAGER_SHA
-          fi
+          git checkout -b tmp_branch $CORE_TAG_NAME
+    			git log -1
   popd
 }
 
