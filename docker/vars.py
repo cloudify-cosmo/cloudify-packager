@@ -93,6 +93,8 @@ VARS = {
         "reqs": [
             "curl",
             "python-dev",
+            "libxslt-dev",
+            "libxml2-dev",
             "git",
             "g++",
             "wget",
