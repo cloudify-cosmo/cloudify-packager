@@ -28,7 +28,7 @@ ENV MANAGEMENT_IP=frontend \
 COPY /config/startup.sh /root/startup.sh
 
 RUN apt-get update && \
-    apt-get install -y python-dev curl g++ sudo wget && \
+    apt-get install -y python-dev curl g++ sudo wget libxslt-dev libxml2-dev && \
     chmod +x /root/startup.sh && \
     mkdir -p ${CELERY_LOG_DIR} && \
     virtualenv ${VIRTUALENV_DIR} && \
