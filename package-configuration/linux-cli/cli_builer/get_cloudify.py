@@ -72,7 +72,7 @@ Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
 
 QUIET = False
-VERBOSE = True
+VERBOSE = False
 # TODO: put these in a private storage
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
 PYCR64_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win-amd64-py2.7.exe'  # NOQA
@@ -97,7 +97,6 @@ def _print_proc_out(proc):
             prn('STDERR: {0}'.format(stderr_line))
 
 
-
 def run(cmd, sudo=False):
     """This will execute a command either sudo-ically or not.
     """
@@ -111,6 +110,8 @@ def run(cmd, sudo=False):
         _print_proc_out(proc)
         sleep(1)
     _print_proc_out(proc)
+    if not proc.returncode == 0:
+        raise RuntimeError('failed executing command \'{}\''.format(cmd))
     return proc
 
 
@@ -172,6 +173,8 @@ def get_os_props():
     release = distro_info[2]
     return os, distro, release
 
+class InstallerError(StandardError):
+    pass
 
 class CloudifyInstaller():
     def __init__(self, args):
@@ -233,13 +236,20 @@ class CloudifyInstaller():
         # TODO: check below to see if pip already exists
         # import distutils
         # if not distutils.spawn.find_executable('pip'):
-        download_file(PIP_URL, 'get-pip.py')
+        try:
+            download_file(PIP_URL, 'get-pip.py')
+        except StandardError as e:
+            raise InstallerError('failed downloading pip. Reason: {}'
+                                 .format(e.message))
+
         cmd = '{0} get-pip.py'.format(self.args.pythonpath)
-        result = run(cmd, sudo=True) if SUDO else run(cmd)
-        # TEST remove get-pip.py file
-        # os.remove('get-pip.py')
-        if not result.returncode == 0:
-            sys.exit('Could not install pip')
+        try:
+            run(cmd, sudo=True) if SUDO else run(cmd)
+            # TEST remove get-pip.py file
+            # os.remove('get-pip.py')
+        except RuntimeError as e:
+            raise InstallerError('pip istallation failed. reason: {}'
+                                 .format(e.message))
 
     def install_pythondev(self):
         prn('Installing python-dev...')

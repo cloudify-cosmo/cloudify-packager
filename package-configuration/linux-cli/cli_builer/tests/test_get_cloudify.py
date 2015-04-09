@@ -15,6 +15,7 @@
 ############
 import sys
 sys.path.append('../')
+from get_cloudify import InstallerError
 import get_cloudify as cli_builder
 import unittest
 import urllib
@@ -28,6 +29,7 @@ class CliBuilderUnitTests(unittest.TestCase):
     def setUp(self):
         self.cli_builder = cli_builder
         self.installer = self.cli_builder.CloudifyInstaller
+        self.cli_builder.SUDO = False
         # self.installer.install_pycrypto()
 
     def test_validate_urls(self):
@@ -45,7 +47,7 @@ class CliBuilderUnitTests(unittest.TestCase):
         except:
             raise AssertionError('url {} is not valid.'.format(url))
 
-    def test_run_command(self):
+    def test_run_valid_command(self):
         self.cli_builder.VERBOSE = True
         builder_stdout = StringIO()
         # replacing builder stdout
@@ -59,6 +61,19 @@ class CliBuilderUnitTests(unittest.TestCase):
                       'expected stderr was not printed')
         self.assertEqual(proc.returncode, 0, 'process execution failed')
 
+    def test_run_invalid_command(self):
+        self.cli_builder.VERBOSE = True
+        builder_stdout = StringIO()
+        # replacing builder stdout
+        self.cli_builder.sys.stdout = builder_stdout
+        cmd = 'this is not a valid command'
+        try:
+            proc = cli_builder.run(cmd)
+            self.fail('command \'{}\' execution was expected to fail')
+        except RuntimeError as e:
+            self.assertEqual(e.message, 'failed executing command \'{}\''
+                                        .format(cmd))
+
     def test_install_failed_download(self):
         mock_boom = MagicMock()
         mock_boom.side_effect = StandardError('Boom!')
@@ -70,9 +85,25 @@ class CliBuilderUnitTests(unittest.TestCase):
         installer = self.cli_builder.CloudifyInstaller(args)
         try:
             installer.install()
-        except StandardError as e:
-            self.assertEqual(e.message, 'Boom!')
+            self.fail('installation did not trigger error as expected')
+        except InstallerError as e:
+            self.assertEqual(e.message, 'failed downloading pip. '
+                                        'Reason: Boom!')
 
+    def test_install_pip_fail(self):
+
+        self.cli_builder.download_file = MagicMock(return_value=None)
+
+        args = Object()
+        args.pythonpath = 'non_existing_path'
+        installer = self.cli_builder.CloudifyInstaller(args)
+        try:
+            installer.install_pip()
+            self.fail('installation did not trigger error as expected')
+        except InstallerError as e:
+            self.assertEqual(e.message, 'pip istallation failed. reason: '
+                                        'failed executing command '
+                                        '\'non_existing_path get-pip.py\'')
 
 class Object(object):
     pass
