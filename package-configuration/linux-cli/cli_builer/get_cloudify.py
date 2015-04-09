@@ -173,8 +173,10 @@ def get_os_props():
     release = distro_info[2]
     return os, distro, release
 
+
 class InstallerError(StandardError):
     pass
+
 
 class CloudifyInstaller():
     def __init__(self, args):

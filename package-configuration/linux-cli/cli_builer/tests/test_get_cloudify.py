@@ -68,7 +68,7 @@ class CliBuilderUnitTests(unittest.TestCase):
         self.cli_builder.sys.stdout = builder_stdout
         cmd = 'this is not a valid command'
         try:
-            proc = cli_builder.run(cmd)
+            cli_builder.run(cmd)
             self.fail('command \'{}\' execution was expected to fail')
         except RuntimeError as e:
             self.assertEqual(e.message, 'failed executing command \'{}\''
@@ -104,6 +104,7 @@ class CliBuilderUnitTests(unittest.TestCase):
             self.assertEqual(e.message, 'pip istallation failed. reason: '
                                         'failed executing command '
                                         '\'non_existing_path get-pip.py\'')
+
 
 class Object(object):
     pass
