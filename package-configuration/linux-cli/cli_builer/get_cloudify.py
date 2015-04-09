@@ -158,7 +158,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     # is enabled
     try:
         run(pip_cmd, sudo=True) if not IS_VIRTUALENV and not virtualenv_path \
-                                   and SUDO else run(pip_cmd)
+            and SUDO else run(pip_cmd)
     except RuntimeError as e:
         raise InstallerError('module \'{0}\' installation failed. reason {1}'
                              .format(module, e.message))
