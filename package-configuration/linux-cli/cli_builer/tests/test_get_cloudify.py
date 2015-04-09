@@ -17,6 +17,7 @@ import sys
 sys.path.append('../')
 from get_cloudify import InstallerError
 import get_cloudify as cli_builder
+
 import unittest
 import urllib
 from mock import MagicMock
@@ -28,9 +29,8 @@ class CliBuilderUnitTests(unittest.TestCase):
 
     def setUp(self):
         self.cli_builder = cli_builder
-        self.installer = self.cli_builder.CloudifyInstaller
         self.cli_builder.SUDO = False
-        # self.installer.install_pycrypto()
+        self.cli_builder.IS_VIRTUALENV = False
 
     def test_validate_urls(self):
         self._validate_url(self.cli_builder.PIP_URL)
@@ -69,7 +69,8 @@ class CliBuilderUnitTests(unittest.TestCase):
         cmd = 'this is not a valid command'
         try:
             cli_builder.run(cmd)
-            self.fail('command \'{}\' execution was expected to fail')
+            self.fail('command \'{}\' execution was expected to fail'
+                      .format(cmd))
         except RuntimeError as e:
             self.assertEqual(e.message, 'failed executing command \'{}\''
                                         .format(cmd))
@@ -88,10 +89,9 @@ class CliBuilderUnitTests(unittest.TestCase):
             self.fail('installation did not trigger error as expected')
         except InstallerError as e:
             self.assertEqual(e.message, 'failed downloading pip. '
-                                        'Reason: Boom!')
+                                        'reason: Boom!')
 
     def test_install_pip_fail(self):
-
         self.cli_builder.download_file = MagicMock(return_value=None)
 
         args = Object()
@@ -101,9 +101,30 @@ class CliBuilderUnitTests(unittest.TestCase):
             installer.install_pip()
             self.fail('installation did not trigger error as expected')
         except InstallerError as e:
-            self.assertEqual(e.message, 'pip istallation failed. reason: '
+            self.assertEqual(e.message, 'pip installation failed. reason: '
                                         'failed executing command '
                                         '\'non_existing_path get-pip.py\'')
+
+    def test_make_virtualenv_fail(self):
+        try:
+            self.cli_builder.make_virtualenv('/path/to/dir',
+                                             'non_existing_path')
+            self.fail('installation did not trigger error as expected')
+        except InstallerError as e:
+            self.assertEqual(e.message, 'failed creating virtualenv '
+                                        '/path/to/dir. reason failed '
+                                        'executing command \'virtualenv -p '
+                                        'non_existing_path /path/to/dir\'')
+
+    def test_install_module_fail(self):
+        try:
+            self.cli_builder.install_module('nonexisting_module')
+            self.fail('installation did not trigger error as expected')
+        except InstallerError as e:
+            self.assertEqual(e.message, 'module \'nonexisting_module\' '
+                                        'installation failed. reason failed '
+                                        'executing command \'pip install '
+                                        'nonexisting_module\'')
 
 
 class Object(object):
