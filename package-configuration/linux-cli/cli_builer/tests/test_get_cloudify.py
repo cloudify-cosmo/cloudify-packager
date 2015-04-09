@@ -13,26 +13,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ############
+import sys
+sys.path.append('../')
+import get_cloudify as cli_builder
 import unittest
-import cli_builer.get_cloudify as cli_bulider
 import urllib
 from mock import MagicMock
-
+from StringIO import StringIO
 
 
 class CliBuilderUnitTests(unittest.TestCase):
     """Unit tests for functions in get_cloudify.py"""
 
     def setUp(self):
-        self.installer = cli_bulider.CloudifyInstaller
-        self.installer.install_pycrypto()
+        self.cli_builder = cli_builder
+        self.installer = self.cli_builder.CloudifyInstaller
+        # self.installer.install_pycrypto()
 
     def test_validate_urls(self):
-        self._validate_url(cli_bulider.PIP_URL)
+        self._validate_url(self.cli_builder.PIP_URL)
 
-        self._validate_url(cli_bulider.PYCR64_URL)
+        self._validate_url(self.cli_builder.PYCR64_URL)
 
-        self._validate_url(cli_bulider.PYCR32_URL)
+        self._validate_url(self.cli_builder.PYCR32_URL)
 
     def _validate_url(self, url):
         try:
@@ -43,7 +46,33 @@ class CliBuilderUnitTests(unittest.TestCase):
             raise AssertionError('url {} is not valid.'.format(url))
 
     def test_run_command(self):
-        cli_bulider.VERBOSE = True
-        stdout = cli_bulider.run('echo just another STDOUT')
-        self.assertEqual(stdout, )
-        stderr = cli_bulider.run('>&2 echo just another STDERR')
+        self.cli_builder.VERBOSE = True
+        builder_stdout = StringIO()
+        # replacing builder stdout
+        self.cli_builder.sys.stdout = builder_stdout
+        proc = cli_builder.run('echo just another STDOUT && '
+                               '>&2 echo just another STDERR')
+
+        self.assertIn('STDOUT: just another STDOUT', builder_stdout.getvalue(),
+                      'expected stdout was not printed')
+        self.assertIn('STDERR: just another STDERR', builder_stdout.getvalue(),
+                      'expected stderr was not printed')
+        self.assertEqual(proc.returncode, 0, 'process execution failed')
+
+    def test_install_failed_download(self):
+        mock_boom = MagicMock()
+        mock_boom.side_effect = StandardError('Boom!')
+        self.cli_builder.download_file = mock_boom
+
+        args = Object()
+        args.installpip = 'true'
+        args.force = 'false'
+        installer = self.cli_builder.CloudifyInstaller(args)
+        try:
+            installer.install()
+        except StandardError as e:
+            self.assertEqual(e.message, 'Boom!')
+
+
+class Object(object):
+    pass
