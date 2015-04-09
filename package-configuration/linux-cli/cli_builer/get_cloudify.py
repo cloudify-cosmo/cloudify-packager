@@ -121,9 +121,11 @@ def make_virtualenv(virtualenv_dir, python_path):
     with the argument parser.
     """
     prn('Creating Virtualenv {0}...'.format(virtualenv_dir))
-    result = run('virtualenv -p {0} {1}'.format(python_path, virtualenv_dir))
-    if not result.returncode == 0:
-        sys.exit('Could not create virtualenv: {0}'.format(virtualenv_dir))
+    try:
+        run('virtualenv -p {0} {1}'.format(python_path, virtualenv_dir))
+    except RuntimeError as e:
+        raise InstallerError('failed creating virtualenv {0}. reason {1}'
+                             .format(virtualenv_dir, e.message))
 
 
 def install_module(module, version=False, pre=False, virtualenv_path=False,
@@ -154,10 +156,12 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
         prn('Installing within current virtualenv: {0}'.format(IS_VIRTUALENV))
     # sudo will be used only when not installing into a virtualenv and sudo
     # is enabled
-    result = run(pip_cmd, sudo=True) \
-        if not IS_VIRTUALENV and not virtualenv_path and SUDO else run(pip_cmd)
-    if not result.returncode == 0:
-        sys.exit('Could not install module: {0}'.format(module))
+    try:
+        run(pip_cmd, sudo=True) if not IS_VIRTUALENV and not virtualenv_path \
+                                   and SUDO else run(pip_cmd)
+    except RuntimeError as e:
+        raise InstallerError('module \'{0}\' installation failed. reason {1}'
+                             .format(module, e.message))
 
 
 def download_file(url, destination):
@@ -229,9 +233,11 @@ class CloudifyInstaller():
         # TODO: use `install_module` function instead.
         prn('Installing virtualenv...')
         cmd = 'pip install virtualenv'
-        result = run(cmd, sudo=True) if SUDO else run(cmd)
-        if not result.returncode == 0:
-            sys.exit('Could not install Virtualenv.')
+        try:
+            run(cmd, sudo=True) if SUDO else run(cmd)
+        except RuntimeError as e:
+            raise InstallerError('virtualenv installation failed. reason: {}'
+                                 .format(e.message))
 
     def install_pip(self):
         prn('Installing pip...')
@@ -241,7 +247,7 @@ class CloudifyInstaller():
         try:
             download_file(PIP_URL, 'get-pip.py')
         except StandardError as e:
-            raise InstallerError('failed downloading pip. Reason: {}'
+            raise InstallerError('failed downloading pip. reason: {}'
                                  .format(e.message))
 
         cmd = '{0} get-pip.py'.format(self.args.pythonpath)
@@ -250,7 +256,7 @@ class CloudifyInstaller():
             # TEST remove get-pip.py file
             # os.remove('get-pip.py')
         except RuntimeError as e:
-            raise InstallerError('pip istallation failed. reason: {}'
+            raise InstallerError('pip installation failed. reason: {}'
                                  .format(e.message))
 
     def install_pythondev(self):
@@ -266,9 +272,13 @@ class CloudifyInstaller():
         elif os == 'darwin':
             prn('python-dev package not required on Darwin.')
         else:
-            sys.exit('python-dev package installation not supported '
-                     'in current distribution.')
-        run(cmd, sudo=True) if SUDO else run(cmd)
+            raise InstallerError('python-dev package installation not '
+                                 'supported in current distribution.')
+        try:
+            run(cmd, sudo=True) if SUDO else run(cmd)
+        except RuntimeError as e:
+            raise InstallerError('python-dev installation failed. reason: {}'
+                                 .format(e.message))
 
     # Windows only
     def install_pycrypto(self, venv):
@@ -286,7 +296,11 @@ class CloudifyInstaller():
             # why not use join on all 3 parameters? hmm...
             # there was a problem here.
             cmd = '{0}\\{1}'.format(os.path.join(venv, 'scripts'), cmd)
-        run(cmd)
+        try:
+            run(cmd)
+        except RuntimeError as e:
+            raise InstallerError('pycrypto installation failed. reason: {}'
+                                 .format(e.message))
 
 
 def parse_args():
