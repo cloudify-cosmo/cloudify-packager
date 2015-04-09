@@ -14,14 +14,15 @@
 # limitations under the License.
 ############
 import sys
+import unittest
+import urllib
+import tempfile
+from StringIO import StringIO
+from mock import MagicMock
+
 sys.path.append('../')
 from get_cloudify import InstallerError
 import get_cloudify as cli_builder
-
-import unittest
-import urllib
-from mock import MagicMock
-from StringIO import StringIO
 
 
 class CliBuilderUnitTests(unittest.TestCase):
@@ -34,9 +35,7 @@ class CliBuilderUnitTests(unittest.TestCase):
 
     def test_validate_urls(self):
         self._validate_url(self.cli_builder.PIP_URL)
-
         self._validate_url(self.cli_builder.PYCR64_URL)
-
         self._validate_url(self.cli_builder.PYCR32_URL)
 
     def _validate_url(self, url):
@@ -54,11 +53,13 @@ class CliBuilderUnitTests(unittest.TestCase):
         self.cli_builder.sys.stdout = builder_stdout
         proc = cli_builder.run('echo just another STDOUT && '
                                '>&2 echo just another STDERR')
-
-        self.assertIn('STDOUT: just another STDOUT', builder_stdout.getvalue(),
+        self.assertIn('STDOUT: just another STDOUT',
+                      builder_stdout.getvalue(),
                       'expected stdout was not printed')
-        self.assertIn('STDERR: just another STDERR', builder_stdout.getvalue(),
+        self.assertIn('STDERR: just another STDERR',
+                      builder_stdout.getvalue(),
                       'expected stderr was not printed')
+        builder_stdout.close()
         self.assertEqual(proc.returncode, 0, 'process execution failed')
 
     def test_run_invalid_command(self):
@@ -80,7 +81,7 @@ class CliBuilderUnitTests(unittest.TestCase):
         mock_boom.side_effect = StandardError('Boom!')
         self.cli_builder.download_file = mock_boom
 
-        args = Object()
+        args = ArgsObject()
         args.installpip = 'true'
         args.force = 'false'
         installer = self.cli_builder.CloudifyInstaller(args)
@@ -94,7 +95,7 @@ class CliBuilderUnitTests(unittest.TestCase):
     def test_install_pip_fail(self):
         self.cli_builder.download_file = MagicMock(return_value=None)
 
-        args = Object()
+        args = ArgsObject()
         args.pythonpath = 'non_existing_path'
         installer = self.cli_builder.CloudifyInstaller(args)
         try:
@@ -116,7 +117,7 @@ class CliBuilderUnitTests(unittest.TestCase):
                                         'executing command \'virtualenv -p '
                                         'non_existing_path /path/to/dir\'')
 
-    def test_install_module_fail(self):
+    def test_install_non_existing_module(self):
         try:
             self.cli_builder.install_module('nonexisting_module')
             self.fail('installation did not trigger error as expected')
@@ -126,6 +127,21 @@ class CliBuilderUnitTests(unittest.TestCase):
                                         'executing command \'pip install '
                                         'nonexisting_module\'')
 
+    def test_get_os_props(self):
+        os = self.cli_builder.get_os_props()[0]
+        supported_os_list = ('windows', 'linux', 'darwin')
+        if os.lower() not in supported_os_list:
+            self.fail('os prop \'{0}\' should be equal to one of these names: '
+                      '{1}'.format(os, supported_os_list))
 
-class Object(object):
+    def test_download_file(self):
+        self.cli_builder.VERBOSE = True
+        tmp_file = tempfile.NamedTemporaryFile(delete=True)
+        self.cli_builder.download_file('http://www.google.com', tmp_file.name)
+        with open(tmp_file.name) as f:
+            content = f.readlines()
+            self.assertIsNotNone(content)
+
+
+class ArgsObject(object):
     pass

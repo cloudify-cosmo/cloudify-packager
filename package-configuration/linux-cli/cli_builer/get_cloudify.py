@@ -29,7 +29,6 @@
 # Run python get-cloudify.py -f
 
 
-import sys
 import subprocess
 import argparse
 import platform
@@ -166,8 +165,11 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
 
 def download_file(url, destination):
     prn('Downloading {0} to {1}'.format(url, destination))
+    final_url = urllib.urlopen(url).geturl()
+    if VERBOSE and final_url != url:
+        prn('redirected to {}'.format(final_url))
     f = urllib.URLopener()
-    f.retrieve(url, destination)
+    f.retrieve(final_url, destination)
 
 
 def get_os_props():
@@ -260,6 +262,7 @@ class CloudifyInstaller():
                                  .format(e.message))
 
     def install_pythondev(self):
+        # TODO(adaml): is pacman pre-installed in arch? bug in os=darwin if
         prn('Installing python-dev...')
         if DISTRO in ('ubuntu', 'debian'):
             cmd = 'apt-get install -y gcc python-dev'
@@ -269,7 +272,7 @@ class CloudifyInstaller():
             # Arch doesn't require a python-dev package.
             # It's already supplied with Python.
             cmd = 'pacman -S gcc --noconfirm'
-        elif os == 'darwin':
+        elif OS == 'darwin':
             prn('python-dev package not required on Darwin.')
         else:
             raise InstallerError('python-dev package installation not '
@@ -362,6 +365,9 @@ if __name__ == '__main__':
     OS = os_props[0].lower() if os_props[0] else 'Unknown'
     DISTRO = os_props[1].lower() if os_props[1] else 'Unknown'
     RELEASE = os_props[2].lower() if os_props[2] else 'Unknown'
+    if OS not in ('windows', 'linux', 'darwin'):
+        raise InstallerError('os \'{}\' is not supported'.format(OS))
+
     args = parse_args()
     if args.quiet:
         QUIET = True
@@ -381,8 +387,6 @@ if __name__ == '__main__':
     # need to check if os.path.join works as expected on windows when
     # declaring these as it seems to provide some problems.
     ENV_BIN_RELATIVE_PATH = '\\scripts\\' if OS == 'windows' else '/bin/'
-    if OS in ('windows', 'linux', 'darwin'):
-        installer = CloudifyInstaller(args)
-        installer.install()
-    else:
-        sys.exit('OS {0} not supported.'.format(OS))
+
+    installer = CloudifyInstaller(args)
+    installer.install()
