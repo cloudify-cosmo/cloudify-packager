@@ -224,10 +224,10 @@ class CloudifyInstaller():
                 install_module('cloudify', pre=True,
                                virtualenv_path=self.args.virtualenv,
                                wheelspath=self.args.wheelspath)
-            except:
-                prn('Offline installation failed. Please verify that '
-                    'the wheels path contains the required wheels. '
-                    'Attemping online installation process.')
+            except Exception as e:
+                prn('offline installation failed. cause: \'{}\'. '
+                    'attempting online installation process..'
+                    .format(e.message))
                 install_module('cloudify', self.args.version,
                                self.args.pre, self.args.virtualenv)
 
