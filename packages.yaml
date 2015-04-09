@@ -234,7 +234,7 @@ packages:
     bootstrap_log: "/var/log/cloudify3-bootstrap.log"
 
   cloudify-linux-cli:
-    name: "cloudify-linux-cli"
+    name: "cloudify-linux_cli"
     version: "3.1.0"
     package_path: "/cloudify"
     sources_path: "/cfy"
@@ -247,5 +247,5 @@ packages:
     bootstrap_template: "cli-linux.template"
     config_templates:
       config_dir:
-        files: "package-configuration/linux-cli"
+        files: "package-configuration/linux-cli/cli_builder"
         config_dir: ""

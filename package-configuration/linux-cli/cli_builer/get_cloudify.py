@@ -36,6 +36,7 @@ import platform
 import os
 import urllib
 import struct
+from time import sleep
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -71,7 +72,7 @@ Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
 
 QUIET = False
-VERBOSE = False
+VERBOSE = True
 # TODO: put these in a private storage
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
 PYCR64_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win-amd64-py2.7.exe'  # NOQA
@@ -86,6 +87,17 @@ def prn(what):
     print(what)
 
 
+def _print_proc_out(proc):
+    stdout_line = proc.stdout.readline()
+    stderr_line = proc.stderr.read()
+    if VERBOSE:
+        if len(stdout_line) > 0:
+            prn('STDOUT: {0}'.format(stdout_line))
+        if len(stderr_line) > 0:
+            prn('STDERR: {0}'.format(stderr_line))
+
+
+
 def run(cmd, sudo=False):
     """This will execute a command either sudo-ically or not.
     """
@@ -96,12 +108,9 @@ def run(cmd, sudo=False):
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # while the process is still running, print output
     while proc.poll() is None:
-        stdout_line = proc.stdout.readline()
-        if VERBOSE and len(stdout_line) > 0:
-            prn('STDOUT: {0}'.format(stdout_line))
-    stderr = proc.stderr.read()
-    if len(stderr) > 0:
-        prn('STDERR: {0}'.format(stderr))
+        _print_proc_out(proc)
+        sleep(1)
+    _print_proc_out(proc)
     return proc
 
 
