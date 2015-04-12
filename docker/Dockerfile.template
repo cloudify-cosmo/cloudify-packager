@@ -200,7 +200,11 @@ ENV NGINX_RUN_FILE $NGINX_SERVICE_DIR/run
 ENV NGINX_LOGS_DIR $NGINX_SERVICE_DIR/logs
 ##### ENV #####
 # add run scripts and configuration
-ADD nginx/ $NGINX_SERVICE_DIR
+ADD nginx/cloudify-rest-location.conf $NGINX_SERVICE_DIR/
+ADD nginx/default.conf $NGINX_SERVICE_DIR/
+ADD nginx/run $NGINX_SERVICE_DIR/
+# add ssl default certificate and private key files
+ADD nginx/ssl/ /root/cloudify/
 
 RUN echo adding nginx repositories to sources.list file and update repo && \
     echo {{ nginx.source_repos }} | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
