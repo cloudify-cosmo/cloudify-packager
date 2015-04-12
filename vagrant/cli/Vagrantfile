@@ -21,7 +21,9 @@ AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
 
 UBUNTU_TRUSTY_BOX_NAME = 'ubuntu/trusty64'
 UBUNTU_PRECISE_BOX_NAME = 'hashicorp/precise64'
+UBUNTU_LUCID_BOX_NAME = 'f500/ubuntu-lucid64'
 DEBIAN_JESSIE_BOX_NAME = 'binarydata/debian-jessie'
+DEBIAN_SQUEEZE_BOX_NAME = 'dene/debian-squeeze'
 CENTOS_FINAL_BOX_NAME = 'chef/centos-6.5'
 
 GITHUB_USERNAME = ENV['GITHUB_USERNAME']
@@ -235,6 +237,31 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
+      s.privileged = false
+    end
+  end
+  config.vm.define :ubuntu_lucid_cli do |local|
+    local.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', '1024']
+    end
+    local.vm.box = UBUNTU_LUCID_BOX_NAME
+    local.vm.hostname = 'local'
+    local.vm.synced_folder "../../", "/cloudify-packager", create: true
+    local.vm.provision "shell" do |s|
+      s.path = "provision.sh"
+      s.privileged = false
+    end
+  end
+  config.vm.define :debian_squeeze_cli do |local|
+    local.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', '1024']
+    end
+    local.vm.box = DEBIAN_SQUEEZE_BOX_NAME
+    local.vm.hostname = 'local'
+    local.vm.synced_folder "../../", "/cloudify-packager", create: true
+    local.vm.provision "shell" do |s|
+      s.path = "provision.sh"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end

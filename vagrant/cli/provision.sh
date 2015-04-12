@@ -5,9 +5,9 @@ function install_prereqs
         sudo apt-get -y update &&
         # precise
         sudo apt-get install -y python-software-properties
-        # trusty
-        sudo apt-get install -y software-properties-common
-        sudo add-apt-repository -y ppa:git-core/ppa &&
+        # # trusty
+        # sudo apt-get install -y software-properties-common
+        # sudo add-apt-repository -y ppa:git-core/ppa &&
         sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev g++ rpm
     elif which yum; then
         # centos/REHL
