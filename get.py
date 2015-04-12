@@ -14,33 +14,29 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
-from packman.packman import init_logger
-from packman.packman import get_component_config as get_conf
-from packman.packman import CommonHandler
-from packman.packman import PythonHandler
-from packman.packman import WgetHandler
+from packman import logger
+from packman.packman import get_package_config as get_conf
+from packman import utils
+from packman import python
+from packman import retrieve
 
-from fabric.api import *  # NOQA
-
-lgr = init_logger()
-
-# __all__ = ['list']
+lgr = logger.init()
 
 
 def _prepare(package):
 
-    common = CommonHandler()
+    common = utils.Handler()
     common.rmdir(package['sources_path'])
     common.mkdir('{0}/archives'.format(package['sources_path']))
     common.mkdir(package['package_path'])
 
 
 def create_agent(package, download=False):
-    dl_handler = WgetHandler()
-    common = CommonHandler()
-    py_handler = PythonHandler()
+    dl_handler = retrieve.Handler()
+    common = utils.Handler()
+    py_handler = python.Handler()
     _prepare(package)
-    py_handler.venv(package['sources_path'])
+    py_handler.make_venv(package['sources_path'])
     if download:
         tar_file = '{0}/{1}.tar.gz'.format(
             package['sources_path'], package['name'])
@@ -74,11 +70,11 @@ def get_debian_jessie_agent(download=False):
 def get_celery(download=False):
     package = get_conf('celery')
 
-    dl_handler = WgetHandler()
-    common = CommonHandler()
-    py_handler = PythonHandler()
+    dl_handler = retrieve.Handler()
+    common = utils.Handler()
+    py_handler = python.Handler()
     _prepare(package)
-    py_handler.venv(package['sources_path'])
+    py_handler.make_venv(package['sources_path'])
     tar_file = '{0}/{1}.tar.gz'.format(
         package['sources_path'], package['name'])
     for url in package['source_urls']:
@@ -92,11 +88,11 @@ def get_celery(download=False):
 def get_manager(download=False):
     package = get_conf('manager')
 
-    dl_handler = WgetHandler()
-    common = CommonHandler()
-    py_handler = PythonHandler()
+    dl_handler = retrieve.Handler()
+    common = utils.Handler()
+    py_handler = python.Handler()
     _prepare(package)
-    py_handler.venv(package['sources_path'])
+    py_handler.make_venv(package['sources_path'])
     tar_file = '{0}/{1}.tar.gz'.format(
         package['sources_path'], package['name'])
     for url in package['source_urls']:

@@ -1,26 +1,26 @@
 input {
     rabbitmq {
-        queue => "{{ config_templates.__params_conf.logs_queue}}"
+        queue => "{{ config_templates.params_conf.logs_queue}}"
         host => "localhost"
         durable => "true"
         auto_delete => "true"
         exclusive => "false"
-        # key => "{{ config_templates.__params_conf.logs_queue}}"
+        # key => "{{ config_templates.params_conf.logs_queue}}"
         # exchange => "test_exchange" # This matches the exchange declared above
     }
 
     rabbitmq {
-        queue => "{{ config_templates.__params_conf.events_queue}}"
+        queue => "{{ config_templates.params_conf.events_queue}}"
         host => "localhost"
         durable => "true"
         auto_delete => "true"
         exclusive => "false"
-        # key => "{{ config_templates.__params_conf.events_queue}}"
+        # key => "{{ config_templates.params_conf.events_queue}}"
         # exchange => "test_exchange" # This matches the exchange declared above
     }
- 
+
     tcp {
-        port => {{ config_templates.__params_conf.test_tcp_port }}
+        port => {{ config_templates.params_conf.test_tcp_port }}
     }
 }
 
@@ -33,7 +33,7 @@ filter {
 output {
     elasticsearch_http {
         host => "localhost"
-        index => "{{ config_templates.__params_conf.events_index}}"
+        index => "{{ config_templates.params_conf.events_index}}"
     }
 
 }

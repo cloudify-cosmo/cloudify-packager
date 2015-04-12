@@ -37,9 +37,11 @@ start_and_export_containers()
 {
   sudo docker run -t --name=cloudify -d cloudify:latest /bin/bash
   sudo docker export cloudify > /tmp/cloudify-docker_.tar
+  sudo docker run -t --name=cloudifycommercial -d cloudify-commercial:latest /bin/bash
+  sudo docker export cloudifycommercial > /tmp/cloudify-docker_commercial.tar
 }
 
-main() 
+main()
 {
   install_docker
   build_images

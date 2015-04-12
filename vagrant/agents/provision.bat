@@ -1,8 +1,5 @@
-SET REST_CLIENT_SHA=
-SET COMMON_PLUGIN_SHA=
-SET MANAGER_SHA=
-SET SCRIPTS_PLUGIN_SHA=
-SET DIAMOND_PLUGIN_SHA=
+SET CORE_TAG_NAME="master"
+SET PLUGINS_TAG_NAME="master"
 
 cd c:\\
 virtualenv CloudifyAgent
@@ -14,27 +11,32 @@ pip install celery==3.1.17
 pip install pyzmq==14.3.1
 git clone https://github.com/cloudify-cosmo/cloudify-rest-client.git
 cd C:\\CloudifyAgent\\cloudify-rest-client
-if not (%REST_CLIENT_SHA%)==() git reset --hard %REST_CLIENT_SHA%
-pip install .
+  git checkout -b tmp_branch %CORE_TAG_NAME%
+  git log -1
+  pip install .
 cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-plugins-common.git
 cd C:\\CloudifyAgent\\cloudify-plugins-common
-if not (%COMMON_PLUGIN_SHA%)==() git reset --hard %COMMON_PLUGIN_SHA%
-pip install .
+  git checkout -b tmp_branch %CORE_TAG_NAME%
+  git log -1
+  pip install .
 cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-script-plugin.git
 cd C:\\CloudifyAgent\\cloudify-script-plugin
-if not (%SCRIPTS_PLUGIN_SHA%)==() git reset --hard %SCRIPTS_PLUGIN_SHA%
-pip install .
+  git checkout -b tmp_branch %PLUGINS_TAG_NAME%
+  git log -1
+  pip install .
 cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-diamond-plugin.git
 cd C:\\CloudifyAgent\\cloudify-diamond-plugin
-if not (%DIAMOND_PLUGIN_SHA%)==() git reset --hard %DIAMOND_PLUGIN_SHA%
-pip install .
+  git checkout -b tmp_branch %PLUGINS_TAG_NAME%
+  git log -1 
+  pip install .
 cd C:\\CloudifyAgent
 git clone https://github.com/cloudify-cosmo/cloudify-manager.git
 cd C:\\CloudifyAgent\\cloudify-manager
-if not (%MANAGER_SHA%)==() git reset --hard %MANAGER_SHA%
+  git checkout -b tmp_branch %CORE_TAG_NAME%
+  git log -1
 cd plugins\\windows-plugin-installer
 pip install .
 cd c:\\
