@@ -65,13 +65,9 @@ class CliBuilderUnitTests(unittest.TestCase):
         # replacing builder stdout
         self.get_cloudify.sys.stdout = builder_stdout
         cmd = 'this is not a valid command'
-        try:
-            get_cloudify.run(cmd)
-            self.fail('command \'{}\' execution was expected to fail'
-                      .format(cmd))
-        except RuntimeError as e:
-            self.assertEqual(e.message, 'failed executing command \'{}\''
-                                        .format(cmd))
+        proc = get_cloudify.run(cmd)
+        self.assertIsNot(proc.returncode, 0, 'command \'{}\' execution was '
+                                             'expected to fail'.format(cmd))
 
     def test_install_failed_download(self):
         mock_boom = MagicMock()
@@ -85,7 +81,7 @@ class CliBuilderUnitTests(unittest.TestCase):
         try:
             installer.execute()
             self.fail('installation did not trigger error as expected')
-        except SystemExit as e:
+        except StandardError as e:
             self.assertEqual(e.message, 'failed downloading pip. '
                                         'reason: Boom!')
 
@@ -109,20 +105,16 @@ class CliBuilderUnitTests(unittest.TestCase):
                                               'non_existing_path')
             self.fail('installation did not trigger error as expected')
         except SystemExit as e:
-            self.assertEqual(e.message, 'failed creating virtualenv '
-                                        '/path/to/dir. reason failed '
-                                        'executing command \'virtualenv -p '
-                                        'non_existing_path /path/to/dir\'')
+            self.assertEqual(e.message,
+                             'Could not create virtualenv: /path/to/dir')
 
     def test_install_non_existing_module(self):
         try:
             self.get_cloudify.install_module('nonexisting_module')
             self.fail('installation did not trigger error as expected')
         except SystemExit as e:
-            self.assertEqual(e.message, 'module \'nonexisting_module\' '
-                                        'installation failed. reason failed '
-                                        'executing command \'pip install '
-                                        'nonexisting_module\'')
+            self.assertEqual(e.message, 'Could not install module: '
+                                        'nonexisting_module')
 
     def test_get_os_props(self):
         os = self.get_cloudify.get_os_props()[0]
