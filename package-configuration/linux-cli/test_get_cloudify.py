@@ -83,7 +83,7 @@ class CliBuilderUnitTests(unittest.TestCase):
         args.force = 'false'
         installer = self.get_cloudify.CloudifyInstaller(args)
         try:
-            installer.install()
+            installer.execute()
             self.fail('installation did not trigger error as expected')
         except SystemExit as e:
             self.assertEqual(e.message, 'failed downloading pip. '
