@@ -142,6 +142,64 @@ class CliBuilderUnitTests(unittest.TestCase):
             content = f.readlines()
             self.assertIsNotNone(content)
 
+    def test_args_parser(self):
+        self.cli_builder.OS = 'linux'
+        linux_args = self.cli_builder.parse_args([])
+        self.assertEqual(linux_args.pythonpath, 'python',
+                         'wrong default python path {} set for linux'
+                         .format(linux_args.pythonpath))
+
+        self.cli_builder.OS = 'windows'
+        win_args = self.cli_builder.parse_args([])
+        self.assertEqual(win_args.pythonpath, 'c:/python27/python.exe',
+                         'wrong default python path {} set for windows'
+                         .format(win_args.pythonpath))
+
+        default_args = self.cli_builder.parse_args([])
+        self.assertFalse(default_args.force)
+        self.assertFalse(default_args.forceonline)
+        self.assertFalse(default_args.installpip)
+        self.assertFalse(default_args.installpycrypto)
+        self.assertFalse(default_args.installvirtualenv)
+        self.assertFalse(default_args.pre)
+        self.assertFalse(default_args.quiet)
+        self.assertFalse(default_args.verbose)
+        self.assertIsNone(default_args.version)
+        self.assertIsNone(default_args.virtualenv)
+        self.assertEqual(default_args.wheelspath, 'wheelhouse')
+
+        self.cli_builder.OS = 'linux'
+        set_args = self.cli_builder.parse_args(['-f',
+                                                '--forceonline',
+                                                '--installpip',
+                                                '--virtualenv=venv_path',
+                                                '--quiet',
+                                                '--version=3.2',
+                                                '--installpip',
+                                                '--installpythondev'])
+
+        self.assertTrue(set_args.force)
+        self.assertTrue(set_args.forceonline)
+        self.assertTrue(set_args.installpip)
+        self.assertTrue(set_args.quiet)
+        self.assertEqual(set_args.version, '3.2')
+        self.assertEqual(set_args.virtualenv, 'venv_path')
+
+        # test with args that do not go together
+        try:
+            self.cli_builder.parse_args(['--version', '--pre'])
+            self.fail('args {} iare expected to raise exception'
+                      .format(['--version', '--pre']))
+        except BaseException as e:
+            print e.message
+
+        try:
+            self.cli_builder.parse_args(['--verbose', '--quiet'])
+            self.fail('args {} iare expected to raise exception'
+                      .format(['--verbose', '--quiet']))
+        except BaseException as e:
+            print e.message
+
 
 class ArgsObject(object):
     pass

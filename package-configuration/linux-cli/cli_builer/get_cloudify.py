@@ -1,3 +1,18 @@
+########
+# Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+############
 # Install Cloudify on Debian and Ubuntu
 # apt-get update
 # apt-get install -y curl
@@ -306,7 +321,7 @@ class CloudifyInstaller():
                                  .format(e.message))
 
 
-def parse_args():
+def parse_args(args=None):
     parser = argparse.ArgumentParser(description=DESCRIPTION)
     default_group = parser.add_mutually_exclusive_group()
     version_group = parser.add_mutually_exclusive_group()
@@ -358,7 +373,8 @@ def parse_args():
         parser.add_argument(
             '--installpycrypto', action='store_true',
             help='Attempt to install PyCrypto')
-    return parser.parse_args()
+    return parser.parse_args(args)
+
 
 if __name__ == '__main__':
     os_props = get_os_props()
