@@ -200,7 +200,12 @@ ENV NGINX_RUN_FILE $NGINX_SERVICE_DIR/run
 ENV NGINX_LOGS_DIR $NGINX_SERVICE_DIR/logs
 ##### ENV #####
 # add run scripts and configuration
-ADD nginx/ $NGINX_SERVICE_DIR
+ADD nginx/cloudify-rest-location.conf $NGINX_SERVICE_DIR/
+ADD nginx/default.conf $NGINX_SERVICE_DIR/
+ADD nginx/run $NGINX_SERVICE_DIR/
+# add ssl default certificate and private key files
+ADD nginx/ssl/ /root/cloudify/
+
 
 RUN echo adding nginx repositories to sources.list file and update repo && \
     echo {{ nginx.source_repos }} | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
@@ -223,7 +228,7 @@ RUN echo "daemon off;" >> $NGINX_CONF_FILE && \
     sed -i "s%/etc/nginx/conf.d/\*.conf%$NGINX_SERVICE_DIR/default.conf%g" $NGINX_CONF_FILE && \
     mkdir -p $NGINX_LOGS_DIR && \
     \
-    echo setting config path in run file && \
+    echo setting config path in run fi  le && \
     sed -i '1s|^|NGINX_CONF_FILE='$NGINX_CONF_FILE' \n|' $NGINX_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $NGINX_RUN_FILE && \
     chmod +x $NGINX_RUN_FILE
