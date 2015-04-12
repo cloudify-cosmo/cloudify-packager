@@ -69,7 +69,7 @@ class CliBuilderUnitTests(unittest.TestCase):
         self.assertIsNot(proc.returncode, 0, 'command \'{}\' execution was '
                                              'expected to fail'.format(cmd))
 
-    def test_install_failed_download(self):
+    def test_install_pip_failed_download(self):
         mock_boom = MagicMock()
         mock_boom.side_effect = StandardError('Boom!')
         self.get_cloudify.download_file = mock_boom
@@ -81,9 +81,10 @@ class CliBuilderUnitTests(unittest.TestCase):
         try:
             installer.execute()
             self.fail('installation did not trigger error as expected')
-        except StandardError as e:
-            self.assertEqual(e.message, 'failed downloading pip. '
-                                        'reason: Boom!')
+        except SystemExit as e:
+            self.assertEqual(e.message, 'failed downloading pip from '
+                                        'https://bootstrap.pypa.io/get-pip.py.'
+                                        ' reason: Boom!')
 
     def test_install_pip_fail(self):
         self.get_cloudify.download_file = MagicMock(return_value=None)
