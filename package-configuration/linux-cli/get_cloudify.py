@@ -347,14 +347,16 @@ def parse_args(args=None):
             help='Attempt to install PyCrypto')
     return parser.parse_args(args)
 
-if __name__ == '__main__':
+
+def main():
+    global OS, DISTRO, RELEASE, QUIET, VERBOSE, SUDO, IS_VIRTUALENV, \
+        IS_PYX32, ENV_BIN_RELATIVE_PATH, args
     os_props = get_os_props()
     OS = os_props[0].lower() if os_props[0] else 'Unknown'
     DISTRO = os_props[1].lower() if os_props[1] else 'Unknown'
     RELEASE = os_props[2].lower() if os_props[2] else 'Unknown'
     if OS not in ('windows', 'linux', 'darwin'):
         sys.exit('OS {0} not supported.'.format(OS))
-
     args = parse_args()
     if args.quiet:
         QUIET = True
@@ -375,9 +377,12 @@ if __name__ == '__main__':
     # need to check if os.path.join works as expected on windows when
     # declaring these as it seems to provide some problems.
     ENV_BIN_RELATIVE_PATH = '\\scripts\\' if OS == 'windows' else '/bin/'
-
     installer = CloudifyInstaller(args)
     installer.execute()
     if args.virtualenv:
         prn('You can now run: "source {0}" to activate the Virtualenv.'.format(
             os.path.join(args.virtualenv, 'bin/activate')))
+
+
+if __name__ == '__main__':
+    main()

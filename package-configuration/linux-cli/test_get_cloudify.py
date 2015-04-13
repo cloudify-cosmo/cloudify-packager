@@ -36,6 +36,7 @@ class CliBuilderUnitTests(testtools.TestCase):
         self._validate_url(self.get_cloudify.PYCR64_URL)
         self._validate_url(self.get_cloudify.PYCR32_URL)
 
+    @staticmethod
     def _validate_url(self, url):
         try:
             status = urllib.urlopen(url).getcode()
