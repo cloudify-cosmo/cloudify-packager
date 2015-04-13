@@ -83,6 +83,12 @@ pip and virtualenv depending on the OS and Distro you're running on.
 Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
 
+OS = 'linux'
+IS_VIRTUALENV = False
+SUDO = False
+DISTRO = ''
+IS_PYX32 = False
+ENV_BIN_RELATIVE_PATH = '/bin/'
 QUIET = False
 VERBOSE = False
 # TODO: put these in a private storage
