@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ############
-import unittest
+import testtools
 import urllib
 import tempfile
 from StringIO import StringIO
@@ -22,10 +22,11 @@ from mock import MagicMock
 get_cloudify = __import__("get_cloudify")
 
 
-class CliBuilderUnitTests(unittest.TestCase):
+class CliBuilderUnitTests(testtools.TestCase):
     """Unit tests for functions in get_cloudify.py"""
 
     def setUp(self):
+        super(CliBuilderUnitTests, self).setUp()
         self.get_cloudify = get_cloudify
         self.get_cloudify.SUDO = False
         self.get_cloudify.IS_VIRTUALENV = False
@@ -96,9 +97,7 @@ class CliBuilderUnitTests(unittest.TestCase):
             installer.install_pip()
             self.fail('installation did not trigger error as expected')
         except SystemExit as e:
-            self.assertEqual(e.message, 'pip installation failed. reason: '
-                                        'failed executing command '
-                                        '\'non_existing_path get-pip.py\'')
+            self.assertEqual(e.message, 'Could not install pip')
 
     def test_make_virtualenv_fail(self):
         try:
@@ -180,14 +179,14 @@ class CliBuilderUnitTests(unittest.TestCase):
             self.get_cloudify.parse_args(['--version', '--pre'])
             self.fail('args {} iare expected to raise exception'
                       .format(['--version', '--pre']))
-        except BaseException as e:
+        except SystemExit as e:
             print e.message
 
         try:
             self.get_cloudify.parse_args(['--verbose', '--quiet'])
             self.fail('args {} iare expected to raise exception'
                       .format(['--verbose', '--quiet']))
-        except BaseException as e:
+        except SystemExit as e:
             print e.message
 
 

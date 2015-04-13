@@ -248,7 +248,7 @@ class CloudifyInstaller():
             download_file(PIP_URL, 'get-pip.py')
         except StandardError as e:
             sys.exit('failed downloading pip from {0}. reason: {1}'.format(
-                      PIP_URL, e.message))
+                     PIP_URL, e.message))
         cmd = '{0} get-pip.py'.format(self.args.pythonpath)
         result = run(cmd, sudo=True) if SUDO else run(cmd)
         # TEST remove get-pip.py file
