@@ -29,8 +29,6 @@ class CliInstallTests(testtools.TestCase):
     def setUp(self):
         super(CliInstallTests, self).setUp()
         self.get_cloudify = get_cloudify
-        self.get_cloudify.SUDO = False
-        self.get_cloudify.IS_VIRTUALENV = False
 
     def test_full_cli_install(self):
-        self.run_get_cloudify('-f -v')
+        self.run_get_cloudify('-f -v -e=/tmp/temp_env/ --nosudo')
