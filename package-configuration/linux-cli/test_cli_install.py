@@ -15,7 +15,6 @@
 ############
 import testtools
 import sys
-
 get_cloudify = __import__("get_cloudify")
 
 
