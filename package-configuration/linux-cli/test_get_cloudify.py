@@ -19,7 +19,7 @@ import tempfile
 from StringIO import StringIO
 from mock import MagicMock
 
-get_cloudify = __import__("get_cloudify")
+get_cloudify = __import__("get-cloudify")
 
 
 class CliBuilderUnitTests(testtools.TestCase):
@@ -37,7 +37,7 @@ class CliBuilderUnitTests(testtools.TestCase):
         self._validate_url(self.get_cloudify.PYCR32_URL)
 
     @staticmethod
-    def _validate_url(self, url):
+    def _validate_url(url):
         try:
             status = urllib.urlopen(url).getcode()
             if not status == 200:
