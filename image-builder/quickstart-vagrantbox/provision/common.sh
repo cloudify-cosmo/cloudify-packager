@@ -67,7 +67,7 @@ cfy init
 git clone https://github.com/cloudify-cosmo/cloudify-manager-blueprints.git
 pushd cloudify-manager-blueprints
 	git checkout -b tmp_branch $CORE_TAG_NAME
-  	git log -1
+  	git --no-pager log -1
 popd
 
 # generate public/private key pair and add to authorized_keys
@@ -82,7 +82,7 @@ sed -i "s|ssh_user: ''|ssh_user: \'${USERNAME}\'|g" inputs.yaml
 sed -i "s|ssh_key_filename: ''|ssh_key_filename: \'~/.ssh/id_rsa\'|g" inputs.yaml
 
 # bootstrap the manager locally
-cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple.yaml -i inputs.yaml --install-plugins
+cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple-manager-blueprint.yaml -i inputs.yaml --install-plugins
 if [ "$?" -ne "0" ]; then
   echo "Bootstrap failed, stoping provision."
   exit 1
