@@ -16,7 +16,7 @@
 import testtools
 import sys
 
-get_cloudify = __import__("get_cloudify")
+get_cloudify = __import__("get-cloudify")
 
 
 class CliInstallTests(testtools.TestCase):

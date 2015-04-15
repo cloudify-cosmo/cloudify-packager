@@ -19,7 +19,7 @@ import tempfile
 from StringIO import StringIO
 from mock import MagicMock
 
-get_cloudify = __import__("get_cloudify")
+get_cloudify = __import__("get-cloudify")
 
 
 class CliBuilderUnitTests(testtools.TestCase):
