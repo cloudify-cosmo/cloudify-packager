@@ -26,6 +26,7 @@ build_images()
 {
   CLONE_LOCATION=/tmp/cloudify-packager
   clone_packager $CLONE_LOCATION
+  cp /cloudify-packager/docker/metadata/* /tmp/cloudify-packager/docker/metadata/
   setup_jocker_env
   echo Building cloudify stack image.
   pushd $CLONE_LOCATION
