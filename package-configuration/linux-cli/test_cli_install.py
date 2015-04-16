@@ -23,7 +23,7 @@ class CliInstallTests(testtools.TestCase):
     @staticmethod
     def run_get_cloudify(params):
         sys.argv = params.split()
-        sys.argv.insert(0, 'get-cloudify')
+        sys.argv.insert(0, 'gett-cloudify')
         get_cloudify.main()
 
     def setUp(self):
