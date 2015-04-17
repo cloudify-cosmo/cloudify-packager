@@ -113,9 +113,7 @@ CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
 
 install_prereqs &&
-if ! which ruby; then
-	install_ruby
-fi
+install_ruby
 install_fpm &&
 install_pip &&
 install_module "packman==0.5.0" &&
