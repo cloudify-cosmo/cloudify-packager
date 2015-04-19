@@ -25,6 +25,7 @@ RUN apt-get update && \
     apt-get purge -y curl && \
     apt-get autoremove -y
 
+COPY LICENSE /opt/cloudify-ui/LICENSE
 COPY config/gsPresets.json /opt/cloudify-ui/backend/gsPresets.json
 
 EXPOSE 9001
