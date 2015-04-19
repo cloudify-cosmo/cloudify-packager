@@ -112,10 +112,10 @@ GITHUB_PASSWORD=$4
 CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
 
-install_prereqs &&
-install_ruby
-install_fpm &&
-install_pip &&
+#install_prereqs &&
+#install_ruby
+#install_fpm &&
+#install_pip &&
 install_module "packman==0.5.0" &&
 install_module "virtualenv==12.0.7" &&
 
