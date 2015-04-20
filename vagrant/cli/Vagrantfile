@@ -18,16 +18,19 @@
 
 AWS_ACCESS_KEY_ID = ENV['AWS_ACCESS_KEY_ID']
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
-GITHUB_USERNAME = ENV['GITHUB_USERNAME']
-GITHUB_PASSWORD = ENV['GITHUB_PASSWORD']
 
 UBUNTU_TRUSTY_BOX_NAME = 'ubuntu/trusty64'
 UBUNTU_PRECISE_BOX_NAME = 'hashicorp/precise64'
+UBUNTU_LUCID_BOX_NAME = 'f500/ubuntu-lucid64'
 DEBIAN_JESSIE_BOX_NAME = 'binarydata/debian-jessie'
+DEBIAN_SQUEEZE_BOX_NAME = 'dene/debian-squeeze'
 CENTOS_FINAL_BOX_NAME = 'chef/centos-6.5'
 
+GITHUB_USERNAME = ENV['GITHUB_USERNAME']
+GITHUB_PASSWORD = ENV['GITHUB_PASSWORD']
+
 Vagrant.configure('2') do |config|
-  config.vm.define "debian_jessie_aws" do |debian_jessie|
+  config.vm.define "debian_jessie_cli_aws" do |debian_jessie|
     # dummy box, will be overriden
     config.nfs.functional = false
     debian_jessie.vm.box = "dummy"
@@ -38,13 +41,13 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # debian-jessie 64bit box
-      aws.ami = "ami-47640130"
+      aws.ami = "ami-699f021e"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
       aws.keypair_name = "vagrant_build"
       override.ssh.username = "admin"
-      override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
+      override.ssh.private_key_path = "/home/.ssh/aws/vagrant_build.pem"
 
       aws.tags = {
           "Name" => "vagrant debian jessie agent build",
@@ -58,11 +61,10 @@ Vagrant.configure('2') do |config|
     rsync__args: ["--verbose", "--rsync-path='sudo rsync'"]
     debian_jessie.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "debian-jessie"
       s.privileged = false
     end
   end
-  config.vm.define "ubuntu_trusty_aws" do |ubuntu_trusty|
+  config.vm.define "ubuntu_trusty_cli_aws" do |ubuntu_trusty|
     # dummy box, will be overriden
     ubuntu_trusty.vm.box = "dummy"
     ubuntu_trusty.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
@@ -72,13 +74,13 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # official ubuntu 14.04 64bit box
-      aws.ami = "ami-77244000"
+      aws.ami = "ami-f0b11187"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
       aws.keypair_name = "vagrant_build"
       override.ssh.username = "ubuntu"
-      override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
+      override.ssh.private_key_path = "/home/.ssh/aws/vagrant_build.pem"
 
       aws.tags = {
           "Name" => "vagrant ubuntu trusty agent build",
@@ -90,43 +92,10 @@ Vagrant.configure('2') do |config|
     ubuntu_trusty.vm.synced_folder "../../", "/cloudify-packager", create: true
     ubuntu_trusty.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-trusty"
       s.privileged = false
     end
   end
-  config.vm.define "ubuntu_trusty_commercial_aws" do |ubuntu_trusty|
-    # dummy box, will be overriden
-    ubuntu_trusty.vm.box = "dummy"
-    ubuntu_trusty.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
-
-    ubuntu_trusty.vm.provider :aws do |aws, override|
-      aws.access_key_id = AWS_ACCESS_KEY_ID
-      aws.secret_access_key = AWS_ACCESS_KEY
-
-      # official ubuntu 14.04 64bit box
-      aws.ami = "ami-77244000"
-      aws.region = "eu-west-1"
-      aws.instance_type = "m3.medium"
-
-      aws.keypair_name = "vagrant_build"
-      override.ssh.username = "ubuntu"
-      override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
-
-      aws.tags = {
-          "Name" => "vagrant ubuntu trusty agent commercial build",
-      }
-        aws.security_groups = "vagrant_cfy_build"
-    end
-
-    # need to sync folders
-    ubuntu_trusty.vm.synced_folder "../../", "/cloudify-packager", create: true
-    ubuntu_trusty.vm.provision "shell" do |s|
-      s.path = "provision.sh"
-      s.args = "Ubuntu-trusty True #{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
-      s.privileged = false
-    end
-  end
-  config.vm.define "ubuntu_precise_aws" do |ubuntu_precise|
+  config.vm.define "ubuntu_precise_cli_aws" do |ubuntu_precise|
     # dummy box, will be overriden
     ubuntu_precise.vm.box = "dummy"
     ubuntu_precise.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
@@ -136,13 +105,13 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # official ubuntu 12.04 64bit box
-      aws.ami = "ami-a16500d6"
+      aws.ami = "ami-036eaa74"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
       aws.keypair_name = "vagrant_build"
       override.ssh.username = "ubuntu"
-      override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
+      override.ssh.private_key_path = "/home/.ssh/aws/vagrant_build.pem"
 
       aws.tags = {
           "Name" => "vagrant ubuntu precise agent build",
@@ -154,11 +123,10 @@ Vagrant.configure('2') do |config|
     ubuntu_precise.vm.synced_folder "../../", "/cloudify-packager", create: true
     ubuntu_precise.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-precise"
       s.privileged = false
     end
   end
-  config.vm.define "centos_final_aws" do |centos_final|
+  config.vm.define "centos_final_cli_aws" do |centos_final|
     #dummy box, will be overriden
     centos_final.vm.box = "dummy"
     centos_final.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
@@ -168,13 +136,13 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # unofficial centos6.4 64bit box
-      aws.ami = "ami-85dbbef2"
+      aws.ami = "ami-3b39ee4c"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
       aws.keypair_name = "vagrant_build"
       override.ssh.username = "root"
-      override.ssh.private_key_path = "~/.ssh/aws/vagrant_centos_build.pem"
+      override.ssh.private_key_path = "/home/.ssh/aws/vagrant_centos_build.pem"
 
       aws.tags = {
           "Name" => "vagrant agent centos build",
@@ -186,7 +154,6 @@ Vagrant.configure('2') do |config|
     centos_final.vm.synced_folder "../../", "/cloudify-packager", create: true, type: "rsync", rsync__exclude: ".git/"
     centos_final.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "centos-Final"
       s.privileged = false
     end
   end
@@ -205,10 +172,10 @@ Vagrant.configure('2') do |config|
 
       aws.keypair_name = "windows_agent_packager"
       override.ssh.username = "Administrator"
-      override.ssh.private_key_path = "~/.ssh/aws/windows_agent_packager.pem"
+      override.ssh.private_key_path = AWS_PK_PATH
 
       aws.tags = {
-          "Name" => "windows agent packager build",
+          "Name" => "windows agent packager",
       }
       aws.security_groups = "vagrant_windows"
     end
@@ -224,7 +191,7 @@ Vagrant.configure('2') do |config|
   end
 
 
-  config.vm.define :debian_jessie do |local|
+  config.vm.define :debian_jessie_cli do |local|
     local.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', '1024']
     end
@@ -233,11 +200,10 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "debian-jessie"
       s.privileged = false
     end
   end
-  config.vm.define :ubuntu_precise do |local|
+  config.vm.define :ubuntu_precise_cli do |local|
     local.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', '1024']
     end
@@ -246,11 +212,10 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-precise"
       s.privileged = false
     end
   end
-  config.vm.define :ubuntu_trusty do |local|
+  config.vm.define :ubuntu_trusty_cli do |local|
     local.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', '1024']
     end
@@ -259,24 +224,11 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-trusty"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
-  config.vm.define :ubuntu_trusty_commercial do |local|
-    local.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', '1024']
-    end
-    local.vm.box = UBUNTU_TRUSTY_BOX_NAME
-    local.vm.hostname = 'local'
-    local.vm.synced_folder "../../", "/cloudify-packager", create: true
-    local.vm.provision "shell" do |s|
-      s.path = "provision.sh"
-      s.args = "Ubuntu-trusty True #{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
-      s.privileged = false
-    end
-  end
-  config.vm.define :centos_final do |local|
+  config.vm.define :centos_final_cli do |local|
     local.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', '1024']
     end
@@ -285,7 +237,31 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "centos-Final"
+      s.privileged = false
+    end
+  end
+  config.vm.define :ubuntu_lucid_cli do |local|
+    local.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', '1024']
+    end
+    local.vm.box = UBUNTU_LUCID_BOX_NAME
+    local.vm.hostname = 'local'
+    local.vm.synced_folder "../../", "/cloudify-packager", create: true
+    local.vm.provision "shell" do |s|
+      s.path = "provision.sh"
+      s.privileged = false
+    end
+  end
+  config.vm.define :debian_squeeze_cli do |local|
+    local.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', '1024']
+    end
+    local.vm.box = DEBIAN_SQUEEZE_BOX_NAME
+    local.vm.hostname = 'local'
+    local.vm.synced_folder "../../", "/cloudify-packager", create: true
+    local.vm.provision "shell" do |s|
+      s.path = "provision.sh"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
