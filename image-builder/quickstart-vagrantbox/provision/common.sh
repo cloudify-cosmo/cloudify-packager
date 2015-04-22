@@ -47,7 +47,7 @@ if [ "$INSTALL_FROM_PYPI" = "true" ]; then
 else
 	echo installing cli from github
 	pip install git+https://github.com/cloudify-cosmo/cloudify-dsl-parser.git@$CORE_TAG_NAME
-	pip install git+https://github.com/cloudify-cosmo/flask-securest.git@master
+	pip install git+https://github.com/cloudify-cosmo/flask-securest.git@0.6
 	pip install git+https://github.com/cloudify-cosmo/cloudify-rest-client.git@$CORE_TAG_NAME
 	pip install git+https://github.com/cloudify-cosmo/cloudify-plugins-common.git@$CORE_TAG_NAME	
 	pip install git+https://github.com/cloudify-cosmo/cloudify-script-plugin.git@$PLUGINS_TAG_NAME
