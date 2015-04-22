@@ -247,5 +247,5 @@ packages:
     bootstrap_template: "cli-linux.template"
     config_templates:
       config_dir:
-        files: "package-configuration/linux-cli/cli_builder"
+        files: "package-configuration/linux-cli"
         config_dir: ""
