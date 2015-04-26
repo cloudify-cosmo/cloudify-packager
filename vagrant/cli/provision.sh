@@ -34,6 +34,13 @@ function install_ruby
 function install_fpm
 {
     sudo gem install fpm --no-ri --no-rdoc
+    sudo which fpm
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        FPM_PATH="$(which fpm)"
+        sudo ln -s $FPM_PATH /bin/fpm
+        # sudo ln -s /usr/local/bin/fpm /bin/fpm
+    fi
     # if we want to downlod gems as a part of the packman run, this should be enabled
     # echo -e 'gem: --no-ri --no-rdoc\ninstall: --no-rdoc --no-ri\nupdate:  --no-rdoc --no-ri' >> ~/.gemrc
 }
@@ -91,6 +98,9 @@ function install_py27
     sudo ./configure --prefix=/usr
     sudo make
     sudo make altinstall
+    if which python2.7; then
+        alias python=python2.7
+    fi
 }
 
 function get_wheels

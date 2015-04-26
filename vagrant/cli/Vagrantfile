@@ -157,6 +157,70 @@ Vagrant.configure('2') do |config|
       s.privileged = false
     end
   end
+  config.vm.define "centos7_0_final_cli_aws" do |centos_final|
+    #dummy box, will be overriden
+    centos_final.vm.box = "dummy"
+    centos_final.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+
+    centos_final.vm.provider :aws do |aws, override|
+      aws.access_key_id = AWS_ACCESS_KEY_ID
+      aws.secret_access_key = AWS_ACCESS_KEY
+
+      # unofficial centos6.4 64bit box
+      aws.ami = "ami-d36200a4"
+      aws.region = "eu-west-1"
+      aws.instance_type = "m3.medium"
+
+      aws.keypair_name = "vagrant_build"
+      override.ssh.username = "ec2-user"
+      override.ssh.private_key_path = "/home/.ssh/aws/vagrant_build.pem"
+
+      aws.tags = {
+          "Name" => "vagrant agent centos build",
+      }
+        aws.security_groups = "vagrant_linux_build"
+    end
+
+    #need to sync folders
+    centos_final.vm.synced_folder "../../", "/cloudify-packager", create: true, type: "rsync", rsync__exclude: ".git/"
+    centos_final.vm.provision "shell" do |s|
+      s.path = "provision.sh"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
+      s.privileged = false
+    end
+  end
+  config.vm.define "centos6_5_final_cli_aws" do |centos_final|
+    #dummy box, will be overriden
+    centos_final.vm.box = "dummy"
+    centos_final.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+
+    centos_final.vm.provider :aws do |aws, override|
+      aws.access_key_id = AWS_ACCESS_KEY_ID
+      aws.secret_access_key = AWS_ACCESS_KEY
+
+      # unofficial centos6.5 64bit
+      aws.ami = "ami-77385400"
+      aws.region = "eu-west-1"
+      aws.instance_type = "m3.medium"
+
+      aws.keypair_name = "vagrant_build"
+      override.ssh.username = "root"
+      override.ssh.private_key_path = "/home/.ssh/aws/vagrant_build.pem"
+
+      aws.tags = {
+          "Name" => "vagrant agent centos 6.5 build",
+      }
+        aws.security_groups = "vagrant_linux_build"
+    end
+
+    #need to sync folders
+    centos_final.vm.synced_folder "../../", "/cloudify-packager", create: true, type: "rsync", rsync__exclude: ".git/"
+    centos_final.vm.provision "shell" do |s|
+      s.path = "provision.sh"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
+      s.privileged = false
+    end
+  end
   config.vm.define "windows_aws" do |windows|
     windows.vm.box = "dummy"
     windows.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
