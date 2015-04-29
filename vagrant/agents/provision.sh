@@ -29,10 +29,12 @@ function install_pip
 install_deps
 
 cd ~
-install_pip
-sudo pip install pip==6.0.8 --upgrade
-sudo pip install virtualenv==12.0.7
+install_pip &&
+sudo pip install pip==6.0.8 --upgrade &&
+sudo pip install virtualenv==12.0.7 &&
+sudo pip install boto==2.36.0 &&
+
 # REPLACE branch before production
-sudo pip install git+https://github.com/cloudify-cosmo/cloudify-agent-packager@agent-refactoring-project
-cd /tmp
+sudo pip install git+https://github.com/cloudify-cosmo/cloudify-agent-packager@agent-refactoring-project &&
+cd /tmp &&
 cfy-ap -c /vagrant/packager.yaml -f -v
