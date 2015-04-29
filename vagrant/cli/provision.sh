@@ -127,6 +127,9 @@ function get_wheels
 
 function get_manager_blueprints
 {
+    curl -O http://cloudify-public-repositories.s3.amazonaws.com/cloudify-manager-blueprints/3.2rc1/cloudify-manager-blueprints.tar.gz &&
+    tar -zxvf cloudify-manager-blueprints.tar.gz &&
+    rm cloudify-manager-blueprints.tar.gz &&
     echo "Retrieving Manager Blueprints"
 }
 
