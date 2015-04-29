@@ -47,10 +47,12 @@ function install_fpm
 
 function install_pip
 {
-    if which apt-get; then
-        curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
-    else
-        curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python2.7
+    if ! which pip >> /dev/null; then
+        if which apt-get; then
+            curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
+        else
+            curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python2.7
+        fi
     fi
 }
 
@@ -138,7 +140,12 @@ if which apt-get; then
     install_ruby
 fi
 if which yum; then
-    install_py27
+    if ! which python2.7 >> /dev/null; then
+        install_py27
+    else
+        alias python=python2.7
+    fi
+
 fi
 install_fpm &&
 install_pip &&
