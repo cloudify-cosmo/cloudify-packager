@@ -24,12 +24,6 @@ input {
     }
 }
 
-filter {
-    date {
-        match => [ "timestamp", "YYYY-MM-dd HH:mm:ss.SSS" ]
-    }
-}
-
 output {
     elasticsearch_http {
         host => "localhost"
