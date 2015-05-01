@@ -199,6 +199,25 @@ packages:
         config_dir: "config"
         dst_dir: "/opt/manager/resources/packages/agents/templates/"
 
+  centos-Final-agent:
+    name: "centos-Final-agent"
+    version: "3.2.0-rc1"
+    source_urls:
+      - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
+    package_path: "/agents/centos-agent"
+    sources_path: "/centos-agent/env"
+    python_modules:
+      - "billiard==2.7.3.28"
+      - "celery==3.1.17"
+      - "bernhard"
+      - "pika"
+      - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
+      - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
+      - "/centos-agent/env/cloudify-manager-master/plugins/plugin-installer/"
+    source_package_type: "dir"
+    destination_package_types:
+      - "tar.gz"
+
   cloudify-centos-core-agent:
     name: "cloudify-centos-core-agent"
     version: "3.2.0-rc1"
@@ -221,8 +240,8 @@ packages:
         config_dir: "config"
         dst_dir: "/opt/manager/resources/packages/agents/templates/"
 
-  centos-Final-agent:
-    name: "centos-Final-agent"
+  centos-Core-agent:
+    name: "centos-Core-agent"
     version: "3.2.0-rc1"
     source_urls:
       - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
