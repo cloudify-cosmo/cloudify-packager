@@ -190,6 +190,39 @@ Vagrant.configure('2') do |config|
       s.privileged = false
     end
   end
+  config.vm.define "centos_core_aws" do |centos_core|
+    #dummy box, will be overriden
+    centos_core.vm.box = "dummy"
+    centos_core.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+
+    centos_core.vm.provider :aws do |aws, override|
+      aws.access_key_id = AWS_ACCESS_KEY_ID
+      aws.secret_access_key = AWS_ACCESS_KEY
+
+      # unofficial centos6.4 64bit box
+      aws.ami = "ami-85dbbef2"
+      aws.region = "eu-west-1"
+      aws.instance_type = "m3.medium"
+
+      aws.keypair_name = "vagrant_build"
+      override.ssh.username = "root"
+      override.ssh.private_key_path = "~/.ssh/aws/vagrant_centos_build.pem"
+
+      aws.tags = {
+          "Name" => "vagrant agent centos build",
+      }
+        aws.security_groups = "vagrant_linux_build"
+    end
+
+    #need to sync folders
+    centos_core.vm.synced_folder "../../", "/cloudify-packager", create: true,
+    type: "rsync", rsync__exclude: ".git/"
+    centos_core.vm.provision "shell" do |s|
+      s.path = "provision.sh"
+      s.args = "centos-Core"
+      s.privileged = false
+    end
+  end
   config.vm.define "windows_aws" do |windows|
     windows.vm.box = "dummy"
     windows.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
