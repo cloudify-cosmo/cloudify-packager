@@ -80,6 +80,8 @@ sed -i "s|public_ip: ''|public_ip: \'127.0.0.1\'|g" inputs.yaml
 sed -i "s|private_ip: ''|private_ip: \'127.0.0.1\'|g" inputs.yaml
 sed -i "s|ssh_user: ''|ssh_user: \'${USERNAME}\'|g" inputs.yaml
 sed -i "s|ssh_key_filename: ''|ssh_key_filename: \'~/.ssh/id_rsa\'|g" inputs.yaml
+# configure manager blueprint
+sed -i "s|/cloudify-docker_3|/cloudify-docker-commercial_3|g" simple-manager-blueprint.yaml
 
 # bootstrap the manager locally
 cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple-manager-blueprint.yaml -i inputs.yaml --install-plugins
