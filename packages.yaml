@@ -51,6 +51,28 @@ packages:
         config_dir: "config"
         dst_dir: "/opt/manager/resources/packages/agents/templates/"
 
+  cloudify-ubuntu-commercial-agent:
+    name: "cloudify-trusty-agent"
+    version: "3.2.0-rc1"
+    package_path: "/cloudify"
+    sources_path: "/tmp/Ubuntu-agent"
+    source_package_type: "dir"
+    destination_package_types:
+      - "deb"
+    bootstrap_script: "package-scripts/agent-ubuntu-bootstrap.sh"
+    bootstrap_template: "agent-ubuntu-bootstrap.template"
+    bootstrap_params:
+      file_server_path: "/opt/manager/resources"
+      dst_agent_location: "packages/agents"
+      dst_template_location: "packages/templates"
+      dst_script_location: "packages/scripts"
+    bootstrap_log: "/var/log/cloudify3-bootstrap.log"
+    config_templates:
+      config_dir:
+        files: "package-configuration/ubuntu-commercial-agent"
+        config_dir: "config"
+        dst_dir: "/opt/manager/resources/packages/agents/templates/"
+
   cloudify-debian-jessie-agent:
     name: "cloudify-debian-jessie-agent"
     version: "3.2.0-rc1"
