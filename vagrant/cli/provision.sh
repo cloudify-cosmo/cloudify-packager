@@ -105,6 +105,22 @@ function install_py27
     fi
 }
 
+function copy_version_file
+{  
+    pushd /cfy/wheelhouse/
+      sudo mkdir -p tmp
+      cli_whl_name=$(basename `find . -name cloudify-*.whl`) 
+      sudo unzip $cli_whl_name -d tmp/
+      sudo cp -f /cloudify-packager/VERSION tmp/cloudify_cli/
+      pushd tmp
+        sudo zip $cli_whl_name cloudify*/*
+      popd
+      sudo rm -f $cli_whl_name
+      sudo mv tmp/$cli_whl_name .      
+      sudo rm -rf tmp
+    popd
+}
+
 function get_wheels
 {
     echo "Retrieving Wheels"
@@ -122,8 +138,8 @@ function get_wheels
     sudo pip wheel git+https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/cloudify-cosmo/cloudify-vsphere-plugin@${PLUGINS_TAG_NAME} --find-links=wheelhouse &&
     sudo pip wheel git+https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/cloudify-cosmo/cloudify-softlayer-plugin@${PLUGINS_TAG_NAME} --find-links=wheelhouse &&
     sudo pip wheel git+https://github.com/cloudify-cosmo/cloudify-cli@${CORE_TAG_NAME} --find-links=wheelhouse
+    copy_version_file
 }
-
 
 function get_manager_blueprints
 {
