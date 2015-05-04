@@ -51,11 +51,11 @@ packages:
         config_dir: "config"
         dst_dir: "/opt/manager/resources/packages/agents/templates/"
 
-  cloudify-ubuntu-commercial-agent:
-    name: "cloudify-trusty-agent"
+  cloudify-ubuntu-trusty-commercial-agent:
+    name: "cloudify-ubuntu-trusty-agent"
     version: "3.2.0-rc1"
     package_path: "/cloudify"
-    sources_path: "/tmp/Ubuntu-agent"
+    sources_path: "/agents/Ubuntu-agent"
     source_package_type: "dir"
     destination_package_types:
       - "deb"
