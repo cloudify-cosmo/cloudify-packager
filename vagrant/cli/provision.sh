@@ -146,7 +146,7 @@ function get_manager_blueprints
 
 function get_license
 {
-    wget https://raw.githubusercontent.com/cloudify-cosmo/cloudify-packager/${CORE_TAG_NAME}/docker/cloudify-ui/LICENSE .  
+    sudo cp -f /cloudify-packager/docker/cloudify-ui/LICENSE .
 }
 
 CORE_TAG_NAME="master"
