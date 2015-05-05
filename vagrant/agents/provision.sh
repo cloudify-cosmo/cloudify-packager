@@ -148,7 +148,9 @@ if [ "${COMMERCIAL}" == "True" ]; then
 	install_module "cloudify-vsphere-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" "${GITHUB_USERNAME}" "${GITHUB_PASSWORD}" &&
 	install_module "cloudify-softlayer-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" "${GITHUB_USERNAME}" "${GITHUB_PASSWORD}" &&
 	# copy license to virtualenv
-	cp -f docker/cloudify-ui/LICENSE "${AGENT_VENV}"
+	lic_dir=${AGENT_VENV}/cloudify-license
+	mkdir -p ${lic_dir}
+	cp -f docker/cloudify-ui/LICENSE ${lic_dir}
 fi
 install_manager_modules "cloudify-manager" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 
