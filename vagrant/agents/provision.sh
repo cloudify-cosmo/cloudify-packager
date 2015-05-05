@@ -146,7 +146,8 @@ install_module "cloudify-script-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
 install_module "cloudify-diamond-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
 if [ "${COMMERCIAL}" == "True" ]; then
 	install_module "cloudify-vsphere-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" "${GITHUB_USERNAME}" "${GITHUB_PASSWORD}" &&
-	install_module "cloudify-softlayer-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" "${GITHUB_USERNAME}" "${GITHUB_PASSWORD}"
+	install_module "cloudify-softlayer-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" "${GITHUB_USERNAME}" "${GITHUB_PASSWORD}" &&
+	# copy license to virtualenv
 	wget https://raw.githubusercontent.com/cloudify-cosmo/cloudify-packager/${CORE_TAG_NAME}/docker/cloudify-ui/LICENSE -P "${AGENT_VENV}"
 fi
 install_manager_modules "cloudify-manager" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
