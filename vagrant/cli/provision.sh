@@ -144,6 +144,11 @@ function get_manager_blueprints
     echo "Retrieving Manager Blueprints"
 }
 
+function get_license
+{
+    wget https://raw.githubusercontent.com/cloudify-cosmo/cloudify-packager/${CORE_TAG_NAME}/docker/cloudify-ui/LICENSE .  
+}
+
 CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
 GITHUB_USERNAME=$1
@@ -169,6 +174,7 @@ install_module "wheel==0.24.0" &&
 sudo mkdir -p /cfy && cd /cfy &&
 
 echo '# GET PROCESS'
+get_license &&
 get_wheels &&
 get_manager_blueprints &&
 
