@@ -148,12 +148,22 @@ install_module "cloudify-script-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
 install_module "cloudify-diamond-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
 if [ "${COMMERCIAL}" == "True" ]; then
 	install_module "cloudify-vsphere-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" "${GITHUB_USERNAME}" "${GITHUB_PASSWORD}" &&
-	install_module "cloudify-softlayer-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" "${GITHUB_USERNAME}" "${GITHUB_PASSWORD}"
+	install_module "cloudify-softlayer-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" "${GITHUB_USERNAME}" "${GITHUB_PASSWORD}" &&
+	# copy license to virtualenv
+	lic_dir=${AGENT_VENV}/cloudify-license
+	mkdir -p ${lic_dir}
+	cp -f docker/cloudify-ui/LICENSE ${lic_dir}
 fi
 install_manager_modules "cloudify-manager" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 
 # create agent tar file
 sudo pkm pack -c ${AGENT}-agent &&
 # convert agent name to lower case and create deb/rpm
+
 AGENT_ID=$(echo ${AGENT} | tr '[:upper:]' '[:lower:]')
-sudo pkm pack -c cloudify-${AGENT_ID}-agent
+if [ "${COMMERCIAL}" == "True" ]; then
+	sudo pkm pack -c cloudify-${AGENT_ID}-commercial-agent
+else
+	sudo pkm pack -c cloudify-${AGENT_ID}-agent
+fi
+
