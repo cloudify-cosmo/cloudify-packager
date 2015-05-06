@@ -11,7 +11,7 @@ function install_prereqs
 		sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev g++
 	elif which yum; then
 		# centos/REHL
-		sudo yum -y update &&
+		sudo yum -y --exclude=kernel\* update &&
 		sudo yum install -y yum-downloadonly wget mlocate yum-utils &&
 		sudo yum install -y python-devel libyaml-devel ruby rubygems ruby-devel make gcc git g++
 		# this is required to build pyzmq under centos/RHEL
@@ -141,7 +141,7 @@ elif [ "${AGENT}" == "debian-jessie" ]; then
 	AGENT_VENV="/debian-agent/env"
 fi
 install_module "celery==3.1.17" "${AGENT_VENV}" &&
-install_module "pyzmq==14.4.0" "${AGENT_VENV}" &&
+install_module "pyzmq==14.4.0" "${AGENT_VENV}"
 install_module "cloudify-rest-client" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 install_module "cloudify-plugins-common" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 install_module "cloudify-script-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
