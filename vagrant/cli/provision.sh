@@ -11,7 +11,7 @@ function install_prereqs
         sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev g++ rpm
     elif which yum; then
         # centos/REHL
-        sudo yum -y update &&
+        sudo yum -y --exclude=kernel\* update &&
         sudo yum install -y yum-downloadonly wget mlocate yum-utils &&
         sudo yum install -y python-devel libyaml-devel ruby rubygems ruby-devel make gcc git g++ rpm-build
     else
@@ -108,16 +108,11 @@ function install_py27
 function copy_version_file
 {  
     pushd /cfy/wheelhouse/
-      sudo mkdir -p tmp
-      cli_whl_name=$(basename `find . -name cloudify-*.whl`) 
-      sudo unzip $cli_whl_name -d tmp/
-      sudo cp -f /cloudify-packager/VERSION tmp/cloudify_cli/
-      pushd tmp
-        sudo zip $cli_whl_name cloudify*/*
-      popd
-      sudo rm -f $cli_whl_name
-      sudo mv tmp/$cli_whl_name .      
-      sudo rm -rf tmp
+      sudo mkdir -p cloudify_cli
+      sudo cp -f /cloudify-packager/VERSION cloudify_cli
+      cloudify_cli=$(basename `find . -name cloudify-*.whl`) 
+      sudo zip $cloudify_cli cloudify_cli/VERSION
+      sudo rm -f cloudify_cli
     popd
 }
 
@@ -149,6 +144,11 @@ function get_manager_blueprints
     echo "Retrieving Manager Blueprints"
 }
 
+function get_license
+{
+    sudo cp -f /cloudify-packager/docker/cloudify-ui/LICENSE .
+}
+
 CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
 GITHUB_USERNAME=$1
@@ -174,6 +174,7 @@ install_module "wheel==0.24.0" &&
 sudo mkdir -p /cfy && cd /cfy &&
 
 echo '# GET PROCESS'
+get_license &&
 get_wheels &&
 get_manager_blueprints &&
 
