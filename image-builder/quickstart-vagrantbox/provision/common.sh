@@ -63,9 +63,11 @@ function init_cfy_workdir
 function get_manager_blueprints
 {
 	echo "Retrieving Manager Blueprints"
-    sudo curl -O http://cloudify-public-repositories.s3.amazonaws.com/cloudify-manager-blueprints/${CORE_TAG_NAME}/cloudify-manager-blueprints.tar.gz &&
+    sudo curl -O http://cloudify-public-repositories.s3.amazonaws.com/cloudify-manager-blueprints/3.2rc1/cloudify-manager-blueprints.tar.gz &&
     sudo tar -zxvf cloudify-manager-blueprints.tar.gz &&
-    sudo rm cloudify-manager-blueprints.tar.gz &&
+    # for some reason, the cloudify-manager-blueprints dir is appended with a weird string. This is a workaround until it is fixed.
+    mv cloudify-manager-blueprints-commercial/ cloudify-manager-blueprints
+    sudo rm cloudify-manager-blueprints.tar.gz
 }
 
 function generate_keys
@@ -79,20 +81,22 @@ function generate_keys
 function configure_manager_blueprint_inputs
 {
 	# configure inputs
+	cd ~/cloudify
 	cp cloudify-manager-blueprints/simple/inputs.yaml.template inputs.yaml
 	sed -i "s|public_ip: ''|public_ip: \'127.0.0.1\'|g" inputs.yaml
 	sed -i "s|private_ip: ''|private_ip: \'127.0.0.1\'|g" inputs.yaml
 	sed -i "s|ssh_user: ''|ssh_user: \'${USERNAME}\'|g" inputs.yaml
 	sed -i "s|ssh_key_filename: ''|ssh_key_filename: \'~/.ssh/id_rsa\'|g" inputs.yaml
 	# configure manager blueprint
-	sed -i "s|/cloudify-docker_3|/cloudify-docker-commercial_3|g" simple-manager-blueprint.yaml
+	sudo sed -i "s|/cloudify-docker_3|/cloudify-docker-commercial_3|g" cloudify-manager-blueprints/simple/simple-manager-blueprint.yaml
 }
 
 function bootstrap
 {
+	cd ~/cloudify
 	echo "bootstrapping..."
 	# bootstrap the manager locally
-	cfy bootstrap -v -p cloudify-manager-blueprints*/simple/simple-manager-blueprint.yaml -i inputs.yaml --install-plugins
+	cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple-manager-blueprint.yaml -i inputs.yaml --install-plugins
 	if [ "$?" -ne "0" ]; then
 	  echo "Bootstrap failed, stoping provision."
 	  exit 1
@@ -126,8 +130,8 @@ function configure_shell_login
 
 INSTALL_FROM_PYPI=$1
 echo "Install from PyPI: ${INSTALL_FROM_PYPI}"
-CORE_TAG_NAME="master"
-PLUGINS_TAG_NAME="master"
+CORE_TAG_NAME="3.2m8"
+PLUGINS_TAG_NAME="3.2m8"
 
 set_username
 install_prereqs
