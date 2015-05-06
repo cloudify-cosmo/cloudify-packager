@@ -11,7 +11,7 @@ function install_prereqs
         sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev g++ rpm
     elif which yum; then
         # centos/REHL
-        sudo yum -y update &&
+        sudo yum -y --exclude=kernel\* update &&
         sudo yum install -y yum-downloadonly wget mlocate yum-utils &&
         sudo yum install -y python-devel libyaml-devel ruby rubygems ruby-devel make gcc git g++ rpm-build
     else
