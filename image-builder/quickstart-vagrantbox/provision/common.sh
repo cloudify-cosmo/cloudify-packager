@@ -62,6 +62,7 @@ function init_cfy_workdir
 
 function get_manager_blueprints
 {
+    cd ~/cloudify
 	echo "Retrieving Manager Blueprints"
     sudo curl -O http://cloudify-public-repositories.s3.amazonaws.com/cloudify-manager-blueprints/3.2rc1/cloudify-manager-blueprints.tar.gz &&
     sudo tar -zxvf cloudify-manager-blueprints.tar.gz &&
@@ -130,8 +131,8 @@ function configure_shell_login
 
 INSTALL_FROM_PYPI=$1
 echo "Install from PyPI: ${INSTALL_FROM_PYPI}"
-CORE_TAG_NAME="3.2m8"
-PLUGINS_TAG_NAME="3.2m8"
+CORE_TAG_NAME="3.2rc1"
+PLUGINS_TAG_NAME="1.2rc1"
 
 set_username
 install_prereqs
