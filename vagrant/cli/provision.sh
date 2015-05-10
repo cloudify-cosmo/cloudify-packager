@@ -146,7 +146,10 @@ function get_manager_blueprints
 
 function get_license
 {
-    sudo cp -f /cloudify-packager/docker/cloudify-ui/LICENSE .
+    # copy license to virtualenv
+	lic_dir="cloudify-license"
+	sudo mkdir -p ${lic_dir}
+    sudo cp -f /cloudify-packager/docker/cloudify-ui/LICENSE ${lic_dir}
 }
 
 CORE_TAG_NAME="master"
