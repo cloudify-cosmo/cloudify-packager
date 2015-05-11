@@ -224,32 +224,33 @@ Vagrant.configure('2') do |config|
   config.vm.define "windows_aws" do |windows|
     windows.vm.box = "dummy"
     windows.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+    windows.vm.guest = :windows
 
     windows.vm.provider :aws do |aws, override|
       aws.access_key_id = AWS_ACCESS_KEY_ID
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # this a pre-baked AMI, not pure base image
-      aws.ami = "ami-bbd90ecc"
+      aws.ami = "ami-118ee566"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
-      aws.keypair_name = "windows_agent_packager"
+      aws.keypair_name = "vagrant_build"
       override.ssh.username = "Administrator"
-      override.ssh.private_key_path = AWS_PK_PATH
+      override.ssh.private_key_path = "/home/.ssh/aws/vagrant_build.pem"
 
       aws.tags = {
-          "Name" => "windows agent packager",
+          "Name" => "windows cli packager",
       }
       aws.security_groups = "vagrant_windows"
     end
 
     windows.vm.synced_folder ".", "/vagrant", disabled: true
-    windows.vm.synced_folder ".", "/home/vagrant"
+    windows.vm.synced_folder "./windows/packaging", "/home/Administrator/packaging"
 
     # shell provisioning uses bash, so use cmd to run batch script
     windows.vm.provision "shell" do |shell|
-      shell.inline = 'cmd /c "c:\\cygwin64\\home\\vagrant\\provision.bat"'
+      shell.path = 'windows/provision.sh'
       shell.privileged = false
     end
   end
