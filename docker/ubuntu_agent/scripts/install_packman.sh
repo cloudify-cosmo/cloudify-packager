@@ -1,5 +1,6 @@
 #!/bin/bash
 
+CORE_TAG_NAME="master"
 
 echo downloading and preparing agent packages
 
@@ -21,5 +22,6 @@ pip install packman==0.5.0
 # clone custom packager branch containing package config
 git clone https://github.com/cloudify-cosmo/cloudify-packager.git
 cd cloudify-packager/
+git checkout -b $CORE_TAG_NAME $CORE_TAG_NAME
 
 pkm pack -c cloudify-ubuntu-agent
