@@ -69,7 +69,7 @@ packages:
     bootstrap_log: "/var/log/cloudify3-bootstrap.log"
     config_templates:
       config_dir:
-        files: "package-configuration/ubuntu-commerical-agent"
+        files: "package-configuration/ubuntu-commercial-agent"
         config_dir: "config"
         dst_dir: "/opt/manager/resources/packages/agents/templates/"
         
