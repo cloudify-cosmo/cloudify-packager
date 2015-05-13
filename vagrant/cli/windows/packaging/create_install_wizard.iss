@@ -1,5 +1,5 @@
 #define AppName "Cloudify CLI"
-#define AppVersion "3.2"
+#define AppVersion GetEnv('VERSION')
 #define AppPublisher "GigaSpaces Technologies"
 #define AppURL "http://getcloudify.org/"
 
