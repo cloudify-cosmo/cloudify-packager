@@ -1,3 +1,4 @@
+import sys
 import argparse
 from zipfile import ZipFile, ZIP_DEFLATED
 from hashlib import sha256
@@ -59,7 +60,11 @@ def parse_args():
 
 def main():
     args = parse_args()
-    modify_wheel(path=args.path, name=args.name, data=args.data)
+    if args.data == '-':
+        data = sys.stdin.read()
+    else:
+        data = args.data
+    modify_wheel(path=args.path, name=args.name, data=data)
 
 
 if __name__ == '__main__':
