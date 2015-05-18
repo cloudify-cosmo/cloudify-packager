@@ -1,6 +1,8 @@
 export TAG_NAME="master"
 export VERSION=`cat packaging/VERSION  | grep version | sed 's/"version":"//g' | sed 's/"//g' | sed 's/,//g' | sed 's/ //g'`
 
+echo "VERSION=$VERSION"
+
 pip install wheel
 
 pip wheel --wheel-dir packaging/source/wheels https://github.com/cloudify-cosmo/cloudify-cli/archive/$TAG_NAME.zip#egg=cloudify-cli \
