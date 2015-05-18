@@ -1,5 +1,5 @@
 export TAG_NAME="master"
-export VERSION=""
+export VERSION=`cat VERSION  | grep version | sed 's/"version": //g' | sed "s/,//g"`
 
 pip install wheel
 
