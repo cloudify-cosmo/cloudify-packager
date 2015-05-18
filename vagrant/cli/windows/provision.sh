@@ -1,15 +1,15 @@
-export TAG_NAME="master"
+export CORE_TAG_NAME="master"
 export VERSION=`cat packaging/VERSION  | grep version | sed 's/"version":"//g' | sed 's/"//g' | sed 's/,//g' | sed 's/ //g'`
 
 echo "VERSION=$VERSION"
 
 pip install wheel
 
-pip wheel --wheel-dir packaging/source/wheels https://github.com/cloudify-cosmo/cloudify-cli/archive/$TAG_NAME.zip#egg=cloudify-cli \
-https://github.com/cloudify-cosmo/cloudify-rest-client/archive/$TAG_NAME.zip#egg=cloudify-rest-client \
-https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/$TAG_NAME.zip#egg=cloudify-dsl-parser \
-https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/$TAG_NAME.zip#egg=cloudify-plugins-common \
-https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/$TAG_NAME.zip#egg=cloudify-script-plugin
+pip wheel --wheel-dir packaging/source/wheels https://github.com/cloudify-cosmo/cloudify-cli/archive/$CORE_TAG_NAME.zip#egg=cloudify-cli \
+https://github.com/cloudify-cosmo/cloudify-rest-client/archive/$CORE_TAG_NAME.zip#egg=cloudify-rest-client \
+https://github.com/cloudify-cosmo/cloudify-dsl-parser/archive/$CORE_TAG_NAME.zip#egg=cloudify-dsl-parser \
+https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/$CORE_TAG_NAME.zip#egg=cloudify-plugins-common \
+https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/$CORE_TAG_NAME.zip#egg=cloudify-script-plugin
 
 export VERSION_FILE=$(cat packaging/VERSION)
 
