@@ -28,6 +28,7 @@ Vagrant.configure('2') do |config|
     end
     local.vm.box = UBUNTU_TRUSTY_BOX_NAME
     local.vm.hostname = 'local'
+    local.vm.network :private_network, ip: "10.10.1.10"
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "common.sh"
