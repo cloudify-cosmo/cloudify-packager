@@ -35,6 +35,8 @@ function install_cloudify
         /cfy/env/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR}/wheelhouse cloudify --pre
         /cfy/env/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR}/wheelhouse cloudify-vsphere-plugin --pre
         /cfy/env/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR}/wheelhouse cloudify-softlayer-plugin --pre
+        /cfy/env/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR}/wheelhouse cloudify-openstack-plugin --pre
+        /cfy/env/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR}/wheelhouse cloudify-aws-plugin --pre
         # when the cli is built for py2.6, unless argparse is put within `install_requires`, we'll have to enable this:
         # if which yum; then
         #   /cfy/env/bin/pip install --use-wheel --no-index --find-links=${PKG_DIR}/wheelhouse argparse=#SOME_VERSION#
