@@ -11,12 +11,10 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 
 ### Generate a custom Cloudify manager image
 
-- Clone the [cloudify-packager](https://github.com/cloudify-cosmo/cloudify-packager) repository from github:
-	{% highlight bash %}
-	git clone https://github.com/cloudify-cosmo/cloudify-packager.git 
-	{% endhighlight %}
+1. Clone the cloudify-packager repository from github:<br>
+`git clone https://github.com/cloudify-cosmo/cloudify-packager.git`
 
-- Make your changes in [var.py](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py)
+1. Make your changes in [var.py](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py)
 	
 	- For example:
 		
@@ -25,8 +23,8 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 		
 		  For example, add the package "my-package" to the manager's requirements list (the [reqs](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py#L119) list):
 			
-		  {% highlight python %}
-		  "managera": {
+```
+		"managera": {
 		    "service_name": "manager",
 			"reqs": [
 			  "git",
@@ -35,32 +33,32 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 			],
 			...
 		  }
-		  {% endhighlight %}
+```
 
-- Run the [build.sh](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/build.sh) 
+1. Run the [build.sh](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/build.sh) 
 	script from the [docker folder](https://github.com/cloudify-cosmo/cloudify-packager/tree/master/docker):
-{% highlight bash %}
-cd cloudify-packager/docker/
-. build.sh
-{% endhighlight %}
+```
+  cd cloudify-packager/docker/
+  . build.sh
+```
 
-- Create a tar file:
-{% highlight bash %}
-sudo docker run -t --name=cloudifycommercial -d cloudify-commercial:latest /bin/bash
-sudo docker export cloudifycommercial > /tmp/cloudify-docker_commercial.tar
-{% endhighlight %}
+1. Create a tar file:
+```
+  sudo docker run -t --name=cloudifycommercial -d cloudify-commercial:latest /bin/bash
+  sudo docker export cloudifycommercial > /tmp/cloudify-docker_commercial.tar
+```
 
-- Create a url to the tar file.
+1. Create a url to the tar file.
 
-- Set the docker_url property in your manager blueprint (see [cloudify_packages]({{page.terminology_link}})) with your custom image url, e.g:
-{% highlight yaml %}
+1. Set the `docker_url` property in your manager blueprint (see `cloudify_packages` property in [CloudifyManager Type](http://getcloudify.org/guide/3.2/reference-types.html#cloudifymanager-type) with your custom image url, e.g:
+```
 cloudify_packages:
 	...
     docker:
     	docker_url: {url to download the custom Cloudify manager image tar file}
-{% endhighlight %}
+```
 
-- Run cfy [bootstrap](http://getcloudify.org/guide/3.1/installation-bootstrapping.html) using your manager blueprint.
+1. Run cfy [bootstrap](http://getcloudify.org/guide/3.1/installation-bootstrapping.html) using your manager blueprint.
 
 
 ### [packman](http://packman.readthedocs.org) configuration
