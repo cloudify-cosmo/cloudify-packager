@@ -14,7 +14,7 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 1. Clone the cloudify-packager repository from github:<br>
 `git clone https://github.com/cloudify-cosmo/cloudify-packager.git`
 
-1. Make your changes in [var.py](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py)
+2. Make your changes in [var.py](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py)
 	
 	- For example:
 		
@@ -35,22 +35,22 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 		  }
 ```
 
-1. Run the [build.sh](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/build.sh) 
+3. Run the [build.sh](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/build.sh) 
 	script from the [docker folder](https://github.com/cloudify-cosmo/cloudify-packager/tree/master/docker):
 ```
   cd cloudify-packager/docker/
   . build.sh
 ```
 
-1. Create a tar file:
+4. Create a tar file:
 ```
   sudo docker run -t --name=cloudifycommercial -d cloudify-commercial:latest /bin/bash
   sudo docker export cloudifycommercial > /tmp/cloudify-docker_commercial.tar
 ```
 
-1. Create a url to the tar file.
+5. Create a url to the tar file.
 
-1. Set the `docker_url` property in your manager blueprint (see `cloudify_packages` property in [CloudifyManager Type](http://getcloudify.org/guide/3.2/reference-types.html#cloudifymanager-type) with your custom image url, e.g:
+6. Set the `docker_url` property in your manager blueprint (see `cloudify_packages` property in [CloudifyManager Type](http://getcloudify.org/guide/3.2/reference-types.html#cloudifymanager-type) with your custom image url, e.g:
 ```
 cloudify_packages:
 	...
@@ -58,7 +58,7 @@ cloudify_packages:
     	docker_url: {url to download the custom Cloudify manager image tar file}
 ```
 
-1. Run cfy [bootstrap](http://getcloudify.org/guide/3.1/installation-bootstrapping.html) using your manager blueprint.
+7. Run cfy [bootstrap](http://getcloudify.org/guide/3.1/installation-bootstrapping.html) using your manager blueprint.
 
 
 ### [packman](http://packman.readthedocs.org) configuration
