@@ -64,9 +64,8 @@ function get_manager_blueprints
 {
     cd ~/cloudify
 	echo "Retrieving Manager Blueprints"
-    sudo curl -O http://cloudify-public-repositories.s3.amazonaws.com/cloudify-manager-blueprints/3.2rc1/cloudify-manager-blueprints.tar.gz &&
+    sudo curl -O http://cloudify-public-repositories.s3.amazonaws.com/cloudify-manager-blueprints/${CORE_TAG_NAME}/cloudify-manager-blueprints.tar.gz &&
     sudo tar -zxvf cloudify-manager-blueprints.tar.gz &&
-    # for some reason, the cloudify-manager-blueprints dir is appended with a weird string. This is a workaround until it is fixed.
     mv cloudify-manager-blueprints-commercial/ cloudify-manager-blueprints
     sudo rm cloudify-manager-blueprints.tar.gz
 }
@@ -131,8 +130,8 @@ function configure_shell_login
 
 INSTALL_FROM_PYPI=$1
 echo "Install from PyPI: ${INSTALL_FROM_PYPI}"
-CORE_TAG_NAME="3.2rc1"
-PLUGINS_TAG_NAME="1.2rc1"
+CORE_TAG_NAME="master"
+PLUGINS_TAG_NAME="master"
 
 set_username
 install_prereqs
