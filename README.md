@@ -20,13 +20,15 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 	
 	- For example:
 		
-		- Replace the master branch with a specific branch for one or more modules in [modules](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py#L123).
-		- Add packages to one of the requirement lists so it will be installed on the image.<br>
+		- Use a specific branch of Cloudify related [modules](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py#L123).<br>
+		  For example, replace the `master` branch with `my-branch` in `cloudify_rest_client` module:
+		  `"cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@my-branch"`
+		- Add system packages to be installed on the image.<br>
 		
 		  For example, add the package "my-package" to the manager's requirements list (the [reqs](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py#L119) list):
 			
 		  {% highlight python %}
-		  "managera": {
+		  "manager": {
 		    "service_name": "manager",
 			"reqs": [
 			  "git",
@@ -44,13 +46,13 @@ cd cloudify-packager/docker/
 . build.sh
 {% endhighlight %}
 
-- Create a tar file:
+- Create a tar file from the generated image:
 {% highlight bash %}
 sudo docker run -t --name=cloudifycommercial -d cloudify-commercial:latest /bin/bash
 sudo docker export cloudifycommercial > /tmp/cloudify-docker_commercial.tar
 {% endhighlight %}
 
-- Create a url to the tar file.
+- Create a url from which you can download the tar file.
 
 - Set the docker_url property in your manager blueprint (see [cloudify_packages]({{page.terminology_link}})) with your custom image url, e.g:
 {% highlight yaml %}
