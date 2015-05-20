@@ -24,7 +24,7 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 		- Add system packages to be installed on the image.<br>
 		  For example, add the package "my-package" to the manager's requirements list (the [reqs](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py#L119) list):
 			
-		  {% highlight python %}
+```
 		  "manager": {
 		    "service_name": "manager",
 			"reqs": [
