@@ -240,7 +240,7 @@ Vagrant.configure('2') do |config|
       override.ssh.private_key_path = "/home/.ssh/aws/vagrant_build.pem"
 
       aws.tags = {
-          "Name" => "windows cli packager",
+          "Name" => "vagrant windows cli build",
       }
       aws.security_groups = "vagrant_windows"
     end
