@@ -12,7 +12,7 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 ### Generate a custom Cloudify manager image
 
 * Clone the cloudify-packager repository from github:<br>
-`git clone https://github.com/cloudify-cosmo/cloudify-packager.git`
+  `git clone https://github.com/cloudify-cosmo/cloudify-packager.git`
 
 * Make your changes in [var.py](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py)
 	
@@ -38,10 +38,10 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 
 * Run the [build.sh](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/build.sh) 
 	script from the [docker folder](https://github.com/cloudify-cosmo/cloudify-packager/tree/master/docker):
-```
+  ```
   cd cloudify-packager/docker/
   . build.sh
-```
+  ```
 - Create a tar file from the generated image:
 {% highlight bash %}
 sudo docker run -t --name=cloudifycommercial -d cloudify-commercial:latest /bin/bash
@@ -51,12 +51,12 @@ sudo docker export cloudifycommercial > /tmp/cloudify-docker_commercial.tar
 - Create a url from which you can download the tar file.
 
 * Set the `docker_url` property in your manager blueprint (see `cloudify_packages` property in [CloudifyManager Type](http://getcloudify.org/guide/3.2/reference-types.html#cloudifymanager-type) with your custom image url, e.g:
-```
-cloudify_packages:
-	...
+  ```
+  cloudify_packages:
+    ...
     docker:
-    	docker_url: {url to download the custom Cloudify manager image tar file}
-```
+      docker_url: {url to download the custom Cloudify manager image tar file}
+  ```
 
 * Run cfy [bootstrap](http://getcloudify.org/guide/3.1/installation-bootstrapping.html) using your manager blueprint.
 
