@@ -22,7 +22,6 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 		  For example, replace the `master` branch with `my-branch` in `cloudify_rest_client` module:
 		  `"cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@my-branch"`
 		- Add system packages to be installed on the image.<br>
-		
 		  For example, add the package "my-package" to the manager's requirements list (the [reqs](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py#L119) list):
 			
 		  {% highlight python %}
