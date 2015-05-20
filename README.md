@@ -24,7 +24,7 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 		- Add system packages to be installed on the image.<br>
 		  For example, add the package "my-package" to the manager's requirements list (the [reqs](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py#L119) list):
 			
-```
+		```
 		  "manager": {
 		    "service_name": "manager",
 			"reqs": [
@@ -34,7 +34,7 @@ To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager
 			],
 			...
 		  }
-```
+		```
 
 * Run the [build.sh](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/build.sh) 
 	script from the [docker folder](https://github.com/cloudify-cosmo/cloudify-packager/tree/master/docker):
