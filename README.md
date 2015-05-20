@@ -9,6 +9,58 @@ Please see [Bootstrapping using Docker](http://getcloudify.org/guide/3.1/install
 
 To generate our [Dockerfile](https://github.com/cloudify-cosmo/cloudify-packager/raw/master/docker/Dockerfile.template) templates, we're using [Jocker](https://github.com/nir0s/jocker).
 
+### Generate a custom Cloudify manager image
+
+* Clone the cloudify-packager repository from github:<br>
+  `git clone https://github.com/cloudify-cosmo/cloudify-packager.git`
+
+* Make your changes in [var.py](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py)
+	
+	- For example:
+		
+		- Use a specific branch of Cloudify related [modules](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py#L123).<br>
+		  For example, replace the `master` branch with `my-branch` in `cloudify_rest_client` module:
+		  `"cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@my-branch"`
+		- Add system packages to be installed on the image.<br>
+		  For example, add the package "my-package" to the manager's requirements list (the [reqs](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/vars.py#L119) list):
+			
+		  ```
+		  "manager": {
+		    "service_name": "manager",
+			"reqs": [
+			  "git",
+			  "python2.7",
+			  "my-package"
+			],
+			...
+		  }
+		  ```
+
+* Run the [build.sh](https://github.com/cloudify-cosmo/cloudify-packager/blob/master/docker/build.sh) 
+	script from the [docker folder](https://github.com/cloudify-cosmo/cloudify-packager/tree/master/docker):
+  ```
+  cd cloudify-packager/docker/
+  . build.sh
+  ```
+- Create a tar file from the generated image:
+{% highlight bash %}
+sudo docker run -t --name=cloudifycommercial -d cloudify-commercial:latest /bin/bash
+sudo docker export cloudifycommercial > /tmp/cloudify-docker_commercial.tar
+{% endhighlight %}
+
+- Create a url from which you can download the tar file.
+
+* Set the `docker_url` property in your manager blueprint (see `cloudify_packages` property in [CloudifyManager Type](http://getcloudify.org/guide/3.2/reference-types.html#cloudifymanager-type) with your custom image url, e.g:
+  ```
+  cloudify_packages:
+    ...
+    docker:
+      docker_url: {url to download the custom Cloudify manager image tar file}
+  ```
+
+* Run cfy [bootstrap](http://getcloudify.org/guide/3.1/installation-bootstrapping.html) using your manager blueprint.
+
+
 ### [packman](http://packman.readthedocs.org) configuration
 
 Package based provisioning will be deprecated in Cloudify 3.2!
