@@ -48,7 +48,6 @@ function install_pip
 
 function install_module
 {
-
 	module=$1
 	venv=${2:-""}
 	tag=${3:-""}
@@ -70,11 +69,7 @@ function install_module
 		popd
 	else
 		if [[ ! -z "$venv" ]]; then
-			# if [[ ! -z "$tag" ]]; then
-			#	pip install git+git://github.com/${org}/${module}.git@${tag}#egg=${module}
-			# else
 			sudo ${venv}/bin/pip install ${module}
-			# fi
 		else
 			sudo pip install ${module}
 		fi
@@ -117,6 +112,7 @@ PLUGINS_TAG_NAME="master"
 #install_fpm &&
 #install_pip &&
 install_module "packman==0.5.0" &&
+echo 'installing venv'
 install_module "virtualenv==12.0.7" &&
 
 cd /cloudify-packager/ &&
@@ -137,6 +133,10 @@ elif [ "${AGENT}" == "centos-Final" ]; then
 	AGENT_VENV="/centos-agent/env"
 elif [ "${AGENT}" == "centos-Core" ]; then
 	AGENT_VENV="/centos-agent/env"
+elif [ "${AGENT}" == "redhat-Maipo" ]; then
+	AGENT_VENV="/redhat-agent/env"
+elif [ "${AGENT}" == "redhat-Santiago" ]; then
+	AGENT_VENV="/redhat-agent/env"
 elif [ "${AGENT}" == "debian-jessie" ]; then
 	AGENT_VENV="/debian-agent/env"
 fi

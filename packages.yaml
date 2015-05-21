@@ -73,6 +73,28 @@ packages:
         config_dir: "config"
         dst_dir: "/opt/manager/resources/packages/agents/templates/"
 
+  cloudify-redhat-agent:
+    name: "cloudify-redhat-agent"
+    version: "3.1.0"
+    package_path: "/cloudify"
+    sources_path: "/tmp/redhat-agent"
+    source_package_type: "dir"
+    destination_package_types:
+      - "deb"
+    bootstrap_script: "package-scripts/agent-redhat-bootstrap.sh"
+    bootstrap_template: "agent-redhat-bootstrap.template"
+    bootstrap_params:
+      file_server_path: "/opt/manager/resources"
+      dst_agent_location: "packages/agents"
+      dst_template_location: "packages/templates"
+      dst_script_location: "packages/scripts"
+    bootstrap_log: "/var/log/cloudify3-bootstrap.log"
+    config_templates:
+      config_dir:
+        files: "package-configuration/redhat-agent"
+        config_dir: "config"
+        dst_dir: "/opt/manager/resources/packages/agents/templates/"
+
   cloudify-ubuntu-trusty-commercial-agent:
     name: "cloudify-ubuntu-trusty-agent"
     version: "3.2.0-rc1"
@@ -283,6 +305,88 @@ packages:
         files: "package-configuration/centos-agent"
         config_dir: "config"
         dst_dir: "/opt/manager/resources/packages/agents/templates/"
+
+  cloudify-redhat-maipo-agent:
+    name: "cloudify-redhat-maipo-agent"
+    version: "3.2.0-rc1"
+    package_path: "/cloudify"
+    sources_path: "/agents/redhat-agent"
+    source_package_type: "dir"
+    destination_package_types:
+      - "deb"
+    bootstrap_script: "package-scripts/agent-redhat-bootstrap.sh"
+    bootstrap_template: "agent-redhat-bootstrap.template"
+    bootstrap_params:
+      file_server_path: "/opt/manager/resources"
+      dst_agent_location: "packages/agents"
+      dst_template_location: "packages/templates"
+      dst_script_location: "packages/scripts"
+    bootstrap_log: "/var/log/cloudify3-bootstrap.log"
+    config_templates:
+      config_dir:
+        files: "package-configuration/redhat-agent"
+        config_dir: "config"
+        dst_dir: "/opt/manager/resources/packages/agents/templates/"
+
+  redhat-Maipo-agent:
+    name: "redhat-Maipo-agent"
+    version: "3.1.0"
+    source_urls:
+      - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
+    package_path: "/agents/redhat-agent"
+    sources_path: "/redhat-agent/env"
+    python_modules:
+      - "billiard==2.7.3.28"
+      - "celery==3.1.17"
+      - "bernhard"
+      - "pika"
+      - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
+      - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
+      - "/centos-agent/env/cloudify-manager-master/plugins/plugin-installer/"
+    source_package_type: "dir"
+    destination_package_types:
+      - "tar.gz"
+
+  cloudify-redhat-santiago-agent:
+    name: "cloudify-redhat-santiago-agent"
+    version: "3.1.0"
+    package_path: "/cloudify"
+    sources_path: "/agents/redhat-agent"
+    source_package_type: "dir"
+    destination_package_types:
+      - "deb"
+    bootstrap_script: "package-scripts/agent-redhat-bootstrap.sh"
+    bootstrap_template: "agent-redhat-bootstrap.template"
+    bootstrap_params:
+      file_server_path: "/opt/manager/resources"
+      dst_agent_location: "packages/agents"
+      dst_template_location: "packages/templates"
+      dst_script_location: "packages/scripts"
+    bootstrap_log: "/var/log/cloudify3-bootstrap.log"
+    config_templates:
+      config_dir:
+        files: "package-configuration/redhat-agent"
+        config_dir: "config"
+        dst_dir: "/opt/manager/resources/packages/agents/templates/"
+
+  redhat-Santiago-agent:
+    name: "redhat-Santiago-agent"
+    version: "3.1.0"
+    source_urls:
+      - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
+    package_path: "/agents/redhat-agent"
+    sources_path: "/redhat-agent/env"
+    python_modules:
+      - "billiard==2.7.3.28"
+      - "celery==3.1.17"
+      - "bernhard"
+      - "pika"
+      - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
+      - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
+      - "/centos-agent/env/cloudify-manager-master/plugins/plugin-installer/"
+    source_package_type: "dir"
+    destination_package_types:
+      - "tar.gz"
 
   centos-Core-agent:
     name: "centos-Core-agent"
