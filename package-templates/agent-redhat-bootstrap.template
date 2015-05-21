@@ -91,6 +91,6 @@ check_dir ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 
 cp -R ${PKG_DIR}/*.tar.gz ${FILE_SERVER_PATH}/${DST_AGENT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 cp -R ${PKG_DIR}/config/*.template ${FILE_SERVER_PATH}/${DST_TEMPLATE_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
-cp -R ${PKG_DIR}/config/centos-agent-disable-requiretty.sh ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
+cp -R ${PKG_DIR}/config/redhat-agent-disable-requiretty.sh ${FILE_SERVER_PATH}/${DST_SCRIPT_LOCATION} >> ${BOOTSTRAP_LOG} 2>&1
 
 echo -e "${PKG_NAME} ${VERSION} installation completed successfully!\n" | tee -a ${BOOTSTRAP_LOG}

@@ -1,9 +1,9 @@
 #!/bin/bash
 # now modify sudoers configuration to allow execution without tty
-grep -i ubuntu /proc/version > /dev/null
+grep -i centos /proc/version > /dev/null
 if [ "$?" -eq "0" ]; then
-    # ubuntu
-    echo Running on Ubuntu
+    # centos
+    echo Running on Centos
     if sudo grep -q -E '[^!]requiretty' /etc/sudoers; then
         echo creating sudoers user file
         echo "Defaults:`whoami` !requiretty" | sudo tee /etc/sudoers.d/`whoami` >/dev/null

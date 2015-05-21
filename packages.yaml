@@ -342,7 +342,7 @@ packages:
       - "pika"
       - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
       - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
-      - "/centos-agent/env/cloudify-manager-master/plugins/plugin-installer/"
+      - "/redhat-agent/env/cloudify-manager-master/plugins/plugin-installer/"
     source_package_type: "dir"
     destination_package_types:
       - "tar.gz"
@@ -383,7 +383,7 @@ packages:
       - "pika"
       - "https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.tar.gz"
       - "https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.tar.gz"
-      - "/centos-agent/env/cloudify-manager-master/plugins/plugin-installer/"
+      - "/redhat-agent/env/cloudify-manager-master/plugins/plugin-installer/"
     source_package_type: "dir"
     destination_package_types:
       - "tar.gz"
