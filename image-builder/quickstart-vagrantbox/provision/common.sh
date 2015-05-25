@@ -111,11 +111,11 @@ function create_blueprints_and_inputs_dir
 
 function configure_nodecellar_blueprint_inputs
 {
-	echo """
-	host_ip: 10.10.1.10
-	agent_user: vagrant
-	agent_private_key_path: /root/.ssh/id_rsa
-	""" > ~/cloudify/blueprints/inputs/nodecellar-singlehost.yaml
+echo '
+host_ip: 10.10.1.10
+agent_user: vagrant
+agent_private_key_path: /root/.ssh/id_rsa
+' >> ~/cloudify/blueprints/inputs/nodecellar-singlehost.yaml
 }
 
 function configure_shell_login
