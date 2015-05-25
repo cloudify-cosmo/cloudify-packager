@@ -146,3 +146,4 @@ configure_manager_blueprint_inputs
 bootstrap
 create_blueprints_and_inputs_dir
 configure_nodecellar_blueprint_inputs
+configure_shell_login
