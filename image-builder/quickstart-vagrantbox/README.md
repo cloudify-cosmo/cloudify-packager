@@ -117,5 +117,5 @@ vagrant up --provider hp
 The nightly image process is more complecated from the rest. This is because we use AWS as the platform to build our images on. The following diagram explains the process:
 
 
-![](https://raw.githubusercontent.com/cloudify-cosmo/cloudify-packager/master/image-builder/nightly.png)
+![](https://raw.githubusercontent.com/cloudify-cosmo/cloudify-packager/master/image-builder/quickstart-vagrantbox/nightly.png)
 
