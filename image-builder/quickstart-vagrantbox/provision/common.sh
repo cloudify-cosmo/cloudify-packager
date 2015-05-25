@@ -127,12 +127,17 @@ function configure_shell_login
 	echo "cd ~/cloudify" >> /home/${USERNAME}/.bashrc
 }
 
+function set_dns_nameserver
+{
+	sudo sed -i "s/nameserver.*/nameserver 8.8.8.8/g" /etc/resolv.conf
+}
 
 INSTALL_FROM_PYPI=$1
 echo "Install from PyPI: ${INSTALL_FROM_PYPI}"
 CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
 
+set_dns_nameserver
 set_username
 install_prereqs
 install_pip
