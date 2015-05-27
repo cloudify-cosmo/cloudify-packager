@@ -49,6 +49,7 @@ import platform
 import os
 import urllib
 import struct
+import time
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -123,6 +124,7 @@ def run(cmd, sudo=False):
     while proc.poll() is None:
         if VERBOSE:
             _print_proc_out(proc)
+        time.sleep(1)
     _print_proc_out(proc)
     stderr = proc.stderr.read()
     if len(stderr) > 0:
