@@ -30,9 +30,10 @@ install_deps
 
 cd ~
 install_pip &&
-sudo pip install pip==7.0.1 --upgrade &&
+sudo pip install pip==6.0.8 --upgrade &&
 sudo pip install virtualenv==12.0.7 &&
 sudo pip install boto==2.36.0 &&
+sudo rm -rf ~/.cache
 
 # REPLACE branch before production
 sudo pip install git+https://github.com/cloudify-cosmo/cloudify-agent-packager@agent-refactoring-project &&
