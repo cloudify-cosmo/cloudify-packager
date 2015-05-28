@@ -131,12 +131,12 @@ def run(cmd):
 
 
 def drop_permissions():
-    if VERBOSE:
-        prn('Dropping root permissions...')
     # maybe we're not root
     if os.getuid() != 0:
         return
 
+    if VERBOSE:
+        prn('Dropping root permissions...')
     os.setegid(int(os.getenv("SUDO_GID")))
     os.seteuid(int(os.getenv("SUDO_UID")))
 
@@ -226,7 +226,7 @@ class CloudifyInstaller():
         # TODO: check if self.args hasattr installpythondev instead.
         if OS == 'linux' and (self.args.force or self.args.installpythondev):
             self.install_pythondev()
-        if IS_VIRTUALENV:
+        if IS_VIRTUALENV and not OS == 'windows':
             # if we're in a virtualenv, drop root permissions so that
             # installation is done using the current user.
             drop_permissions()
