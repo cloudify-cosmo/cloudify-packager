@@ -55,8 +55,8 @@ DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
 Windows (with Python32 AND 64), and OS X (Darwin).
 On the linux front, it supports Debian/Ubuntu, CentOS/RHEL and Arch.
 
-Installations are supported for both system python and virtualenv
-(using the --virtualenv flag).
+Installations are supported for both system python, the currently active
+virtualenv and a declared virtualenv (using the --virtualenv flag).
 
 If you're already running the script from within a virtualenv and you're not
 providing a --virtualenv path, Cloudify will be installed within the virtualenv
@@ -68,17 +68,26 @@ within the default wheels directory or within --wheelspath, they will (unless
 the --forceonline flag is set) be used instead of performing an online
 installation.
 
-A --nosudo flag can be supplied (If not on Windows) so that prerequisites can
-be installed on machines/containers without the sudo execuable
-(must be run by root user). Sudo for relevant prerequisites is on by default.
+The script will attempt to install all necessary requirements including
+python-dev and gcc (for Fabric on Linux), pycrypto (for Fabric on Windows),
+pip and virtualenv depending on the OS and Distro you're running on.
+Note that to install certain dependencies (like pip or pythondev), you must
+run the script as sudo.
+
+It's important to note that even if you're running as sudo, if you're
+installing in a declared virtualenv, the script will drop the root privileges
+since you probably declared a virtualenv so that it can be installed using
+the current user.
+Also note, that if you're running with sudo and you have an active virtualenv,
+much like any other python script, the installation will occur in the system
+python.
+
+A --nodrop flag can be supplied (If not on Windows) so that you can choose
+to not drop root privileges at all.
 
 By default, the script assumes that the Python executable is in the
 path and is called 'Python' on Linux and 'c:\python27\python.exe on Windows.
 The Python path can be overriden by using the --pythonpath flag.
-
-The script will attempt to install all necessary requirements including
-python-dev and gcc (for Fabric on Linux), pycrypto (for Fabric on Windows),
-pip and virtualenv depending on the OS and Distro you're running on.
 
 Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
@@ -130,9 +139,24 @@ def run(cmd):
     return proc
 
 
-def drop_permissions():
+def is_root():
+    """Check if running as root
+    """
+    if os.getuid() == 0:
+        return True
+    return False
+
+
+def drop_root_privileges():
+    """Drop root privileges
+
+    This is used so that when installing cloudify within a virtualenv
+    using sudo, the default behavior will not be to install using sudo
+    as a virtualenv is created especially so that users don't have to
+    install in the system python.
+    """
     # maybe we're not root
-    if os.getuid() != 0:
+    if not is_root():
         return
 
     if VERBOSE:
@@ -229,7 +253,7 @@ class CloudifyInstaller():
         if IS_VIRTUALENV and not OS == 'windows' and not self.args.nodrop:
             # drop root permissions so that installation is done using the
             # current user.
-            drop_permissions()
+            drop_root_privileges()
         if self.args.virtualenv:
             if not os.path.isfile(
                     self.args.virtualenv + ENV_BIN_RELATIVE_PATH +
