@@ -111,10 +111,10 @@ def _print_proc_out(proc):
         prn('STDOUT: {0}'.format(stdout_line))
 
 
-def run(cmd, sudo=False):
+def run(cmd):
     """This will execute a command either sudo-ically or not.
     """
-    cmd = 'sudo {0}'.format(cmd) if sudo else cmd
+    # cmd = 'sudo {0}'.format(cmd) if sudo else cmd
     if VERBOSE:
         prn('Executing: {0}...'.format(cmd))
     proc = subprocess.Popen(
@@ -128,6 +128,20 @@ def run(cmd, sudo=False):
     if len(stderr) > 0:
         prn('STDERR: {0}'.format(stderr))
     return proc
+
+
+def drop_permissions():
+    if VERBOSE:
+        prn('Dropping root permissions...')
+    # maybe we're not root
+    if os.getuid() != 0:
+        return
+
+    os.setegid(int(os.getenv("SUDO_GID")))
+    os.seteuid(int(os.getenv("SUDO_UID")))
+
+#     # Remove group privileges
+#     os.setgroups([])
 
 
 def make_virtualenv(virtualenv_dir, python_path):
@@ -169,8 +183,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
         prn('Installing within current virtualenv: {0}'.format(IS_VIRTUALENV))
     # sudo will be used only when not installing into a virtualenv and sudo
     # is enabled
-    result = run(pip_cmd, sudo=True) \
-        if not IS_VIRTUALENV and not virtualenv_path and SUDO else run(pip_cmd)
+    result = run(pip_cmd)
     if not result.returncode == 0:
         sys.exit('Could not install module: {0}'.format(module))
 
@@ -213,6 +226,10 @@ class CloudifyInstaller():
         # TODO: check if self.args hasattr installpythondev instead.
         if OS == 'linux' and (self.args.force or self.args.installpythondev):
             self.install_pythondev()
+        if IS_VIRTUALENV:
+            # if we're in a virtualenv, drop root permissions so that
+            # installation is done using the current user.
+            drop_permissions()
         if self.args.virtualenv:
             if not os.path.isfile(
                     self.args.virtualenv + ENV_BIN_RELATIVE_PATH +
@@ -241,7 +258,7 @@ class CloudifyInstaller():
         # TODO: use `install_module` function instead.
         prn('Installing virtualenv...')
         cmd = 'pip install virtualenv'
-        result = run(cmd, sudo=True) if SUDO else run(cmd)
+        result = run(cmd)
         if not result.returncode == 0:
             sys.exit('Could not install Virtualenv.')
 
@@ -256,7 +273,7 @@ class CloudifyInstaller():
             sys.exit('failed downloading pip from {0}. reason: {1}'.format(
                      PIP_URL, e.message))
         cmd = '{0} get-pip.py'.format(self.args.pythonpath)
-        result = run(cmd, sudo=True) if SUDO else run(cmd)
+        result = run(cmd)
         # TEST remove get-pip.py file
         # os.remove('get-pip.py')
         if not result.returncode == 0:
@@ -278,7 +295,7 @@ class CloudifyInstaller():
         else:
             sys.exit('python-dev package installation not supported '
                      'in current distribution.')
-        run(cmd, sudo=True) if SUDO else run(cmd)
+        run(cmd)
 
     # Windows only
     def install_pycrypto(self, venv):
@@ -332,8 +349,9 @@ def parse_args(args=None):
             help='Python path to use (defaults to "python").')
     else:
         parser.add_argument(
-            '--nosudo', action='store_true',
-            help='Do not use sudo for prerequisites.')
+            '--nodrop', action='store_true',
+            help='Do not drop sudo permissions even when installing '
+                 'within a virtualenv.')
         parser.add_argument(
             '--pythonpath', type=str, default='python',
             help='Python path to use (defaults to "python").')
@@ -355,7 +373,7 @@ def parse_args(args=None):
 
 
 def main():
-    global OS, DISTRO, RELEASE, QUIET, VERBOSE, SUDO, IS_VIRTUALENV, \
+    global OS, DISTRO, RELEASE, QUIET, VERBOSE, IS_VIRTUALENV, \
         IS_PYX32, ENV_BIN_RELATIVE_PATH, args
     os_props = get_os_props()
     OS = os_props[0].lower() if os_props[0] else 'Unknown'
@@ -372,9 +390,6 @@ def main():
         prn('Identified OS: {0}'.format(OS))
         prn('Identified Distribution: {0}'.format(DISTRO))
         prn('Identified Release: {0}'.format(RELEASE))
-    # if OS is windows, we want to make sure sudo will not be used
-    # the nosudo arg is missing only if on windows.
-    SUDO = False if not hasattr(args, 'nosudo') or args.nosudo else True
     # are we running within a virtualenv? This will potentially affect the
     # destination installation directory
     IS_VIRTUALENV = os.environ.get('VIRTUAL_ENV')
