@@ -250,7 +250,8 @@ class CloudifyInstaller():
         # TODO: check if self.args hasattr installpythondev instead.
         if OS == 'linux' and (self.args.force or self.args.installpythondev):
             self.install_pythondev()
-        if IS_VIRTUALENV and not OS == 'windows' and not self.args.nodrop:
+        if (IS_VIRTUALENV or self.args.virtualenv) \
+                and not OS == 'windows' and not self.args.nodrop:
             # drop root permissions so that installation is done using the
             # current user.
             drop_root_privileges()
