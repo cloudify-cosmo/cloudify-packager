@@ -52,12 +52,12 @@
   "provisioners": [
     {
       "type": "shell",
-      "script": "provision/common.sh"
+      "script": "provision/prepare_nightly.sh",
+      "only": ["nightly_virtualbox_build"]
     },
     {
       "type": "shell",
-      "script": "provision/prepare_nightly.sh",
-      "only": ["nightly_virtualbox_build"]
+      "script": "provision/common.sh"
     },
     {
       "type": "shell",
