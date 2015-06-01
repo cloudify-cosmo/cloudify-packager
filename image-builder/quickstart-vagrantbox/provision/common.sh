@@ -66,7 +66,7 @@ function get_manager_blueprints
 	echo "Retrieving Manager Blueprints"
     sudo curl -O http://cloudify-public-repositories.s3.amazonaws.com/cloudify-manager-blueprints/${CORE_TAG_NAME}/cloudify-manager-blueprints.tar.gz &&
     sudo tar -zxvf cloudify-manager-blueprints.tar.gz &&
-    mv cloudify-manager-blueprints-commercial/ cloudify-manager-blueprints
+    mv cloudify-manager-blueprints-*/ cloudify-manager-blueprints
     sudo rm cloudify-manager-blueprints.tar.gz
 }
 
