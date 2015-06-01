@@ -47,3 +47,6 @@ packager.log
 
 # QuickBuild
 .qbcache/
+
+# OS X
+.DS_Store
