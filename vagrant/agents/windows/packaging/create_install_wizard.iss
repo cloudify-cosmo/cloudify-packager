@@ -48,7 +48,7 @@ Type: "filesandordirs"; Name: "{app}"
 
 [Code]
 const
-  mainPackageName = 'cloudify';
+  mainPackageName = 'cloudify-agent';
   //Registry key path
   RegPythonPath = 'SOFTWARE\Python\PythonCore\2.7\InstallPath';
   //Error messages
