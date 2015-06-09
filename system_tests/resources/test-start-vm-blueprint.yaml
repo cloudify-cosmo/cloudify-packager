@@ -97,7 +97,7 @@ node_templates:
     type: cloudify.openstack.nodes.Server
     properties:
       install_agent: false
-      image: { get_input: image }
+      image: { get_input: image_name }
       flavor: { get_input: flavor }
       management_network_name: { get_property: [network, resource_id] }
       openstack_config: *OPENSTACK_CONFIG
