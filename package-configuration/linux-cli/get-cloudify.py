@@ -107,11 +107,11 @@ def prn(what):
 
 
 def _print_proc_out(proc):
-    stdout_line = proc.stdout.readline();
-    stdout_contents = len(stdout_line) > 0;
+    stdout_line = proc.stdout.readline()
+    stdout_contents = len(stdout_line) > 0
     if stdout_contents:
         prn('STDOUT: {0}'.format(stdout_line))
-    return stdout_contents;
+    return stdout_contents
 
 
 def run(cmd, sudo=False):
@@ -126,7 +126,7 @@ def run(cmd, sudo=False):
     while proc.poll() is None:
         if VERBOSE:
             while _print_proc_out(proc):
-                pass;
+                pass
         time.sleep(1)
     _print_proc_out(proc)
     stderr = proc.stderr.read()
