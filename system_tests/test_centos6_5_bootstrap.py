@@ -53,7 +53,7 @@ class TestCentos65Bootstrap(TestCliPackage):
                               'tools\'', sudo=True)
         self._execute_command('yum install -y zlib-devel bzip2-devel '
                               'openssl-devel xz-libs', sudo=True)
-        self._execute_command('curl -O http://www.python.org/ftp/python/2.7.8'
+        self._execute_command('curl -LO http://www.python.org/ftp/python/2.7.8'
                               '/Python-2.7.8.tar.xz', sudo=True)
         self._execute_command('xz -d Python-2.7.8.tar.xz', sudo=True)
         self._execute_command('tar -xvf Python-2.7.8.tar', sudo=True)
