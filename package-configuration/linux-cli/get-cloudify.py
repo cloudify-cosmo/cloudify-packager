@@ -264,19 +264,22 @@ class CloudifyInstaller():
 
     def install_pythondev(self):
         prn('Installing python-dev...')
-        if DISTRO in ('ubuntu', 'debian'):
-            cmd = 'apt-get install -y gcc python-dev'
-        elif DISTRO in ('centos', 'redhat'):
-            cmd = 'yum -y install gcc python-devel'
-        elif os.path.isfile('/etc/arch-release'):
+        cmd = ''
+        for distro in ('ubuntu', 'debian'):
+            if distro in DISTRO:
+                cmd = 'apt-get install -y gcc python-dev'
+        for distro in ('centos', 'redhat', 'fedora'):
+            if distro in DISTRO:
+                cmd = 'yum -y install gcc python-devel'
+        if os.path.isfile('/etc/arch-release'):
             # Arch doesn't require a python-dev package.
             # It's already supplied with Python.
             cmd = 'pacman -S gcc --noconfirm'
         elif OS == 'darwin':
             prn('python-dev package not required on Darwin.')
             return
-        else:
-            sys.exit('python-dev package installation not supported '
+        if not cmd:
+            sys.exit('Python requirements installation not supported '
                      'in current distribution.')
         run(cmd, sudo=True) if SUDO else run(cmd)
 
