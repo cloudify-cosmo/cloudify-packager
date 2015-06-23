@@ -204,7 +204,6 @@ class CloudifyInstaller():
         If an offline installation fails (for instance, not all wheels were
         found), an online installation process will commence.
         """
-        # TODO: check if there are any darwin dependencies to handle
         module = self.args.source if self.args.source else 'cloudify'
 
         if self.args.force or self.args.installpip:

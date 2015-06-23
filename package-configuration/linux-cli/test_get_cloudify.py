@@ -79,6 +79,7 @@ class CliBuilderUnitTests(testtools.TestCase):
         args = ArgsObject()
         args.installpip = 'true'
         args.force = 'false'
+        args.source = ''
         installer = self.get_cloudify.CloudifyInstaller(args)
         try:
             installer.execute()
