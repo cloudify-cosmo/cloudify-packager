@@ -205,36 +205,43 @@ class CloudifyInstaller():
         found), an online installation process will commence.
         """
         # TODO: check if there are any darwin dependencies to handle
+        module = self.args.source if self.args.source else 'cloudify'
+
         if self.args.force or self.args.installpip:
             self.install_pip()
+
         if self.args.virtualenv and (
                 self.args.force or self.args.installvirtualenv):
             self.install_virtualenv()
+
         # TODO: check if self.args hasattr installpythondev instead.
         if OS == 'linux' and (self.args.force or self.args.installpythondev):
             self.install_pythondev()
+
         if self.args.virtualenv:
             if not os.path.isfile(
                     self.args.virtualenv + ENV_BIN_RELATIVE_PATH +
                     ('activate.exe' if OS == 'windows' else 'activate')):
                 make_virtualenv(self.args.virtualenv, self.args.pythonpath)
         # TODO: check if self.args hasattr installpycrypto instead.
+
         if OS == 'windows' and (self.args.force or self.args.installpycrypto):
             self.install_pycrypto(self.args.virtualenv)
+
         if self.args.forceonline or not os.path.isdir(self.args.wheelspath):
-            install_module('cloudify', self.args.version, self.args.pre,
+            install_module(module, self.args.version, self.args.pre,
                            self.args.virtualenv)
         elif os.path.isdir(self.args.wheelspath):
             prn('Wheels directory found: "{0}". '
                 'Attemping offline installation...'.format(
                     self.args.wheelspath))
             try:
-                install_module('cloudify', pre=True,
+                install_module(module, pre=True,
                                virtualenv_path=self.args.virtualenv,
                                wheelspath=self.args.wheelspath)
             except Exception as ex:
                 prn('Offline installation failed ({0}).'.format(ex.message))
-                install_module('cloudify', self.args.version,
+                install_module(module, self.args.version,
                                self.args.pre, self.args.virtualenv)
 
     def install_virtualenv(self):
@@ -320,6 +327,9 @@ def parse_args(args=None):
     version_group.add_argument(
         '--pre', action='store_true',
         help='Attempt to install the latest Cloudify Milestone')
+    version_group.add_argument(
+        '-s', '--source', type=str,
+        help='Install from the provided URL or local path')
     online_group.add_argument(
         '--forceonline', action='store_true',
         help='Even if wheels are found locally, install from PyPI.')
