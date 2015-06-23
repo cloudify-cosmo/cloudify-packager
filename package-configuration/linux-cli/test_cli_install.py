@@ -18,6 +18,9 @@ import sys
 
 get_cloudify = __import__("get-cloudify")
 
+cloudify_cli_url = \
+    'https://github.com/cloudify-cosmo/cloudify-cli/archive/3.2.tar.gz'
+
 
 class CliInstallTests(testtools.TestCase):
     @staticmethod
@@ -32,3 +35,8 @@ class CliInstallTests(testtools.TestCase):
 
     def test_full_cli_install(self):
         self.run_get_cloudify('-f -v -e=/tmp/temp_env/ --nosudo')
+
+    def test_install_from_source_url(self):
+        self.run_get_cloudify('-s {0} -v -e=/tmp/temp_env'.format(
+            cloudify_cli_url))
+        self.get_cloudify.run('/tmp/temp_env/cfy --version')
