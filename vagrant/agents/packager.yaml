@@ -1,4 +1,4 @@
 python_path: /usr/bin/python
-cloudify_agent_module: https://github.com/cloudify-cosmo/cloudify-agent/archive/CFY-2649-cloudify-agent.zip
-requirements_file: https://raw.githubusercontent.com/cloudify-cosmo/cloudify-agent/CFY-2649-cloudify-agent/dev-requirements.txt
+cloudify_agent_module: https://github.com/cloudify-cosmo/cloudify-agent/archive/master.zip
+requirements_file: https://raw.githubusercontent.com/cloudify-cosmo/cloudify-agent/master/dev-requirements.txt
 keep_virtualenv: true
