@@ -109,6 +109,7 @@ def _print_proc_out(proc):
     stdout_line = proc.stdout.readline()
     if len(stdout_line) > 0:
         prn('STDOUT: {0}'.format(stdout_line))
+    return stdout_line
 
 
 def run(cmd, sudo=False):
@@ -119,14 +120,17 @@ def run(cmd, sudo=False):
         prn('Executing: {0}...'.format(cmd))
     proc = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout = ''
     # while the process is still running, print output
     while proc.poll() is None:
         if VERBOSE:
-            _print_proc_out(proc)
-    _print_proc_out(proc)
+            stdout += _print_proc_out(proc)
+    stdout += _print_proc_out(proc)
     stderr = proc.stderr.read()
     if len(stderr) > 0:
         prn('STDERR: {0}'.format(stderr))
+    proc.stdout = stdout
+    proc.stderr = stderr
     return proc
 
 

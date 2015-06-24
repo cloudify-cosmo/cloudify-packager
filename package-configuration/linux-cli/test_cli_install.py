@@ -15,6 +15,8 @@
 ############
 import testtools
 import sys
+import shutil
+
 
 get_cloudify = __import__("get-cloudify")
 
@@ -35,8 +37,11 @@ class CliInstallTests(testtools.TestCase):
 
     def test_full_cli_install(self):
         self.run_get_cloudify('-f -v -e=/tmp/temp_env/ --nosudo')
+        shutil.rmtree('/tmp/temp_env')
 
-    def test_install_from_source_url(self):
+    def test_install_from_source(self):
         self.run_get_cloudify('-s {0} -v -e=/tmp/temp_env'.format(
             cloudify_cli_url))
-        self.get_cloudify.run('/tmp/temp_env/cfy --version')
+        p = self.get_cloudify.run('/tmp/temp_env/bin/cfy --version')
+        self.assertIn('Cloudify CLI 3', p.stderr)
+        shutil.rmtree('/tmp/temp_env')
