@@ -263,6 +263,19 @@ class CloudifyInstaller():
             sys.exit('Could not install pip')
 
     def install_pythondev(self):
+        """Installs python-dev and gcc
+
+        This will try to match a command for your distribution.
+        The reason for looping through the names of the distros instead of just
+        checking for equality is that the name of the distro `DISTRO` might not
+        always be a pure distro name. For instance, in CentOS 7.1,
+        platform.linux_distribution() return 'CentOS Linux'. Checking for the
+        approximate distribution name will allow us to better match the command
+        to the distro in those cases.
+
+        In the Arch-Linux case, Python 2.7's platform.linux_distribution()
+        doesn't return a distro name.
+        """
         prn('Installing python-dev...')
         cmd = ''
         for distro in ('ubuntu', 'debian'):
