@@ -18,6 +18,8 @@
 
 AWS_ACCESS_KEY_ID = ENV['AWS_ACCESS_KEY_ID']
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
+GITHUB_USERNAME = ENV['GITHUB_USERNAME']
+GITHUB_PASSWORD = ENV['GITHUB_PASSWORD']
 
 UBUNTU_TRUSTY_BOX_NAME = 'ubuntu/trusty64'
 UBUNTU_PRECISE_BOX_NAME = 'hashicorp/precise64'
@@ -56,7 +58,7 @@ Vagrant.configure('2') do |config|
     rsync__args: ["--verbose", "--rsync-path='sudo rsync'"]
     debian_jessie.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "debian-jessie"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -88,7 +90,7 @@ Vagrant.configure('2') do |config|
     ubuntu_trusty.vm.synced_folder "../../", "/cloudify-packager", create: true
     ubuntu_trusty.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-trusty"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -120,7 +122,7 @@ Vagrant.configure('2') do |config|
     ubuntu_precise.vm.synced_folder "../../", "/cloudify-packager", create: true
     ubuntu_precise.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-precise"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -152,7 +154,7 @@ Vagrant.configure('2') do |config|
     centos_final.vm.synced_folder "../../", "/cloudify-packager", create: true, type: "rsync", rsync__exclude: ".git/"
     centos_final.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "centos-Final"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -199,6 +201,7 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -211,6 +214,7 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -223,6 +227,7 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -235,6 +240,7 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end

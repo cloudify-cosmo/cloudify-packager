@@ -35,6 +35,11 @@ sudo pip install virtualenv==12.0.7 &&
 sudo pip install boto==2.36.0 &&
 sudo rm -rf ~/.cache
 
+# clone commercial plugins. this should be a feature in the agent-packager
+git clone https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/cloudify-cosmo/cloudify-vsphere-plugin.git /tmp
+git clone https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/cloudify-cosmo/cloudify-softlayer-plugin.git /tmp
+
+
 # REPLACE branch before production
 sudo pip install git+https://github.com/cloudify-cosmo/cloudify-agent-packager@agent-refactoring-project &&
 cd /tmp &&
