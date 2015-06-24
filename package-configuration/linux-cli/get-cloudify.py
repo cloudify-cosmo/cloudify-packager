@@ -151,7 +151,7 @@ def drop_root_privileges():
     This is used so that when installing cloudify within a virtualenv
     using sudo, the default behavior will not be to install using sudo
     as a virtualenv is created especially so that users don't have to
-    install in the system python.
+    install in the system Python or using a Sudoer.
     """
     # maybe we're not root
     if not is_root():
