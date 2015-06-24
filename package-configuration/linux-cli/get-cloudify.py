@@ -142,9 +142,7 @@ def run(cmd):
 def is_root():
     """Check if running as root
     """
-    if os.getuid() == 0:
-        return True
-    return False
+    return True if os.getuid() == 0 else False
 
 
 def drop_root_privileges():
@@ -163,9 +161,6 @@ def drop_root_privileges():
         prn('Dropping root permissions...')
     os.setegid(int(os.getenv("SUDO_GID")))
     os.seteuid(int(os.getenv("SUDO_UID")))
-
-#     # Remove group privileges
-#     os.setgroups([])
 
 
 def make_virtualenv(virtualenv_dir, python_path):
