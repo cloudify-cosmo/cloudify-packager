@@ -105,13 +105,6 @@ def prn(what):
     print(what)
 
 
-def _print_proc_out(proc):
-    stdout_line = proc.stdout.readline()
-    if len(stdout_line) > 0:
-        prn('STDOUT: {0}'.format(stdout_line))
-    return stdout_line
-
-
 def run(cmd, sudo=False):
     """This will execute a command either sudo-ically or not.
     """
@@ -122,16 +115,17 @@ def run(cmd, sudo=False):
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout = ''
     # while the process is still running, print output
-    while proc.poll() is None:
-        if VERBOSE:
-            stdout += _print_proc_out(proc)
-    stdout += _print_proc_out(proc)
+    while True:
+        output = proc.stdout.readline()
+        stdout += output
+        if output == '' and proc.poll() is not None:
+            break
+        if output and VERBOSE:
+            prn('STDOUT: {0}'.format(output))
     stderr = proc.stderr.read()
     if len(stderr) > 0:
         prn('STDERR: {0}'.format(stderr))
-    proc.stdout = stdout
-    proc.stderr = stderr
-    return proc
+    return proc, stdout, stderr
 
 
 def make_virtualenv(virtualenv_dir, python_path):
@@ -141,7 +135,7 @@ def make_virtualenv(virtualenv_dir, python_path):
     """
     prn('Creating Virtualenv {0}...'.format(virtualenv_dir))
     result = run('virtualenv -p {0} {1}'.format(python_path, virtualenv_dir))
-    if not result.returncode == 0:
+    if not result[0].returncode == 0:
         sys.exit('Could not create virtualenv: {0}'.format(virtualenv_dir))
 
 
@@ -175,7 +169,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     # is enabled
     result = run(pip_cmd, sudo=True) \
         if not IS_VIRTUALENV and not virtualenv_path and SUDO else run(pip_cmd)
-    if not result.returncode == 0:
+    if not result[0].returncode == 0:
         sys.exit('Could not install module: {0}'.format(module))
 
 
@@ -208,7 +202,7 @@ class CloudifyInstaller():
         If an offline installation fails (for instance, not all wheels were
         found), an online installation process will commence.
         """
-        module = self.args.source if self.args.source else 'cloudify'
+        module = self.args.source or 'cloudify'
 
         if self.args.force or self.args.installpip:
             self.install_pip()
@@ -252,7 +246,7 @@ class CloudifyInstaller():
         prn('Installing virtualenv...')
         cmd = 'pip install virtualenv'
         result = run(cmd, sudo=True) if SUDO else run(cmd)
-        if not result.returncode == 0:
+        if not result[0].returncode == 0:
             sys.exit('Could not install Virtualenv.')
 
     def install_pip(self):
@@ -269,7 +263,7 @@ class CloudifyInstaller():
         result = run(cmd, sudo=True) if SUDO else run(cmd)
         # TEST remove get-pip.py file
         # os.remove('get-pip.py')
-        if not result.returncode == 0:
+        if not result[0].returncode == 0:
             sys.exit('Could not install pip')
 
     def install_pythondev(self):
