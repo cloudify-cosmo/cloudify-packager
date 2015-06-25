@@ -185,7 +185,7 @@ def download_file(url, destination):
 
 
 def get_os_props():
-    distro_info = platform.linux_distribution()
+    distro_info = platform.linux_distribution(full_distribution_name=False)
     os = platform.system()
     distro = distro_info[0]
     release = distro_info[2]
@@ -266,33 +266,21 @@ class CloudifyInstaller():
         """Installs python-dev and gcc
 
         This will try to match a command for your distribution.
-        The reason for looping through the names of the distros instead of just
-        checking for equality is that the name of the distro `DISTRO` might not
-        always be a pure distro name. For instance, in CentOS 7.1,
-        platform.linux_distribution() return 'CentOS Linux'. Checking for the
-        approximate distribution name will allow us to better match the command
-        to the distro in those cases.
-
-        In the Arch-Linux case, Python 2.7's platform.linux_distribution()
-        doesn't return a distro name.
         """
         prn('Installing python-dev...')
-        cmd = ''
-        for distro in ('ubuntu', 'debian'):
-            if distro in DISTRO:
-                cmd = 'apt-get install -y gcc python-dev'
-        for distro in ('centos', 'redhat', 'fedora'):
-            if distro in DISTRO:
-                cmd = 'yum -y install gcc python-devel'
-        if os.path.isfile('/etc/arch-release'):
+        if DISTRO in ('ubuntu', 'debian'):
+            cmd = 'apt-get install -y gcc python-dev'
+        elif DISTRO in ('centos', 'redhat'):
+            cmd = 'yum -y install gcc python-devel'
+        elif os.path.isfile('/etc/arch-release'):
             # Arch doesn't require a python-dev package.
             # It's already supplied with Python.
             cmd = 'pacman -S gcc --noconfirm'
         elif OS == 'darwin':
             prn('python-dev package not required on Darwin.')
             return
-        if not cmd:
-            sys.exit('Python requirements installation not supported '
+        else:
+            sys.exit('python-dev package installation not supported '
                      'in current distribution.')
         run(cmd, sudo=True) if SUDO else run(cmd)
 
