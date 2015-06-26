@@ -305,10 +305,9 @@ class CloudifyInstaller():
 
 def check_cloudify_installed(virtualenv_path=None):
     if virtualenv_path:
-        import_cmd = '{0}{1}{2}'.format(
+        result = run('{0}{1}{2}'.format(
             virtualenv_path, ENV_BIN_RELATIVE_PATH,
-            'python -c "import cloudify"')
-        result = run(import_cmd)
+            'python -c "import cloudify"'))
     else:
         result = run('python -c "import cloudify"')
     return result.returncode == 0
