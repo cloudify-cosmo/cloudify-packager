@@ -94,7 +94,6 @@ ENV_BIN_RELATIVE_PATH = '/bin/'
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
 PYCR64_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win-amd64-py2.7.exe'  # NOQA
 PYCR32_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win32-py2.7.exe'  # NOQA
-LOGGER = ''
 
 
 def init_logger(logger_name):
@@ -365,7 +364,7 @@ def parse_args(args=None):
 
 def main():
     global OS, DISTRO, RELEASE, SUDO, IS_VIRTUALENV, \
-        IS_PYX32, ENV_BIN_RELATIVE_PATH, LOGGER, args
+        IS_PYX32, ENV_BIN_RELATIVE_PATH, args
     os_props = get_os_props()
     OS = os_props[0].lower() if os_props[0] else 'Unknown'
     DISTRO = os_props[1].lower() if os_props[1] else 'Unknown'
