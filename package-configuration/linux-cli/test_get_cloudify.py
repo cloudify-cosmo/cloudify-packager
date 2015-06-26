@@ -46,23 +46,10 @@ class CliBuilderUnitTests(testtools.TestCase):
             raise AssertionError('url {} is not valid.'.format(url))
 
     def test_run_valid_command(self):
-        self.get_cloudify.VERBOSE = True
-        builder_stdout = StringIO()
-        # replacing builder stdout
-        self.get_cloudify.sys.stdout = builder_stdout
-        proc = get_cloudify.run('echo just another STDOUT && '
-                                '>&2 echo just another STDERR')
-        self.assertIn('STDOUT: just another STDOUT',
-                      builder_stdout.getvalue(),
-                      'expected stdout was not printed')
-        self.assertIn('STDERR: just another STDERR',
-                      builder_stdout.getvalue(),
-                      'expected stderr was not printed')
-        builder_stdout.close()
+        proc = get_cloudify.run('echo Hi!')
         self.assertEqual(proc.returncode, 0, 'process execution failed')
 
     def test_run_invalid_command(self):
-        self.get_cloudify.VERBOSE = True
         builder_stdout = StringIO()
         # replacing builder stdout
         self.get_cloudify.sys.stdout = builder_stdout
