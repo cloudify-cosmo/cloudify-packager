@@ -115,7 +115,7 @@ def set_global_verbosity_level(level):
 def _print_proc_out(proc):
     stdout_line = proc.stdout.readline()
     if len(stdout_line) > 0:
-        lgr.debug('STDOUT: {0}'.format(stdout_line))
+        lgr.debug(stdout_line)
 
 
 def run(cmd, sudo=False):
@@ -131,7 +131,7 @@ def run(cmd, sudo=False):
     _print_proc_out(proc)
     stderr = proc.stderr.read()
     if len(stderr) > 0:
-        lgr.error('STDERR: {0}'.format(stderr))
+        lgr.error(stderr)
     return proc
 
 
