@@ -49,6 +49,7 @@ import platform
 import os
 import urllib
 import struct
+import logging
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -89,44 +90,46 @@ SUDO = False
 DISTRO = ''
 IS_PYX32 = False
 ENV_BIN_RELATIVE_PATH = '/bin/'
-QUIET = False
-VERBOSE = False
 # TODO: put these in a private storage
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
 PYCR64_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win-amd64-py2.7.exe'  # NOQA
 PYCR32_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win32-py2.7.exe'  # NOQA
+LOGGER = ''
 
 
-def prn(what):
-    """Print, yo! Oh wait.. unless QUIET.
-    """
-    if QUIET:
-        return
-    print(what)
+def init_logger(logger_name, level):
+    logger = logging.getLogger(logger_name)
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter(fmt='%(asctime)s [%(levelname)s] '
+                                      '[%(name)s] %(message)s',
+                                  datefmt='%H:%M:%S')
+    handler.setFormatter(formatter)
+    logger.setLevel(level)
+    logger.addHandler(handler)
+
+    return logger
 
 
 def _print_proc_out(proc):
     stdout_line = proc.stdout.readline()
     if len(stdout_line) > 0:
-        prn('STDOUT: {0}'.format(stdout_line))
+        LOGGER.debug('STDOUT: {0}'.format(stdout_line))
 
 
 def run(cmd, sudo=False):
     """This will execute a command either sudo-ically or not.
     """
     cmd = 'sudo {0}'.format(cmd) if sudo else cmd
-    if VERBOSE:
-        prn('Executing: {0}...'.format(cmd))
+    LOGGER.debug('Executing: {0}...'.format(cmd))
     proc = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # while the process is still running, print output
     while proc.poll() is None:
-        if VERBOSE:
-            _print_proc_out(proc)
+        _print_proc_out(proc)
     _print_proc_out(proc)
     stderr = proc.stderr.read()
     if len(stderr) > 0:
-        prn('STDERR: {0}'.format(stderr))
+        LOGGER.error('STDERR: {0}'.format(stderr))
     return proc
 
 
@@ -135,7 +138,7 @@ def make_virtualenv(virtualenv_dir, python_path):
     will assume that `python` is in path. This default assumption is provided
     with the argument parser.
     """
-    prn('Creating Virtualenv {0}...'.format(virtualenv_dir))
+    LOGGER.info('Creating Virtualenv {0}...'.format(virtualenv_dir))
     result = run('virtualenv -p {0} {1}'.format(python_path, virtualenv_dir))
     if not result.returncode == 0:
         sys.exit('Could not create virtualenv: {0}'.format(virtualenv_dir))
@@ -153,7 +156,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     a `sudo` run will be performed if not running within a virtualenv
     and an explicit --nosudo isn't provided.
     """
-    prn('Installing {0}...'.format(module))
+    LOGGER.info('Installing {0}...'.format(module))
     if version:
         module = '{0}=={1}'.format(module, version)
     pip_cmd = 'pip install {0}'.format(module)
@@ -166,7 +169,8 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
         pip_cmd = '{0}{1}{2}'.format(
             virtualenv_path, ENV_BIN_RELATIVE_PATH, pip_cmd)
     if IS_VIRTUALENV and not virtualenv_path:
-        prn('Installing within current virtualenv: {0}'.format(IS_VIRTUALENV))
+        LOGGER.info('Installing within current virtualenv: {0}'.format(
+            IS_VIRTUALENV))
     # sudo will be used only when not installing into a virtualenv and sudo
     # is enabled
     result = run(pip_cmd, sudo=True) \
@@ -176,10 +180,10 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
 
 
 def download_file(url, destination):
-    prn('Downloading {0} to {1}'.format(url, destination))
+    LOGGER.info('Downloading {0} to {1}'.format(url, destination))
     final_url = urllib.urlopen(url).geturl()
-    if VERBOSE and final_url != url:
-        prn('Redirected to {}'.format(final_url))
+    if final_url != url:
+        LOGGER.debug('Redirected to {}'.format(final_url))
     f = urllib.URLopener()
     f.retrieve(final_url, destination)
 
@@ -225,28 +229,29 @@ class CloudifyInstaller():
             install_module('cloudify', self.args.version, self.args.pre,
                            self.args.virtualenv)
         elif os.path.isdir(self.args.wheelspath):
-            prn('Wheels directory found: "{0}". '
-                'Attemping offline installation...'.format(
-                    self.args.wheelspath))
+            LOGGER.info('Wheels directory found: "{0}". '
+                        'Attemping offline installation...'.format(
+                            self.args.wheelspath))
             try:
                 install_module('cloudify', pre=True,
                                virtualenv_path=self.args.virtualenv,
                                wheelspath=self.args.wheelspath)
             except Exception as ex:
-                prn('Offline installation failed ({0}).'.format(ex.message))
+                LOGGER.warning('Offline installation failed ({0}).'.format(
+                    ex.message))
                 install_module('cloudify', self.args.version,
                                self.args.pre, self.args.virtualenv)
 
     def install_virtualenv(self):
         # TODO: use `install_module` function instead.
-        prn('Installing virtualenv...')
+        LOGGER.info('Installing virtualenv...')
         cmd = 'pip install virtualenv'
         result = run(cmd, sudo=True) if SUDO else run(cmd)
         if not result.returncode == 0:
             sys.exit('Could not install Virtualenv.')
 
     def install_pip(self):
-        prn('Installing pip...')
+        LOGGER.info('Installing pip...')
         # TODO: check below to see if pip already exists
         # import distutils
         # if not distutils.spawn.find_executable('pip'):
@@ -263,7 +268,7 @@ class CloudifyInstaller():
             sys.exit('Could not install pip')
 
     def install_pythondev(self):
-        prn('Installing python-dev...')
+        LOGGER.info('Installing python-dev...')
         if DISTRO in ('ubuntu', 'debian'):
             cmd = 'apt-get install -y gcc python-dev'
         elif DISTRO in ('centos', 'redhat'):
@@ -273,7 +278,7 @@ class CloudifyInstaller():
             # It's already supplied with Python.
             cmd = 'pacman -S gcc --noconfirm'
         elif OS == 'darwin':
-            prn('python-dev package not required on Darwin.')
+            LOGGER.info('python-dev package not required on Darwin.')
             return
         else:
             sys.exit('python-dev package installation not supported '
@@ -288,7 +293,8 @@ class CloudifyInstaller():
         It will attempt to install the 32 or 64 bit version according to the
         Python version installed.
         """
-        prn('Installing PyCrypto {0}bit...'.format('32' if IS_PYX32 else '64'))
+        LOGGER.info('Installing PyCrypto {0}bit...'.format(
+            '32' if IS_PYX32 else '64'))
         # easy install is used instead of pip as pip doesn't handle windows
         # executables.
         cmd = 'easy_install {0}'.format(PYCR32_URL if IS_PYX32 else PYCR64_URL)
@@ -355,8 +361,8 @@ def parse_args(args=None):
 
 
 def main():
-    global OS, DISTRO, RELEASE, QUIET, VERBOSE, SUDO, IS_VIRTUALENV, \
-        IS_PYX32, ENV_BIN_RELATIVE_PATH, args
+    global OS, DISTRO, RELEASE, SUDO, IS_VIRTUALENV, \
+        IS_PYX32, ENV_BIN_RELATIVE_PATH, LOGGER, args
     os_props = get_os_props()
     OS = os_props[0].lower() if os_props[0] else 'Unknown'
     DISTRO = os_props[1].lower() if os_props[1] else 'Unknown'
@@ -364,14 +370,18 @@ def main():
     if OS not in ('windows', 'linux', 'darwin'):
         sys.exit('OS {0} not supported.'.format(OS))
     args = parse_args()
+
     if args.quiet:
-        QUIET = True
+        logging_level = logging.ERROR
     elif args.verbose:
-        VERBOSE = True
-    if VERBOSE:
-        prn('Identified OS: {0}'.format(OS))
-        prn('Identified Distribution: {0}'.format(DISTRO))
-        prn('Identified Release: {0}'.format(RELEASE))
+        logging_level = logging.DEBUG
+    else:
+        logging_level = logging.INFO
+    LOGGER = init_logger('get-cloudify', logging_level)
+
+    LOGGER.debug('Identified OS: {0}'.format(OS))
+    LOGGER.debug('Identified Distribution: {0}'.format(DISTRO))
+    LOGGER.debug('Identified Release: {0}'.format(RELEASE))
     # if OS is windows, we want to make sure sudo will not be used
     # the nosudo arg is missing only if on windows.
     SUDO = False if not hasattr(args, 'nosudo') or args.nosudo else True
@@ -386,8 +396,9 @@ def main():
     installer = CloudifyInstaller(args)
     installer.execute()
     if args.virtualenv:
-        prn('You can now run: "source {0}" to activate the Virtualenv.'.format(
-            os.path.join(args.virtualenv, 'bin/activate')))
+        LOGGER.info('You can now run: "source {0}" to activate '
+                    'the Virtualenv.'.format(
+                        os.path.join(args.virtualenv, 'bin/activate')))
 
 
 if __name__ == '__main__':
