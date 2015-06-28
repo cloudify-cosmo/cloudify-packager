@@ -26,6 +26,9 @@ function install_pip
 	curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
 }
 
+GITHUB_USERNAME=$1
+GITHUB_PASSWORD=$2
+
 install_deps
 
 cd ~
@@ -36,8 +39,8 @@ sudo pip install boto==2.36.0 &&
 sudo rm -rf ~/.cache
 
 # clone commercial plugins. this should be a feature in the agent-packager
-git clone https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/cloudify-cosmo/cloudify-vsphere-plugin.git /tmp
-git clone https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/cloudify-cosmo/cloudify-softlayer-plugin.git /tmp
+git clone https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/cloudify-cosmo/cloudify-vsphere-plugin.git /tmp/cloudify-vsphere-plugin
+git clone https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/cloudify-cosmo/cloudify-softlayer-plugin.git /tmp/cloudify-softlayer-plugin
 
 
 # REPLACE branch before production
