@@ -159,8 +159,8 @@ def drop_root_privileges():
 
     if VERBOSE:
         prn('Dropping root permissions...')
-    os.setegid(int(os.getenv("SUDO_GID")))
-    os.seteuid(int(os.getenv("SUDO_UID")))
+    os.setegid(int(os.environ.get('SUDO_GID', 0)))
+    os.seteuid(int(os.environ.get('SUDO_UID', 0)))
 
 
 def make_virtualenv(virtualenv_dir, python_path):
