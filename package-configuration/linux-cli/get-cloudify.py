@@ -217,7 +217,7 @@ def download_file(url, destination):
 
 
 def get_os_props():
-    distro_info = platform.linux_distribution()
+    distro_info = platform.linux_distribution(full_distribution_name=False)
     os = platform.system()
     distro = distro_info[0]
     release = distro_info[2]
@@ -300,6 +300,10 @@ class CloudifyInstaller():
             sys.exit('Could not install pip')
 
     def install_pythondev(self):
+        """Installs python-dev and gcc
+
+        This will try to match a command for your distribution.
+        """
         prn('Installing python-dev...')
         if DISTRO in ('ubuntu', 'debian'):
             cmd = 'apt-get install -y gcc python-dev'
