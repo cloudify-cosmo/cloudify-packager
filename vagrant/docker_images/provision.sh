@@ -7,6 +7,7 @@ install_docker()
 {
   export DEBIAN_FRONTEND=noninteractive
   kern_extras="linux-image-extra-$(uname -r) linux-image-extra-virtual"
+  sudo apt-get update
   sudo apt-get install -y -q $kern_extras
   sudo modprobe aufs
 
