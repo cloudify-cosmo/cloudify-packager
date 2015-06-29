@@ -39,9 +39,10 @@ class CliInstallTests(testtools.TestCase):
     def test_full_cli_install(self):
         try:
             tempdir = tempfile.mkdtemp()
-            self.run_get_cloudify('-f -v -e={0} --nosudo'.format(tempdir))
-            p = self.get_cloudify.run('{0}/bin/cfy --version'.format(tempdir))
-            self.assertIn('Cloudify CLI 3', p[2])
+            self.run_get_cloudify('-f -v -e={0}'.format(tempdir))
+            proc, stdout, stderr = self.get_cloudify.run(
+                '{0}/bin/cfy --version'.format(tempdir))
+            self.assertIn('Cloudify CLI 3', stderr)
         finally:
             shutil.rmtree(tempdir)
 
@@ -50,7 +51,8 @@ class CliInstallTests(testtools.TestCase):
             tempdir = tempfile.mkdtemp()
             self.run_get_cloudify('-s {0} -v -e={1}'.format(
                 cloudify_cli_url, tempdir))
-            p = self.get_cloudify.run('{0}/bin/cfy --version'.format(tempdir))
-            self.assertIn('Cloudify CLI 3', p[2])
+            proc, stdout, stderr = self.get_cloudify.run(
+                '{0}/bin/cfy --version'.format(tempdir))
+            self.assertIn('Cloudify CLI 3', stderr)
         finally:
             shutil.rmtree(tempdir)
