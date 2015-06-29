@@ -142,7 +142,7 @@ def run(cmd):
 def is_root():
     """Check if running as root
     """
-    return True if os.getuid() == 0 else False
+    return os.getuid() == 0
 
 
 def drop_root_privileges():
