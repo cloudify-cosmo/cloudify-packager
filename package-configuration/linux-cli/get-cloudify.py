@@ -56,8 +56,8 @@ DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
 Windows (with Python32 AND 64), and OS X (Darwin).
 On the linux front, it supports Debian/Ubuntu, CentOS/RHEL and Arch.
 
-Installations are supported for both system python and virtualenv
-(using the --virtualenv flag).
+Installations are supported for both system python, the currently active
+virtualenv and a declared virtualenv (using the --virtualenv flag).
 
 If you're already running the script from within a virtualenv and you're not
 providing a --virtualenv path, Cloudify will be installed within the virtualenv
@@ -69,17 +69,26 @@ within the default wheels directory or within --wheelspath, they will (unless
 the --forceonline flag is set) be used instead of performing an online
 installation.
 
-A --nosudo flag can be supplied (If not on Windows) so that prerequisites can
-be installed on machines/containers without the sudo execuable
-(must be run by root user). Sudo for relevant prerequisites is on by default.
+The script will attempt to install all necessary requirements including
+python-dev and gcc (for Fabric on Linux), pycrypto (for Fabric on Windows),
+pip and virtualenv depending on the OS and Distro you're running on.
+Note that to install certain dependencies (like pip or pythondev), you must
+run the script as sudo.
+
+It's important to note that even if you're running as sudo, if you're
+installing in a declared virtualenv, the script will drop the root privileges
+since you probably declared a virtualenv so that it can be installed using
+the current user.
+Also note, that if you're running with sudo and you have an active virtualenv,
+much like any other python script, the installation will occur in the system
+python.
+
+A --nodrop flag can be supplied (If not on Windows) so that you can choose
+to not drop root privileges at all.
 
 By default, the script assumes that the Python executable is in the
 path and is called 'Python' on Linux and 'c:\python27\python.exe on Windows.
 The Python path can be overriden by using the --pythonpath flag.
-
-The script will attempt to install all necessary requirements including
-python-dev and gcc (for Fabric on Linux), pycrypto (for Fabric on Windows),
-pip and virtualenv depending on the OS and Distro you're running on.
 
 Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
@@ -118,10 +127,9 @@ def _print_proc_out(proc):
         lgr.debug(stdout_line)
 
 
-def run(cmd, sudo=False):
+def run(cmd):
     """This will execute a command either sudo-ically or not.
     """
-    cmd = 'sudo {0}'.format(cmd) if sudo else cmd
     lgr.debug('Executing: {0}...'.format(cmd))
     proc = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -133,6 +141,29 @@ def run(cmd, sudo=False):
     if len(stderr) > 0:
         lgr.error(stderr)
     return proc
+
+
+def is_root():
+    """Check if running as root
+    """
+    return os.getuid() == 0
+
+
+def drop_root_privileges():
+    """Drop root privileges
+
+    This is used so that when installing cloudify within a virtualenv
+    using sudo, the default behavior will not be to install using sudo
+    as a virtualenv is created especially so that users don't have to
+    install in the system Python or using a Sudoer.
+    """
+    # maybe we're not root
+    if not is_root():
+        return
+
+    lgr.info('Dropping root permissions...')
+    os.setegid(int(os.environ.get('SUDO_GID', 0)))
+    os.seteuid(int(os.environ.get('SUDO_UID', 0)))
 
 
 def make_virtualenv(virtualenv_dir, python_path):
@@ -175,8 +206,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
             IS_VIRTUALENV))
     # sudo will be used only when not installing into a virtualenv and sudo
     # is enabled
-    result = run(pip_cmd, sudo=True) \
-        if not IS_VIRTUALENV and not virtualenv_path and SUDO else run(pip_cmd)
+    result = run(pip_cmd)
     if not result.returncode == 0:
         sys.exit('Could not install module: {0}'.format(module))
 
@@ -191,7 +221,7 @@ def download_file(url, destination):
 
 
 def get_os_props():
-    distro_info = platform.linux_distribution()
+    distro_info = platform.linux_distribution(full_distribution_name=False)
     os = platform.system()
     distro = distro_info[0]
     release = distro_info[2]
@@ -219,6 +249,11 @@ class CloudifyInstaller():
         # TODO: check if self.args hasattr installpythondev instead.
         if OS == 'linux' and (self.args.force or self.args.installpythondev):
             self.install_pythondev()
+        if (IS_VIRTUALENV or self.args.virtualenv) \
+                and not OS == 'windows' and not self.args.nodrop:
+            # drop root permissions so that installation is done using the
+            # current user.
+            drop_root_privileges()
         if self.args.virtualenv:
             if not os.path.isfile(
                     self.args.virtualenv + ENV_BIN_RELATIVE_PATH +
@@ -248,7 +283,7 @@ class CloudifyInstaller():
         # TODO: use `install_module` function instead.
         lgr.info('Installing virtualenv...')
         cmd = 'pip install virtualenv'
-        result = run(cmd, sudo=True) if SUDO else run(cmd)
+        result = run(cmd)
         if not result.returncode == 0:
             sys.exit('Could not install Virtualenv.')
 
@@ -263,13 +298,17 @@ class CloudifyInstaller():
             sys.exit('failed downloading pip from {0}. reason: {1}'.format(
                      PIP_URL, e.message))
         cmd = '{0} get-pip.py'.format(self.args.pythonpath)
-        result = run(cmd, sudo=True) if SUDO else run(cmd)
+        result = run(cmd)
         # TEST remove get-pip.py file
         # os.remove('get-pip.py')
         if not result.returncode == 0:
             sys.exit('Could not install pip')
 
     def install_pythondev(self):
+        """Installs python-dev and gcc
+
+        This will try to match a command for your distribution.
+        """
         lgr.info('Installing python-dev...')
         if DISTRO in ('ubuntu', 'debian'):
             cmd = 'apt-get install -y gcc python-dev'
@@ -285,7 +324,7 @@ class CloudifyInstaller():
         else:
             sys.exit('python-dev package installation not supported '
                      'in current distribution.')
-        run(cmd, sudo=True) if SUDO else run(cmd)
+        run(cmd)
 
     # Windows only
     def install_pycrypto(self, venv):
@@ -340,8 +379,9 @@ def parse_args(args=None):
             help='Python path to use (defaults to "python").')
     else:
         parser.add_argument(
-            '--nosudo', action='store_true',
-            help='Do not use sudo for prerequisites.')
+            '--nodrop', action='store_true',
+            help='Do not drop sudo permissions even when installing '
+                 'within a virtualenv.')
         parser.add_argument(
             '--pythonpath', type=str, default='python',
             help='Python path to use (defaults to "python").')
