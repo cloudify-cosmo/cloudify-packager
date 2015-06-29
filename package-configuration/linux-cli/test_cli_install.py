@@ -15,6 +15,9 @@
 ############
 import testtools
 import sys
+import tempfile
+import shutil
+
 
 get_cloudify = __import__("get-cloudify")
 
@@ -31,4 +34,18 @@ class CliInstallTests(testtools.TestCase):
         self.get_cloudify = get_cloudify
 
     def test_full_cli_install(self):
-        self.run_get_cloudify('-f -v -e=/tmp/temp_env/ --nosudo --upgrade')
+        tempdir = tempfile.mkdtemp()
+        try:
+            self.run_get_cloudify('-v -e={0}'.format(tempdir))
+        finally:
+            shutil.rmtree(tempdir)
+
+    def test_full_cli_install_and_upgrade(self):
+        tempdir = tempfile.mkdtemp()
+        try:
+            self.run_get_cloudify('-v -e={0}'.format(tempdir))
+            self.assertRaises(
+                SystemExit, self.run_get_cloudify,
+                '-v -e={0} --upgrade'.format(tempdir))
+        finally:
+            shutil.rmtree(tempdir)
