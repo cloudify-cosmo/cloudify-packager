@@ -49,6 +49,7 @@ import platform
 import os
 import urllib
 import struct
+import tempfile
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -288,13 +289,14 @@ class CloudifyInstaller():
         # TODO: check below to see if pip already exists
         # import distutils
         # if not distutils.spawn.find_executable('pip'):
+        tempdir = tempfile.mkdtemp()
+        get_pip_path = os.path.join(tempdir, 'get-pip.py')
         try:
-            download_file(PIP_URL, 'get-pip.py')
+            download_file(PIP_URL, get_pip_path)
         except StandardError as e:
-            sys.exit('failed downloading pip from {0}. reason: {1}'.format(
+            sys.exit('Failed downloading pip from {0}. reason: {1}'.format(
                      PIP_URL, e.message))
-        result = run('{0} get-pip.py'.format(self.args.pythonpath))
-        os.remove('get-pip.py')
+        result = run('{0} {1}'.format(self.args.pythonpath, get_pip_path))
         if not result[0].returncode == 0:
             sys.exit('Could not install pip')
 

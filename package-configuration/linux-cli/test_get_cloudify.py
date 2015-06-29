@@ -85,7 +85,7 @@ class CliBuilderUnitTests(testtools.TestCase):
             installer.execute()
             self.fail('installation did not trigger error as expected')
         except SystemExit as e:
-            self.assertEqual(e.message, 'failed downloading pip from '
+            self.assertEqual(e.message, 'Failed downloading pip from '
                                         'https://bootstrap.pypa.io/get-pip.py.'
                                         ' reason: Boom!')
 

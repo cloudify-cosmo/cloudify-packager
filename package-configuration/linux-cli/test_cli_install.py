@@ -39,7 +39,7 @@ class CliInstallTests(testtools.TestCase):
     def test_full_cli_install(self):
         try:
             tempdir = tempfile.mkdtemp()
-            self.run_get_cloudify('-f -v -e={0}'.format(tempdir))
+            self.run_get_cloudify('-f -v -e={0} --installpip'.format(tempdir))
             proc, stdout, stderr = self.get_cloudify.run(
                 '{0}/bin/cfy --version'.format(tempdir))
             self.assertIn('Cloudify CLI 3', stderr)
