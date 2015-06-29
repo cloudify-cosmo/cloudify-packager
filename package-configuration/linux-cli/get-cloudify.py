@@ -345,18 +345,15 @@ class CloudifyInstaller():
 
 
 def check_cloudify_installed(virtualenv_path=None):
+    check_import = 'python -c "import cloudify"'
     if virtualenv_path:
         result = run('{0}{1}{2}'.format(
-            virtualenv_path, ENV_BIN_RELATIVE_PATH,
-            'python -c "import cloudify"'))
-        if result.returncode == 0:
-            return True
-        return False
+            virtualenv_path, ENV_BIN_RELATIVE_PATH, check_import))
     else:
-        result = run('python -c "import cloudify"')
-        if result.returncode == 0:
-            return True
-        return False
+        result = run(check_import)
+    if result.returncode == 0:
+        return True
+    return False
 
 
 def parse_args(args=None):
