@@ -40,9 +40,9 @@ class CliInstallTests(testtools.TestCase):
         try:
             tempdir = tempfile.mkdtemp()
             self.run_get_cloudify('-f -v -e={0} --installpip'.format(tempdir))
-            proc, stdout, stderr = self.get_cloudify.run(
+            proc = self.get_cloudify.run(
                 '{0}/bin/cfy --version'.format(tempdir))
-            self.assertIn('Cloudify CLI 3', stderr)
+            self.assertIn('Cloudify CLI 3', proc.aggr_stderr)
         finally:
             shutil.rmtree(tempdir)
 
@@ -51,8 +51,8 @@ class CliInstallTests(testtools.TestCase):
             tempdir = tempfile.mkdtemp()
             self.run_get_cloudify('-s {0} -v -e={1}'.format(
                 cloudify_cli_url, tempdir))
-            proc, stdout, stderr = self.get_cloudify.run(
+            proc = self.get_cloudify.run(
                 '{0}/bin/cfy --version'.format(tempdir))
-            self.assertIn('Cloudify CLI 3', stderr)
+            self.assertIn('Cloudify CLI 3', proc.aggr_stderr)
         finally:
             shutil.rmtree(tempdir)

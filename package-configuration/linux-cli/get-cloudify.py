@@ -124,19 +124,19 @@ def run(cmd):
     pipe = subprocess.PIPE
     proc = subprocess.Popen(
         cmd, shell=True, stdout=pipe, stderr=pipe)
-    stdout = ''
+    proc.aggr_stdout = ''
     # while the process is still running, print output
     while True:
         output = proc.stdout.readline()
-        stdout += output
+        proc.aggr_stdout += output
         if output == '' and proc.poll() is not None:
             break
         if output and VERBOSE:
             prn('STDOUT: {0}'.format(output))
-    stderr = proc.stderr.read()
-    if len(stderr) > 0:
-        prn('STDERR: {0}'.format(stderr))
-    return proc, stdout, stderr
+    proc.aggr_stderr = proc.stderr.read()
+    if len(proc.aggr_stderr) > 0:
+        prn('STDERR: {0}'.format(proc.aggr_stderr))
+    return proc
 
 
 def is_root():
@@ -170,7 +170,7 @@ def make_virtualenv(virtualenv_dir, python_path):
     """
     prn('Creating Virtualenv {0}...'.format(virtualenv_dir))
     result = run('virtualenv -p {0} {1}'.format(python_path, virtualenv_dir))
-    if not result[0].returncode == 0:
+    if not result.returncode == 0:
         sys.exit('Could not create virtualenv: {0}'.format(virtualenv_dir))
 
 
@@ -201,7 +201,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     if IS_VIRTUALENV and not virtualenv_path:
         prn('Installing within current virtualenv: {0}'.format(IS_VIRTUALENV))
     result = run(pip_cmd)
-    if not result[0].returncode == 0:
+    if not result.returncode == 0:
         sys.exit('Could not install module: {0}'.format(module))
 
 
@@ -281,7 +281,7 @@ class CloudifyInstaller():
         # TODO: use `install_module` function instead.
         prn('Installing virtualenv...')
         result = run('pip install virtualenv')
-        if not result[0].returncode == 0:
+        if not result.returncode == 0:
             sys.exit('Could not install Virtualenv.')
 
     def install_pip(self):
@@ -297,7 +297,7 @@ class CloudifyInstaller():
             sys.exit('Failed downloading pip from {0}. reason: {1}'.format(
                      PIP_URL, e.message))
         result = run('{0} {1}'.format(self.args.pythonpath, get_pip_path))
-        if not result[0].returncode == 0:
+        if not result.returncode == 0:
             sys.exit('Could not install pip')
 
     def install_pythondev(self):

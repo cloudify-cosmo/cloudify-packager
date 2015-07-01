@@ -59,7 +59,7 @@ class CliBuilderUnitTests(testtools.TestCase):
                       builder_stdout.getvalue(),
                       'expected stderr was not printed')
         builder_stdout.close()
-        self.assertEqual(proc[0].returncode, 0, 'process execution failed')
+        self.assertEqual(proc.returncode, 0, 'process execution failed')
 
     def test_run_invalid_command(self):
         self.get_cloudify.VERBOSE = True
@@ -68,8 +68,8 @@ class CliBuilderUnitTests(testtools.TestCase):
         self.get_cloudify.sys.stdout = builder_stdout
         cmd = 'this is not a valid command'
         proc = get_cloudify.run(cmd)
-        self.assertIsNot(proc[0].returncode, 0, 'command \'{}\' execution was '
-                                                'expected to fail'.format(cmd))
+        self.assertIsNot(proc.returncode, 0, 'command \'{}\' execution was '
+                                             'expected to fail'.format(cmd))
 
     def test_install_pip_failed_download(self):
         mock_boom = MagicMock()
