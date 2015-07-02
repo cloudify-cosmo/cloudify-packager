@@ -139,7 +139,7 @@ VARS = {
             "python2.7",
             "make"
         ],
-        "nodejs_latest_url": "http://nodejs.org/dist/v0.10.35/node-v0.10.35.tar.gz",
+        "nodejs_latest_url": "http://nodejs.org/dist/v0.10.25/node-v0.10.25.tar.gz",
         "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.3.0/m3-RELEASE/cloudify-ui_3.3.0-m3-b273_amd64.deb",
         "ports": ["80"],
     }
