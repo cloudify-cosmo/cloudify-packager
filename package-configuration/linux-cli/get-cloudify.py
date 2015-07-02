@@ -97,7 +97,7 @@ IS_VIRTUALENV = False
 SUDO = False
 DISTRO = ''
 IS_PYX32 = False
-ENV_BIN_RELATIVE_PATH = '/bin/'
+ENV_BIN_RELATIVE_PATH = ''
 QUIET = False
 VERBOSE = False
 # TODO: put these in a private storage
@@ -198,8 +198,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     if upgrade:
         pip_cmd = '{0} --upgrade'.format(pip_cmd)
     if virtualenv_path:
-        pip_cmd = '{0}{1}{2}'.format(
-            virtualenv_path, ENV_BIN_RELATIVE_PATH, pip_cmd)
+        pip_cmd = os.path.join(virtualenv_path, ENV_BIN_RELATIVE_PATH, pip_cmd)
     if IS_VIRTUALENV and not virtualenv_path:
         prn('Installing within current virtualenv: {0}'.format(IS_VIRTUALENV))
     # sudo will be used only when not installing into a virtualenv and sudo
@@ -253,9 +252,9 @@ class CloudifyInstaller():
             # current user.
             drop_root_privileges()
         if self.args.virtualenv:
-            if not os.path.isfile(
-                    self.args.virtualenv + ENV_BIN_RELATIVE_PATH +
-                    ('activate.exe' if OS == 'windows' else 'activate')):
+            if not os.path.isfile(os.path.join(
+                    self.args.virtualenv, ENV_BIN_RELATIVE_PATH,
+                    ('activate.exe' if OS == 'windows' else 'activate'))):
                 make_virtualenv(self.args.virtualenv, self.args.pythonpath)
         # TODO: check if self.args hasattr installpycrypto instead.
         if OS == 'windows' and (self.args.force or self.args.installpycrypto):
@@ -346,9 +345,8 @@ class CloudifyInstaller():
 
 def check_cloudify_installed(virtualenv_path=None):
     if virtualenv_path:
-        result = run('{0}{1}{2}'.format(
-            virtualenv_path, ENV_BIN_RELATIVE_PATH,
-            'python -c "import cloudify"'))
+        result = run(os.path.join(virtualenv_path, ENV_BIN_RELATIVE_PATH,
+                                  'python -c "import cloudify"'))
         if result.returncode == 0:
             return True
         return False
@@ -444,13 +442,18 @@ def main():
     IS_PYX32 = True if struct.calcsize("P") == 4 else False
     # need to check if os.path.join works as expected on windows when
     # declaring these as it seems to provide some problems.
-    ENV_BIN_RELATIVE_PATH = '\\scripts\\' if OS == 'windows' else '/bin/'
+    ENV_BIN_RELATIVE_PATH = 'scripts' if OS == 'windows' else 'bin'
     if check_cloudify_installed(args.virtualenv):
         prn('Cloudify is already installed in the path.')
         if args.upgrade:
             prn('Upgrading...')
         else:
             prn('Use the --upgrade flag to upgrade.')
+            sys.exit(1)
+    else:
+        if args.upgrade:
+            prn('Cloudify is not installed. '
+                'Remove the --upgrade flag and try again.')
             sys.exit(1)
     installer = CloudifyInstaller(args)
     installer.execute()
