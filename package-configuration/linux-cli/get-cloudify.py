@@ -97,7 +97,7 @@ OS = 'linux'
 IS_VIRTUALENV = False
 DISTRO = ''
 IS_PYX32 = False
-ENV_BIN_RELATIVE_PATH = '/bin/'
+ENV_BIN_RELATIVE_PATH = ''
 # TODO: put these in a private storage
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
 PYCR64_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win-amd64-py2.7.exe'  # NOQA
@@ -173,7 +173,7 @@ def make_virtualenv(virtualenv_dir, python_path):
 
 
 def install_module(module, version=False, pre=False, virtualenv_path=False,
-                   wheelspath=False):
+                   wheelspath=False, upgrade=False):
     """This will install a module.
     Can specify a specific version.
     Can specify a prerelease.
@@ -191,9 +191,10 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
             pip_cmd, wheelspath)
     if pre:
         pip_cmd = '{0} --pre'.format(pip_cmd)
+    if upgrade:
+        pip_cmd = '{0} --upgrade'.format(pip_cmd)
     if virtualenv_path:
-        pip_cmd = '{0}{1}{2}'.format(
-            virtualenv_path, ENV_BIN_RELATIVE_PATH, pip_cmd)
+        pip_cmd = os.path.join(virtualenv_path, ENV_BIN_RELATIVE_PATH, pip_cmd)
     if IS_VIRTUALENV and not virtualenv_path:
         lgr.info('Installing within current virtualenv: {0}'.format(
             IS_VIRTUALENV))
@@ -248,16 +249,16 @@ class CloudifyInstaller():
             # current user.
             drop_root_privileges()
         if self.args.virtualenv:
-            if not os.path.isfile(
-                    self.args.virtualenv + ENV_BIN_RELATIVE_PATH +
-                    ('activate.exe' if OS == 'windows' else 'activate')):
+            if not os.path.isfile(os.path.join(
+                    self.args.virtualenv, ENV_BIN_RELATIVE_PATH,
+                    ('activate.exe' if OS == 'windows' else 'activate'))):
                 make_virtualenv(self.args.virtualenv, self.args.pythonpath)
         # TODO: check if self.args hasattr installpycrypto instead.
         if OS == 'windows' and (self.args.force or self.args.installpycrypto):
             self.install_pycrypto(self.args.virtualenv)
         if self.args.forceonline or not os.path.isdir(self.args.wheelspath):
             install_module('cloudify', self.args.version, self.args.pre,
-                           self.args.virtualenv)
+                           self.args.virtualenv, self.args.upgrade)
         elif os.path.isdir(self.args.wheelspath):
             lgr.info('Wheels directory found: "{0}". '
                      'Attemping offline installation...'.format(
@@ -265,12 +266,14 @@ class CloudifyInstaller():
             try:
                 install_module('cloudify', pre=True,
                                virtualenv_path=self.args.virtualenv,
-                               wheelspath=self.args.wheelspath)
+                               wheelspath=self.args.wheelspath,
+                               upgrade=self.args.upgrade)
             except Exception as ex:
                 lgr.warning('Offline installation failed ({0}).'.format(
                     ex.message))
                 install_module('cloudify', self.args.version,
-                               self.args.pre, self.args.virtualenv)
+                               self.args.pre, self.args.virtualenv,
+                               self.args.upgrade)
 
     def install_virtualenv(self):
         # TODO: use `install_module` function instead.
@@ -339,6 +342,21 @@ class CloudifyInstaller():
         run(cmd)
 
 
+def check_cloudify_installed(virtualenv_path=None):
+    if virtualenv_path:
+        result = run(os.path.join(virtualenv_path, ENV_BIN_RELATIVE_PATH,
+                                  'python -c "import cloudify"'))
+        if result.returncode == 0:
+            return True
+        return False
+    else:
+        try:
+            import cloudify  # NOQA
+            return True
+        except ImportError:
+            return False
+
+
 def parse_args(args=None):
     parser = argparse.ArgumentParser(description=DESCRIPTION)
     default_group = parser.add_mutually_exclusive_group()
@@ -360,6 +378,9 @@ def parse_args(args=None):
     version_group.add_argument(
         '--pre', action='store_true',
         help='Attempt to install the latest Cloudify Milestone')
+    parser.add_argument(
+        '-u', '--upgrade', action='store_true',
+        help='Upgrades Cloudify.')
     online_group.add_argument(
         '--forceonline', action='store_true',
         help='Even if wheels are found locally, install from PyPI.')
@@ -423,7 +444,19 @@ def main():
     IS_PYX32 = True if struct.calcsize("P") == 4 else False
     # need to check if os.path.join works as expected on windows when
     # declaring these as it seems to provide some problems.
-    ENV_BIN_RELATIVE_PATH = '\\scripts\\' if OS == 'windows' else '/bin/'
+    ENV_BIN_RELATIVE_PATH = 'scripts' if OS == 'windows' else 'bin'
+    if check_cloudify_installed(args.virtualenv):
+        lgr.info('Cloudify is already installed in the path.')
+        if args.upgrade:
+            lgr.info('Upgrading...')
+        else:
+            lgr.error('Use the --upgrade flag to upgrade.')
+            sys.exit(1)
+    else:
+        if args.upgrade:
+            lgr.error('Cloudify is not installed. '
+                      'Remove the --upgrade flag and try again.')
+            sys.exit(1)
     installer = CloudifyInstaller(args)
     installer.execute()
     if args.virtualenv:
