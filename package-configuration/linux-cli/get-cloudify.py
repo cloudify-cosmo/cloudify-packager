@@ -437,5 +437,5 @@ def main():
 
 
 if __name__ == '__main__':
-    lgr = init_logger('get-cloudify')
+    lgr = init_logger(__name__)
     main()
