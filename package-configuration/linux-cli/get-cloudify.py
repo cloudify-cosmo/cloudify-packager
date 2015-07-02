@@ -95,7 +95,6 @@ additional information.'''
 
 OS = 'linux'
 IS_VIRTUALENV = False
-SUDO = False
 DISTRO = ''
 IS_PYX32 = False
 ENV_BIN_RELATIVE_PATH = '/bin/'
@@ -128,7 +127,7 @@ def _print_proc_out(proc):
 
 
 def run(cmd):
-    """This will execute a command either sudo-ically or not.
+    """Executes a command
     """
     lgr.debug('Executing: {0}...'.format(cmd))
     proc = subprocess.Popen(
@@ -186,8 +185,6 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     Can specify a local wheelspath to use for offline installation.
     In a Windows envrinoment, a virtualenv bin dir would be declared under
     'VIRTUALENV\\scripts\\'.
-    a `sudo` run will be performed if not running within a virtualenv
-    and an explicit --nosudo isn't provided.
     """
     lgr.info('Installing {0}...'.format(module))
     if version:
@@ -403,7 +400,7 @@ def parse_args(args=None):
 
 
 def main():
-    global OS, DISTRO, RELEASE, SUDO, IS_VIRTUALENV, \
+    global OS, DISTRO, RELEASE, IS_VIRTUALENV, \
         IS_PYX32, ENV_BIN_RELATIVE_PATH, args
     os_props = get_os_props()
     OS = os_props[0].lower() if os_props[0] else 'Unknown'
@@ -414,19 +411,15 @@ def main():
     args = parse_args()
 
     if args.quiet:
-        logging_level = logging.ERROR
+        lgr.setLevel(logging.ERROR)
     elif args.verbose:
-        logging_level = logging.DEBUG
+        lgr.setLevel(logging.DEBUG)
     else:
-        logging_level = logging.INFO
-    set_global_verbosity_level(logging_level)
+        lgr.setLevel(logging.INFO)
 
     lgr.debug('Identified OS: {0}'.format(OS))
     lgr.debug('Identified Distribution: {0}'.format(DISTRO))
     lgr.debug('Identified Release: {0}'.format(RELEASE))
-    # if OS is windows, we want to make sure sudo will not be used
-    # the nosudo arg is missing only if on windows.
-    SUDO = False if not hasattr(args, 'nosudo') or args.nosudo else True
     # are we running within a virtualenv? This will potentially affect the
     # destination installation directory
     IS_VIRTUALENV = os.environ.get('VIRTUAL_ENV')
@@ -443,7 +436,6 @@ def main():
                      os.path.join(args.virtualenv, 'bin/activate')))
 
 
-lgr = init_logger('get-cloudify')
-
 if __name__ == '__main__':
+    lgr = init_logger('get-cloudify')
     main()
