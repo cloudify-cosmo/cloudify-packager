@@ -116,10 +116,6 @@ def init_logger(logger_name):
     return logger
 
 
-def set_global_verbosity_level(level):
-    lgr.setLevel(level)
-
-
 def _print_proc_out(proc):
     stdout_line = proc.stdout.readline()
     if len(stdout_line) > 0:
