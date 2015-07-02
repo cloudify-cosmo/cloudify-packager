@@ -431,7 +431,8 @@ def main():
                  'the Virtualenv.'.format(
                      os.path.join(args.virtualenv, 'bin/activate')))
 
+lgr = init_logger('get-cloudify')
+
 
 if __name__ == '__main__':
-    lgr = init_logger(__name__)
     main()
