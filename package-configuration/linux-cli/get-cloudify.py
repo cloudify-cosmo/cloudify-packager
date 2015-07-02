@@ -208,7 +208,7 @@ def download_file(url, destination):
     lgr.info('Downloading {0} to {1}'.format(url, destination))
     final_url = urllib.urlopen(url).geturl()
     if final_url != url:
-        lgr.debug('Redirected to {}'.format(final_url))
+        lgr.debug('Redirected to {0}'.format(final_url))
     f = urllib.URLopener()
     f.retrieve(final_url, destination)
 
