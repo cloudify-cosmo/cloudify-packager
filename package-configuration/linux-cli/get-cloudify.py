@@ -450,12 +450,12 @@ def main():
         if args.upgrade:
             lgr.info('Upgrading...')
         else:
-            lgr.info('Use the --upgrade flag to upgrade.')
+            lgr.error('Use the --upgrade flag to upgrade.')
             sys.exit(1)
     else:
         if args.upgrade:
-            lgr.info('Cloudify is not installed. '
-                     'Remove the --upgrade flag and try again.')
+            lgr.error('Cloudify is not installed. '
+                      'Remove the --upgrade flag and try again.')
             sys.exit(1)
     installer = CloudifyInstaller(args)
     installer.execute()
