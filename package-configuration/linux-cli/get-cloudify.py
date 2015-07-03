@@ -344,7 +344,8 @@ class CloudifyInstaller():
         if venv:
             # why not use join on all 3 parameters? hmm...
             # there was a problem here.
-            cmd = '{0}\\{1}'.format(os.path.join(venv, 'scripts'), cmd)
+            cmd = os.path.join(venv, ENV_BIN_RELATIVE_PATH, cmd)
+            # cmd = '{0}\\{1}'.format(os.path.join(venv, 'scripts'), cmd)
         run(cmd)
 
 
@@ -454,6 +455,7 @@ def main():
     # need to check if os.path.join works as expected on windows when
     # declaring these as it seems to provide some problems.
     ENV_BIN_RELATIVE_PATH = 'scripts' if OS == 'windows' else 'bin'
+
     if check_cloudify_installed(args.virtualenv):
         lgr.info('Cloudify is already installed in the path.')
         if args.upgrade:
@@ -469,9 +471,14 @@ def main():
     installer = CloudifyInstaller(args)
     installer.execute()
     if args.virtualenv:
-        lgr.info('You can now run: "source {0}" to activate '
-                 'the Virtualenv.'.format(
-                     os.path.join(args.virtualenv, 'bin/activate')))
+        activate_path = os.path.join(
+            args.virtualenv, ENV_BIN_RELATIVE_PATH, 'activate')
+        if OS == 'windows':
+            lgr.info('You can now run: "{0}.exe" to activate '
+                     'the Virtualenv.'.format(activate_path))
+        else:
+            lgr.info('You can now run: "source {0}" to activate '
+                     'the Virtualenv.'.format(activate_path))
 
 lgr = init_logger(__file__)
 
