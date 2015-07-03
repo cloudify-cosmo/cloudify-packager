@@ -49,11 +49,8 @@ import platform
 import os
 import urllib
 import struct
-<<<<<<< HEAD
 import tempfile
-=======
 import logging
->>>>>>> master
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -120,49 +117,27 @@ def init_logger(logger_name):
     return logger
 
 
-<<<<<<< HEAD
-=======
-def _print_proc_out(proc):
-    stdout_line = proc.stdout.readline()
-    if len(stdout_line) > 0:
-        lgr.debug(stdout_line)
-
-
->>>>>>> master
 def run(cmd):
     """Executes a command
     """
-<<<<<<< HEAD
-    # cmd = 'sudo {0}'.format(cmd) if sudo else cmd
-    if VERBOSE:
-        prn('Executing: {0}...'.format(cmd))
-    pipe = subprocess.PIPE
-=======
     lgr.debug('Executing: {0}...'.format(cmd))
->>>>>>> master
+    pipe = subprocess.PIPE
     proc = subprocess.Popen(
         cmd, shell=True, stdout=pipe, stderr=pipe)
     proc.aggr_stdout = ''
     # while the process is still running, print output
-<<<<<<< HEAD
-    while True:
+    while proc.poll() is None:
         output = proc.stdout.readline()
         proc.aggr_stdout += output
-        if output == '' and proc.poll() is not None:
-            break
-        if output and VERBOSE:
-            prn('STDOUT: {0}'.format(output))
+        if len(output) > 0:
+            lgr.debug(output)
+    output = proc.stdout.readline()
+    proc.aggr_stdout += output
+    if len(output) > 0:
+        lgr.debug(output)
     proc.aggr_stderr = proc.stderr.read()
     if len(proc.aggr_stderr) > 0:
-        prn('STDERR: {0}'.format(proc.aggr_stderr))
-=======
-    while proc.poll() is None:
-        _print_proc_out(proc)
-    _print_proc_out(proc)
-    stderr = proc.stderr.read()
-    if len(stderr) > 0:
-        lgr.error(stderr)
->>>>>>> master
+        lgr.error(proc.aggr_stderr)
     return proc
 
 
@@ -224,14 +199,10 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     if virtualenv_path:
         pip_cmd = os.path.join(virtualenv_path, ENV_BIN_RELATIVE_PATH, pip_cmd)
     if IS_VIRTUALENV and not virtualenv_path:
-<<<<<<< HEAD
-        prn('Installing within current virtualenv: {0}'.format(IS_VIRTUALENV))
-=======
         lgr.info('Installing within current virtualenv: {0}'.format(
             IS_VIRTUALENV))
     # sudo will be used only when not installing into a virtualenv and sudo
     # is enabled
->>>>>>> master
     result = run(pip_cmd)
     if not result.returncode == 0:
         sys.exit('Could not install module: {0}'.format(module))
@@ -294,13 +265,8 @@ class CloudifyInstaller():
             self.install_pycrypto(self.args.virtualenv)
 
         if self.args.forceonline or not os.path.isdir(self.args.wheelspath):
-<<<<<<< HEAD
             install_module(module, self.args.version, self.args.pre,
                            self.args.virtualenv)
-=======
-            install_module('cloudify', self.args.version, self.args.pre,
-                           self.args.virtualenv, self.args.upgrade)
->>>>>>> master
         elif os.path.isdir(self.args.wheelspath):
             lgr.info('Wheels directory found: "{0}". '
                      'Attemping offline installation...'.format(
@@ -311,28 +277,16 @@ class CloudifyInstaller():
                                wheelspath=self.args.wheelspath,
                                upgrade=self.args.upgrade)
             except Exception as ex:
-<<<<<<< HEAD
-                prn('Offline installation failed ({0}).'.format(ex.message))
-                install_module(module, self.args.version,
-                               self.args.pre, self.args.virtualenv)
-
-    def install_virtualenv(self):
-        # TODO: use `install_module` function instead.
-        prn('Installing virtualenv...')
-        result = run('pip install virtualenv')
-=======
                 lgr.warning('Offline installation failed ({0}).'.format(
                     ex.message))
-                install_module('cloudify', self.args.version,
+                install_module(module, self.args.version,
                                self.args.pre, self.args.virtualenv,
                                self.args.upgrade)
 
     def install_virtualenv(self):
         # TODO: use `install_module` function instead.
         lgr.info('Installing virtualenv...')
-        cmd = 'pip install virtualenv'
-        result = run(cmd)
->>>>>>> master
+        result = run('pip install virtualenv')
         if not result.returncode == 0:
             sys.exit('Could not install Virtualenv.')
 
@@ -430,15 +384,12 @@ def parse_args(args=None):
     version_group.add_argument(
         '--pre', action='store_true',
         help='Attempt to install the latest Cloudify Milestone')
-<<<<<<< HEAD
     version_group.add_argument(
         '-s', '--source', type=str,
         help='Install from the provided URL or local path')
-=======
     parser.add_argument(
         '-u', '--upgrade', action='store_true',
         help='Upgrades Cloudify.')
->>>>>>> master
     online_group.add_argument(
         '--forceonline', action='store_true',
         help='Even if wheels are found locally, install from PyPI.')
