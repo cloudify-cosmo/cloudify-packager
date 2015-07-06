@@ -49,6 +49,7 @@ import platform
 import os
 import urllib
 import struct
+import tempfile
 import logging
 
 
@@ -116,25 +117,27 @@ def init_logger(logger_name):
     return logger
 
 
-def _print_proc_out(proc):
-    stdout_line = proc.stdout.readline()
-    if len(stdout_line) > 0:
-        lgr.debug(stdout_line)
-
-
 def run(cmd):
     """Executes a command
     """
     lgr.debug('Executing: {0}...'.format(cmd))
+    pipe = subprocess.PIPE
     proc = subprocess.Popen(
-        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd, shell=True, stdout=pipe, stderr=pipe)
+    proc.aggr_stdout = ''
     # while the process is still running, print output
     while proc.poll() is None:
-        _print_proc_out(proc)
-    _print_proc_out(proc)
-    stderr = proc.stderr.read()
-    if len(stderr) > 0:
-        lgr.error(stderr)
+        output = proc.stdout.readline()
+        proc.aggr_stdout += output
+        if len(output) > 0:
+            lgr.debug(output)
+    output = proc.stdout.readline()
+    proc.aggr_stdout += output
+    if len(output) > 0:
+        lgr.debug(output)
+    proc.aggr_stderr = proc.stderr.read()
+    if len(proc.aggr_stderr) > 0:
+        lgr.error(proc.aggr_stderr)
     return proc
 
 
@@ -234,12 +237,15 @@ class CloudifyInstaller():
         If an offline installation fails (for instance, not all wheels were
         found), an online installation process will commence.
         """
-        # TODO: check if there are any darwin dependencies to handle
+        module = self.args.source or 'cloudify'
+
         if self.args.force or self.args.installpip:
             self.install_pip()
+
         if self.args.virtualenv and (
                 self.args.force or self.args.installvirtualenv):
             self.install_virtualenv()
+
         # TODO: check if self.args hasattr installpythondev instead.
         if OS == 'linux' and (self.args.force or self.args.installpythondev):
             self.install_pythondev()
@@ -254,32 +260,33 @@ class CloudifyInstaller():
                     ('activate.exe' if OS == 'windows' else 'activate'))):
                 make_virtualenv(self.args.virtualenv, self.args.pythonpath)
         # TODO: check if self.args hasattr installpycrypto instead.
+
         if OS == 'windows' and (self.args.force or self.args.installpycrypto):
             self.install_pycrypto(self.args.virtualenv)
+
         if self.args.forceonline or not os.path.isdir(self.args.wheelspath):
-            install_module('cloudify', self.args.version, self.args.pre,
-                           self.args.virtualenv, self.args.upgrade)
+            install_module(module, self.args.version, self.args.pre,
+                           self.args.virtualenv)
         elif os.path.isdir(self.args.wheelspath):
             lgr.info('Wheels directory found: "{0}". '
                      'Attemping offline installation...'.format(
                          self.args.wheelspath))
             try:
-                install_module('cloudify', pre=True,
+                install_module(module, pre=True,
                                virtualenv_path=self.args.virtualenv,
                                wheelspath=self.args.wheelspath,
                                upgrade=self.args.upgrade)
             except Exception as ex:
                 lgr.warning('Offline installation failed ({0}).'.format(
                     ex.message))
-                install_module('cloudify', self.args.version,
+                install_module(module, self.args.version,
                                self.args.pre, self.args.virtualenv,
                                self.args.upgrade)
 
     def install_virtualenv(self):
         # TODO: use `install_module` function instead.
         lgr.info('Installing virtualenv...')
-        cmd = 'pip install virtualenv'
-        result = run(cmd)
+        result = run('pip install virtualenv')
         if not result.returncode == 0:
             sys.exit('Could not install Virtualenv.')
 
@@ -288,15 +295,14 @@ class CloudifyInstaller():
         # TODO: check below to see if pip already exists
         # import distutils
         # if not distutils.spawn.find_executable('pip'):
+        tempdir = tempfile.mkdtemp()
+        get_pip_path = os.path.join(tempdir, 'get-pip.py')
         try:
-            download_file(PIP_URL, 'get-pip.py')
+            download_file(PIP_URL, get_pip_path)
         except StandardError as e:
-            sys.exit('failed downloading pip from {0}. reason: {1}'.format(
+            sys.exit('Failed downloading pip from {0}. reason: {1}'.format(
                      PIP_URL, e.message))
-        cmd = '{0} get-pip.py'.format(self.args.pythonpath)
-        result = run(cmd)
-        # TEST remove get-pip.py file
-        # os.remove('get-pip.py')
+        result = run('{0} {1}'.format(self.args.pythonpath, get_pip_path))
         if not result.returncode == 0:
             sys.exit('Could not install pip')
 
@@ -338,7 +344,8 @@ class CloudifyInstaller():
         if venv:
             # why not use join on all 3 parameters? hmm...
             # there was a problem here.
-            cmd = '{0}\\{1}'.format(os.path.join(venv, 'scripts'), cmd)
+            cmd = os.path.join(venv, ENV_BIN_RELATIVE_PATH, cmd)
+            # cmd = '{0}\\{1}'.format(os.path.join(venv, 'scripts'), cmd)
         run(cmd)
 
 
@@ -378,6 +385,9 @@ def parse_args(args=None):
     version_group.add_argument(
         '--pre', action='store_true',
         help='Attempt to install the latest Cloudify Milestone')
+    version_group.add_argument(
+        '-s', '--source', type=str,
+        help='Install from the provided URL or local path')
     parser.add_argument(
         '-u', '--upgrade', action='store_true',
         help='Upgrades Cloudify.')
@@ -445,6 +455,7 @@ def main():
     # need to check if os.path.join works as expected on windows when
     # declaring these as it seems to provide some problems.
     ENV_BIN_RELATIVE_PATH = 'scripts' if OS == 'windows' else 'bin'
+
     if check_cloudify_installed(args.virtualenv):
         lgr.info('Cloudify is already installed in the path.')
         if args.upgrade:
@@ -460,9 +471,14 @@ def main():
     installer = CloudifyInstaller(args)
     installer.execute()
     if args.virtualenv:
-        lgr.info('You can now run: "source {0}" to activate '
-                 'the Virtualenv.'.format(
-                     os.path.join(args.virtualenv, 'bin/activate')))
+        activate_path = os.path.join(
+            args.virtualenv, ENV_BIN_RELATIVE_PATH, 'activate')
+        if OS == 'windows':
+            lgr.info('You can now run: "{0}.exe" to activate '
+                     'the Virtualenv.'.format(activate_path))
+        else:
+            lgr.info('You can now run: "source {0}" to activate '
+                     'the Virtualenv.'.format(activate_path))
 
 lgr = init_logger(__file__)
 

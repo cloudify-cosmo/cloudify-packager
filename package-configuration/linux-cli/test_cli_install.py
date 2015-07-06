@@ -15,11 +15,14 @@
 ############
 import testtools
 import sys
-import tempfile
 import shutil
+import tempfile
 
 
 get_cloudify = __import__("get-cloudify")
+
+cloudify_cli_url = \
+    'https://github.com/cloudify-cosmo/cloudify-cli/archive/3.2.tar.gz'
 
 
 class CliInstallTests(testtools.TestCase):
@@ -34,9 +37,23 @@ class CliInstallTests(testtools.TestCase):
         self.get_cloudify = get_cloudify
 
     def test_full_cli_install(self):
+        try:
+            tempdir = tempfile.mkdtemp()
+            self.run_get_cloudify('-f -v -e={0} --installpip'.format(tempdir))
+            proc = self.get_cloudify.run(
+                '{0}/bin/cfy --version'.format(tempdir))
+            self.assertIn('Cloudify CLI 3', proc.aggr_stderr)
+        finally:
+            shutil.rmtree(tempdir)
+
+    def test_install_from_source(self):
         tempdir = tempfile.mkdtemp()
         try:
-            self.run_get_cloudify('-v -e={0}'.format(tempdir))
+            self.run_get_cloudify('-s {0} -v -e={1}'.format(
+                cloudify_cli_url, tempdir))
+            proc = self.get_cloudify.run(
+                '{0}/bin/cfy --version'.format(tempdir))
+            self.assertIn('Cloudify CLI 3', proc.aggr_stderr)
         finally:
             shutil.rmtree(tempdir)
 
