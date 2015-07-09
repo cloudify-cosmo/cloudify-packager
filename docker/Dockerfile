@@ -253,16 +253,9 @@ WORKDIR /etc/service/celeryd-cloudify-management/
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-diamond-plugin.git@master && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install git+git://github.com/cloudify-cosmo/cloudify-agent.git@master && \
     /bin/bash -c 'git clone -b master https://github.com/cloudify-cosmo/cloudify-manager.git && \
-    pushd cloudify-manager/plugins/plugin-installer && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
-    popd && \
-    pushd cloudify-manager/plugins/agent-installer && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
-    popd && \
-    pushd cloudify-manager/plugins/windows-agent-installer && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
-    popd && \
     pushd cloudify-manager/plugins/riemann-controller && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
     popd && \
