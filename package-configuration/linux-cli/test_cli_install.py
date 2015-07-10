@@ -14,7 +14,7 @@
 # limitations under the License.
 ############
 import testtools
-import sys
+# import sys
 import shutil
 import tempfile
 
@@ -27,10 +27,12 @@ cloudify_cli_url = \
 
 class CliInstallTests(testtools.TestCase):
     @staticmethod
-    def run_get_cloudify(params):
-        sys.argv = params.split()
-        sys.argv.insert(0, 'get-cloudify')
-        get_cloudify.main()
+    def run_get_cloudify(cmd):
+        # args = get_cloudify.parse_args()
+        # sys.argv = params.split()
+        # sys.argv.insert(0, 'get-cloudify')
+        # get_cloudify.install(args)
+        get_cloudify.run('python get-cloudify.py {0}'.format(cmd))
 
     def setUp(self):
         super(CliInstallTests, self).setUp()
@@ -70,6 +72,7 @@ class CliInstallTests(testtools.TestCase):
         try:
             self.run_get_cloudify('-v -e={0}'.format(tempdir))
             self.assertRaises(
+
                 SystemExit, self.run_get_cloudify, '-v -e={0}'.format(tempdir))
         finally:
             shutil.rmtree(tempdir)
