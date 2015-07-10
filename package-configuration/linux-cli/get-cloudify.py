@@ -51,6 +51,7 @@ import urllib
 import struct
 import tempfile
 import logging
+import time
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -131,6 +132,7 @@ def run(cmd):
         proc.aggr_stdout += output
         if len(output) > 0:
             lgr.debug(output)
+        time.sleep(0.5)
     output = proc.stdout.readline()
     proc.aggr_stdout += output
     if len(output) > 0:
