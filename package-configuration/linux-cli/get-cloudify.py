@@ -474,7 +474,7 @@ def main():
         activate_path = os.path.join(
             args.virtualenv, ENV_BIN_RELATIVE_PATH, 'activate')
         if OS == 'windows':
-            lgr.info('You can now run: "{0}.exe" to activate '
+            lgr.info('You can now run: "{0}.bat" to activate '
                      'the Virtualenv.'.format(activate_path))
         else:
             lgr.info('You can now run: "source {0}" to activate '
