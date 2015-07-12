@@ -196,13 +196,6 @@ class TestCliPackage(TestCase):
         package_name = self.get_cli_package_url()[last_ind + 1:]
         self._execute_command('rpm -i {0}'.format(package_name), sudo=True)
 
-    def change_to_tarzan_urls(self):
-        self._execute_command(
-            'sed -i \'s/http:\/\/gigaspaces-repository-eu.s3'
-            '.amazonaws.com\/org/http:\/\/tarzan\/builds\/Giga'
-            'SpacesBuilds/g\' {0}'.format(
-                self.test_openstack_manager_blueprint_path), sudo=True)
-
     def prepare_manager_blueprint(self):
         self.manager_blueprints_repo_dir = '{0}/cloudify-manager-blueprints' \
                                            '-commercial/' \
@@ -218,8 +211,6 @@ class TestCliPackage(TestCase):
             os.path.join(self.cfy_work_dir, 'bootstrap_inputs.json')
         fab.put(self.local_bootstrap_inputs_path,
                 self.remote_bootstrap_inputs_path, use_sudo=True)
-
-        self.change_to_tarzan_urls()
 
     def bootstrap_manager(self):
         self.logger.info('Bootstrapping Cloudify manager...')
