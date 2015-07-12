@@ -107,10 +107,6 @@ GITHUB_PASSWORD=$4
 CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
 
-#install_prereqs &&
-#install_ruby
-#install_fpm &&
-#install_pip &&
 install_module "packman==0.5.0" &&
 echo 'installing venv'
 install_module "virtualenv==12.0.7" &&
@@ -133,9 +129,21 @@ elif [ "${AGENT}" == "centos-Final" ]; then
 	AGENT_VENV="/centos-agent/env"
 elif [ "${AGENT}" == "centos-Core" ]; then
 	AGENT_VENV="/centos-agent/env"
+	install_prereqs &&
+	install_ruby
+	install_fpm &&
+	install_pip &&
 elif [ "${AGENT}" == "redhat-Maipo" ]; then
+	install_prereqs &&
+	install_ruby
+	install_fpm &&
+	install_pip &&
 	AGENT_VENV="/redhat-agent/env"
 elif [ "${AGENT}" == "redhat-Santiago" ]; then
+	install_prereqs &&
+	install_ruby
+	install_fpm &&
+	install_pip &&
 	AGENT_VENV="/redhat-agent/env"
 elif [ "${AGENT}" == "debian-jessie" ]; then
 	AGENT_VENV="/debian-agent/env"
