@@ -11,7 +11,7 @@ function install_prereqs
 		sudo apt-get install -y curl python-dev git make gcc libyaml-dev zlib1g-dev g++
 	elif which yum; then
 		# centos/REHL
-		sudo yum -y update &&
+		sudo yum -y --exclude=kernel\* update &&
 		sudo yum install -y yum-downloadonly wget mlocate yum-utils &&
 		sudo yum install -y python-devel libyaml-devel ruby rubygems ruby-devel make gcc git g++
 		# this is required to build pyzmq under centos/RHEL
@@ -48,7 +48,6 @@ function install_pip
 
 function install_module
 {
-
 	module=$1
 	venv=${2:-""}
 	tag=${3:-""}
@@ -70,11 +69,7 @@ function install_module
 		popd
 	else
 		if [[ ! -z "$venv" ]]; then
-			# if [[ ! -z "$tag" ]]; then
-			#	pip install git+git://github.com/${org}/${module}.git@${tag}#egg=${module}
-			# else
 			sudo ${venv}/bin/pip install ${module}
-			# fi
 		else
 			sudo pip install ${module}
 		fi
@@ -112,11 +107,8 @@ GITHUB_PASSWORD=$4
 CORE_TAG_NAME="master"
 PLUGINS_TAG_NAME="master"
 
-#install_prereqs &&
-#install_ruby
-#install_fpm &&
-#install_pip &&
 install_module "packman==0.5.0" &&
+echo 'installing venv'
 install_module "virtualenv==12.0.7" &&
 
 cd /cloudify-packager/ &&
@@ -135,11 +127,29 @@ elif [ "${AGENT}" == "Ubuntu-precise" ]; then
 	AGENT_VENV="/Ubuntu-agent/env"
 elif [ "${AGENT}" == "centos-Final" ]; then
 	AGENT_VENV="/centos-agent/env"
+elif [ "${AGENT}" == "centos-Core" ]; then
+	AGENT_VENV="/centos-agent/env"
+	install_prereqs &&
+	install_ruby
+	install_fpm &&
+	install_pip &&
+elif [ "${AGENT}" == "redhat-Maipo" ]; then
+	install_prereqs &&
+	install_ruby
+	install_fpm &&
+	install_pip &&
+	AGENT_VENV="/redhat-agent/env"
+elif [ "${AGENT}" == "redhat-Santiago" ]; then
+	install_prereqs &&
+	install_ruby
+	install_fpm &&
+	install_pip &&
+	AGENT_VENV="/redhat-agent/env"
 elif [ "${AGENT}" == "debian-jessie" ]; then
 	AGENT_VENV="/debian-agent/env"
 fi
 install_module "celery==3.1.17" "${AGENT_VENV}" &&
-install_module "pyzmq==14.4.0" "${AGENT_VENV}" &&
+install_module "pyzmq==14.4.0" "${AGENT_VENV}"
 install_module "cloudify-rest-client" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 install_module "cloudify-plugins-common" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 install_module "cloudify-script-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&

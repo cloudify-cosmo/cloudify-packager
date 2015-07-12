@@ -62,6 +62,19 @@ def get_centos_final_agent(download=False):
     create_agent(package, download)
 
 
+def get_centos_core_agent(download=False):
+    package = get_conf('centos-Core-agent')
+    create_agent(package, download)
+
+
+def get_redhat_maipo_agent(download=False):
+    package = get_conf('redhat-Maipo-agent')
+    create_agent(package, download)
+
+def get_redhat_santiago_agent(download=False):
+    package = get_conf('redhat-Santiago-agent')
+    create_agent(package, download)
+
 def get_debian_jessie_agent(download=False):
     package = get_conf('debian-jessie-agent')
     create_agent(package, download)
