@@ -96,6 +96,7 @@ Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
 
 IS_VIRTUALENV = os.environ.get('VIRTUAL_ENV')
+
 # Path to the pip executable
 PIP_EXEC = 'pip'
 
@@ -157,13 +158,8 @@ def drop_root_privileges():
     as a virtualenv is created especially so that users don't have to
     install in the system Python or using a Sudoer.
     """
-    def is_root():
-        """Check if running as root
-        """
-        return os.getuid() == 0
-
     # maybe we're not root
-    if not is_root():
+    if not os.getuid() == 0:
         return
 
     lgr.info('Dropping root permissions...')
@@ -454,9 +450,6 @@ def parse_args(args=None):
 
 
 def install(args):
-    lgr.error(IS_WIN)
-    lgr.error(IS_DARWIN)
-    lgr.error(IS_LINUX)
     if check_cloudify_installed(args.virtualenv):
         lgr.info('Cloudify is already installed in the path.')
         if args.upgrade:
