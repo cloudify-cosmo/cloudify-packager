@@ -233,11 +233,11 @@ def _get_env_bin_path(env_path):
 
 
 class CloudifyInstaller():
-    def __init__(self, args):
+    def __init__(self, args, os_distro=None, os_release=None):
         self.args = args
         os_props = get_os_props()
-        self.distro = os_props[0].lower() or 'Unknown'
-        self.release = os_props[1].lower() or 'Unknown'
+        self.distro = os_distro or os_props[0].lower()
+        self.release = os_release or os_props[1].lower()
 
     def execute(self):
         """Installation Logic
@@ -331,7 +331,7 @@ class CloudifyInstaller():
     def install_pythondev(self, distro):
         """Installs python-dev and gcc
 
-        This will try to match a command for your distribution.
+        This will try to match a command for your platform and distribution.
         """
         lgr.info('Installing python-dev...')
         if distro in ('ubuntu', 'debian'):
@@ -367,10 +367,7 @@ class CloudifyInstaller():
         # executables.
         cmd = 'easy_install {0}'.format(PYCR32_URL if is_pyx32 else PYCR64_URL)
         if venv:
-            # why not use join on all 3 parameters? hmm...
-            # there was a problem here.
             cmd = os.path.join(_get_env_bin_path(venv), cmd)
-            # cmd = '{0}\\{1}'.format(os.path.join(venv, 'scripts'), cmd)
         run(cmd)
 
 
