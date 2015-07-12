@@ -8,4 +8,5 @@ env:
 install:
 - pip install tox
 script:
+- apt-get install python-dev gcc -y
 - tox -e $TOX_ENV
