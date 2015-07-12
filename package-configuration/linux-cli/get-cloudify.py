@@ -52,11 +52,15 @@ import struct
 import tempfile
 import logging
 import shutil
+import distutils
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
 Windows (with Python32 AND 64), and OS X (Darwin).
 On the linux front, it supports Debian/Ubuntu, CentOS/RHEL and Arch.
+
+Note that the script attempts to not be instrusive by forcing the user
+to explicitly declare installation of various dependencies.
 
 Installations are supported for both system python, the currently active
 virtualenv and a declared virtualenv (using the --virtualenv flag).
@@ -97,8 +101,9 @@ additional information.'''
 
 IS_VIRTUALENV = os.environ.get('VIRTUAL_ENV')
 
-# Path to the pip executable
+# Path to the pip and virtualenv executables
 PIP_EXEC = 'pip'
+VIRTUALENV_EXEC = 'virtualenv'
 
 # TODO: put these in a private storage
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
@@ -228,8 +233,16 @@ def get_os_props():
 
 
 def _get_env_bin_path(env_path):
+    """returns the bin path for a virtualenv
+    """
     import virtualenv
     return virtualenv.path_locations(env_path)[3]
+
+
+def is_exec(app):
+    """Checks if app is executable in the path
+    """
+    return distutils.spawn.find_executable(app)
 
 
 class CloudifyInstaller():
@@ -241,6 +254,7 @@ class CloudifyInstaller():
 
     def execute(self):
         """Installation Logic
+
         --force argument forces installation of all prerequisites.
         If a wheels directory is found, it will be used for offline
         installation unless explicitly prevented using the --forceonline flag.
@@ -304,13 +318,15 @@ class CloudifyInstaller():
                          'the Virtualenv.'.format(activate_path))
 
     def install_virtualenv(self):
-        lgr.info('Installing virtualenv...')
-        install_module('virtualenv')
+        if not is_exec(VIRTUALENV_EXEC):
+            lgr.info('Installing virtualenv...')
+            install_module('virtualenv')
+        else:
+            lgr.info('virtualenv is already installed in the path.')
 
     def install_pip(self):
         lgr.info('Installing pip...')
-        import distutils
-        if not distutils.spawn.find_executable(PIP_EXEC):
+        if not is_exec(PIP_EXEC):
             try:
                 tempdir = tempfile.mkdtemp()
                 get_pip_path = os.path.join(tempdir, 'get-pip.py')
@@ -351,7 +367,7 @@ class CloudifyInstaller():
         run(cmd)
 
     # Windows only
-    def install_pycrypto(self, venv):
+    def install_pycrypto(self, virtualenv_path):
         """This will install PyCrypto to be used by Fabric.
         PyCrypto isn't compiled with Fabric on Windows by default thus it needs
         to be provided explicitly.
@@ -366,8 +382,8 @@ class CloudifyInstaller():
         # easy install is used instead of pip as pip doesn't handle windows
         # executables.
         cmd = 'easy_install {0}'.format(PYCR32_URL if is_pyx32 else PYCR64_URL)
-        if venv:
-            cmd = os.path.join(_get_env_bin_path(venv), cmd)
+        if virtualenv_path:
+            cmd = os.path.join(_get_env_bin_path(virtualenv_path), cmd)
         run(cmd)
 
 
