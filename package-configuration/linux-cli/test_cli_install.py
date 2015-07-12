@@ -33,7 +33,7 @@ class CliInstallInSystemPythonTests(testtools.TestCase):
     def setUp(self):
         if getpass.getuser() != 'travis':
             raise self.skipTest('Not Running in Travis.')
-        super(CliInstallTests, self).setUp()
+        super(CliInstallInSystemPythonTests, self).setUp()
         self.get_cloudify = get_cloudify
 
     def test_full_cli_install(self):
