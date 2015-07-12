@@ -109,7 +109,8 @@ class CliBuilderUnitTests(testtools.TestCase):
 
     def test_get_os_props(self):
         distro = self.get_cloudify.get_os_props()[0]
-        distros = ('ubuntu', 'centos', 'archlinux')
+        distros = ('ubuntu', 'redhat', 'debian', 'fedora', 'centos',
+                   'archlinux')
         if distro.lower() not in distros:
             self.fail('distro prop \'{0}\' should be equal to one of: '
                       '{1}'.format(distro, distros))

@@ -352,7 +352,7 @@ class CloudifyInstaller():
         lgr.info('Installing python-dev...')
         if distro in ('ubuntu', 'debian'):
             cmd = 'apt-get install -y gcc python-dev'
-        elif distro in ('centos', 'redhat'):
+        elif distro in ('centos', 'redhat', 'fedora'):
             cmd = 'yum -y install gcc python-devel'
         elif os.path.isfile('/etc/arch-release'):
             # Arch doesn't require a python-dev package.
