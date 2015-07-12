@@ -96,6 +96,9 @@ Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
 
 IS_VIRTUALENV = os.environ.get('VIRTUAL_ENV')
+# Path to the pip executable
+PIP_EXEC = 'pip'
+
 # TODO: put these in a private storage
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
 PYCR64_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win-amd64-py2.7.exe'  # NOQA
@@ -106,7 +109,7 @@ IS_WIN = (PLATFORM == 'win32')
 IS_DARWIN = (PLATFORM == 'darwin')
 IS_LINUX = (PLATFORM == 'linux2')
 
-if 0 not in (IS_LINUX, IS_DARWIN, IS_WIN):
+if not (IS_LINUX or IS_DARWIN or IS_WIN):
     sys.exit('Platform {0} not supported.'.format(PLATFORM))
 
 
@@ -311,7 +314,7 @@ class CloudifyInstaller():
     def install_pip(self):
         lgr.info('Installing pip...')
         import distutils
-        if not distutils.spawn.find_executable('pip'):
+        if not distutils.spawn.find_executable(PIP_EXEC):
             try:
                 tempdir = tempfile.mkdtemp()
                 get_pip_path = os.path.join(tempdir, 'get-pip.py')
@@ -451,6 +454,9 @@ def parse_args(args=None):
 
 
 def install(args):
+    lgr.error(IS_WIN)
+    lgr.error(IS_DARWIN)
+    lgr.error(IS_LINUX)
     if check_cloudify_installed(args.virtualenv):
         lgr.info('Cloudify is already installed in the path.')
         if args.upgrade:

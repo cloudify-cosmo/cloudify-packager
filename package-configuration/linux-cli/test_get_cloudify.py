@@ -37,8 +37,8 @@ class CliBuilderUnitTests(testtools.TestCase):
         self._validate_url(self.get_cloudify.PYCR32_URL)
 
     @staticmethod
-    def run_get_cloudify(cmd):
-        get_cloudify.run('python get-cloudify.py {0}'.format(cmd))
+    def run_get_cloudify(params):
+        get_cloudify.install(get_cloudify.parse_args(params.split()))
 
     @staticmethod
     def _validate_url(url):
@@ -67,23 +67,21 @@ class CliBuilderUnitTests(testtools.TestCase):
         mock_boom.side_effect = StandardError('Boom!')
         self.get_cloudify.download_file = mock_boom
 
-        args = ArgsObject()
-        args.installpip = 'true'
-        args.force = 'false'
-        args.source = ''
-        installer = self.get_cloudify.CloudifyInstaller(args)
+        self.get_cloudify.PIP_EXEC = 'not_pip'
+        installer = self.get_cloudify.CloudifyInstaller(ArgsObject())
         try:
-            installer.execute()
+            installer.install_pip()
             self.fail('installation did not trigger error as expected')
-        except SystemExit as e:
-            self.assertEqual(e.message, 'Failed downloading pip from '
-                                        'https://bootstrap.pypa.io/get-pip.py.'
-                                        ' reason: Boom!')
+        except SystemExit as ex:
+            self.assertEqual(
+                ex.message, 'Failed downloading pip from {0}. (Boom!)'.format(
+                    self.get_cloudify.PIP_URL))
 
     def test_install_pip_fail(self):
         self.get_cloudify.download_file = MagicMock(return_value=None)
 
         args = ArgsObject()
+        self.get_cloudify.PIP_EXEC = 'not_pip'
         args.pythonpath = 'non_existing_path'
         installer = self.get_cloudify.CloudifyInstaller(args)
         try:
@@ -107,7 +105,7 @@ class CliBuilderUnitTests(testtools.TestCase):
             self.fail('installation did not trigger error as expected')
         except SystemExit as e:
             self.assertEqual(e.message, 'Could not install module: '
-                                        'nonexisting_module')
+                                        'nonexisting_module.')
 
     def test_get_os_props(self):
         distro = self.get_cloudify.get_os_props()[0]
@@ -142,12 +140,6 @@ class CliBuilderUnitTests(testtools.TestCase):
                 self.get_cloudify.check_cloudify_installed(tmp_venv))
         finally:
             shutil.rmtree(tmp_venv)
-
-    def test_unsupported_platform(self):
-        self.get_cloudify.PLATFORM = 'non-existing-platform'
-        ex = self.assertRaises('SystemExit', self.run_get_cloudify, '-v')
-        self.assertIn('Platform {0} not supported.'.format(
-            self.get_cloudify.platform), ex.message)
 
 
 class TestArgParser(testtools.TestCase):
