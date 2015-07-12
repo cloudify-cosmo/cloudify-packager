@@ -143,6 +143,12 @@ class CliBuilderUnitTests(testtools.TestCase):
         finally:
             shutil.rmtree(tmp_venv)
 
+    def test_unsupported_platform(self):
+        self.get_cloudify.PLATFORM = 'non-existing-platform'
+        ex = self.assertRaises('SystemExit', self.run_get_cloudify, '-v')
+        self.assertIn('Platform {0} not supported.'.format(
+            self.get_cloudify.platform), ex.message)
+
 
 class TestArgParser(testtools.TestCase):
     """Unit tests for functions in get_cloudify.py"""

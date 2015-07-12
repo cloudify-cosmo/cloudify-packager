@@ -14,9 +14,9 @@
 # limitations under the License.
 ############
 import testtools
-# import sys
 import shutil
 import tempfile
+import getpass
 
 
 get_cloudify = __import__("get-cloudify")
@@ -25,14 +25,32 @@ cloudify_cli_url = \
     'https://github.com/cloudify-cosmo/cloudify-cli/archive/3.2.tar.gz'
 
 
+class CliInstallInSystemPythonTests(testtools.TestCase):
+    @staticmethod
+    def run_get_cloudify(params):
+        get_cloudify.install(get_cloudify.parse_args(params.split()))
+
+    def setUp(self):
+        if getpass.getuser() != 'travis':
+            raise self.skipTest('Not Running in Travis.')
+        super(CliInstallTests, self).setUp()
+        self.get_cloudify = get_cloudify
+
+    def test_full_cli_install(self):
+        try:
+            tempdir = tempfile.mkdtemp()
+            self.run_get_cloudify('-f -v'.format(tempdir))
+            proc = self.get_cloudify.run(
+                '{0}/bin/cfy --version'.format(tempdir))
+            self.assertIn('Cloudify CLI 3', proc.aggr_stderr)
+        finally:
+            shutil.rmtree(tempdir)
+
+
 class CliInstallTests(testtools.TestCase):
     @staticmethod
-    def run_get_cloudify(cmd):
-        # args = get_cloudify.parse_args()
-        # sys.argv = params.split()
-        # sys.argv.insert(0, 'get-cloudify')
-        # get_cloudify.install(args)
-        get_cloudify.run('python get-cloudify.py {0}'.format(cmd))
+    def run_get_cloudify(params):
+        get_cloudify.install(get_cloudify.parse_args(params.split()))
 
     def setUp(self):
         super(CliInstallTests, self).setUp()
@@ -72,8 +90,8 @@ class CliInstallTests(testtools.TestCase):
         try:
             self.run_get_cloudify('-v -e={0}'.format(tempdir))
             self.assertRaises(
-
-                SystemExit, self.run_get_cloudify, '-v -e={0}'.format(tempdir))
+                SystemExit, self.run_get_cloudify,
+                '-v -e={0}'.format(tempdir))
         finally:
             shutil.rmtree(tempdir)
 
