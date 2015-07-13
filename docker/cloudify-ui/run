@@ -5,4 +5,4 @@
 #
 #
 cd /etc/service/cloudify-ui/cosmo-ui/
-node cosmoui.js localhost
+nodejs cosmoui.js localhost

@@ -1,0 +1,134 @@
+
+tosca_definitions_version: cloudify_dsl_1_1
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.3m3/types.yaml
+  - http://www.getcloudify.org/spec/openstack-plugin/1.3m3/plugin.yaml
+
+inputs:
+  prefix:
+    description: >
+      Unique test id to be added as a prefix for resource names.
+  os_username:
+    type: string
+  os_password:
+    type: string
+  os_tenant_name:
+    type: string
+  os_auth_url:
+    type: string
+  os_region:
+    type: string
+  flavor:
+    type: string
+  image_name:
+    type: string
+  key_pair_path:
+    type: string
+  external_network:
+    type: string
+
+node_templates:
+  external_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: external_network }
+      openstack_config: &OPENSTACK_CONFIG
+        username: { get_input: os_username }
+        password: { get_input: os_password }
+        tenant_name: { get_input: os_tenant_name }
+        auth_url: { get_input: os_auth_url }
+        region: { get_input: os_region }
+
+  router:
+    type: cloudify.openstack.nodes.Router
+    properties:
+      resource_id: { concat: [{ get_input: prefix }, '-windows-vm-router'] }
+      openstack_config: *OPENSTACK_CONFIG
+    relationships:
+      - target: external_network
+        type: cloudify.relationships.connected_to
+
+  network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      resource_id: { concat: [{ get_input: prefix }, '-windows-vm-network'] }
+      openstack_config: *OPENSTACK_CONFIG
+
+  subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      resource_id: { concat: [{ get_input: prefix }, '-windows-vm-subnet'] }
+      subnet:
+        ip_version: 4
+        cidr: 10.67.79.0/24
+      openstack_config: *OPENSTACK_CONFIG
+    relationships:
+      - target: network
+        type: cloudify.relationships.contained_in
+      - target: router
+        type: cloudify.openstack.subnet_connected_to_router
+
+  floating_ip:
+    type: cloudify.openstack.nodes.FloatingIP
+    properties:
+      floatingip:
+        floating_network_name: { get_property: [external_network, resource_id] }
+      openstack_config: *OPENSTACK_CONFIG
+
+  security_group:
+    type: cloudify.openstack.nodes.SecurityGroup
+    properties:
+      resource_id: { concat: [{ get_input: prefix }, '-windows-vm-security-group'] }
+      rules:
+        - port: 3389
+          remote_ip_prefix: 0.0.0.0/0
+        - port: 5985
+          remote_ip_prefix: 0.0.0.0/0
+      openstack_config: *OPENSTACK_CONFIG
+
+  keypair:
+    type: cloudify.openstack.nodes.KeyPair
+    properties:
+      resource_id: { concat: [{ get_input: prefix }, '-windows-vm-keypair'] }
+      private_key_path: { get_input: key_pair_path }
+      openstack_config: *OPENSTACK_CONFIG
+
+  windows_vm:
+    type: cloudify.openstack.nodes.WindowsServer
+    properties:
+      install_agent: false
+      image: { get_input: image_name }
+      flavor: { get_input: flavor }
+      server:
+        userdata: |
+          #ps1_sysnative
+          winrm quickconfig -q
+          winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="300"}'
+          winrm set winrm/config '@{MaxTimeoutms="1800000"}'
+          winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+          winrm set winrm/config/service/auth '@{Basic="true"}'
+          &netsh advfirewall firewall add rule name="WinRM 5985" protocol=TCP dir=in localport=5985 action=allow
+          &netsh advfirewall firewall add rule name="WinRM 5986" protocol=TCP dir=in localport=5986 action=allow
+          iex ((new-object net.webclient).DownloadString("https://chocolatey.org/install.ps1"))
+          choco install 7zip.commandline -y
+      management_network_name: { get_property: [network, resource_id] }
+      openstack_config: *OPENSTACK_CONFIG
+    relationships:
+      - target: floating_ip
+        type: cloudify.openstack.server_connected_to_floating_ip
+      - target: network
+        type: cloudify.relationships.connected_to
+      - target: subnet
+        type: cloudify.relationships.depends_on
+      - target: keypair
+        type: cloudify.openstack.server_connected_to_keypair
+      - target: security_group
+        type: cloudify.openstack.server_connected_to_security_group
+
+outputs:
+  windows_vm_ip_address:
+    value: { get_attribute: [floating_ip, floating_ip_address] }
+  windows_vm_password:
+    value: { get_attribute: [windows_vm, password] }

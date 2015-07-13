@@ -74,13 +74,13 @@ BOOTSTRAP_LOG="/var/log/cloudify3-bootstrap.log"
 BASE_DIR="/opt"
 HOME_DIR="${BASE_DIR}/${PKG_NAME}"
 
-PKG_INIT_DIR="${PKG_DIR}/{{ config_templates.__template_file_init.config_dir }}"
-INIT_DIR="{{ config_templates.__template_file_init.dst_dir }}"
-INIT_FILE="{{ config_templates.__template_file_init.output_file }}"
+PKG_INIT_DIR="${PKG_DIR}/{{ config_templates.template_file_init.config_dir }}"
+INIT_DIR="{{ config_templates.template_file_init.dst_dir }}"
+INIT_FILE="{{ config_templates.template_file_init.output_file }}"
 
-PKG_CONF_DIR="${PKG_DIR}/{{ config_templates.__template_file_conf.config_dir }}"
-CONF_DIR="{{ config_templates.__template_file_conf.dst_dir }}"
-CONF_FILE="{{ config_templates.__template_file_conf.output_file }}"
+PKG_CONF_DIR="${PKG_DIR}/{{ config_templates.template_file_conf.config_dir }}"
+CONF_DIR="{{ config_templates.template_file_conf.dst_dir }}"
+CONF_FILE="{{ config_templates.template_file_conf.output_file }}"
 
 
 echo "creating ${PKG_NAME} home dir..."
@@ -145,8 +145,10 @@ curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/blue
 echo "creating deployment mapping..."
 curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/deployment/_mapping -d '{"deployment": {"properties": {"workflows": {"enabled": false}, "inputs": {"enabled": false}, "policy_type": {"enabled": false}, "policy_triggers": {"enabled": false}, "groups": {"enabled": false}, "outputs": {"enabled": false}}}}'
 echo "creating node mapping..."
-curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node/_mapping -d '{ "node": { "_id": { "path": "id" }, "properties": { "types": { "type": "string", "index_name": "type" }, "properties": { "enabled": false }, "operations": { "enabled": false } } } }'
+curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node/_mapping -d '{ "node": { "_id": { "path": "id" }, "properties": { "types": { "type": "string", "index_name": "type" }, "properties": { "enabled": false }, "operations": { "enabled": false }, "relationships": { "enabled": false } } } }'
 echo "creating node-instance mapping..."
 curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node_instance/_mapping -d '{ "node_instance": { "_id": { "path": "id" }, "properties": { "runtime_properties": { "enabled": false } } } }'
+echo "creating deployment-modifications mapping..."
+curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/deployment_modification/_mapping -d '{ "deployment_modification": { "_id": { "path": "id" }, "properties": { "modified_nodes": { "enabled": false }, "node_instances": { "enabled": false }, "context": { "enabled": false } } } }'
 echo "printing mappings..."
 curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1

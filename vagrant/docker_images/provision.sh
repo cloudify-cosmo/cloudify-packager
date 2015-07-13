@@ -1,47 +1,60 @@
-
-
-
 #! /bin/bash -e
+
+CORE_TAG_NAME="master"
+
 
 install_docker()
 {
-  curl -sSL https://get.docker.com/ubuntu/ | sudo sh
+  export DEBIAN_FRONTEND=noninteractive
+  kern_extras="linux-image-extra-$(uname -r) linux-image-extra-virtual"
+  sudo apt-get update
+  sudo -E apt-get install -y -q $kern_extras
+  sudo modprobe aufs
+
+  sudo apt-get install -y -q curl ca-certificates
+  sudo apt-get install -y -q apt-transport-https ca-certificates
+
+  sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
+  echo deb https://get.docker.com/ubuntu docker main | sudo tee /etc/apt/sources.list.d/docker.list
+  sudo apt-get update
+  sudo apt-get install -y lxc-docker-1.6.0
+}
+
+setup_jocker_env()
+{
+  sudo apt-get install -y python-pip
 }
 
 clone_packager()
 {
   git clone https://github.com/cloudify-cosmo/cloudify-packager.git $1
-}
-
-# $1 - path to dockerfile folder
-# $2 - docker build command
-build_image()
-{
   pushd $1
-  # docker build sometimes failes for no reason. Retry 
-  for i in 1 2 3 4 5 
-  do sudo docker build -t $2 . && break || sleep 2; done
+          git checkout -b tmp_branch $CORE_TAG_NAME
+    			git log -1
   popd
 }
 
 build_images()
 {
-  clone_packager /tmp/cloudify-packager
+  CLONE_LOCATION=/tmp/cloudify-packager
+  clone_packager $CLONE_LOCATION
+  cp /cloudify-packager/docker/metadata/* /tmp/cloudify-packager/docker/metadata/
+  setup_jocker_env
   echo Building cloudify stack image.
-  build_image /tmp/cloudify-packager/docker cloudify:latest
-  echo Building cloudify data image.
-  build_image /tmp/cloudify-packager/docker/data_container data:latest
+  pushd $CLONE_LOCATION
+  ./docker/build.sh $CLONE_LOCATION
+  popd
 }
 
 start_and_export_containers()
 {
   sudo docker run -t --name=cloudify -d cloudify:latest /bin/bash
-  sudo docker run -t -d --name data data /bin/bash
-  sudo docker export cloudify > /tmp/coudify-docker_3.1.0-ga-b85.tar
-  sudo docker export data > /tmp/cloudify-docker-data_3.1.0-ga-b85.tar
+  sudo docker export cloudify > /tmp/cloudify-docker_.tar
+  sudo docker run -t --name=cloudifycommercial -d cloudify-commercial:latest /bin/bash
+  sudo docker export cloudifycommercial > /tmp/cloudify-docker_commercial.tar
 }
 
-main() 
+main()
 {
   install_docker
   build_images

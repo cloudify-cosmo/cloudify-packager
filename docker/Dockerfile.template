@@ -5,6 +5,7 @@ MAINTAINER {{ maintainer.name }}, {{ maintainer.email }}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # add utility functions
 ADD utils/ /opt/tmp/utils/
+ADD metadata/ /root/metadata/
 ADD NOTICE.txt /root/license
 # Used by 'cfy status' impl to determine if running in container.
 ENV DOCKER_ENV True
@@ -32,6 +33,7 @@ RUN echo installing rabbitmq dependencies && \
     echo granting exec permissions && \
     chmod +x $RABBITMQ_RUN_FILE
 
+EXPOSE {% for dep in rabbitmq.ports %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - RIEMANN
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -66,7 +68,9 @@ RUN sed -i '1s|^|RIEMANN_JAR_PATH='$RIEMANN_SERVICE_DIR'/langohr.jar \n|' $RIEMA
     chmod +x $RIEMANN_RUN_FILE
 
 # riemann persistence path
-VOLUME /etc/service/riemann
+VOLUME {% for dep in riemann.persistence_path %} {{ dep }}{% endfor %}
+
+EXPOSE {% for dep in riemann.ports %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - LOGSTASH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -92,7 +96,6 @@ RUN sed -i '1s|^|LOGSTASH_JAR_PATH='$LOGSTASH_SERVICE_DIR/logstash.jar' \n|' $LO
     sed -i '1s|^|LOGSTASH_CONF_PATH='$LOGSTASH_CONF_FILE' \n|' $LOGSTASH_RUN_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $LOGSTASH_RUN_FILE && \
     chmod +x $LOGSTASH_RUN_FILE
-
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - ELASTICSEARCH
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -134,18 +137,22 @@ RUN /bin/bash -c 'source /opt/tmp/utils/bootstrap_utils.sh && \
     echo "creating deployment mapping..." && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/deployment/_mapping -d '{"deployment": {"properties": {"workflows": {"enabled": false}, "inputs": {"enabled": false}, "policy_type": {"enabled": false}, "policy_triggers": {"enabled": false}, "groups": {"enabled": false}, "outputs": {"enabled": false}}}}' && \
     echo "creating node mapping..." && \
-    curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node/_mapping -d '{ "node": { "_id": { "path": "id" }, "properties": { "types": { "type": "string", "index_name": "type" }, "properties": { "enabled": false }, "operations": { "enabled": false } } } }' && \
+    curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node/_mapping -d '{ "node": { "_id": { "path": "id" }, "properties": { "types": { "type": "string", "index_name": "type" }, "properties": { "enabled": false }, "operations": { "enabled": false }, "relationships": { "enabled": false } } } }' && \
     echo "creating node-instance mapping..." && \
     curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/node_instance/_mapping -d '{ "node_instance": { "_id": { "path": "id" }, "properties": { "runtime_properties": { "enabled": false } } } }' && \
+    echo "creating deployment-modifications mapping..." && \
+    curl --retry 5 --retry-delay 3 -XPUT http://localhost:9200/cloudify_storage/deployment_modification/_mapping -d '{ "deployment_modification": { "_id": { "path": "id" }, "properties": { "modified_nodes": { "enabled": false }, "node_instances": { "enabled": false }, "context": { "enabled": false } } } }' && \
     echo "printing mappings..." && \
     curl --retry 5 --retry-delay 3 -XGET http://localhost:9200/cloudify_storage/_mapping?pretty=1 && \
     \
+    echo changing the default es discovery port to 54329 && \
+    echo 'discovery.zen.ping.multicast.port: 54329' >> $ELASTICSEARCH_SERVICE_DIR/config/elasticsearch.yml && \
     echo granting run permissions to run file && \
     chmod +x $ELASTICSEARCH_SERVICE_DIR/run
 
+EXPOSE {% for dep in elasticsearch.ports %} {{ dep }}{% endfor %}
 #elasticsearch persistence paths
-VOLUME /etc/service/elasticsearch/data
-VOLUME /etc/service/elasticsearch/logs
+VOLUME {% for dep in elasticsearch.persistence_path %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - INFLUXDB
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -180,7 +187,7 @@ RUN sed -i '1s|^|INFLUXDB_CONFIG_FILE='$INFLUXDB_CONFIG_FILE' \n|' $INFLUXDB_RUN
     chmod +x $INFLUXDB_RUN_FILE
 
 #influxdb persistence path
-VOLUME /opt/influxdb/shared/data
+VOLUME {% for dep in influxdb.persistence_path %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - NGINX
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -194,7 +201,11 @@ ENV NGINX_RUN_FILE $NGINX_SERVICE_DIR/run
 ENV NGINX_LOGS_DIR $NGINX_SERVICE_DIR/logs
 ##### ENV #####
 # add run scripts and configuration
-ADD nginx/ $NGINX_SERVICE_DIR
+ADD nginx/cloudify-rest-location.conf $NGINX_SERVICE_DIR/
+ADD nginx/default.conf $NGINX_SERVICE_DIR/
+ADD nginx/run $NGINX_SERVICE_DIR/
+# add ssl default certificate and private key files
+ADD nginx/ssl/ /root/cloudify/
 
 RUN echo adding nginx repositories to sources.list file and update repo && \
     echo {{ nginx.source_repos }} | tr -d "'["| tr ',]' '\n' >> /etc/apt/sources.list && \
@@ -222,6 +233,7 @@ RUN echo "daemon off;" >> $NGINX_CONF_FILE && \
     sed -i '1s|^|#!/bin/bash \n|' $NGINX_RUN_FILE && \
     chmod +x $NGINX_RUN_FILE
 
+EXPOSE {% for dep in nginx.ports %} {{ dep }}{% endfor %}
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # INSTALL - CELERY
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -247,6 +259,8 @@ RUN echo installing celery dependencies && \
     \
     echo installing celery python requirements in virtualenv && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install $(echo {{ celery.python_install_requires }} | tr -d "',[]")
+
+VOLUME {% for dep in celery.persistence_path %} {{ dep }}{% endfor %}
 
 ############################## install cloudify core components ##############################
 WORKDIR /etc/service/celeryd-cloudify-management/
@@ -309,10 +323,16 @@ RUN echo install dependencies && \
     \
     echo installing amqpinflux && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_amqp_influxdb }} && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_rest_client }} && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_dsl_parser }} && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_plugins_common }} && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.flask_securest }} && \
     \
     echo installing rest-service && \
     /bin/bash -c 'git clone {{ manager.modules.cloudify_manager }} && \
+    pushd cloudify-manager/plugins/plugin-installer && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install . && \
+    popd && \
     pushd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .' && \
     \
@@ -327,57 +347,13 @@ RUN echo install dependencies && \
     echo creating logs folder && \
     mkdir -p /var/log/cloudify && \
     \
+    echo copying rest-service resources to resource folder && \
+    cp -r /opt/manager/cloudify-manager/resources/rest-service/. /opt/manager/resources && \
+    \
     echo granting run permissions to run file && \
     chmod +x $AMQPFLUX_RUN_FILE && \
     chmod +x $REST_RUN_FILE
 
-# create resources folder and copy all required resources
-RUN curl {{ manager.agents.ubuntu_agent_url }} --create-dirs -o /opt/tmp/manager/ubuntu_agent.deb && \
-    dpkg -i /opt/tmp/manager/ubuntu_agent.deb && \
-    rm -rf /opt/tmp/manager/ubuntu_agent.deb && \
-    curl {{ manager.agents.centos_agent_url }} --create-dirs -o /opt/tmp/manager/centos_agent.deb && \
-    dpkg -i /opt/tmp/manager/centos_agent.deb && \
-    rm -rf /opt/tmp/manager/centos_agent.deb && \
-    curl {{ manager.agents.windows_agent_url }} --create-dirs -o /opt/tmp/manager/windows_agent.deb && \
-    dpkg -i /opt/tmp/manager/windows_agent.deb && \
-    cp -r /opt/manager/cloudify-manager/resources/rest-service/* /opt/manager/resources && \
-    rm -rf /opt/tmp/manager/windows_agent.deb
-
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-# INSTALL - WEB-UI
-# ------------------------------------------------------------------------------------------------------------------------------------------ #
-##### ENV #####
-ENV WEBUI_SERVICE_NAME {{ webui.service_name }}
-ENV WEBUI_SERVICE_DIR /etc/service/$WEBUI_SERVICE_NAME
-ENV WEBUI_RUN_FILE $WEBUI_SERVICE_DIR/run
-ENV WEBUI_VIRTUAL_ENV_DIR $WEBUI_SERVICE_DIR/env
-##### ENV #####
-ADD cloudify-ui/ $WEBUI_SERVICE_DIR/
-
-RUN echo installing web-ui dependencies && \
-    apt-get install -y {% for dep in webui.reqs %} {{ dep }}{% endfor %} && \
-    \
-    echo installing nodejs from source && \
-    cd /tmp && \
-    curl {{ webui.nodejs_latest_url }} -o /tmp/node-latest.tar.gz && \
-    tar xvzf node-latest.tar.gz && \
-    rm -f node-latest.tar.gz && \
-    cd node-v* && \
-    ./configure && \
-    CXX="g++ -Wno-unused-local-typedefs" make && \
-    CXX="g++ -Wno-unused-local-typedefs" make install && \
-    cd /tmp && \
-    rm -rf /tmp/node-v* && \
-    echo '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc && \
-    \
-    echo downloading cloudify-webui package and extracting webui and grafana tar.gz && \
-    curl {{ webui.ui_package_url }} --create-dirs -o /opt/tmp/cloudify-webui/cloudify-webui.deb && \
-    dpkg-deb -x /opt/tmp/cloudify-webui/cloudify-webui.deb /opt/tmp/cloudify-webui/ && \
-    mkdir -p $WEBUI_SERVICE_DIR/cosmo-ui && \
-    tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/cosmo-ui* -C $WEBUI_SERVICE_DIR/cosmo-ui --strip-components=1 && \
-    mkdir -p $WEBUI_SERVICE_DIR/grafana && \
-    tar -xvf /opt/tmp/cloudify-webui/packages/cloudify-ui/grafana* -C $WEBUI_SERVICE_DIR/grafana --strip-components=1 && \
-    cp /opt/tmp/cloudify-webui/packages/cloudify-ui/config/grafana/config.js $WEBUI_SERVICE_DIR/grafana/ && \
-    rm -rf /opt/tmp/cloudify-webui/cloudify-webui.deb && \
-    chmod +x $WEBUI_RUN_FILE
-#RUN apt-get -y install nodejs npm
+EXPOSE {% for dep in manager.ports %} {{ dep }}{% endfor %}
+#manager persistence path
+VOLUME {% for dep in manager.persistence_path %} {{ dep }}{% endfor %}

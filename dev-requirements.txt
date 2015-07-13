@@ -1,0 +1,6 @@
+coverage==3.7.1
+nose
+nose-cov
+testfixtures
+testtools
+mock
