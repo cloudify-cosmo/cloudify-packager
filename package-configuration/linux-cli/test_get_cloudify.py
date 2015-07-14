@@ -25,13 +25,6 @@ import shutil
 get_cloudify = __import__("get-cloudify")
 
 
-# class EnvDependentTests(testtools.TestCase)
-#     def setUp(self):
-#         # if getpass.getuser() != 'travis':
-#         if hasattr(sys, 'real_prefix'):
-#             raise unittest.SkipTest('Does not run ')
-
-
 class CliBuilderUnitTests(testtools.TestCase):
     """Unit tests for functions in get_cloudify.py"""
 
