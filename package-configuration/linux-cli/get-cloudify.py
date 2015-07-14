@@ -450,7 +450,8 @@ def handle_upgrade(upgrade=False, virtualenv=''):
 
 
 def parse_args(args=None):
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    parser = argparse.ArgumentParser(
+        description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter)
     default_group = parser.add_mutually_exclusive_group()
     version_group = parser.add_mutually_exclusive_group()
     online_group = parser.add_mutually_exclusive_group()
