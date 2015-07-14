@@ -94,18 +94,3 @@ class CliInstallTests(testtools.TestCase):
             self.assertEqual(1, ex.message)
         finally:
             shutil.rmtree(tempdir)
-
-    def test_cli_not_installed_and_upgrade(self):
-        tempdir = tempfile.mkdtemp()
-        install_args = {
-            'virtualenv': tempdir,
-            'upgrade': True
-        }
-
-        try:
-            self.get_cloudify.make_virtualenv(tempdir, 'python')
-            ex = self.assertRaises(
-                SystemExit, self.get_cloudify.handle_upgrade, **install_args)
-            self.assertEqual(1, ex.message)
-        finally:
-            shutil.rmtree(tempdir)

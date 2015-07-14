@@ -90,7 +90,7 @@ much like any other python script, the installation will occur in the system
 python.
 
 By default, the script assumes that the Python executable is in the
-path and is called 'Python' on Linux and 'c:\python27\python.exe on Windows.
+path and is called 'python' on Linux and 'c:\python27\python.exe on Windows.
 The Python path can be overriden by using the --pythonpath flag.
 
 Please refer to Cloudify's documentation at http://getcloudify.org for
@@ -447,15 +447,11 @@ def handle_upgrade(upgrade=False, virtualenv=''):
         else:
             lgr.error('Use the --upgrade flag to upgrade.')
             sys.exit(1)
-    else:
-        if upgrade:
-            lgr.error('Cloudify is not installed. '
-                      'Remove the --upgrade flag and try again.')
-            sys.exit(1)
 
 
 def parse_args(args=None):
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    parser = argparse.ArgumentParser(
+        description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter)
     default_group = parser.add_mutually_exclusive_group()
     version_group = parser.add_mutually_exclusive_group()
     online_group = parser.add_mutually_exclusive_group()
@@ -468,19 +464,19 @@ def parse_args(args=None):
         help='Force install any requirements (USE WITH CARE!).')
     parser.add_argument(
         '-e', '--virtualenv', type=str,
-        help='Path to a Virtualenv to install Cloudify in')
+        help='Path to a Virtualenv to install Cloudify in.')
     version_group.add_argument(
         '--version', type=str,
-        help='Attempt to install a specific version of Cloudify')
+        help='Attempt to install a specific version of Cloudify.')
     version_group.add_argument(
         '--pre', action='store_true',
-        help='Attempt to install the latest Cloudify Milestone')
+        help='Attempt to install the latest Cloudify Milestone.')
     version_group.add_argument(
         '-s', '--source', type=str,
-        help='Install from the provided URL or local path')
+        help='Install from the provided URL or local path.')
     parser.add_argument(
         '-u', '--upgrade', action='store_true',
-        help='Upgrades Cloudify.')
+        help='Upgrades Cloudify if already installed.')
     online_group.add_argument(
         '--forceonline', action='store_true',
         help='Even if wheels are found locally, install from PyPI.')
@@ -499,18 +495,18 @@ def parse_args(args=None):
                  'when creating a virtualenv.')
     parser.add_argument(
         '--installpip', action='store_true',
-        help='Attempt to install pip')
+        help='Attempt to install pip.')
     parser.add_argument(
         '--installvirtualenv', action='store_true',
-        help='Attempt to install Virtualenv')
+        help='Attempt to install Virtualenv.')
     if IS_LINUX:
         parser.add_argument(
             '--installpythondev', action='store_true',
-            help='Attempt to install Python Developers Package')
+            help='Attempt to install Python Developers Package.')
     elif IS_WIN:
         parser.add_argument(
             '--installpycrypto', action='store_true',
-            help='Attempt to install PyCrypto')
+            help='Attempt to install PyCrypto.')
     return parser.parse_args(args)
 
 
