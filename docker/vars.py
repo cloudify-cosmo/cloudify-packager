@@ -105,9 +105,9 @@ VARS = {
             "pyzmq==14.3.1"
         ],
         "modules": {
-                "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@3.2",
-                "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@3.2",
-                "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@1.2",
+                "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@3.2.1",
+                "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@3.2.1",
+                "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@1.2.1",
                 "cloudify_manager": "-b 3.2 https://github.com/cloudify-cosmo/cloudify-manager.git",
             },
         "workers_autoscale": "5,2",
@@ -121,10 +121,10 @@ VARS = {
             "python2.7"
         ],
         "modules": {
-            "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@3.2",
-            "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@3.2",
-            "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@3.2",
-            "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@3.2",
+            "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@3.2.1",
+            "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@3.2.1",
+            "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@3.2.1",
+            "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@3.2.1",
             "flask_securest": "git+git://github.com/cloudify-cosmo/flask-securest.git@0.6",
             "cloudify_manager": "-b 3.2 https://github.com/cloudify-cosmo/cloudify-manager.git",
         },
@@ -140,7 +140,7 @@ VARS = {
             "make"
         ],
         "nodejs_latest_url": "http://nodejs.org/dist/node-latest.tar.gz",
-        "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.0/ga-RELEASE/cloudify-ui_3.2.0-ga-b200_amd64.deb",
+        "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.1/ga-RELEASE/cloudify-ui_3.2.1-ga-b212_amd64.deb",
         "ports": ["80"],
     }
 }
