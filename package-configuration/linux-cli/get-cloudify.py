@@ -439,6 +439,21 @@ def check_cloudify_installed(virtualenv_path=None):
             return False
 
 
+def handle_upgrade(upgrade=False, virtualenv=''):
+    if check_cloudify_installed(virtualenv):
+        lgr.info('Cloudify is already installed in the path.')
+        if upgrade:
+            lgr.info('Upgrading...')
+        else:
+            lgr.error('Use the --upgrade flag to upgrade.')
+            sys.exit(1)
+    else:
+        if upgrade:
+            lgr.error('Cloudify is not installed. '
+                      'Remove the --upgrade flag and try again.')
+            sys.exit(1)
+
+
 def parse_args(args=None):
     parser = argparse.ArgumentParser(description=DESCRIPTION)
     default_group = parser.add_mutually_exclusive_group()
@@ -511,18 +526,7 @@ if __name__ == '__main__':
     else:
         lgr.setLevel(logging.INFO)
 
-    if check_cloudify_installed(args.virtualenv):
-        lgr.info('Cloudify is already installed in the path.')
-        if args.upgrade:
-            lgr.info('Upgrading...')
-        else:
-            lgr.error('Use the --upgrade flag to upgrade.')
-            sys.exit(1)
-    else:
-        if args.upgrade:
-            lgr.error('Cloudify is not installed. '
-                      'Remove the --upgrade flag and try again.')
-            sys.exit(1)
+    handle_upgrade(args.upgrade, args.virtualenv)
 
     xargs = ['quiet', 'verbose']
     args = {arg: v for arg, v in vars(args).items() if arg not in xargs}
