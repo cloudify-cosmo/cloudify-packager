@@ -240,8 +240,6 @@ def _get_env_bin_path(env_path):
         # to use the script and create a virtualenv from within
         # a virtualenv in which virtualenv isn't installed and so
         # is not importable.
-        # we might be able to use imp to do this, but it's not
-        # straightforward.
         return os.path.join(env_path, 'scripts' if IS_WIN else 'bin')
 
 
