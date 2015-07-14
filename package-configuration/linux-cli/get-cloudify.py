@@ -516,11 +516,6 @@ if __name__ == '__main__':
         else:
             lgr.error('Use the --upgrade flag to upgrade.')
             sys.exit(1)
-    else:
-        if args.upgrade:
-            lgr.error('Cloudify is not installed. '
-                      'Remove the --upgrade flag and try again.')
-            sys.exit(1)
 
     xargs = ['quiet', 'verbose']
     args = {arg: v for arg, v in vars(args).items() if arg not in xargs}

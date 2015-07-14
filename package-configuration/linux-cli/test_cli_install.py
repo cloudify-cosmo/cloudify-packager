@@ -96,14 +96,3 @@ class CliInstallTests(testtools.TestCase):
                 self.fail(result.aggr_stderr)
         finally:
             shutil.rmtree(tempdir)
-
-    def test_cli_not_installed_and_upgrade(self):
-        tempdir = tempfile.mkdtemp()
-        try:
-            self.get_cloudify.make_virtualenv(tempdir, 'python')
-            result = self.get_cloudify.run(
-                'python get-cloudify.py -e={0} --upgrade'.format(tempdir))
-            if result.returncode == 0:
-                self.fail(result.aggr_stderr)
-        finally:
-            shutil.rmtree(tempdir)
