@@ -19,8 +19,17 @@ import tempfile
 from StringIO import StringIO
 from mock import MagicMock
 import shutil
+# import sys
+
 
 get_cloudify = __import__("get-cloudify")
+
+
+# class EnvDependentTests(testtools.TestCase)
+#     def setUp(self):
+#         # if getpass.getuser() != 'travis':
+#         if hasattr(sys, 'real_prefix'):
+#             raise unittest.SkipTest('Does not run ')
 
 
 class CliBuilderUnitTests(testtools.TestCase):
@@ -35,10 +44,6 @@ class CliBuilderUnitTests(testtools.TestCase):
         self._validate_url(self.get_cloudify.PIP_URL)
         self._validate_url(self.get_cloudify.PYCR64_URL)
         self._validate_url(self.get_cloudify.PYCR32_URL)
-
-    @staticmethod
-    def run_get_cloudify(params):
-        get_cloudify.install(get_cloudify.parse_args(params.split()))
 
     @staticmethod
     def _validate_url(url):
@@ -63,49 +68,52 @@ class CliBuilderUnitTests(testtools.TestCase):
                                              'expected to fail'.format(cmd))
 
     def test_install_pip_failed_download(self):
+        installer = self.get_cloudify.CloudifyInstaller()
+
         mock_boom = MagicMock()
         mock_boom.side_effect = StandardError('Boom!')
         self.get_cloudify.download_file = mock_boom
 
-        self.get_cloudify.PIP_EXEC = 'not_pip'
-        installer = self.get_cloudify.CloudifyInstaller(ArgsObject())
-        try:
-            installer.install_pip()
-            self.fail('installation did not trigger error as expected')
-        except SystemExit as ex:
-            self.assertEqual(
-                ex.message, 'Failed downloading pip from {0}. (Boom!)'.format(
-                    self.get_cloudify.PIP_URL))
+        mock_false = MagicMock()
+
+        def side_effect():
+            return False
+        mock_false.side_effect = side_effect
+        installer.find_pip = mock_false
+
+        ex = self.assertRaises(SystemExit, installer.install_pip)
+        self.assertEqual(
+            'Failed downloading pip from {0}. (Boom!)'.format(
+                self.get_cloudify.PIP_URL), ex.message)
 
     def test_install_pip_fail(self):
         self.get_cloudify.download_file = MagicMock(return_value=None)
 
-        args = ArgsObject()
-        self.get_cloudify.PIP_EXEC = 'not_pip'
-        args.pythonpath = 'non_existing_path'
-        installer = self.get_cloudify.CloudifyInstaller(args)
-        try:
-            installer.install_pip()
-            self.fail('installation did not trigger error as expected')
-        except SystemExit as e:
-            self.assertEqual(e.message, 'Could not install pip')
+        pythonpath = 'non_existing_path'
+        installer = self.get_cloudify.CloudifyInstaller(pythonpath=pythonpath)
+
+        mock_false = MagicMock()
+
+        def side_effect():
+            return False
+        mock_false.side_effect = side_effect
+        installer.find_pip = mock_false
+
+        ex = self.assertRaises(SystemExit, installer.install_pip)
+        self.assertIn('Could not install pip', ex.message)
 
     def test_make_virtualenv_fail(self):
-        try:
-            self.get_cloudify.make_virtualenv('/path/to/dir',
-                                              'non_existing_path')
-            self.fail('installation did not trigger error as expected')
-        except SystemExit as e:
-            self.assertEqual(e.message,
-                             'Could not create virtualenv: /path/to/dir')
+        ex = self.assertRaises(
+            SystemExit, self.get_cloudify.make_virtualenv,
+            '/path/to/dir', 'non_existing_path')
+        self.assertEqual(
+            'Could not create virtualenv: /path/to/dir', ex.message)
 
     def test_install_non_existing_module(self):
-        try:
-            self.get_cloudify.install_module('nonexisting_module')
-            self.fail('installation did not trigger error as expected')
-        except SystemExit as e:
-            self.assertEqual(e.message, 'Could not install module: '
-                                        'nonexisting_module.')
+        ex = self.assertRaises(
+            SystemExit, self.get_cloudify.install_module, 'nonexisting_module')
+        self.assertEqual(
+            'Could not install module: nonexisting_module.', ex.message)
 
     def test_get_os_props(self):
         distro = self.get_cloudify.get_os_props()[0]
@@ -136,7 +144,8 @@ class CliBuilderUnitTests(testtools.TestCase):
         tmp_venv = tempfile.mkdtemp()
         try:
             self.get_cloudify.make_virtualenv(tmp_venv, 'python')
-            self.run_get_cloudify('-e {0}'.format(tmp_venv))
+            installer = get_cloudify.CloudifyInstaller(virtualenv=tmp_venv)
+            installer.execute()
             self.assertTrue(
                 self.get_cloudify.check_cloudify_installed(tmp_venv))
         finally:
@@ -204,26 +213,18 @@ class TestArgParser(testtools.TestCase):
 
     def test_mutually_exclude_groups(self):
         # # test with args that do not go together
-        try:
-            self.get_cloudify.parse_args(['--version', '--pre'])
-            self.fail('args {0} iare expected to raise exception'
-                      .format(['--version', '--pre']))
-        except SystemExit as e:
-            print e.message
+        ex = self.assertRaises(
+            SystemExit, self.get_cloudify.parse_args, ['--version', '--pre'])
+        self.assertEqual(2, ex.message)
 
-        try:
-            self.get_cloudify.parse_args(['--verbose', '--quiet'])
-            self.fail('args {0} iare expected to raise exception'
-                      .format(['--verbose', '--quiet']))
-        except SystemExit as e:
-            print e.message
+        ex = self.assertRaises(
+            SystemExit, self.get_cloudify.parse_args, ['--verbose', '--quiet'])
+        self.assertEqual(2, ex.message)
 
-        try:
-            self.get_cloudify.parse_args(['--wheelspath', '--forceonline'])
-            self.fail('args {0} iare expected to raise exception'
-                      .format(['--verbose', '--quiet']))
-        except SystemExit as e:
-            print e.message
+        ex = self.assertRaises(
+            SystemExit, self.get_cloudify.parse_args,
+            ['--wheelspath', '--forceonline'])
+        self.assertEqual(2, ex.message)
 
 
 class ArgsObject(object):

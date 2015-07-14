@@ -52,7 +52,6 @@ import struct
 import tempfile
 import logging
 import shutil
-import distutils
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -89,9 +88,6 @@ Also note, that if you're running with sudo and you have an active virtualenv,
 much like any other python script, the installation will occur in the system
 python.
 
-A --nodrop flag can be supplied (If not on Windows) so that you can choose
-to not drop root privileges at all.
-
 By default, the script assumes that the Python executable is in the
 path and is called 'Python' on Linux and 'c:\python27\python.exe on Windows.
 The Python path can be overriden by using the --pythonpath flag.
@@ -99,11 +95,8 @@ The Python path can be overriden by using the --pythonpath flag.
 Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
 
-IS_VIRTUALENV = os.environ.get('VIRTUAL_ENV')
+IS_VIRTUALENV = hasattr(sys, 'real_prefix')
 
-# Path to the pip and virtualenv executables
-PIP_EXEC = 'pip'
-VIRTUALENV_EXEC = 'virtualenv'
 
 # TODO: put these in a private storage
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
@@ -114,6 +107,8 @@ PLATFORM = sys.platform
 IS_WIN = (PLATFORM == 'win32')
 IS_DARWIN = (PLATFORM == 'darwin')
 IS_LINUX = (PLATFORM == 'linux2')
+# defined below
+lgr = None
 
 if not (IS_LINUX or IS_DARWIN or IS_WIN):
     sys.exit('Platform {0} not supported.'.format(PLATFORM))
@@ -211,7 +206,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     if IS_VIRTUALENV and not virtualenv_path:
         lgr.info('Installing within current virtualenv: {0}...'.format(
             IS_VIRTUALENV))
-    result = run(''.join(pip_cmd))
+    result = run(' '.join(pip_cmd))
     if not result.returncode == 0:
         sys.exit('Could not install module: {0}.'.format(module))
 
@@ -235,19 +230,46 @@ def get_os_props():
 def _get_env_bin_path(env_path):
     """returns the bin path for a virtualenv
     """
-    import virtualenv
-    return virtualenv.path_locations(env_path)[3]
-
-
-def is_exec(app):
-    """Checks if app is executable in the path
-    """
-    return distutils.spawn.find_executable(app)
+    try:
+        import virtualenv
+        return virtualenv.path_locations(env_path)[3]
+    except ImportError:
+        # this is a fallback for an edge case in which you're trying
+        # to use the script and create a virtualenv from within
+        # a virtualenv in which virtualenv isn't installed and so
+        # is not importable.
+        # we might be able to use imp to do this, but it's not
+        # straightforward.
+        return os.path.join(env_path, 'scripts' if IS_WIN else 'bin')
 
 
 class CloudifyInstaller():
-    def __init__(self, args, os_distro=None, os_release=None):
-        self.args = args
+    def __init__(self, force=False, upgrade=False, virtualenv='',
+                 version='', pre=False, source='', forceonline=False,
+                 wheelspath='wheelhouse', pythonpath='python',
+                 installpip=False, installvirtualenv=False,
+                 installpythondev=False, installpycrypto=False,
+                 os_distro=None, os_release=None):
+        self.force = force
+        self.upgrade = upgrade
+        self.virtualenv = virtualenv
+        self.version = version
+        self.pre = pre
+        self.source = source
+        self.force_online = forceonline
+        self.wheels_path = wheelspath
+        self.python_path = pythonpath
+        self.installpip = installpip
+        self.installvirtualenv = installvirtualenv
+        self.installpythondev = installpythondev
+        self.installpycrypto = installpycrypto
+
+        if not IS_WIN and self.installpycrypto:
+            lgr.error('Pycrypto installation only relevant on Windows.')
+            sys.exit(1)
+        if not (IS_LINUX or IS_DARWIN) and self.installpythondev:
+            lgr.error('Pythondev installation only relevant on Linux or OS x.')
+            sys.exit(1)
         os_props = get_os_props()
         self.distro = os_distro or os_props[0].lower()
         self.release = os_release or os_props[1].lower()
@@ -265,50 +287,49 @@ class CloudifyInstaller():
         lgr.debug('Identified Distribution: {0}'.format(self.distro))
         lgr.debug('Identified Release: {0}'.format(self.release))
 
-        module = self.args.source or 'cloudify'
+        module = self.source or 'cloudify'
 
-        if self.args.force or self.args.installpip:
+        if self.force or self.installpip:
             self.install_pip()
 
-        if self.args.virtualenv:
-            if self.args.force or self.args.installvirtualenv:
+        if self.virtualenv:
+            if self.force or self.installvirtualenv:
                 self.install_virtualenv()
-            env_bin_path = _get_env_bin_path(self.args.virtualenv)
+            env_bin_path = _get_env_bin_path(self.virtualenv)
 
-        if IS_LINUX and (self.args.force or self.args.installpythondev):
+        if IS_LINUX and (self.force or self.installpythondev):
             self.install_pythondev(self.distro)
-        if (IS_VIRTUALENV or self.args.virtualenv) \
-                and not IS_WIN and not self.args.nodrop:
+        if (IS_VIRTUALENV or self.virtualenv) and not IS_WIN:
             # drop root permissions so that installation is done using the
             # current user.
             drop_root_privileges()
-        if self.args.virtualenv:
+        if self.virtualenv:
             if not os.path.isfile(os.path.join(
-                    env_bin_path, ('activate.exe' if IS_WIN else 'activate'))):
-                make_virtualenv(self.args.virtualenv, self.args.pythonpath)
+                    env_bin_path, ('activate.bat' if IS_WIN else 'activate'))):
+                make_virtualenv(self.virtualenv, self.python_path)
 
-        if IS_WIN and (self.args.force or self.args.installpycrypto):
-            self.install_pycrypto(self.args.virtualenv)
+        if IS_WIN and (self.force or self.installpycrypto):
+            self.install_pycrypto(self.virtualenv)
 
-        if self.args.forceonline or not os.path.isdir(self.args.wheelspath):
-            install_module(module, self.args.version, self.args.pre,
-                           self.args.virtualenv)
-        elif os.path.isdir(self.args.wheelspath):
+        if self.force_online or not os.path.isdir(self.wheels_path):
+            install_module(module, self.version, self.pre,
+                           self.virtualenv)
+        elif os.path.isdir(self.wheels_path):
             lgr.info('Wheels directory found: "{0}". '
                      'Attemping offline installation...'.format(
-                         self.args.wheelspath))
+                         self.wheels_path))
             try:
                 install_module(module, pre=True,
-                               virtualenv_path=self.args.virtualenv,
-                               wheelspath=self.args.wheelspath,
-                               upgrade=self.args.upgrade)
+                               virtualenv_path=self.virtualenv,
+                               wheelspath=self.wheels_path,
+                               upgrade=self.upgrade)
             except Exception as ex:
                 lgr.warning('Offline installation failed ({0}).'.format(
                     ex.message))
-                install_module(module, self.args.version,
-                               self.args.pre, self.args.virtualenv,
-                               self.args.upgrade)
-        if self.args.virtualenv:
+                install_module(module, self.version,
+                               self.pre, self.virtualenv,
+                               self.upgrade)
+        if self.virtualenv:
             activate_path = os.path.join(env_bin_path, 'activate')
             if IS_WIN:
                 lgr.info('You can now run: "{0}.bat" to activate '
@@ -317,16 +338,32 @@ class CloudifyInstaller():
                 lgr.info('You can now run: "source {0}" to activate '
                          'the Virtualenv.'.format(activate_path))
 
+    @staticmethod
+    def find_virtualenv():
+        try:
+            import virtualenv  # NOQA
+            return True
+        except:
+            return False
+
     def install_virtualenv(self):
-        if not is_exec(VIRTUALENV_EXEC):
+        if not self.find_virtualenv():
             lgr.info('Installing virtualenv...')
             install_module('virtualenv')
         else:
             lgr.info('virtualenv is already installed in the path.')
 
+    @staticmethod
+    def find_pip():
+        try:
+            import pip  # NOQA
+            return True
+        except:
+            return False
+
     def install_pip(self):
         lgr.info('Installing pip...')
-        if not is_exec(PIP_EXEC):
+        if not self.find_pip():
             try:
                 tempdir = tempfile.mkdtemp()
                 get_pip_path = os.path.join(tempdir, 'get-pip.py')
@@ -336,7 +373,7 @@ class CloudifyInstaller():
                     sys.exit('Failed downloading pip from {0}. ({1})'.format(
                              PIP_URL, e.message))
                 result = run('{0} {1}'.format(
-                    self.args.pythonpath, get_pip_path))
+                    self.python_path, get_pip_path))
                 if not result.returncode == 0:
                     sys.exit('Could not install pip')
             finally:
@@ -436,15 +473,13 @@ def parse_args(args=None):
     if IS_WIN:
         parser.add_argument(
             '--pythonpath', type=str, default='c:/python27/python.exe',
-            help='Python path to use (defaults to "python").')
+            help='Python path to use (defaults to "python") '
+                 'when creating a virtualenv.')
     else:
         parser.add_argument(
-            '--nodrop', action='store_true',
-            help='Do not drop sudo permissions even when installing '
-                 'within a virtualenv.')
-        parser.add_argument(
             '--pythonpath', type=str, default='python',
-            help='Python path to use (defaults to "python").')
+            help='Python path to use (defaults to "python") '
+                 'when creating a virtualenv.')
     parser.add_argument(
         '--installpip', action='store_true',
         help='Attempt to install pip')
@@ -462,7 +497,18 @@ def parse_args(args=None):
     return parser.parse_args(args)
 
 
-def install(args):
+lgr = init_logger(__file__)
+
+
+if __name__ == '__main__':
+    args = parse_args()
+    if args.quiet:
+        lgr.setLevel(logging.ERROR)
+    elif args.verbose:
+        lgr.setLevel(logging.DEBUG)
+    else:
+        lgr.setLevel(logging.INFO)
+
     if check_cloudify_installed(args.virtualenv):
         lgr.info('Cloudify is already installed in the path.')
         if args.upgrade:
@@ -475,18 +521,8 @@ def install(args):
             lgr.error('Cloudify is not installed. '
                       'Remove the --upgrade flag and try again.')
             sys.exit(1)
-    installer = CloudifyInstaller(args)
+
+    xargs = ['quiet', 'verbose']
+    args = {arg: v for arg, v in vars(args).items() if arg not in xargs}
+    installer = CloudifyInstaller(**args)
     installer.execute()
-
-lgr = init_logger(__file__)
-
-
-if __name__ == '__main__':
-    args = parse_args()
-    if args.quiet:
-        lgr.setLevel(logging.ERROR)
-    elif args.verbose:
-        lgr.setLevel(logging.DEBUG)
-    else:
-        lgr.setLevel(logging.INFO)
-    install(args)
