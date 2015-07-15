@@ -28,7 +28,7 @@ CELERY_DEFAULTS="/etc/default/${ME}"
 SLEEP_SECONDS=5
 
 DEFAULT_PID_FILE="/var/run/celery/%n.pid"
-DEFAULT_LOG_FILE="/var/log/celery/%n.log"B
+DEFAULT_LOG_FILE="/var/log/celery/%n%I.log"
 DEFAULT_LOG_LEVEL="INFO"
 DEFAULT_NODES="celery"
 DEFAULT_CELERYD="-m celery.bin.celeryd_detach"
