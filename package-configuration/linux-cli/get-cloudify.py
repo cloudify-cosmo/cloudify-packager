@@ -138,13 +138,13 @@ def run(cmd):
     # while the process is still running, print output
     while proc.poll() is None:
         output = proc.stdout.readline()
-        proc.aggr_stdout += output
         if len(output) > 0:
+            proc.aggr_stdout += output
             lgr.debug(output)
         time.sleep(0.2)
     output = proc.stdout.readline()
-    proc.aggr_stdout += output
     if len(output) > 0:
+        proc.aggr_stdout += output
         lgr.debug(output)
     proc.aggr_stderr = proc.stderr.read()
     if len(proc.aggr_stderr) > 0:
@@ -214,9 +214,9 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
             IS_VIRTUALENV))
     pip_cmd = ' '.join(pip_cmd)
     lgr.info('Executing Install Command: {0}'.format(pip_cmd))
-    sys.exit(1)
     result = run(pip_cmd)
     if not result.returncode == 0:
+        lgr.error(result.aggr_stdout)
         sys.exit('Could not install module: {0}.'.format(module))
 
 
@@ -321,14 +321,14 @@ class CloudifyInstaller():
 
         if isinstance(self.requirements, list):
             if self.requirements:
-                requirement_files = [self.requirements]
+                self.requirements = [self.requirements]
             else:
-                requirement_files = \
+                self.requirements = \
                     self._get_default_requirements_file(self.source)
 
         if self.force_online or not os.path.isdir(self.wheels_path):
             install_module(module, self.version, self.pre,
-                           self.virtualenv, requirements=requirement_files,
+                           self.virtualenv, requirements=self.requirements,
                            upgrade=self.upgrade)
         elif os.path.isdir(self.wheels_path):
             lgr.info('Wheels directory found: "{0}". '
@@ -338,14 +338,14 @@ class CloudifyInstaller():
                 install_module(module, pre=True,
                                virtualenv_path=self.virtualenv,
                                wheelspath=self.wheels_path,
-                               requirements=requirement_files,
+                               requirements=self.requirements,
                                upgrade=self.upgrade)
             except Exception as ex:
                 lgr.warning('Offline installation failed ({0}).'.format(
                     ex.message))
                 install_module(module, version=self.version,
                                pre=self.pre, virtualenv_path=self.virtualenv,
-                               requirements=requirement_files,
+                               requirements=self.requirements,
                                upgrade=self.upgrade)
         if self.virtualenv:
             activate_path = os.path.join(env_bin_path, 'activate')
@@ -405,7 +405,7 @@ class CloudifyInstaller():
             tempdir = tempfile.mkdtemp()
             archive = os.path.join(tempdir, 'cli_source')
             download_file(source, archive)
-            run('tar -xzvf {0} -C {1}'.format(archive, tempdir))
+            run('tar -xzvf {0} -C {1} --strip=1'.format(archive, tempdir))
             return [os.path.join(tempdir, f) for f in REQUIREMENT_FILE_NAMES
                     if os.path.isfile(os.path.join(tempdir, f))]
         elif os.path.isdir(source):
