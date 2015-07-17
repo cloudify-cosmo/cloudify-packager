@@ -328,7 +328,8 @@ class CloudifyInstaller():
 
         if self.force_online or not os.path.isdir(self.wheels_path):
             install_module(module, self.version, self.pre,
-                           self.virtualenv, requirements=requirement_files)
+                           self.virtualenv, requirements=requirement_files,
+                           upgrade=self.upgrade)
         elif os.path.isdir(self.wheels_path):
             lgr.info('Wheels directory found: "{0}". '
                      'Attemping offline installation...'.format(
