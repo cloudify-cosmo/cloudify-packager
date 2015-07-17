@@ -98,7 +98,7 @@ additional information.'''
 
 IS_VIRTUALENV = hasattr(sys, 'real_prefix')
 
-
+REQUIREMENT_FILE_NAMES = ['dev-requirements.txt', 'requirements.txt']
 # TODO: put these in a private storage
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
 PYCR64_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win-amd64-py2.7.exe'  # NOQA
@@ -181,7 +181,7 @@ def make_virtualenv(virtualenv_dir, python_path):
 
 
 def install_module(module, version=False, pre=False, virtualenv_path=False,
-                   wheelspath=False, upgrade=False):
+                   wheelspath=False, requirements=None, upgrade=False):
     """This will install a Python module.
 
     Can specify a specific version.
@@ -191,13 +191,17 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     Can request an upgrade.
     """
     lgr.info('Installing {0}...'.format(module))
-    pip_cmd = 'pip install {0}'.format(module)
+    pip_cmd = 'pip install'
     if virtualenv_path:
         pip_cmd = os.path.join(
             _get_env_bin_path(virtualenv_path), pip_cmd)
     if version:
         pip_cmd = '{0}=={1}'.format(pip_cmd, version)
     pip_cmd = [pip_cmd]
+    if requirements:
+        for req_file in requirements:
+            pip_cmd.append('-r {0}'.format(req_file))
+    pip_cmd.append(module)
     if wheelspath:
         pip_cmd.append('--use-wheel --no-index --find-links={0}'.format(
             wheelspath))
@@ -208,7 +212,10 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     if IS_VIRTUALENV and not virtualenv_path:
         lgr.info('Installing within current virtualenv: {0}...'.format(
             IS_VIRTUALENV))
-    result = run(' '.join(pip_cmd))
+    pip_cmd = ' '.join(pip_cmd)
+    lgr.info('Executing Install Command: {0}'.format(pip_cmd))
+    sys.exit(1)
+    result = run(pip_cmd)
     if not result.returncode == 0:
         sys.exit('Could not install module: {0}.'.format(module))
 
@@ -245,17 +252,18 @@ def _get_env_bin_path(env_path):
 
 class CloudifyInstaller():
     def __init__(self, force=False, upgrade=False, virtualenv='',
-                 version='', pre=False, source='', forceonline=False,
-                 wheelspath='wheelhouse', pythonpath='python',
-                 installpip=False, installvirtualenv=False,
-                 installpythondev=False, installpycrypto=False,
-                 os_distro=None, os_release=None):
+                 version='', pre=False, source='', requirements='',
+                 forceonline=False, wheelspath='wheelhouse',
+                 pythonpath='python', installpip=False,
+                 installvirtualenv=False, installpythondev=False,
+                 installpycrypto=False, os_distro=None, os_release=None):
         self.force = force
         self.upgrade = upgrade
         self.virtualenv = virtualenv
         self.version = version
         self.pre = pre
         self.source = source
+        self.requirements = requirements
         self.force_online = forceonline
         self.wheels_path = wheelspath
         self.python_path = pythonpath
@@ -311,9 +319,16 @@ class CloudifyInstaller():
         if IS_WIN and (self.force or self.installpycrypto):
             self.install_pycrypto(self.virtualenv)
 
+        if isinstance(self.requirements, list):
+            if self.requirements:
+                requirement_files = [self.requirements]
+            else:
+                requirement_files = \
+                    self._get_default_requirements_file(self.source)
+
         if self.force_online or not os.path.isdir(self.wheels_path):
             install_module(module, self.version, self.pre,
-                           self.virtualenv)
+                           self.virtualenv, requirements=requirement_files)
         elif os.path.isdir(self.wheels_path):
             lgr.info('Wheels directory found: "{0}". '
                      'Attemping offline installation...'.format(
@@ -322,13 +337,15 @@ class CloudifyInstaller():
                 install_module(module, pre=True,
                                virtualenv_path=self.virtualenv,
                                wheelspath=self.wheels_path,
+                               requirements=requirement_files,
                                upgrade=self.upgrade)
             except Exception as ex:
                 lgr.warning('Offline installation failed ({0}).'.format(
                     ex.message))
-                install_module(module, self.version,
-                               self.pre, self.virtualenv,
-                               self.upgrade)
+                install_module(module, version=self.version,
+                               pre=self.pre, virtualenv_path=self.virtualenv,
+                               requirements=requirement_files,
+                               upgrade=self.upgrade)
         if self.virtualenv:
             activate_path = os.path.join(env_bin_path, 'activate')
             if IS_WIN:
@@ -380,6 +397,21 @@ class CloudifyInstaller():
                 shutil.rmtree(tempdir)
         else:
             lgr.info('pip is already installed in the path.')
+
+    @staticmethod
+    def _get_default_requirements_file(source):
+        if '://' in source:
+            tempdir = tempfile.mkdtemp()
+            archive = os.path.join(tempdir, 'cli_source')
+            download_file(source, archive)
+            run('tar -xzvf {0} -C {1}'.format(archive, tempdir))
+            return [os.path.join(tempdir, f) for f in REQUIREMENT_FILE_NAMES
+                    if os.path.isfile(os.path.join(tempdir, f))]
+        elif os.path.isdir(source):
+            return [os.path.join(source, f) for f in REQUIREMENT_FILE_NAMES
+                    if os.path.isfile(os.path.join(source, f))]
+        else:
+            lgr.warning('Requirement files not found in {0}'.format(source))
 
     def install_pythondev(self, distro):
         """Installs python-dev and gcc
@@ -448,6 +480,14 @@ def handle_upgrade(upgrade=False, virtualenv=''):
 
 
 def parse_args(args=None):
+    class VerifySource(argparse.Action):
+        def __call__(self, parser, args, values, option_string=None):
+            # print 'No: {n} {v} {o}'.format(n=args, v=values, o=option_string)
+            if not args.source:
+                parser.error(
+                    '--source is required when calling --requirements.')
+            setattr(args, self.dest, values)
+
     parser = argparse.ArgumentParser(
         description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter)
     default_group = parser.add_mutually_exclusive_group()
@@ -472,6 +512,10 @@ def parse_args(args=None):
     version_group.add_argument(
         '-s', '--source', type=str,
         help='Install from the provided URL or local path.')
+    parser.add_argument(
+        '-r', '--requirements', nargs='*',
+        help='Install default or provided requirements file.',
+        action=VerifySource)
     parser.add_argument(
         '-u', '--upgrade', action='store_true',
         help='Upgrades Cloudify if already installed.')
@@ -519,7 +563,6 @@ if __name__ == '__main__':
         lgr.setLevel(logging.DEBUG)
     else:
         lgr.setLevel(logging.INFO)
-
     handle_upgrade(args.upgrade, args.virtualenv)
 
     xargs = ['quiet', 'verbose']
