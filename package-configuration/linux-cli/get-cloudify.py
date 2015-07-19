@@ -181,7 +181,7 @@ def make_virtualenv(virtualenv_dir, python_path):
 
 
 def install_module(module, version=False, pre=False, virtualenv_path=False,
-                   wheelspath=False, requirements=None, upgrade=False):
+                   wheelspath=False, requirement_files=None, upgrade=False):
     """This will install a Python module.
 
     Can specify a specific version.
@@ -198,8 +198,8 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     if version:
         pip_cmd = '{0}=={1}'.format(pip_cmd, version)
     pip_cmd = [pip_cmd]
-    if requirements:
-        for req_file in requirements:
+    if requirement_files:
+        for req_file in requirement_files:
             pip_cmd.append('-r {0}'.format(req_file))
     pip_cmd.append(module)
     if wheelspath:
@@ -213,7 +213,6 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
         lgr.info('Installing within current virtualenv: {0}...'.format(
             IS_VIRTUALENV))
     pip_cmd = ' '.join(pip_cmd)
-    lgr.info('Executing Install Command: {0}'.format(pip_cmd))
     result = run(pip_cmd)
     if not result.returncode == 0:
         lgr.error(result.aggr_stdout)
@@ -252,7 +251,7 @@ def _get_env_bin_path(env_path):
 
 class CloudifyInstaller():
     def __init__(self, force=False, upgrade=False, virtualenv='',
-                 version='', pre=False, source='', requirements='',
+                 version='', pre=False, source='', withrequirements='',
                  forceonline=False, wheelspath='wheelhouse',
                  pythonpath='python', installpip=False,
                  installvirtualenv=False, installpythondev=False,
@@ -263,7 +262,7 @@ class CloudifyInstaller():
         self.version = version
         self.pre = pre
         self.source = source
-        self.requirements = requirements
+        self.withrequirements = withrequirements
         self.force_online = forceonline
         self.wheels_path = wheelspath
         self.python_path = pythonpath
@@ -319,16 +318,16 @@ class CloudifyInstaller():
         if IS_WIN and (self.force or self.installpycrypto):
             self.install_pycrypto(self.virtualenv)
 
-        if isinstance(self.requirements, list):
-            if self.requirements:
-                self.requirements = [self.requirements]
-            else:
-                self.requirements = \
-                    self._get_default_requirements_file(self.source)
+        # if withrequirements is not provided, this will be None.
+        # if it's provided without a value, it will be a list.
+        if isinstance(self.withrequirements, list):
+            self.withrequirements = self.withrequirements \
+                or self._get_default_requirement_files(self.source)
 
         if self.force_online or not os.path.isdir(self.wheels_path):
             install_module(module, self.version, self.pre,
-                           self.virtualenv, requirements=self.requirements,
+                           self.virtualenv,
+                           requirement_files=self.withrequirements,
                            upgrade=self.upgrade)
         elif os.path.isdir(self.wheels_path):
             lgr.info('Wheels directory found: "{0}". '
@@ -338,14 +337,14 @@ class CloudifyInstaller():
                 install_module(module, pre=True,
                                virtualenv_path=self.virtualenv,
                                wheelspath=self.wheels_path,
-                               requirements=self.requirements,
+                               requirement_files=self.withrequirements,
                                upgrade=self.upgrade)
             except Exception as ex:
                 lgr.warning('Offline installation failed ({0}).'.format(
                     ex.message))
                 install_module(module, version=self.version,
                                pre=self.pre, virtualenv_path=self.virtualenv,
-                               requirements=self.requirements,
+                               requirement_files=self.withrequirements,
                                upgrade=self.upgrade)
         if self.virtualenv:
             activate_path = os.path.join(env_bin_path, 'activate')
@@ -400,7 +399,7 @@ class CloudifyInstaller():
             lgr.info('pip is already installed in the path.')
 
     @staticmethod
-    def _get_default_requirements_file(source):
+    def _get_default_requirement_files(source):
         if '://' in source:
             tempdir = tempfile.mkdtemp()
             archive = os.path.join(tempdir, 'cli_source')
@@ -514,7 +513,7 @@ def parse_args(args=None):
         '-s', '--source', type=str,
         help='Install from the provided URL or local path.')
     parser.add_argument(
-        '-r', '--requirements', nargs='*',
+        '-r', '--withrequirements', nargs='*',
         help='Install default or provided requirements file.',
         action=VerifySource)
     parser.add_argument(
