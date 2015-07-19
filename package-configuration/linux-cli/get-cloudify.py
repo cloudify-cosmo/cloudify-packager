@@ -236,7 +236,7 @@ def _get_env_bin_path(env_path):
         import virtualenv
         return virtualenv.path_locations(env_path)[3]
     except ImportError:
-        # this is a fallback for an edge case in which you're trying
+        # this is a fallback for a race condition in which you're trying
         # to use the script and create a virtualenv from within
         # a virtualenv in which virtualenv isn't installed and so
         # is not importable.
