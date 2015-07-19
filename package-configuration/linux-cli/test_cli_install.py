@@ -51,10 +51,11 @@ class CliInstallTests(testtools.TestCase):
         finally:
             shutil.rmtree(tempdir)
 
-    def test_install_from_source(self):
+    def test_install_from_source_with_requirements(self):
         tempdir = tempfile.mkdtemp()
         install_args = {
             'source': cloudify_cli_url,
+            'withrequirements': ['resources/dev-requirements.txt'],
             'virtualenv': tempdir,
         }
 

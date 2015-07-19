@@ -70,7 +70,8 @@ providing a --virtualenv path, Cloudify will be installed within the virtualenv
 you're in.
 
 The script allows you to install requirement txt files when installing from
---source. If --withrequirements is provided with a value (a URL or path to
+--source (Currently not supported on Windows as it assumes tar is installed).
+If --withrequirements is provided with a value (a URL or path to
 a requirements file) it will use it. If it's provided without a value, it
 will try to download the archive provided in --source, untar it
 (yes, currently only tar.gz files are supported) and look for
@@ -135,7 +136,7 @@ def init_logger(logger_name):
 
 
 def run(cmd):
-    """Executes a command
+    """Executes a command.
     """
     lgr.debug('Executing: {0}...'.format(cmd))
     pipe = subprocess.PIPE
@@ -194,6 +195,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     Can specify a specific version.
     Can specify a prerelease.
     Can specify a virtualenv to install in.
+    Can specify a list of paths or urls to requirement txt files.
     Can specify a local wheelspath to use for offline installation.
     Can request an upgrade.
     """
@@ -202,12 +204,12 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     if virtualenv_path:
         pip_cmd = os.path.join(
             _get_env_bin_path(virtualenv_path), pip_cmd)
-    if version:
-        pip_cmd = '{0}=={1}'.format(pip_cmd, version)
     pip_cmd = [pip_cmd]
     if requirement_files:
         for req_file in requirement_files:
             pip_cmd.append('-r {0}'.format(req_file))
+    if version:
+        module = '{0}=={1}'.format(module, version)
     pip_cmd.append(module)
     if wheelspath:
         pip_cmd.append('--use-wheel --no-index --find-links={0}'.format(
@@ -219,11 +221,17 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     if IS_VIRTUALENV and not virtualenv_path:
         lgr.info('Installing within current virtualenv: {0}...'.format(
             IS_VIRTUALENV))
-    pip_cmd = ' '.join(pip_cmd)
-    result = run(pip_cmd)
+    result = run(' '.join(pip_cmd))
     if not result.returncode == 0:
         lgr.error(result.aggr_stdout)
         sys.exit('Could not install module: {0}.'.format(module))
+
+
+def untar(archive, destination):
+    """This will extract a tar.gz archive and extract it while stripping
+    the parents directory within the archive.
+    """
+    run('tar -xzvf {0} -C {1} --strip=1'.format(archive, destination))
 
 
 def download_file(url, destination):
@@ -278,6 +286,7 @@ class CloudifyInstaller():
         self.installpythondev = installpythondev
         self.installpycrypto = installpycrypto
 
+        # TODO: we should test all mutually exclusive arguments.
         if not IS_WIN and self.installpycrypto:
             lgr.error('Pycrypto installation only relevant on Windows.')
             sys.exit(1)
@@ -410,8 +419,9 @@ class CloudifyInstaller():
         if '://' in source:
             tempdir = tempfile.mkdtemp()
             archive = os.path.join(tempdir, 'cli_source')
+            # TODO: need to handle deletion of the temp source dir
             download_file(source, archive)
-            run('tar -xzvf {0} -C {1} --strip=1'.format(archive, tempdir))
+            untar(archive, tempdir)
             return [os.path.join(tempdir, f) for f in REQUIREMENT_FILE_NAMES
                     if os.path.isfile(os.path.join(tempdir, f))]
         elif os.path.isdir(source):
@@ -518,10 +528,11 @@ def parse_args(args=None):
     version_group.add_argument(
         '-s', '--source', type=str,
         help='Install from the provided URL or local path.')
-    parser.add_argument(
-        '-r', '--withrequirements', nargs='*',
-        help='Install default or provided requirements file.',
-        action=VerifySource)
+    if not IS_WIN:
+        parser.add_argument(
+            '-r', '--withrequirements', nargs='*',
+            help='Install default or provided requirements file.',
+            action=VerifySource)
     parser.add_argument(
         '-u', '--upgrade', action='store_true',
         help='Upgrades Cloudify if already installed.')

@@ -19,10 +19,13 @@ import tempfile
 from StringIO import StringIO
 from mock import MagicMock
 import shutil
-# import sys
+import os
 
 
 get_cloudify = __import__("get-cloudify")
+
+cloudify_cli_url = \
+    'https://github.com/cloudify-cosmo/cloudify-cli/archive/3.2.tar.gz'
 
 
 class CliBuilderUnitTests(testtools.TestCase):
@@ -143,6 +146,25 @@ class CliBuilderUnitTests(testtools.TestCase):
                 self.get_cloudify.check_cloudify_installed(tmp_venv))
         finally:
             shutil.rmtree(tmp_venv)
+
+    def test_get_requirements_from_source_url(self):
+        installer = get_cloudify.CloudifyInstaller()
+        req_list = installer._get_default_requirement_files(cloudify_cli_url)
+        self.assertEquals(len(req_list), 1)
+        self.assertIn('dev-requirements.txt', req_list[0])
+
+    def test_get_requirements_from_source_path(self):
+        tempdir = tempfile.mkdtemp()
+        archive = os.path.join(tempdir, 'cli_source')
+        try:
+            get_cloudify.download_file(cloudify_cli_url, archive)
+            get_cloudify.untar(archive, tempdir)
+            installer = get_cloudify.CloudifyInstaller()
+            req_list = installer._get_default_requirement_files(tempdir)
+            self.assertEquals(len(req_list), 1)
+            self.assertIn('dev-requirements.txt', req_list[0])
+        finally:
+            shutil.rmtree(tempdir)
 
 
 class TestArgParser(testtools.TestCase):
