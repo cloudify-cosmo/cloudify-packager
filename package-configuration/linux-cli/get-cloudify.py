@@ -69,6 +69,13 @@ If you're already running the script from within a virtualenv and you're not
 providing a --virtualenv path, Cloudify will be installed within the virtualenv
 you're in.
 
+The script allows you to install requirement txt files when installing from
+--source. If --withrequirements is provided with a value (a URL or path to
+a requirements file) it will use it. If it's provided without a value, it
+will try to download the archive provided in --source, untar it
+(yes, currently only tar.gz files are supported) and look for
+dev-requirements.txt and requirements.txt files within it.
+
 Passing the --wheelspath allows for an offline installation of Cloudify
 from predownloaded Cloudify dependency wheels. Note that if wheels are found
 within the default wheels directory or within --wheelspath, they will (unless
@@ -482,10 +489,9 @@ def handle_upgrade(upgrade=False, virtualenv=''):
 def parse_args(args=None):
     class VerifySource(argparse.Action):
         def __call__(self, parser, args, values, option_string=None):
-            # print 'No: {n} {v} {o}'.format(n=args, v=values, o=option_string)
             if not args.source:
                 parser.error(
-                    '--source is required when calling --requirements.')
+                    '--source is required when calling --withrequirements.')
             setattr(args, self.dest, values)
 
     parser = argparse.ArgumentParser(
