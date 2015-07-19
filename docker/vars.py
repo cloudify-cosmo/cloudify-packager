@@ -108,6 +108,8 @@ VARS = {
                 "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",
                 "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",
                 "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
+                "cloudify_diamond_plugin": "git+git://github.com/cloudify-cosmo/cloudify-diamond-plugin.git@master",
+                "cloudify_agent": "git+git://github.com/cloudify-cosmo/cloudify-agent.git@master",
                 "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
             },
         "workers_autoscale": "5,2",
