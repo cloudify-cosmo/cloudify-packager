@@ -55,7 +55,8 @@ class CliInstallTests(testtools.TestCase):
         tempdir = tempfile.mkdtemp()
         install_args = {
             'source': cloudify_cli_url,
-            'withrequirements': ['resources/dev-requirements.txt'],
+            'withrequirements':
+            ['package-configuration/linux-cli/resources/dev-requirements.txt'],
             'virtualenv': tempdir,
         }
 
