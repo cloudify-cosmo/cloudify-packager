@@ -70,6 +70,7 @@ class CliInstallTests(testtools.TestCase):
             self.assertIn('Cloudify CLI 3', proc.aggr_stderr)
         finally:
             shutil.rmtree(tempdir)
+            temp_requirements_file.close()
 
     def test_cli_installed_and_upgrade(self):
         tempdir = tempfile.mkdtemp()

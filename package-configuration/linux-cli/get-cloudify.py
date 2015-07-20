@@ -272,7 +272,8 @@ class CloudifyInstaller():
                  forceonline=False, wheelspath='wheelhouse',
                  pythonpath='python', installpip=False,
                  installvirtualenv=False, installpythondev=False,
-                 installpycrypto=False, os_distro=None, os_release=None):
+                 installpycrypto=False, os_distro=None, os_release=None,
+                 **kwargs):
         self.force = force
         self.upgrade = upgrade
         self.virtualenv = virtualenv
@@ -336,7 +337,7 @@ class CloudifyInstaller():
         if IS_WIN and (self.force or self.installpycrypto):
             self.install_pycrypto(self.virtualenv)
 
-        # if withrequirements is not provided, this will be None.
+        # if withrequirements is not provided, this will be False.
         # if it's provided without a value, it will be a list.
         if isinstance(self.withrequirements, list):
             self.withrequirements = self.withrequirements \
