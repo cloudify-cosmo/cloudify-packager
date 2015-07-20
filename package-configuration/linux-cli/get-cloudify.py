@@ -223,9 +223,8 @@ def download_file(url, destination):
 
 
 def get_os_props():
-    distro_info = platform.linux_distribution(full_distribution_name=False)
-    distro = distro_info[0]
-    release = distro_info[2]
+    distro, _, release = platform.linux_distribution(
+        full_distribution_name=False)
     return distro, release
 
 
