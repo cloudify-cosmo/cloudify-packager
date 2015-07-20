@@ -44,6 +44,6 @@ git clone https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/cloudify-cosm
 
 
 # REPLACE branch before production
-sudo pip install git+https://github.com/cloudify-cosmo/cloudify-agent-packager@agent-refactoring-project &&
+sudo pip install git+https://github.com/cloudify-cosmo/cloudify-agent-packager@master &&
 cd /tmp &&
 cfy-ap -c /vagrant/packager.yaml -f -v
