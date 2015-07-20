@@ -51,10 +51,14 @@ class CliInstallTests(testtools.TestCase):
         finally:
             shutil.rmtree(tempdir)
 
-    def test_install_from_source(self):
+    def test_install_from_source_with_requirements(self):
         tempdir = tempfile.mkdtemp()
+        temp_requirements_file = tempfile.NamedTemporaryFile(delete=True)
+        with open(temp_requirements_file.name, 'w') as requirements_file:
+            requirements_file.write('sh==1.11')
         install_args = {
             'source': cloudify_cli_url,
+            'withrequirements': [temp_requirements_file.name],
             'virtualenv': tempdir,
         }
 
@@ -66,6 +70,7 @@ class CliInstallTests(testtools.TestCase):
             self.assertIn('Cloudify CLI 3', proc.aggr_stderr)
         finally:
             shutil.rmtree(tempdir)
+            temp_requirements_file.close()
 
     def test_cli_installed_and_upgrade(self):
         tempdir = tempfile.mkdtemp()

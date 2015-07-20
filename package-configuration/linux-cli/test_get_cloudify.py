@@ -19,10 +19,14 @@ import tempfile
 from StringIO import StringIO
 from mock import MagicMock
 import shutil
-# import sys
+import os
+import tarfile
 
 
 get_cloudify = __import__("get-cloudify")
+
+cloudify_cli_url = \
+    'https://github.com/cloudify-cosmo/cloudify-cli/archive/master.tar.gz'
 
 
 class CliBuilderUnitTests(testtools.TestCase):
@@ -32,6 +36,17 @@ class CliBuilderUnitTests(testtools.TestCase):
         super(CliBuilderUnitTests, self).setUp()
         self.get_cloudify = get_cloudify
         self.get_cloudify.IS_VIRTUALENV = False
+
+    def _create_dummy_requirements_tar(self):
+        tempdir = tempfile.mkdtemp()
+        fpath = os.path.join(tempdir, 'dev-requirements.txt')
+        with open(fpath, 'w') as f:
+            f.write('sh==1.11\n')
+
+        tar = tarfile.open(name='sample.tar.gz', mode='w:gz')
+        tar.add(name=tempdir, arcname='maindir')
+        tar.close()
+        return os.path.join(tempdir, 'sample.tar.gz')
 
     def test_validate_urls(self):
         self._validate_url(self.get_cloudify.PIP_URL)
@@ -143,6 +158,26 @@ class CliBuilderUnitTests(testtools.TestCase):
                 self.get_cloudify.check_cloudify_installed(tmp_venv))
         finally:
             shutil.rmtree(tmp_venv)
+
+    def test_get_requirements_from_source_url(self):
+        installer = get_cloudify.CloudifyInstaller()
+        req_list = installer._get_default_requirement_files(cloudify_cli_url)
+        self.assertEquals(len(req_list), 1)
+        self.assertIn('dev-requirements.txt', req_list[0])
+
+    def test_get_requirements_from_source_path(self):
+        tempdir = tempfile.mkdtemp()
+        archive = os.path.join(tempdir, 'cli_source')
+        try:
+            # get_cloudify.download_file(cloudify_cli_url, archive)
+            archive = self._create_dummy_requirements_tar()
+            get_cloudify.untar(archive, tempdir)
+            installer = get_cloudify.CloudifyInstaller()
+            req_list = installer._get_default_requirement_files(tempdir)
+            self.assertEquals(len(req_list), 1)
+            self.assertIn('dev-requirements.txt', req_list[0])
+        finally:
+            shutil.rmtree(tempdir)
 
 
 class TestArgParser(testtools.TestCase):
