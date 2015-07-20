@@ -53,6 +53,7 @@ import tempfile
 import logging
 import shutil
 import time
+import tar
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -70,11 +71,10 @@ providing a --virtualenv path, Cloudify will be installed within the virtualenv
 you're in.
 
 The script allows you to install requirement txt files when installing from
---source (Currently not supported on Windows as it assumes tar is installed).
+--source.
 If --withrequirements is provided with a value (a URL or path to
 a requirements file) it will use it. If it's provided without a value, it
-will try to download the archive provided in --source, untar it
-(yes, currently only tar.gz files are supported) and look for
+will try to download the archive provided in --source, extract it, and look for
 dev-requirements.txt and requirements.txt files within it.
 
 Passing the --wheelspath allows for an offline installation of Cloudify
@@ -231,7 +231,9 @@ def untar(archive, destination):
     """This will extract a tar.gz archive and extract it while stripping
     the parents directory within the archive.
     """
-    run('tar -xzvf {0} -C {1} --strip=1'.format(archive, destination))
+    tar.open(name=archive)
+    tar.extractall(path=destination)
+    # run('tar -xzvf {0} -C {1} --strip=1'.format(archive, destination))
 
 
 def download_file(url, destination):
@@ -416,19 +418,27 @@ class CloudifyInstaller():
 
     @staticmethod
     def _get_default_requirement_files(source):
-        if '://' in source:
-            tempdir = tempfile.mkdtemp()
-            archive = os.path.join(tempdir, 'cli_source')
-            # TODO: need to handle deletion of the temp source dir
-            download_file(source, archive)
-            untar(archive, tempdir)
-            return [os.path.join(tempdir, f) for f in REQUIREMENT_FILE_NAMES
-                    if os.path.isfile(os.path.join(tempdir, f))]
-        elif os.path.isdir(source):
+        if os.path.isdir(source):
             return [os.path.join(source, f) for f in REQUIREMENT_FILE_NAMES
                     if os.path.isfile(os.path.join(source, f))]
         else:
-            lgr.warning('Requirement files not found in {0}'.format(source))
+            tempdir = tempfile.mkdtemp()
+            archive = os.path.join(tempdir, 'cli_source')
+            # TODO: need to handle deletion of the temp source dir
+            try:
+                download_file(source, archive)
+            except Exception as ex:
+                lgr.error('Could not download {0} ({1})'.format(
+                    source, ex.message))
+                sys.exit(1)
+            try:
+                untar(archive, tempdir)
+            except Exception as ex:
+                lgr.error('Could not extract {0} ({1})'.format(
+                    archive, ex.message))
+                sys.exit(1)
+            return [os.path.join(tempdir, f) for f in REQUIREMENT_FILE_NAMES
+                    if os.path.isfile(os.path.join(tempdir, f))]
 
     def install_pythondev(self, distro):
         """Installs python-dev and gcc
@@ -528,11 +538,10 @@ def parse_args(args=None):
     version_group.add_argument(
         '-s', '--source', type=str,
         help='Install from the provided URL or local path.')
-    if not IS_WIN:
-        parser.add_argument(
-            '-r', '--withrequirements', nargs='*',
-            help='Install default or provided requirements file.',
-            action=VerifySource)
+    parser.add_argument(
+        '-r', '--withrequirements', nargs='*',
+        help='Install default or provided requirements file.',
+        action=VerifySource)
     parser.add_argument(
         '-u', '--upgrade', action='store_true',
         help='Upgrades Cloudify if already installed.')
