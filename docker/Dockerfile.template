@@ -268,16 +268,9 @@ WORKDIR /etc/service/celeryd-cloudify-management/
 RUN $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_rest_client }} && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_plugins_common }} && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_script_plugin }} && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_diamond_plugin }} && \
+    $CELERY_VIRTUAL_ENV_DIR/bin/pip install {{ celery.modules.cloudify_agent }} && \
     /bin/bash -c 'git clone {{ celery.modules.cloudify_manager }} && \
-    pushd cloudify-manager/plugins/plugin-installer && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
-    popd && \
-    pushd cloudify-manager/plugins/agent-installer && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
-    popd && \
-    pushd cloudify-manager/plugins/windows-agent-installer && \
-    $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
-    popd && \
     pushd cloudify-manager/plugins/riemann-controller && \
     $CELERY_VIRTUAL_ENV_DIR/bin/pip install . && \
     popd && \
@@ -323,16 +316,16 @@ RUN echo install dependencies && \
     \
     echo installing amqpinflux && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_amqp_influxdb }} && \
-    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_rest_client }} && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_dsl_parser }} && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_rest_client }} && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_plugins_common }} && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_script_plugin }} && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_diamond_plugin }} && \
+    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.cloudify_agent }} && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install {{ manager.modules.flask_securest }} && \
     \
     echo installing rest-service && \
     /bin/bash -c 'git clone {{ manager.modules.cloudify_manager }} && \
-    pushd cloudify-manager/plugins/plugin-installer && \
-    $MANAGER_VIRTUAL_ENV_DIR/bin/pip install . && \
-    popd && \
     pushd cloudify-manager/rest-service && \
     $MANAGER_VIRTUAL_ENV_DIR/bin/pip install .' && \
     \

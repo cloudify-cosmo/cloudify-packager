@@ -38,7 +38,7 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # debian-jessie 64bit box
-      aws.ami = "ami-47640130"
+      aws.ami = "ami-699f021e"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
@@ -58,7 +58,7 @@ Vagrant.configure('2') do |config|
     rsync__args: ["--verbose", "--rsync-path='sudo rsync'"]
     debian_jessie.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "debian-jessie"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -72,7 +72,7 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # official ubuntu 14.04 64bit box
-      aws.ami = "ami-77244000"
+      aws.ami = "ami-f0b11187"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
@@ -90,39 +90,7 @@ Vagrant.configure('2') do |config|
     ubuntu_trusty.vm.synced_folder "../../", "/cloudify-packager", create: true
     ubuntu_trusty.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-trusty"
-      s.privileged = false
-    end
-  end
-  config.vm.define "ubuntu_trusty_commercial_aws" do |ubuntu_trusty|
-    # dummy box, will be overriden
-    ubuntu_trusty.vm.box = "dummy"
-    ubuntu_trusty.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
-
-    ubuntu_trusty.vm.provider :aws do |aws, override|
-      aws.access_key_id = AWS_ACCESS_KEY_ID
-      aws.secret_access_key = AWS_ACCESS_KEY
-
-      # official ubuntu 14.04 64bit box
-      aws.ami = "ami-77244000"
-      aws.region = "eu-west-1"
-      aws.instance_type = "m3.medium"
-
-      aws.keypair_name = "vagrant_build"
-      override.ssh.username = "ubuntu"
-      override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
-
-      aws.tags = {
-          "Name" => "vagrant ubuntu trusty agent commercial build",
-      }
-        aws.security_groups = "vagrant_cfy_build"
-    end
-
-    # need to sync folders
-    ubuntu_trusty.vm.synced_folder "../../", "/cloudify-packager", create: true
-    ubuntu_trusty.vm.provision "shell" do |s|
-      s.path = "provision.sh"
-      s.args = "Ubuntu-trusty True #{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -136,7 +104,7 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # official ubuntu 12.04 64bit box
-      aws.ami = "ami-a16500d6"
+      aws.ami = "ami-036eaa74"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
@@ -154,39 +122,7 @@ Vagrant.configure('2') do |config|
     ubuntu_precise.vm.synced_folder "../../", "/cloudify-packager", create: true
     ubuntu_precise.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-precise"
-      s.privileged = false
-    end
-  end
-  config.vm.define "ubuntu_precise_commercial_aws" do |ubuntu_precise|
-    # dummy box, will be overriden
-    ubuntu_precise.vm.box = "dummy"
-    ubuntu_precise.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
-
-    ubuntu_precise.vm.provider :aws do |aws, override|
-      aws.access_key_id = AWS_ACCESS_KEY_ID
-      aws.secret_access_key = AWS_ACCESS_KEY
-
-      # official ubuntu 12.04 64bit box
-      aws.ami = "ami-a16500d6"
-      aws.region = "eu-west-1"
-      aws.instance_type = "m3.medium"
-
-      aws.keypair_name = "vagrant_build"
-      override.ssh.username = "ubuntu"
-      override.ssh.private_key_path = "~/.ssh/aws/vagrant_build.pem"
-
-      aws.tags = {
-          "Name" => "vagrant ubuntu precise agent commercial build",
-      }
-        aws.security_groups = "vagrant_cfy_build"
-    end
-
-    # need to sync folders
-    ubuntu_precise.vm.synced_folder "../../", "/cloudify-packager", create: true
-    ubuntu_precise.vm.provision "shell" do |s|
-      s.path = "provision.sh"
-      s.args = "Ubuntu-precise True #{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -200,7 +136,7 @@ Vagrant.configure('2') do |config|
       aws.secret_access_key = AWS_ACCESS_KEY
 
       # unofficial centos6.4 64bit box
-      aws.ami = "ami-85dbbef2"
+      aws.ami = "ami-3b39ee4c"
       aws.region = "eu-west-1"
       aws.instance_type = "m3.medium"
 
@@ -218,7 +154,7 @@ Vagrant.configure('2') do |config|
     centos_final.vm.synced_folder "../../", "/cloudify-packager", create: true, type: "rsync", rsync__exclude: ".git/"
     centos_final.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "centos-Final"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -265,7 +201,7 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "debian-jessie"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -278,20 +214,7 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-precise"
-      s.privileged = false
-    end
-  end
-  config.vm.define :ubuntu_precise_commercial do |local|
-    local.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', '1024']
-    end
-    local.vm.box = UBUNTU_PRECISE_BOX_NAME
-    local.vm.hostname = 'local'
-    local.vm.synced_folder "../../", "/cloudify-packager", create: true
-    local.vm.provision "shell" do |s|
-      s.path = "provision.sh"
-      s.args = "Ubuntu-precise True #{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -304,20 +227,7 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "Ubuntu-trusty"
-      s.privileged = false
-    end
-  end
-  config.vm.define :ubuntu_trusty_commercial do |local|
-    local.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', '1024']
-    end
-    local.vm.box = UBUNTU_TRUSTY_BOX_NAME
-    local.vm.hostname = 'local'
-    local.vm.synced_folder "../../", "/cloudify-packager", create: true
-    local.vm.provision "shell" do |s|
-      s.path = "provision.sh"
-      s.args = "Ubuntu-trusty True #{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
@@ -330,7 +240,7 @@ Vagrant.configure('2') do |config|
     local.vm.synced_folder "../../", "/cloudify-packager", create: true
     local.vm.provision "shell" do |s|
       s.path = "provision.sh"
-      s.args = "centos-Final"
+      s.args = "#{GITHUB_USERNAME} #{GITHUB_PASSWORD}"
       s.privileged = false
     end
   end
