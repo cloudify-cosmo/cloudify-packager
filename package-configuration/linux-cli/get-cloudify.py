@@ -264,11 +264,11 @@ class CloudifyInstaller():
         self.installpycrypto = installpycrypto
 
         if not IS_WIN and self.installpycrypto:
-            lgr.error('Pycrypto installation only relevant on Windows.')
-            sys.exit(1)
+            lgr.warning(
+                'Pycrypto installation only relevant on Windows.')
         if not (IS_LINUX or IS_DARWIN) and self.installpythondev:
-            lgr.error('Pythondev installation only relevant on Linux or OS x.')
-            sys.exit(1)
+            lgr.warning(
+                'Pythondev installation only relevant on Linux or OS x.')
         os_props = get_os_props()
         self.distro = os_distro or os_props[0].lower()
         self.release = os_release or os_props[1].lower()
