@@ -483,7 +483,7 @@ def parse_args(args=None):
     if IS_WIN:
         parser.add_argument(
             '--pythonpath', type=str, default='c:/python27/python.exe',
-            help='Python path to use (defaults to "python") '
+            help='Python path to use (defaults to "c:/python27/python.exe") '
                  'when creating a virtualenv.')
     else:
         parser.add_argument(
