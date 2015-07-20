@@ -29,6 +29,9 @@ RUN echo installing rabbitmq dependencies && \
     apt-get -y install rabbitmq-server && \
     rabbitmq-plugins enable rabbitmq_management && \
     rabbitmq-plugins enable rabbitmq_tracing && \
+    rabbitmqctl add_user "cloudify" "c10udify" && \
+    rabbitmqctl set_permissions cloudify '.*' '.*' '.*' && \
+    rabbitmqctl delete_user guest && \
     \
     echo granting exec permissions && \
     chmod +x $RABBITMQ_RUN_FILE
