@@ -123,8 +123,14 @@ VARS = {
             "python2.7"
         ],
         "modules": {
+            # all these modules are only installed so we could eventually use plugin installation code
+            # from cloudify-agent
             "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",
             "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",
+            "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
+            "cloudify_diamond_plugin": "git+git://github.com/cloudify-cosmo/cloudify-diamond-plugin.git@master",
+            "cloudify_agent": "git+git://github.com/cloudify-cosmo/cloudify-agent.git@master",
+
             "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",
             "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",
             "flask_securest": "git+git://github.com/cloudify-cosmo/flask-securest.git@0.6",
