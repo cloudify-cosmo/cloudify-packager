@@ -52,6 +52,7 @@ import struct
 import tempfile
 import logging
 import time
+import shutil
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -301,12 +302,15 @@ class CloudifyInstaller():
         get_pip_path = os.path.join(tempdir, 'get-pip.py')
         try:
             download_file(PIP_URL, get_pip_path)
+            result = run('{0} {1}'.format(self.args.pythonpath, get_pip_path))
+            if not result.returncode == 0:
+                sys.exit('Could not install pip')
         except StandardError as e:
             sys.exit('Failed downloading pip from {0}. reason: {1}'.format(
                      PIP_URL, e.message))
-        result = run('{0} {1}'.format(self.args.pythonpath, get_pip_path))
-        if not result.returncode == 0:
-            sys.exit('Could not install pip')
+        finally:
+            lgr.debug('Removing pip installer...')
+            shutil.rmtree(tempdir)
 
     def install_pythondev(self):
         """Installs python-dev and gcc
