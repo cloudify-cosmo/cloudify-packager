@@ -197,12 +197,8 @@ class TestCliPackage(TestCase):
         self._execute_command('rpm -i {0}'.format(package_name), sudo=True)
 
     def change_to_tarzan_urls(self):
-        self._execute_command(
-            'sed -i \'s/http:\/\/gigaspaces-repository-eu.s3'
-            '.amazonaws.com\/org/http:\/\/tarzan\/builds\/Giga'
-            'SpacesBuilds/g\' {0}'.format(
-                self.test_openstack_manager_blueprint_path), sudo=True)
-
+        pass
+    
     def prepare_manager_blueprint(self):
         self.manager_blueprints_repo_dir = '{0}/cloudify-manager-blueprints' \
                                            '-commercial/' \
