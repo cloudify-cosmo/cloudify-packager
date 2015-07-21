@@ -198,7 +198,7 @@ class TestCliPackage(TestCase):
 
     def change_to_tarzan_urls(self):
         pass
-    
+
     def prepare_manager_blueprint(self):
         self.manager_blueprints_repo_dir = '{0}/cloudify-manager-blueprints' \
                                            '-commercial/' \
