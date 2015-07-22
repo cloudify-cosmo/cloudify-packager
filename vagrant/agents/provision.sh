@@ -109,8 +109,8 @@ AGENT=$1
 COMMERCIAL=$2
 GITHUB_USERNAME=$3
 GITHUB_PASSWORD=$4
-CORE_TAG_NAME="master"
-PLUGINS_TAG_NAME="master"
+CORE_TAG_NAME="3.2.1"
+PLUGINS_TAG_NAME="3.2.1"
 
 #install_prereqs &&
 #install_ruby
