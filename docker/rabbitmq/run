@@ -2,7 +2,7 @@
 # description "RabbitMQ-Server"
 #
 username="cloudify"
-password="c10udyfy"
+password="c10udify"
 
 command_exists() {
     command -v "$@" > /dev/null 2>&1
