@@ -1,4 +1,54 @@
 #!/bin/bash
 # description "RabbitMQ-Server"
 #
+username="cloudify"
+password="c10udyfy"
+
+command_exists() {
+    command -v "$@" > /dev/null 2>&1
+}
+
+# wait for rabbitmq-server to be avaliable. timeout after ~5 seconds and quit
+wait_for_rabbitmq() {
+    for i in {1..50}; do
+        if rabbitmqctl list_users > /dev/null 2>&1; then
+            return 0
+        else
+            sleep 0.1
+        fi
+    done
+    return 1
+}
+
+wait_rabbitmq_exited() {
+    for i in {1..50}; do
+        if ! pgrep -u rabbitmq > /dev/null 2>&1; then
+            return 0
+        else
+            sleep 0.1
+        fi
+    done
+    return 1
+}
+
+if command_exists rabbitmqctl && command_exists rabbitmq-server; then
+    printf "starting rabbitmq in detached mode..\n"
+    rabbitmq-server -detached
+    wait_for_rabbitmq || exit 1
+    if ! rabbitmqctl list_users | grep -qw $username; then
+        printf "$username user not found, creating\n"
+        rabbitmqctl add_user "$username" "$password" > /dev/null 2>&1
+        rabbitmqctl set_permissions cloudify '.*' '.*' '.*' > /dev/null 2>&1
+        rabbitmqctl delete_user guest > /dev/null 2>&1
+    else
+        printf "$username user already exists\n"
+    fi
+    pkill -u rabbitmq
+else
+    printf "Error: rabbitmqctl or rabbitmq-server not found in PATH\n"
+    exit 1
+fi
+
+printf "starting rabbitmq-server..\n"
+wait_rabbitmq_exited || exit 1
 rabbitmq-server
