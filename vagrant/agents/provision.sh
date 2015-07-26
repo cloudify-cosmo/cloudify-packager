@@ -135,6 +135,8 @@ elif [ "${AGENT}" == "Ubuntu-precise" ]; then
 	AGENT_VENV="/Ubuntu-agent/env"
 elif [ "${AGENT}" == "centos-Final" ]; then
 	AGENT_VENV="/centos-agent/env"
+elif [ "${AGENT}" == "centos-Core" ]; then
+	AGENT_VENV="/centos-agent/env"
 elif [ "${AGENT}" == "debian-jessie" ]; then
 	AGENT_VENV="/debian-agent/env"
 fi
