@@ -1,15 +1,17 @@
-#!/bin/bash
-# now modify sudoers configuration to allow execution without tty
-grep -i ubuntu /proc/version > /dev/null
+ #!/bin/bash
+ # now modify sudoers configuration to allow execution without tty
+
+grep -i centos /proc/version > /dev/null
 if [ "$?" -eq "0" ]; then
-    # ubuntu
-    echo Running on Ubuntu
+
+    # centos
+    echo Running on Centos
     if sudo grep -q -E '[^!]requiretty' /etc/sudoers; then
         echo creating sudoers user file
         echo "Defaults:`whoami` !requiretty" | sudo tee /etc/sudoers.d/`whoami` >/dev/null
         sudo chmod 0440 /etc/sudoers.d/`whoami`
     else
-        echo No requiretty directive found, nothing to do
+       echo No requiretty directive found, nothing to do
     fi
 else
     # other - modify sudoers file
@@ -19,3 +21,4 @@ else
     echo Setting privileged mode
     sudo sed -i 's/^Defaults.*requiretty/#&/g' /etc/sudoers || error_exit_on_level $? 117 "Failed to edit sudoers file to disable requiretty directive" 1
 fi
+echo "Defaults:`whoami` !requiretty" | sudo tee /etc/sudoers.d/`whoami` >/dev/null

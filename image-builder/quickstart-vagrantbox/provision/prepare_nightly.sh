@@ -15,7 +15,7 @@ sudo dpkg-reconfigure -f noninteractive cloud-init
 echo manual | sudo tee /etc/init/ttyS0.override
 
 # install guest additions
-sudo apt-get install -y module-assistant
+sudo apt-get install -y dkms module-assistant
 sudo m-a -i prepare
 wget http://download.virtualbox.org/virtualbox/4.3.20/VBoxGuestAdditions_4.3.20.iso
 sudo mkdir -p /mnt/iso
