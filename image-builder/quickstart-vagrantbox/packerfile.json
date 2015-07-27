@@ -61,7 +61,7 @@
     },
     {
        "type": "shell",
-       "infline": ["sudo reboot"],
+       "inline": ["sudo reboot"],
        "only": ["nightly_virtualbox_build"]
     },
     {
