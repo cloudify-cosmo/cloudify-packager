@@ -141,7 +141,7 @@ elif [ "${AGENT}" == "centos-Core" ]; then
 	install_prereqs &&
 	install_ruby
 	install_fpm &&
-	install_pip &&
+	install_pip
 elif [ "${AGENT}" == "debian-jessie" ]; then
 	AGENT_VENV="/debian-agent/env"
 fi
