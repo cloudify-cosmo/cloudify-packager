@@ -117,6 +117,7 @@ PLUGINS_TAG_NAME="3.2.1"
 #install_fpm &&
 #install_pip &&
 install_module "packman==0.5.0" &&
+echo 'installing venv'
 install_module "virtualenv==12.0.7" &&
 
 cd /cloudify-packager/ &&
@@ -137,11 +138,15 @@ elif [ "${AGENT}" == "centos-Final" ]; then
 	AGENT_VENV="/centos-agent/env"
 elif [ "${AGENT}" == "centos-Core" ]; then
 	AGENT_VENV="/centos-agent/env"
+	install_prereqs &&
+	install_ruby
+	install_fpm &&
+	install_pip &&
 elif [ "${AGENT}" == "debian-jessie" ]; then
 	AGENT_VENV="/debian-agent/env"
 fi
 install_module "celery==3.1.17" "${AGENT_VENV}" &&
-install_module "pyzmq==14.4.0" "${AGENT_VENV}" &&
+install_module "pyzmq==14.4.0" "${AGENT_VENV}"
 install_module "cloudify-rest-client" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 install_module "cloudify-plugins-common" "${AGENT_VENV}" "${CORE_TAG_NAME}" &&
 install_module "cloudify-script-plugin" "${AGENT_VENV}" "${PLUGINS_TAG_NAME}" &&
