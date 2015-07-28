@@ -21,5 +21,6 @@ pip install packman==0.5.0
 # clone custom packager branch containing package config
 git clone https://github.com/cloudify-cosmo/cloudify-packager.git
 cd cloudify-packager/
+git checkout 3.2.1-build
 
 pkm pack -c cloudify-centos-agent
