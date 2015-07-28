@@ -4,7 +4,7 @@
 echo downloading and preparing agent packages
 
 curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.1/ga-RELEASE/cloudify-centos-final-agent_3.2.1-ga-b212_amd64.deb --create-dirs -o /opt/tmp/manager/centos_final_agent.deb && \
-curl --create-dirs -o /opt/tmp/manager/centos_core_agent.deb && \
+curl http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.1/ga-RELEASE/cloudify-centos-core-agent_3.2.1-ga-b212_amd64.deb --create-dirs -o /opt/tmp/manager/centos_core_agent.deb && \
 
 mkdir -p /tmp/centos-agent/ && \
 dpkg-deb -x /opt/tmp/manager/centos_final_agent.deb /opt/tmp/manager/final && \
