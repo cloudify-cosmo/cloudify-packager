@@ -56,7 +56,7 @@ function install_ruby
 
 function install_fpm
 {
-    sudo gem install fpm --no-ri --no-rdoc
+    sudo gem install fpm -v 1.3.3 --no-ri --no-rdoc
     sudo which fpm
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
