@@ -80,11 +80,11 @@ class CliInstallTests(testtools.TestCase):
         finally:
             shutil.rmtree(tempdir)
 
-    def test_cli_installed_and_no_upgrade(self):
+    def test_cli_installed_and_upgrade(self):
         tempdir = tempfile.mkdtemp()
         install_args = {
             'virtualenv': tempdir,
-            'upgrade': False
+            'upgrade': True
         }
 
         try:
