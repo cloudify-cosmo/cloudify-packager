@@ -127,7 +127,7 @@ def init_logger(logger_name):
     return logger
 
 
-def run(cmd):
+def run(cmd, suppress_errors=False):
     """Executes a command
     """
     lgr.debug('Executing: {0}...'.format(cmd))
@@ -147,7 +147,7 @@ def run(cmd):
     if len(output) > 0:
         lgr.debug(output)
     proc.aggr_stderr = proc.stderr.read()
-    if len(proc.aggr_stderr) > 0:
+    if len(proc.aggr_stderr) > 0 and not suppress_errors:
         lgr.error(proc.aggr_stderr)
     return proc
 
@@ -425,8 +425,10 @@ class CloudifyInstaller():
 
 def check_cloudify_installed(virtualenv_path=None):
     if virtualenv_path:
-        result = run(os.path.join(_get_env_bin_path(virtualenv_path),
-                                  'python -c "import cloudify"'))
+        result = run(
+            os.path.join(_get_env_bin_path(virtualenv_path),
+                         'python -c "import cloudify"'),
+            suppress_errors=True)
         return result.returncode == 0
     else:
         try:
