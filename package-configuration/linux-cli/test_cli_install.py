@@ -79,12 +79,12 @@ class CliInstallTests(testtools.TestCase):
             self.get_cloudify.handle_upgrade(**install_args)
         finally:
             shutil.rmtree(tempdir)
-
-    def test_cli_installed_and_upgrade(self):
+            
+    def test_cli_installed_and_no_upgrade(self):
         tempdir = tempfile.mkdtemp()
         install_args = {
             'virtualenv': tempdir,
-            'upgrade': True
+            'upgrade': False
         }
 
         try:
