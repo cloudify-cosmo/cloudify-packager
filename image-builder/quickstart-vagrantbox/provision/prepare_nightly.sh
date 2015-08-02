@@ -1,7 +1,9 @@
 #!/bin/bash
 
+# update apt cache
+sudo apt-get update
+
 # change partition uuid
-sudo apt-get -f -y install
 sudo apt-get install -y uuid
 sudo tune2fs /dev/xvda1 -U `uuid`
 
