@@ -3,8 +3,8 @@ export PLUGINS_TAG_NAME="master"
 
 pip install wheel
 
-pip wheel --wheel-dir packaging/source/wheels --requirement https://raw.githubusercontent.com/cloudify-cosmo/cloudify-agent/CFY-2649-cloudify-agent/dev-requirements.txt
-pip wheel --find-links packaging/source/wheels --wheel-dir packaging/source/wheels https://github.com/cloudify-cosmo/cloudify-agent/archive/CFY-2649-cloudify-agent.zip
+pip wheel --wheel-dir packaging/source/wheels --requirement "https://raw.githubusercontent.com/cloudify-cosmo/cloudify-agent/$CORE_TAG_NAME/dev-requirements.txt"
+pip wheel --find-links packaging/source/wheels --wheel-dir packaging/source/wheels "https://github.com/cloudify-cosmo/cloudify-agent/archive/$CORE_TAG_NAME.zip"
 
 export VERSION=`ls packaging/source/wheels/cloudify_agent-* | cut -d"-" -f2`
 
