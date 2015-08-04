@@ -51,13 +51,16 @@ import urllib
 import struct
 import tempfile
 import logging
-import time
 import shutil
+import time
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
 Windows (with Python32 AND 64), and OS X (Darwin).
 On the linux front, it supports Debian/Ubuntu, CentOS/RHEL and Arch.
+
+Note that the script attempts to not be instrusive by forcing the user
+to explicitly declare installation of various dependencies.
 
 Installations are supported for both system python, the currently active
 virtualenv and a declared virtualenv (using the --virtualenv flag).
@@ -86,25 +89,30 @@ Also note, that if you're running with sudo and you have an active virtualenv,
 much like any other python script, the installation will occur in the system
 python.
 
-A --nodrop flag can be supplied (If not on Windows) so that you can choose
-to not drop root privileges at all.
-
 By default, the script assumes that the Python executable is in the
-path and is called 'Python' on Linux and 'c:\python27\python.exe on Windows.
+path and is called 'python' on Linux and 'c:\python27\python.exe on Windows.
 The Python path can be overriden by using the --pythonpath flag.
 
 Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
 
-OS = 'linux'
-IS_VIRTUALENV = False
-DISTRO = ''
-IS_PYX32 = False
-ENV_BIN_RELATIVE_PATH = ''
+IS_VIRTUALENV = hasattr(sys, 'real_prefix')
+
+
 # TODO: put these in a private storage
 PIP_URL = 'https://bootstrap.pypa.io/get-pip.py'
 PYCR64_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win-amd64-py2.7.exe'  # NOQA
 PYCR32_URL = 'http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win32-py2.7.exe'  # NOQA
+
+PLATFORM = sys.platform
+IS_WIN = (PLATFORM == 'win32')
+IS_DARWIN = (PLATFORM == 'darwin')
+IS_LINUX = (PLATFORM == 'linux2')
+# defined below
+lgr = None
+
+if not (IS_LINUX or IS_DARWIN or IS_WIN):
+    sys.exit('Platform {0} not supported.'.format(PLATFORM))
 
 
 def init_logger(logger_name):
@@ -119,7 +127,7 @@ def init_logger(logger_name):
     return logger
 
 
-def run(cmd):
+def run(cmd, suppress_errors=False):
     """Executes a command
     """
     lgr.debug('Executing: {0}...'.format(cmd))
@@ -133,21 +141,15 @@ def run(cmd):
         proc.aggr_stdout += output
         if len(output) > 0:
             lgr.debug(output)
-        time.sleep(0.5)
+        time.sleep(0.2)
     output = proc.stdout.readline()
     proc.aggr_stdout += output
     if len(output) > 0:
         lgr.debug(output)
     proc.aggr_stderr = proc.stderr.read()
-    if len(proc.aggr_stderr) > 0:
+    if len(proc.aggr_stderr) > 0 and not suppress_errors:
         lgr.error(proc.aggr_stderr)
     return proc
-
-
-def is_root():
-    """Check if running as root
-    """
-    return os.getuid() == 0
 
 
 def drop_root_privileges():
@@ -159,7 +161,7 @@ def drop_root_privileges():
     install in the system Python or using a Sudoer.
     """
     # maybe we're not root
-    if not is_root():
+    if not os.getuid() == 0:
         return
 
     lgr.info('Dropping root permissions...')
@@ -170,7 +172,7 @@ def drop_root_privileges():
 def make_virtualenv(virtualenv_dir, python_path):
     """This will create a virtualenv. If no `python_path` is supplied,
     will assume that `python` is in path. This default assumption is provided
-    with the argument parser.
+    via the argument parser.
     """
     lgr.info('Creating Virtualenv {0}...'.format(virtualenv_dir))
     result = run('virtualenv -p {0} {1}'.format(python_path, virtualenv_dir))
@@ -180,35 +182,35 @@ def make_virtualenv(virtualenv_dir, python_path):
 
 def install_module(module, version=False, pre=False, virtualenv_path=False,
                    wheelspath=False, upgrade=False):
-    """This will install a module.
+    """This will install a Python module.
+
     Can specify a specific version.
     Can specify a prerelease.
     Can specify a virtualenv to install in.
     Can specify a local wheelspath to use for offline installation.
-    In a Windows envrinoment, a virtualenv bin dir would be declared under
-    'VIRTUALENV\\scripts\\'.
+    Can request an upgrade.
     """
     lgr.info('Installing {0}...'.format(module))
-    if version:
-        module = '{0}=={1}'.format(module, version)
     pip_cmd = 'pip install {0}'.format(module)
-    if wheelspath:
-        pip_cmd = '{0} --use-wheel --no-index --find-links={1}'.format(
-            pip_cmd, wheelspath)
-    if pre:
-        pip_cmd = '{0} --pre'.format(pip_cmd)
-    if upgrade:
-        pip_cmd = '{0} --upgrade'.format(pip_cmd)
     if virtualenv_path:
-        pip_cmd = os.path.join(virtualenv_path, ENV_BIN_RELATIVE_PATH, pip_cmd)
+        pip_cmd = os.path.join(
+            _get_env_bin_path(virtualenv_path), pip_cmd)
+    if version:
+        pip_cmd = '{0}=={1}'.format(pip_cmd, version)
+    pip_cmd = [pip_cmd]
+    if wheelspath:
+        pip_cmd.append('--use-wheel --no-index --find-links={0}'.format(
+            wheelspath))
+    if pre:
+        pip_cmd.append('--pre')
+    if upgrade:
+        pip_cmd.append('--upgrade')
     if IS_VIRTUALENV and not virtualenv_path:
-        lgr.info('Installing within current virtualenv: {0}'.format(
+        lgr.info('Installing within current virtualenv: {0}...'.format(
             IS_VIRTUALENV))
-    # sudo will be used only when not installing into a virtualenv and sudo
-    # is enabled
-    result = run(pip_cmd)
+    result = run(' '.join(pip_cmd))
     if not result.returncode == 0:
-        sys.exit('Could not install module: {0}'.format(module))
+        sys.exit('Could not install module: {0}.'.format(module))
 
 
 def download_file(url, destination):
@@ -221,112 +223,178 @@ def download_file(url, destination):
 
 
 def get_os_props():
-    distro_info = platform.linux_distribution(full_distribution_name=False)
-    os = platform.system()
-    distro = distro_info[0]
-    release = distro_info[2]
-    return os, distro, release
+    distro, _, release = platform.linux_distribution(
+        full_distribution_name=False)
+    return distro, release
+
+
+def _get_env_bin_path(env_path):
+    """returns the bin path for a virtualenv
+    """
+    try:
+        import virtualenv
+        return virtualenv.path_locations(env_path)[3]
+    except ImportError:
+        # this is a fallback for a race condition in which you're trying
+        # to use the script and create a virtualenv from within
+        # a virtualenv in which virtualenv isn't installed and so
+        # is not importable.
+        return os.path.join(env_path, 'scripts' if IS_WIN else 'bin')
 
 
 class CloudifyInstaller():
-    def __init__(self, args):
-        self.args = args
+    def __init__(self, force=False, upgrade=False, virtualenv='',
+                 version='', pre=False, source='', forceonline=False,
+                 wheelspath='wheelhouse', pythonpath='python',
+                 installpip=False, installvirtualenv=False,
+                 installpythondev=False, installpycrypto=False,
+                 os_distro=None, os_release=None):
+        self.force = force
+        self.upgrade = upgrade
+        self.virtualenv = virtualenv
+        self.version = version
+        self.pre = pre
+        self.source = source
+        self.force_online = forceonline
+        self.wheels_path = wheelspath
+        self.python_path = pythonpath
+        self.installpip = installpip
+        self.installvirtualenv = installvirtualenv
+        self.installpythondev = installpythondev
+        self.installpycrypto = installpycrypto
+
+        if not IS_WIN and self.installpycrypto:
+            lgr.warning(
+                'Pycrypto installation only relevant on Windows.')
+        if not (IS_LINUX or IS_DARWIN) and self.installpythondev:
+            lgr.warning(
+                'Pythondev installation only relevant on Linux or OS x.')
+        os_props = get_os_props()
+        self.distro = os_distro or os_props[0].lower()
+        self.release = os_release or os_props[1].lower()
 
     def execute(self):
         """Installation Logic
+
         --force argument forces installation of all prerequisites.
         If a wheels directory is found, it will be used for offline
         installation unless explicitly prevented using the --forceonline flag.
         If an offline installation fails (for instance, not all wheels were
         found), an online installation process will commence.
         """
-        module = self.args.source or 'cloudify'
+        lgr.debug('Identified Platform: {0}'.format(PLATFORM))
+        lgr.debug('Identified Distribution: {0}'.format(self.distro))
+        lgr.debug('Identified Release: {0}'.format(self.release))
 
-        if self.args.force or self.args.installpip:
+        module = self.source or 'cloudify'
+
+        if self.force or self.installpip:
             self.install_pip()
 
-        if self.args.virtualenv and (
-                self.args.force or self.args.installvirtualenv):
-            self.install_virtualenv()
+        if self.virtualenv:
+            if self.force or self.installvirtualenv:
+                self.install_virtualenv()
+            env_bin_path = _get_env_bin_path(self.virtualenv)
 
-        # TODO: check if self.args hasattr installpythondev instead.
-        if OS == 'linux' and (self.args.force or self.args.installpythondev):
-            self.install_pythondev()
-        if (IS_VIRTUALENV or self.args.virtualenv) \
-                and not OS == 'windows' and not self.args.nodrop:
+        if IS_LINUX and (self.force or self.installpythondev):
+            self.install_pythondev(self.distro)
+        if (IS_VIRTUALENV or self.virtualenv) and not IS_WIN:
             # drop root permissions so that installation is done using the
             # current user.
             drop_root_privileges()
-        if self.args.virtualenv:
+        if self.virtualenv:
             if not os.path.isfile(os.path.join(
-                    self.args.virtualenv, ENV_BIN_RELATIVE_PATH,
-                    ('activate.exe' if OS == 'windows' else 'activate'))):
-                make_virtualenv(self.args.virtualenv, self.args.pythonpath)
-        # TODO: check if self.args hasattr installpycrypto instead.
+                    env_bin_path, ('activate.bat' if IS_WIN else 'activate'))):
+                make_virtualenv(self.virtualenv, self.python_path)
 
-        if OS == 'windows' and (self.args.force or self.args.installpycrypto):
-            self.install_pycrypto(self.args.virtualenv)
+        if IS_WIN and (self.force or self.installpycrypto):
+            self.install_pycrypto(self.virtualenv)
 
-        if self.args.forceonline or not os.path.isdir(self.args.wheelspath):
-            install_module(module, self.args.version, self.args.pre,
-                           self.args.virtualenv)
-        elif os.path.isdir(self.args.wheelspath):
+        if self.force_online or not os.path.isdir(self.wheels_path):
+            install_module(module, self.version, self.pre,
+                           self.virtualenv)
+        elif os.path.isdir(self.wheels_path):
             lgr.info('Wheels directory found: "{0}". '
                      'Attemping offline installation...'.format(
-                         self.args.wheelspath))
+                         self.wheels_path))
             try:
                 install_module(module, pre=True,
-                               virtualenv_path=self.args.virtualenv,
-                               wheelspath=self.args.wheelspath,
-                               upgrade=self.args.upgrade)
+                               virtualenv_path=self.virtualenv,
+                               wheelspath=self.wheels_path,
+                               upgrade=self.upgrade)
             except Exception as ex:
                 lgr.warning('Offline installation failed ({0}).'.format(
                     ex.message))
-                install_module(module, self.args.version,
-                               self.args.pre, self.args.virtualenv,
-                               self.args.upgrade)
+                install_module(module, self.version,
+                               self.pre, self.virtualenv,
+                               self.upgrade)
+        if self.virtualenv:
+            activate_path = os.path.join(env_bin_path, 'activate')
+            if IS_WIN:
+                lgr.info('You can now run: "{0}.bat" to activate '
+                         'the Virtualenv.'.format(activate_path))
+            else:
+                lgr.info('You can now run: "source {0}" to activate '
+                         'the Virtualenv.'.format(activate_path))
+
+    @staticmethod
+    def find_virtualenv():
+        try:
+            import virtualenv  # NOQA
+            return True
+        except:
+            return False
 
     def install_virtualenv(self):
-        # TODO: use `install_module` function instead.
-        lgr.info('Installing virtualenv...')
-        result = run('pip install virtualenv')
-        if not result.returncode == 0:
-            sys.exit('Could not install Virtualenv.')
+        if not self.find_virtualenv():
+            lgr.info('Installing virtualenv...')
+            install_module('virtualenv')
+        else:
+            lgr.info('virtualenv is already installed in the path.')
+
+    @staticmethod
+    def find_pip():
+        try:
+            import pip  # NOQA
+            return True
+        except:
+            return False
 
     def install_pip(self):
         lgr.info('Installing pip...')
-        # TODO: check below to see if pip already exists
-        # import distutils
-        # if not distutils.spawn.find_executable('pip'):
-        tempdir = tempfile.mkdtemp()
-        get_pip_path = os.path.join(tempdir, 'get-pip.py')
-        try:
-            download_file(PIP_URL, get_pip_path)
-            result = run('{0} {1}'.format(self.args.pythonpath, get_pip_path))
-            if not result.returncode == 0:
-                sys.exit('Could not install pip')
-        except StandardError as e:
-            sys.exit('Failed downloading pip from {0}. reason: {1}'.format(
-                     PIP_URL, e.message))
-        finally:
-            lgr.debug('Removing pip installer...')
-            shutil.rmtree(tempdir)
+        if not self.find_pip():
+            try:
+                tempdir = tempfile.mkdtemp()
+                get_pip_path = os.path.join(tempdir, 'get-pip.py')
+                try:
+                    download_file(PIP_URL, get_pip_path)
+                except StandardError as e:
+                    sys.exit('Failed downloading pip from {0}. ({1})'.format(
+                             PIP_URL, e.message))
+                result = run('{0} {1}'.format(
+                    self.python_path, get_pip_path))
+                if not result.returncode == 0:
+                    sys.exit('Could not install pip')
+            finally:
+                shutil.rmtree(tempdir)
+        else:
+            lgr.info('pip is already installed in the path.')
 
-    def install_pythondev(self):
+    def install_pythondev(self, distro):
         """Installs python-dev and gcc
 
-        This will try to match a command for your distribution.
+        This will try to match a command for your platform and distribution.
         """
         lgr.info('Installing python-dev...')
-        if DISTRO in ('ubuntu', 'debian'):
+        if distro in ('ubuntu', 'debian'):
             cmd = 'apt-get install -y gcc python-dev'
-        elif DISTRO in ('centos', 'redhat'):
+        elif distro in ('centos', 'redhat', 'fedora'):
             cmd = 'yum -y install gcc python-devel'
         elif os.path.isfile('/etc/arch-release'):
             # Arch doesn't require a python-dev package.
             # It's already supplied with Python.
             cmd = 'pacman -S gcc --noconfirm'
-        elif OS == 'darwin':
+        elif IS_DARWIN:
             lgr.info('python-dev package not required on Darwin.')
             return
         else:
@@ -335,33 +403,33 @@ class CloudifyInstaller():
         run(cmd)
 
     # Windows only
-    def install_pycrypto(self, venv):
+    def install_pycrypto(self, virtualenv_path):
         """This will install PyCrypto to be used by Fabric.
         PyCrypto isn't compiled with Fabric on Windows by default thus it needs
         to be provided explicitly.
         It will attempt to install the 32 or 64 bit version according to the
         Python version installed.
         """
+        # check 32/64bit to choose the correct PyCrypto installation
+        is_pyx32 = True if struct.calcsize("P") == 4 else False
+
         lgr.info('Installing PyCrypto {0}bit...'.format(
-            '32' if IS_PYX32 else '64'))
+            '32' if is_pyx32 else '64'))
         # easy install is used instead of pip as pip doesn't handle windows
         # executables.
-        cmd = 'easy_install {0}'.format(PYCR32_URL if IS_PYX32 else PYCR64_URL)
-        if venv:
-            # why not use join on all 3 parameters? hmm...
-            # there was a problem here.
-            cmd = os.path.join(venv, ENV_BIN_RELATIVE_PATH, cmd)
-            # cmd = '{0}\\{1}'.format(os.path.join(venv, 'scripts'), cmd)
+        cmd = 'easy_install {0}'.format(PYCR32_URL if is_pyx32 else PYCR64_URL)
+        if virtualenv_path:
+            cmd = os.path.join(_get_env_bin_path(virtualenv_path), cmd)
         run(cmd)
 
 
 def check_cloudify_installed(virtualenv_path=None):
     if virtualenv_path:
-        result = run(os.path.join(virtualenv_path, ENV_BIN_RELATIVE_PATH,
-                                  'python -c "import cloudify"'))
-        if result.returncode == 0:
-            return True
-        return False
+        result = run(
+            os.path.join(_get_env_bin_path(virtualenv_path),
+                         'python -c "import cloudify"'),
+            suppress_errors=True)
+        return result.returncode == 0
     else:
         try:
             import cloudify  # NOQA
@@ -370,8 +438,19 @@ def check_cloudify_installed(virtualenv_path=None):
             return False
 
 
+def handle_upgrade(upgrade=False, virtualenv=''):
+    if check_cloudify_installed(virtualenv):
+        lgr.info('Cloudify is already installed in the path.')
+        if upgrade:
+            lgr.info('Upgrading...')
+        else:
+            lgr.error('Use the --upgrade flag to upgrade.')
+            sys.exit(1)
+
+
 def parse_args(args=None):
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    parser = argparse.ArgumentParser(
+        description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter)
     default_group = parser.add_mutually_exclusive_group()
     version_group = parser.add_mutually_exclusive_group()
     online_group = parser.add_mutually_exclusive_group()
@@ -384,65 +463,57 @@ def parse_args(args=None):
         help='Force install any requirements (USE WITH CARE!).')
     parser.add_argument(
         '-e', '--virtualenv', type=str,
-        help='Path to a Virtualenv to install Cloudify in')
+        help='Path to a Virtualenv to install Cloudify in.')
     version_group.add_argument(
         '--version', type=str,
-        help='Attempt to install a specific version of Cloudify')
+        help='Attempt to install a specific version of Cloudify.')
     version_group.add_argument(
         '--pre', action='store_true',
-        help='Attempt to install the latest Cloudify Milestone')
+        help='Attempt to install the latest Cloudify Milestone.')
     version_group.add_argument(
         '-s', '--source', type=str,
-        help='Install from the provided URL or local path')
+        help='Install from the provided URL or local path.')
     parser.add_argument(
         '-u', '--upgrade', action='store_true',
-        help='Upgrades Cloudify.')
+        help='Upgrades Cloudify if already installed.')
     online_group.add_argument(
         '--forceonline', action='store_true',
         help='Even if wheels are found locally, install from PyPI.')
     online_group.add_argument(
         '--wheelspath', type=str, default='wheelhouse',
         help='Path to wheels (defaults to "<cwd>/wheelhouse").')
-    if OS == 'windows':
+    if IS_WIN:
         parser.add_argument(
             '--pythonpath', type=str, default='c:/python27/python.exe',
-            help='Python path to use (defaults to "python").')
+            help='Python path to use (defaults to "c:/python27/python.exe") '
+                 'when creating a virtualenv.')
     else:
         parser.add_argument(
-            '--nodrop', action='store_true',
-            help='Do not drop sudo permissions even when installing '
-                 'within a virtualenv.')
-        parser.add_argument(
             '--pythonpath', type=str, default='python',
-            help='Python path to use (defaults to "python").')
+            help='Python path to use (defaults to "python") '
+                 'when creating a virtualenv.')
     parser.add_argument(
         '--installpip', action='store_true',
-        help='Attempt to install pip')
+        help='Attempt to install pip.')
     parser.add_argument(
         '--installvirtualenv', action='store_true',
-        help='Attempt to install Virtualenv')
-    if OS == 'linux':
+        help='Attempt to install Virtualenv.')
+    if IS_LINUX:
         parser.add_argument(
             '--installpythondev', action='store_true',
-            help='Attempt to install Python Developers Package')
-    elif OS == 'windows':
+            help='Attempt to install Python Developers Package.')
+    elif IS_WIN:
         parser.add_argument(
             '--installpycrypto', action='store_true',
-            help='Attempt to install PyCrypto')
+            help='Attempt to install PyCrypto.')
     return parser.parse_args(args)
 
 
-def main():
-    global OS, DISTRO, RELEASE, IS_VIRTUALENV, \
-        IS_PYX32, ENV_BIN_RELATIVE_PATH, args
-    os_props = get_os_props()
-    OS = os_props[0].lower() if os_props[0] else 'Unknown'
-    DISTRO = os_props[1].lower() if os_props[1] else 'Unknown'
-    RELEASE = os_props[2].lower() if os_props[2] else 'Unknown'
-    if OS not in ('windows', 'linux', 'darwin'):
-        sys.exit('OS {0} not supported.'.format(OS))
-    args = parse_args()
+lgr = init_logger(__file__)
 
+
+if __name__ == '__main__':
+    args = parse_args()
     if args.quiet:
         lgr.setLevel(logging.ERROR)
     elif args.verbose:
@@ -450,44 +521,9 @@ def main():
     else:
         lgr.setLevel(logging.INFO)
 
-    lgr.debug('Identified OS: {0}'.format(OS))
-    lgr.debug('Identified Distribution: {0}'.format(DISTRO))
-    lgr.debug('Identified Release: {0}'.format(RELEASE))
-    # are we running within a virtualenv? This will potentially affect the
-    # destination installation directory
-    IS_VIRTUALENV = os.environ.get('VIRTUAL_ENV')
-    # check 32/64bit to choose the correct PyCrypto installation (windows only)
-    IS_PYX32 = True if struct.calcsize("P") == 4 else False
-    # need to check if os.path.join works as expected on windows when
-    # declaring these as it seems to provide some problems.
-    ENV_BIN_RELATIVE_PATH = 'scripts' if OS == 'windows' else 'bin'
+    handle_upgrade(args.upgrade, args.virtualenv)
 
-    if check_cloudify_installed(args.virtualenv):
-        lgr.info('Cloudify is already installed in the path.')
-        if args.upgrade:
-            lgr.info('Upgrading...')
-        else:
-            lgr.error('Use the --upgrade flag to upgrade.')
-            sys.exit(1)
-    else:
-        if args.upgrade:
-            lgr.error('Cloudify is not installed. '
-                      'Remove the --upgrade flag and try again.')
-            sys.exit(1)
-    installer = CloudifyInstaller(args)
+    xargs = ['quiet', 'verbose']
+    args = {arg: v for arg, v in vars(args).items() if arg not in xargs}
+    installer = CloudifyInstaller(**args)
     installer.execute()
-    if args.virtualenv:
-        activate_path = os.path.join(
-            args.virtualenv, ENV_BIN_RELATIVE_PATH, 'activate')
-        if OS == 'windows':
-            lgr.info('You can now run: "{0}.bat" to activate '
-                     'the Virtualenv.'.format(activate_path))
-        else:
-            lgr.info('You can now run: "source {0}" to activate '
-                     'the Virtualenv.'.format(activate_path))
-
-lgr = init_logger(__file__)
-
-
-if __name__ == '__main__':
-    main()
