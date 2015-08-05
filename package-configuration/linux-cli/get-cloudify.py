@@ -109,6 +109,9 @@ PLATFORM = sys.platform
 IS_WIN = (PLATFORM == 'win32')
 IS_DARWIN = (PLATFORM == 'darwin')
 IS_LINUX = (PLATFORM == 'linux2')
+
+PROCESS_POLLING_INTERVAL = 0.1
+
 # defined below
 lgr = None
 
@@ -135,18 +138,24 @@ def run(cmd, suppress_errors=False):
     pipe = subprocess.PIPE
     proc = subprocess.Popen(
         cmd, shell=True, stdout=pipe, stderr=pipe)
-    
-    stdout_thread = Thread(target=read_pipe, args=(proc.stdout, proc, lgr, logging.DEBUG))
-    stderr_thread = Thread(target=read_pipe, args=(proc.stderr, proc, lgr, logging.ERROR if not suppress_errors else logging.NOTSET))
-    
+
+    stderr_log_level = logging.NOTSET if suppress_errors else logging.ERROR
+
+    stdout_thread = PipeReader(proc.stdout, proc, lgr, logging.DEBUG)
+    stderr_thread = PipeReader(proc.stderr, proc, lgr, stderr_log_level)
+
     stdout_thread.start()
     stderr_thread.start()
-    
-    proc.wait()
-    
+
+    while proc.poll() is None:
+        time.sleep(PROCESS_POLLING_INTERVAL)
+
     stdout_thread.join()
     stderr_thread.join()
-    
+
+    proc.aggr_stdout = stdout_thread.aggr
+    proc.aggr_stderr = stderr_thread.aggr
+
     return proc
 
 
@@ -240,13 +249,23 @@ def _get_env_bin_path(env_path):
         return os.path.join(env_path, 'scripts' if IS_WIN else 'bin')
 
 
-def read_pipe(fd, proc, logger, log_level):
-    while proc.poll() is None:
-        output = fd.readline()
-        if len(output) > 0:
-            logger.log(log_level, output)
-        else:
-            time.sleep(0.1)
+class PipeReader(Thread):
+    def __init__(self, fd, proc, logger, log_level):
+        Thread.__init__(self)
+        self.fd = fd
+        self.proc = proc
+        self.logger = logger
+        self.log_level = log_level
+        self.aggr = ''
+
+    def run(self):
+        while self.proc.poll() is None:
+            output = self.fd.readline()
+            if len(output) > 0:
+                self.aggr += output
+                self.logger.log(self.log_level, output)
+            else:
+                time.sleep(PROCESS_POLLING_INTERVAL)
 
 
 class CloudifyInstaller():
