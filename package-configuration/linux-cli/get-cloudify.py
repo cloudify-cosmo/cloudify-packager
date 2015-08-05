@@ -53,6 +53,7 @@ import tempfile
 import logging
 import shutil
 import time
+from threading import Thread
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -134,21 +135,18 @@ def run(cmd, suppress_errors=False):
     pipe = subprocess.PIPE
     proc = subprocess.Popen(
         cmd, shell=True, stdout=pipe, stderr=pipe)
-    proc.aggr_stdout = ''
-    # while the process is still running, print output
-    while proc.poll() is None:
-        output = proc.stdout.readline()
-        proc.aggr_stdout += output
-        if len(output) > 0:
-            lgr.debug(output)
-        time.sleep(0.2)
-    output = proc.stdout.readline()
-    proc.aggr_stdout += output
-    if len(output) > 0:
-        lgr.debug(output)
-    proc.aggr_stderr = proc.stderr.read()
-    if len(proc.aggr_stderr) > 0 and not suppress_errors:
-        lgr.error(proc.aggr_stderr)
+    
+    stdout_thread = Thread(target=read_pipe, args=(proc.stdout, proc, lgr, logging.DEBUG))
+    stderr_thread = Thread(target=read_pipe, args=(proc.stderr, proc, lgr, logging.ERROR if not suppress_errors else logging.NOTSET))
+    
+    stdout_thread.start()
+    stderr_thread.start()
+    
+    proc.wait()
+    
+    stdout_thread.join()
+    stderr_thread.join()
+    
     return proc
 
 
@@ -240,6 +238,15 @@ def _get_env_bin_path(env_path):
         # a virtualenv in which virtualenv isn't installed and so
         # is not importable.
         return os.path.join(env_path, 'scripts' if IS_WIN else 'bin')
+
+
+def read_pipe(fd, proc, logger, log_level):
+    while proc.poll() is None:
+        output = fd.readline()
+        if len(output) > 0:
+            logger.log(log_level, output)
+        else:
+            time.sleep(0.1)
 
 
 class CloudifyInstaller():
