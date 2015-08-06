@@ -25,9 +25,6 @@ import tarfile
 
 get_cloudify = __import__("get-cloudify")
 
-cloudify_cli_url = \
-    'https://github.com/cloudify-cosmo/cloudify-cli/archive/master.tar.gz'
-
 
 class CliBuilderUnitTests(testtools.TestCase):
     """Unit tests for functions in get_cloudify.py"""
@@ -172,8 +169,7 @@ class CliBuilderUnitTests(testtools.TestCase):
         self.get_cloudify.download_file = get
         try:
             installer = self.get_cloudify.CloudifyInstaller()
-            req_list = installer._get_default_requirement_files(
-                cloudify_cli_url)
+            req_list = installer._get_default_requirement_files('null')
             self.assertEquals(len(req_list), 1)
             self.assertIn('dev-requirements.txt', req_list[0])
         finally:

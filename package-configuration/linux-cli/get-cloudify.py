@@ -236,7 +236,6 @@ def untar(archive, destination):
                      if os.path.basename(tarinfo.name)
                      in REQUIREMENT_FILE_NAMES]
         tar.extractall(path=destination, members=req_files)
-    # run('tar -xzvf {0} -C {1} --strip=1'.format(archive, destination))
 
 
 def download_file(url, destination):
