@@ -53,7 +53,7 @@ import tempfile
 import logging
 import shutil
 import time
-import tar
+import tarfile
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -135,8 +135,8 @@ def init_logger(logger_name):
     return logger
 
 
-def run(cmd):
-    """Executes a command.
+def run(cmd, suppress_errors=False):
+    """Executes a command
     """
     lgr.debug('Executing: {0}...'.format(cmd))
     pipe = subprocess.PIPE
@@ -155,7 +155,7 @@ def run(cmd):
         proc.aggr_stdout += output
         lgr.debug(output)
     proc.aggr_stderr = proc.stderr.read()
-    if len(proc.aggr_stderr) > 0:
+    if len(proc.aggr_stderr) > 0 and not suppress_errors:
         lgr.error(proc.aggr_stderr)
     return proc
 
@@ -231,8 +231,11 @@ def untar(archive, destination):
     """This will extract a tar.gz archive and extract it while stripping
     the parents directory within the archive.
     """
-    tar.open(name=archive)
-    tar.extractall(path=destination)
+    with tarfile.open(name=archive) as tar:
+        req_files = [tarinfo for tarinfo in tar.getmembers()
+                     if os.path.basename(tarinfo.name)
+                     in REQUIREMENT_FILE_NAMES]
+        tar.extractall(path=destination, members=req_files)
     # run('tar -xzvf {0} -C {1} --strip=1'.format(archive, destination))
 
 
@@ -246,9 +249,8 @@ def download_file(url, destination):
 
 
 def get_os_props():
-    distro_info = platform.linux_distribution(full_distribution_name=False)
-    distro = distro_info[0]
-    release = distro_info[2]
+    distro, _, release = platform.linux_distribution(
+        full_distribution_name=False)
     return distro, release
 
 
@@ -259,7 +261,7 @@ def _get_env_bin_path(env_path):
         import virtualenv
         return virtualenv.path_locations(env_path)[3]
     except ImportError:
-        # this is a fallback for an edge case in which you're trying
+        # this is a fallback for a race condition in which you're trying
         # to use the script and create a virtualenv from within
         # a virtualenv in which virtualenv isn't installed and so
         # is not importable.
@@ -291,11 +293,10 @@ class CloudifyInstaller():
 
         # TODO: we should test all mutually exclusive arguments.
         if not IS_WIN and self.installpycrypto:
-            lgr.error('Pycrypto installation only relevant on Windows.')
-            sys.exit(1)
+            lgr.warning('Pycrypto only relevant on Windows.')
         if not (IS_LINUX or IS_DARWIN) and self.installpythondev:
-            lgr.error('Pythondev installation only relevant on Linux or OS x.')
-            sys.exit(1)
+            lgr.warning('Pythondev only relevant on Linux or OSx.')
+
         os_props = get_os_props()
         self.distro = os_distro or os_props[0].lower()
         self.release = os_release or os_props[1].lower()
@@ -344,8 +345,10 @@ class CloudifyInstaller():
                 or self._get_default_requirement_files(self.source)
 
         if self.force_online or not os.path.isdir(self.wheels_path):
-            install_module(module, self.version, self.pre,
-                           self.virtualenv,
+            install_module(module=module,
+                           version=self.version,
+                           pre=self.pre,
+                           virtualenv_path=self.virtualenv,
                            requirement_files=self.withrequirements,
                            upgrade=self.upgrade)
         elif os.path.isdir(self.wheels_path):
@@ -353,26 +356,28 @@ class CloudifyInstaller():
                      'Attemping offline installation...'.format(
                          self.wheels_path))
             try:
-                install_module(module, pre=True,
+                install_module(module=module,
+                               pre=True,
                                virtualenv_path=self.virtualenv,
                                wheelspath=self.wheels_path,
                                requirement_files=self.withrequirements,
                                upgrade=self.upgrade)
             except Exception as ex:
                 lgr.warning('Offline installation failed ({0}).'.format(
-                    ex.message))
-                install_module(module, version=self.version,
-                               pre=self.pre, virtualenv_path=self.virtualenv,
+                    str(ex)))
+                install_module(module=module,
+                               version=self.version,
+                               pre=self.pre,
+                               virtualenv_path=self.virtualenv,
                                requirement_files=self.withrequirements,
                                upgrade=self.upgrade)
         if self.virtualenv:
             activate_path = os.path.join(env_bin_path, 'activate')
-            if IS_WIN:
-                lgr.info('You can now run: "{0}.bat" to activate '
-                         'the Virtualenv.'.format(activate_path))
-            else:
-                lgr.info('You can now run: "source {0}" to activate '
-                         'the Virtualenv.'.format(activate_path))
+            activate_command = \
+                '{0}.bat'.format(activate_path) if IS_WIN \
+                else 'source {0}'.format(activate_path)
+            lgr.info('You can now run: "{0}" to activate '
+                     'the Virtualenv.'.format(activate_command))
 
     @staticmethod
     def find_virtualenv():
@@ -430,16 +435,20 @@ class CloudifyInstaller():
                 download_file(source, archive)
             except Exception as ex:
                 lgr.error('Could not download {0} ({1})'.format(
-                    source, ex.message))
+                    source, str(ex)))
                 sys.exit(1)
             try:
                 untar(archive, tempdir)
             except Exception as ex:
                 lgr.error('Could not extract {0} ({1})'.format(
-                    archive, ex.message))
+                    archive, str(ex)))
                 sys.exit(1)
-            return [os.path.join(tempdir, f) for f in REQUIREMENT_FILE_NAMES
-                    if os.path.isfile(os.path.join(tempdir, f))]
+            finally:
+                os.remove(archive)
+            # GitHub always adds a single parent directory to the tree.
+            req_dir = os.path.join(tempdir, os.listdir(tempdir)[0])
+            return [os.path.join(req_dir, f) for f in REQUIREMENT_FILE_NAMES
+                    if os.path.isfile(os.path.join(req_dir, f))]
 
     def install_pythondev(self, distro):
         """Installs python-dev and gcc
@@ -486,8 +495,10 @@ class CloudifyInstaller():
 
 def check_cloudify_installed(virtualenv_path=None):
     if virtualenv_path:
-        result = run(os.path.join(_get_env_bin_path(virtualenv_path),
-                                  'python -c "import cloudify"'))
+        result = run(
+            os.path.join(_get_env_bin_path(virtualenv_path),
+                         'python -c "import cloudify"'),
+            suppress_errors=True)
         return result.returncode == 0
     else:
         try:
@@ -555,7 +566,7 @@ def parse_args(args=None):
     if IS_WIN:
         parser.add_argument(
             '--pythonpath', type=str, default='c:/python27/python.exe',
-            help='Python path to use (defaults to "python") '
+            help='Python path to use (defaults to "c:/python27/python.exe") '
                  'when creating a virtualenv.')
     else:
         parser.add_argument(

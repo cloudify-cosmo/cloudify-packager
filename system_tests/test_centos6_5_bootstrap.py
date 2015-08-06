@@ -38,11 +38,6 @@ class TestCentos65Bootstrap(TestCliPackage):
 
         self.logger.info('installing python 2.7...')
 
-        # TODO temp for 6.3
-        self._execute_command('sudo sed -i "s/mirrorlist=https/'
-                              'mirrorlist=http/" '
-                              '/etc/yum.repos.d/epel.repo')
-
         self._execute_command('yum -y update', sudo=True)
         self._execute_command('yum install yum-downloadonly wget '
                               'mlocate yum-utils python-devel '

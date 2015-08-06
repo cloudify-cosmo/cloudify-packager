@@ -61,6 +61,21 @@
     },
     {
       "type": "shell",
+      "inline": ["sudo reboot"],
+      "only": ["nightly_virtualbox_build"]
+    },
+    {
+      "type": "shell",
+      "script": "provision/install_ga.sh",
+      "only": ["nightly_virtualbox_build"]
+    },
+    {
+      "type": "shell",
+      "script": "provision/influxdb_monkeypatch.sh",
+      "only": ["nightly_virtualbox_build"]
+    },
+    {
+      "type": "shell",
       "script": "provision/cleanup.sh",
       "only": ["nightly_virtualbox_build"]
     }
