@@ -444,6 +444,8 @@ class CloudifyInstaller():
             finally:
                 os.remove(archive)
             # GitHub always adds a single parent directory to the tree.
+            # TODO: look in parent dir, then one level underneath.
+            # the GitHub style tar assumption isn't a very good one.
             req_dir = os.path.join(tempdir, os.listdir(tempdir)[0])
             return [os.path.join(req_dir, f) for f in REQUIREMENT_FILE_NAMES
                     if os.path.isfile(os.path.join(req_dir, f))]
