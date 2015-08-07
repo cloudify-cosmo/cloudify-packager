@@ -227,7 +227,7 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
         sys.exit('Could not install module: {0}.'.format(module))
 
 
-def untar(archive, destination):
+def untar_requirement_files(archive, destination):
     """This will extract a tar.gz archive and extract it while stripping
     the parents directory within the archive.
     """
@@ -437,7 +437,7 @@ class CloudifyInstaller():
                     source, str(ex)))
                 sys.exit(1)
             try:
-                untar(archive, tempdir)
+                untar_requirement_files(archive, tempdir)
             except Exception as ex:
                 lgr.error('Could not extract {0} ({1})'.format(
                     archive, str(ex)))
