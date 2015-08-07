@@ -228,12 +228,11 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
 
 
 def untar_requirement_files(archive, destination):
-    """This will extract a tar.gz archive and extract it while stripping
-    the parents directory within the archive.
+    """This will extract requirement files from an archive.
     """
     with tarfile.open(name=archive) as tar:
-        req_files = [tarinfo for tarinfo in tar.getmembers()
-                     if os.path.basename(tarinfo.name)
+        req_files = [req_file for req_file in tar.getmembers()
+                     if os.path.basename(req_file.name)
                      in REQUIREMENT_FILE_NAMES]
         tar.extractall(path=destination, members=req_files)
 
