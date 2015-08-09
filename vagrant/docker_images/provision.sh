@@ -48,8 +48,9 @@ build_images()
 
 start_and_export_containers()
 {
-  sudo docker run -t --name=cloudify -d cloudify:latest /bin/bash
-  sudo docker export cloudify > /tmp/cloudify-docker_.tar
+  #sudo docker run -t --name=cloudify -d cloudify:latest /bin/bash
+  #sudo docker export cloudify > /tmp/cloudify-docker_.tar
+  sudo docker import http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.2.1/ga-RELEASE/cloudify-docker_3.2.1-ga-b212.tar cloudify
   sudo docker run -t --name=cloudifycommercial -d cloudify-commercial:latest /bin/bash
   sudo docker export cloudifycommercial > /tmp/cloudify-docker_commercial.tar
 }
