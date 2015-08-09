@@ -17,9 +17,10 @@ import testtools
 import urllib
 import tempfile
 from StringIO import StringIO
-from mock import MagicMock
+import mock
 import shutil
-# import sys
+import os
+import tarfile
 
 
 get_cloudify = __import__("get-cloudify")
@@ -32,6 +33,23 @@ class CliBuilderUnitTests(testtools.TestCase):
         super(CliBuilderUnitTests, self).setUp()
         self.get_cloudify = get_cloudify
         self.get_cloudify.IS_VIRTUALENV = False
+
+    def _create_dummy_requirements_tar(self, url, destination):
+        tempdir = os.path.dirname(destination)
+        fpath = self._generate_requirements_file(tempdir)
+        try:
+            tar = tarfile.open(name=destination, mode='w:gz')
+            tar.add(name=tempdir, arcname='maindir')
+            tar.close()
+        finally:
+            os.remove(fpath)
+        return destination
+
+    def _generate_requirements_file(self, path):
+        fpath = os.path.join(path, 'dev-requirements.txt')
+        with open(fpath, 'w') as f:
+            f.write('sh==1.11\n')
+        return fpath
 
     def test_validate_urls(self):
         self._validate_url(self.get_cloudify.PIP_URL)
@@ -63,11 +81,11 @@ class CliBuilderUnitTests(testtools.TestCase):
     def test_install_pip_failed_download(self):
         installer = self.get_cloudify.CloudifyInstaller()
 
-        mock_boom = MagicMock()
+        mock_boom = mock.MagicMock()
         mock_boom.side_effect = StandardError('Boom!')
         self.get_cloudify.download_file = mock_boom
 
-        mock_false = MagicMock()
+        mock_false = mock.MagicMock()
 
         def side_effect():
             return False
@@ -80,12 +98,12 @@ class CliBuilderUnitTests(testtools.TestCase):
                 self.get_cloudify.PIP_URL), ex.message)
 
     def test_install_pip_fail(self):
-        self.get_cloudify.download_file = MagicMock(return_value=None)
+        self.get_cloudify.download_file = mock.MagicMock(return_value=None)
 
         pythonpath = 'non_existing_path'
         installer = self.get_cloudify.CloudifyInstaller(pythonpath=pythonpath)
 
-        mock_false = MagicMock()
+        mock_false = mock.MagicMock()
 
         def side_effect():
             return False
@@ -143,6 +161,30 @@ class CliBuilderUnitTests(testtools.TestCase):
                 self.get_cloudify.check_cloudify_installed(tmp_venv))
         finally:
             shutil.rmtree(tmp_venv)
+
+    def test_get_requirements_from_source_url(self):
+        def get(url, destination):
+            return self._create_dummy_requirements_tar(url, destination)
+
+        self.get_cloudify.download_file = get
+        try:
+            installer = self.get_cloudify.CloudifyInstaller()
+            req_list = installer._get_default_requirement_files('null')
+            self.assertEquals(len(req_list), 1)
+            self.assertIn('dev-requirements.txt', req_list[0])
+        finally:
+            self.get_cloudify.download_file = get_cloudify.download_file
+
+    def test_get_requirements_from_source_path(self):
+        tempdir = tempfile.mkdtemp()
+        self._generate_requirements_file(tempdir)
+        try:
+            installer = self.get_cloudify.CloudifyInstaller()
+            req_list = installer._get_default_requirement_files(tempdir)
+            self.assertEquals(len(req_list), 1)
+            self.assertIn('dev-requirements.txt', req_list[0])
+        finally:
+            shutil.rmtree(tempdir)
 
 
 class TestArgParser(testtools.TestCase):
