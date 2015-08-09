@@ -85,7 +85,8 @@ installation.
 
 The script will attempt to install all necessary requirements including
 python-dev and gcc (for Fabric on Linux), pycrypto (for Fabric on Windows),
-pip and virtualenv depending on the OS and Distro you're running on.
+pip and virtualenv (if --virtualenv was specified) depending on the OS and
+Distro you're running on.
 Note that to install certain dependencies (like pip or pythondev), you must
 run the script as sudo.
 
@@ -200,20 +201,21 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     Can request an upgrade.
     """
     lgr.info('Installing {0}...'.format(module))
-    pip_cmd = 'pip install'
+    pip_cmd = ['pip', 'install']
     if virtualenv_path:
-        pip_cmd = os.path.join(
+        pip_cmd[0] = os.path.join(
             _get_env_bin_path(virtualenv_path), pip_cmd)
     pip_cmd = [pip_cmd]
     if requirement_files:
         for req_file in requirement_files:
-            pip_cmd.append('-r {0}'.format(req_file))
+            pip_cmd.extend(['-r', req_file])
     if version:
-        module = '{0}=={1}'.format(module, version)
-    pip_cmd.append(module)
+        pip_cmd.extend([module, version])
+    else:
+        pip_cmd.append(module)
     if wheelspath:
-        pip_cmd.append('--use-wheel --no-index --find-links={0}'.format(
-            wheelspath))
+        pip_cmd.extend(
+            ['--use-wheel', '--no-index', '--find-links', wheelspath])
     if pre:
         pip_cmd.append('--pre')
     if upgrade:
