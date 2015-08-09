@@ -204,15 +204,13 @@ def install_module(module, version=False, pre=False, virtualenv_path=False,
     pip_cmd = ['pip', 'install']
     if virtualenv_path:
         pip_cmd[0] = os.path.join(
-            _get_env_bin_path(virtualenv_path), pip_cmd)
-    pip_cmd = [pip_cmd]
+            _get_env_bin_path(virtualenv_path), pip_cmd[0])
     if requirement_files:
         for req_file in requirement_files:
             pip_cmd.extend(['-r', req_file])
+    pip_cmd.append(module)
     if version:
-        pip_cmd.extend([module, version])
-    else:
-        pip_cmd.append(module)
+        pip_cmd.append(version)
     if wheelspath:
         pip_cmd.extend(
             ['--use-wheel', '--no-index', '--find-links', wheelspath])
