@@ -54,6 +54,7 @@ import logging
 import shutil
 import time
 import tarfile
+from threading import Thread
 
 
 DESCRIPTION = '''This script attempts(!) to install Cloudify's CLI on Linux,
@@ -117,6 +118,9 @@ PLATFORM = sys.platform
 IS_WIN = (PLATFORM == 'win32')
 IS_DARWIN = (PLATFORM == 'darwin')
 IS_LINUX = (PLATFORM == 'linux2')
+
+PROCESS_POLLING_INTERVAL = 0.1
+
 # defined below
 lgr = None
 
@@ -143,21 +147,24 @@ def run(cmd, suppress_errors=False):
     pipe = subprocess.PIPE
     proc = subprocess.Popen(
         cmd, shell=True, stdout=pipe, stderr=pipe)
-    proc.aggr_stdout = ''
-    # while the process is still running, print output
+
+    stderr_log_level = logging.NOTSET if suppress_errors else logging.ERROR
+
+    stdout_thread = PipeReader(proc.stdout, proc, lgr, logging.DEBUG)
+    stderr_thread = PipeReader(proc.stderr, proc, lgr, stderr_log_level)
+
+    stdout_thread.start()
+    stderr_thread.start()
+
     while proc.poll() is None:
-        output = proc.stdout.readline()
-        if len(output) > 0:
-            proc.aggr_stdout += output
-            lgr.debug(output)
-        time.sleep(0.2)
-    output = proc.stdout.readline()
-    if len(output) > 0:
-        proc.aggr_stdout += output
-        lgr.debug(output)
-    proc.aggr_stderr = proc.stderr.read()
-    if len(proc.aggr_stderr) > 0 and not suppress_errors:
-        lgr.error(proc.aggr_stderr)
+        time.sleep(PROCESS_POLLING_INTERVAL)
+
+    stdout_thread.join()
+    stderr_thread.join()
+
+    proc.aggr_stdout = stdout_thread.aggr
+    proc.aggr_stderr = stderr_thread.aggr
+
     return proc
 
 
@@ -264,6 +271,25 @@ def _get_env_bin_path(env_path):
         # a virtualenv in which virtualenv isn't installed and so
         # is not importable.
         return os.path.join(env_path, 'scripts' if IS_WIN else 'bin')
+
+
+class PipeReader(Thread):
+    def __init__(self, fd, proc, logger, log_level):
+        Thread.__init__(self)
+        self.fd = fd
+        self.proc = proc
+        self.logger = logger
+        self.log_level = log_level
+        self.aggr = ''
+
+    def run(self):
+        while self.proc.poll() is None:
+            output = self.fd.readline()
+            if len(output) > 0:
+                self.aggr += output
+                self.logger.log(self.log_level, output)
+            else:
+                time.sleep(PROCESS_POLLING_INTERVAL)
 
 
 class CloudifyInstaller():
