@@ -63,6 +63,7 @@ node_templates:
       subnet:
         ip_version: 4
         cidr: 10.67.79.0/24
+        dns_nameservers: [8.8.4.4, 8.8.8.8]
       openstack_config: *OPENSTACK_CONFIG
     relationships:
       - target: network
