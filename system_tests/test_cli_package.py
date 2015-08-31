@@ -16,6 +16,7 @@
 import os
 import time
 import uuid
+
 import requests
 from retrying import retry
 
@@ -85,10 +86,10 @@ class TestCliPackage(TestCase):
             ignored_modules=cli_constants.IGNORED_LOCAL_WORKFLOW_MODULES)
 
         self.logger.info('starting vm to serve as the management vm')
+        self.addCleanup(self.cleanup)
         self.local_env.execute('install',
                                task_retries=40,
                                task_retry_interval=30)
-        self.addCleanup(self.cleanup)
 
         self.get_local_env_outputs()
         self.logger.info('Outputs: {0}'.format(self.local_env.outputs()))
@@ -199,6 +200,17 @@ class TestCliPackage(TestCase):
     def change_to_tarzan_urls(self):
         pass
 
+    def add_dns_nameservers_to_manager_blueprint(self, local_modify_script):
+        remote_modify_script = os.path.join(self.cfy_work_dir, 'modify.py')
+        self.logger.info(
+            'Uploading {0} to {1} on manager...'.format(local_modify_script,
+                                                        remote_modify_script))
+        fab.put(local_modify_script, remote_modify_script, use_sudo=True)
+        self.logger.info(
+            'Adding DNS name servers to remote manager blueprint...')
+        fab.run('sudo python {0} {1}'.format(
+            remote_modify_script, self.test_openstack_manager_blueprint_path))
+
     def prepare_manager_blueprint(self):
         self.manager_blueprints_repo_dir = '{0}/cloudify-manager-blueprints' \
                                            '-commercial/' \
@@ -284,6 +296,9 @@ class TestCliPackage(TestCase):
     def _test_cli_package(self):
         self.install_cli()
         self.prepare_manager_blueprint()
+        self.add_dns_nameservers_to_manager_blueprint(
+            os.path.join(os.path.dirname(__file__),
+                         'resources/add_nameservers_to_subnet.py'))
         self.bootstrap_manager()
         blueprint_id = self.publish_hello_world_blueprint()
         self.deployment_id = self.create_deployment(blueprint_id)

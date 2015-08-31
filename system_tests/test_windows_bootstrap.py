@@ -14,6 +14,7 @@
 #    * limitations under the License.
 
 
+import base64
 import os
 import socket
 import time
@@ -138,6 +139,31 @@ $client.DownloadFile($url, $file)""".format(self.cli_package_url,
         self.logger.info('Verifying CLI installation...')
         self._execute_command('--version', within_cfy_env=True)
 
+    def add_dns_nameservers_to_manager_blueprint(self, local_modify_script):
+        remote_modify_script = '{0}\{1}'.format(self.cfy_work_dir, 'modify.py')
+        self.logger.info(
+            'Uploading {0} to {1} on manager...'.format(local_modify_script,
+                                                        remote_modify_script))
+        with open(local_modify_script, 'r') as f:
+            modify_script = f.read()
+
+        ps_script = """
+$filePath = "{0}"
+$s = @"
+{1}
+"@
+$data = [System.Convert]::FromBase64String($s)
+set-content -value $data -encoding byte -path $filePath
+                """.format(remote_modify_script,
+                           base64.b64encode(modify_script))
+        self._execute_command(ps_script)
+        self.logger.info(
+            'Adding DNS name servers to remote manager blueprint...')
+        self._execute_command('{0}\Scripts\python.exe {1} {2}'.format(
+            self.cfy_work_dir,
+            remote_modify_script,
+            self.test_openstack_manager_blueprint_path))
+
     def prepare_manager_blueprint(self):
         manager_blueprints_url = \
             'https://github.com/cloudify-cosmo/cloudify-manager-blueprints/' \
@@ -160,7 +186,7 @@ $client.DownloadFile($url, $file)
             '\openstack-manager-blueprint.yaml'.format(
             self.cfy_work_dir, self.branch)  # NOQA
 
-        self.change_to_tarzan_urls()
+        # self.change_to_tarzan_urls()
 
         self._execute_command("""$inputs = '{0}'
 $inputs | Out-File {1}\inputs.json""".format(
