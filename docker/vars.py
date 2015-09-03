@@ -148,7 +148,7 @@ VARS = {
             "make"
         ],
         "nodejs_latest_url": "http://nodejs.org/dist/v0.10.25/node-v0.10.25.tar.gz",
-        "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.3.0/m4-RELEASE/cloudify-ui_3.3.0-m4-b274_amd64.deb",
+        "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.3.0/m5-RELEASE/cloudify-ui_3.3.0-m5-b275_amd64.deb",
         "ports": ["80"],
     }
 }
