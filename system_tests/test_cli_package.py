@@ -217,7 +217,7 @@ class TestCliPackage(TestCase):
                                            ''.format(self.cfy_work_dir)
         self.test_openstack_manager_blueprint_path = \
             os.path.join(self.manager_blueprints_repo_dir,
-                         'openstack', 'openstack-manager-blueprint.yaml')
+                         'new', 'openstack-manager-blueprint.yaml')
 
         self.local_bootstrap_inputs_path = \
             self.cfy._get_inputs_in_temp_file(self.bootstrap_inputs,
