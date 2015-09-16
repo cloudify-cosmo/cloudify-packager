@@ -127,7 +127,7 @@ class TestCliPackage(TestCase):
             'image_id': self.env.ubuntu_trusty_image_id,
             'flavor_id': self.env.medium_flavor_id,
             'external_network_name': self.env.external_network_name,
-            'manager_public_key_name': '{0}-manager-keypair'.format(
+            'ssh_key_filename': '{0}-manager-keypair'.format(
                 self.prefix),
             'agent_public_key_name': '{0}-agent-keypair'.format(
                 self.prefix),
