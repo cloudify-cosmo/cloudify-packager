@@ -37,7 +37,7 @@ def main():
 
     print('Launching worker machine..')
     mapping = bdm.BlockDeviceMapping()
-    mapping['/dev/sda1'] = bdm.BlockDeviceType(size=10,
+    mapping['/dev/sda1'] = bdm.BlockDeviceType(size=30,
                                                volume_type='gp2',
                                                delete_on_termination=True)
     mapping['/dev/sdf'] = bdm.BlockDeviceType(snapshot_id=baked_snap,
@@ -108,55 +108,36 @@ def run_packer():
 
 
 def do_work():
+    sudo('echo "deb http://download.virtualbox.org/virtualbox/debian trusty contrib" > /etc/apt/sources.list.d/virtualbox.list')
+    sudo('wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | apt-key add -')
     sudo('apt-get update')
-    sudo('apt-get install -y virtualbox kpartx extlinux qemu-utils python-pip')
+
+    sudo('curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python -')
+    sudo('apt-get install -y virtualbox-4.3')
+
     sudo('pip install awscli')
 
     sudo('mkdir -p /mnt/image')
-    sudo('mount /dev/xvdf1 /mnt/image')
+    sudo('mkdir -p /mnt/archive')
 
-    run('dd if=/dev/zero of=image.raw bs=1M count=8192')
-    sudo('losetup --find --show image.raw')
-    sudo('parted -s -a optimal /dev/loop0 mklabel msdos'
-         ' -- mkpart primary ext4 1 -1')
-    sudo('parted -s /dev/loop0 set 1 boot on')
-    sudo('kpartx -av /dev/loop0')
-    sudo('mkfs.ext4 /dev/mapper/loop0p1')
-    sudo('mkdir -p /mnt/raw')
-    sudo('mount /dev/mapper/loop0p1 /mnt/raw')
+    sudo('dd if=/dev/xvdf of=/mnt/archive/disk.raw bs=1M')
 
-    sudo('cp -a /mnt/image/* /mnt/raw')
-
-    sudo('extlinux --install /mnt/raw/boot')
-    sudo('dd if=/usr/lib/syslinux/mbr.bin conv=notrunc bs=440 count=1 '
-         'of=/dev/loop0')
-    sudo('echo -e "DEFAULT cloudify\n'
-         'LABEL cloudify\n'
-         'LINUX /vmlinuz\n'
-         'APPEND root=/dev/disk/by-uuid/'
-         '`sudo blkid -s UUID -o value /dev/mapper/loop0p1` ro\n'
-         'INITRD  /initrd.img" | sudo -s tee /mnt/raw/boot/extlinux.conf')
-
-    sudo('umount /mnt/raw')
-    sudo('kpartx -d /dev/loop0')
-    sudo('losetup --detach /dev/loop0')
-
-    run('qemu-img convert -f raw -O vmdk image.raw image.vmdk')
-    run('rm image.raw')
+    sudo('VBoxManage convertfromraw --format vmdk /mnt/archive/disk.raw /mnt/archive/disk.vmdk')
+    sudo('chown ubuntu:ubuntu /mnt/archive/disk.vmdk')
 
     run('mkdir output')
-    run('VBoxManage createvm --name cloudify --ostype Ubuntu_64 --register')
+    run('VBoxManage createvm --name cloudify --ostype RedHat_64 --register')
     run('VBoxManage storagectl cloudify '
         '--name SATA '
         '--add sata '
-        '--sataportcount 1 '
+        '--portcount 1 '
         '--hostiocache on '
         '--bootable on')
     run('VBoxManage storageattach cloudify '
         '--storagectl SATA '
         '--port 0 '
         '--type hdd '
-        '--medium image.vmdk')
+        '--medium /mnt/archive/disk.vmdk')
     run('VBoxManage modifyvm cloudify '
         '--memory 2048 '
         '--cpus 2 '
