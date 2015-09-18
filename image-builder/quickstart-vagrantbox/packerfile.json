@@ -71,7 +71,6 @@
     },
     {
       "type": "shell",
-      "script": "provision/influxdb_monkeypatch.sh",
       "only": ["nightly_virtualbox_build"]
     },
     {
