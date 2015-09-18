@@ -28,7 +28,7 @@ function create_and_source_virtualenv
 {
 	cd ~
 	echo installing virtualenv
-	sudo pip install virtualenv==1.11.4
+	sudo pip install virtualenv
 	echo creating cloudify virtualenv
 	virtualenv cloudify
 	source cloudify/bin/activate
