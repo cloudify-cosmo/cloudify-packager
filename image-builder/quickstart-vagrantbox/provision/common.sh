@@ -15,10 +15,8 @@ function set_username
 
 function install_prereqs
 {
-	echo updating apt cache
-	sudo apt-get -y update
 	echo installing prerequisites
-	sudo apt-get install -y curl vim git gcc python-dev
+	sudo yum install -y git gcc python-devel
 }
 
 function install_pip
