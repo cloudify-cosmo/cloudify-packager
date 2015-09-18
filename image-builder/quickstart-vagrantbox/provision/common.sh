@@ -36,18 +36,9 @@ function create_and_source_virtualenv
 
 function install_cli
 {
-	if [ "$INSTALL_FROM_PYPI" = "true" ]; then
-		echo installing cli from pypi
-		pip install cloudify
-	else
-		echo installing cli from github
-		pip install git+https://github.com/cloudify-cosmo/cloudify-dsl-parser.git@$CORE_TAG_NAME
-		pip install git+https://github.com/cloudify-cosmo/flask-securest.git@0.6
-		pip install git+https://github.com/cloudify-cosmo/cloudify-rest-client.git@$CORE_TAG_NAME
-		pip install git+https://github.com/cloudify-cosmo/cloudify-plugins-common.git@$CORE_TAG_NAME
-		pip install git+https://github.com/cloudify-cosmo/cloudify-script-plugin.git@$PLUGINS_TAG_NAME
-		pip install git+https://github.com/cloudify-cosmo/cloudify-cli.git@$CORE_TAG_NAME
-	fi
+	pip install https://github.com/cloudify-cosmo/cloudify-cli/archive/${CORE_TAG_NAME}.zip \
+	  -r https://raw.githubusercontent.com/cloudify-cosmo/cloudify-cli/${CORE_TAG_NAME}/dev-requirements.txt
+
 }
 
 function init_cfy_workdir
@@ -62,10 +53,10 @@ function get_manager_blueprints
 {
     cd ~/cloudify
 	echo "Retrieving Manager Blueprints"
-    sudo curl -O http://cloudify-public-repositories.s3.amazonaws.com/cloudify-manager-blueprints/${CORE_TAG_NAME}/cloudify-manager-blueprints.tar.gz &&
-    sudo tar -zxvf cloudify-manager-blueprints.tar.gz &&
+    sudo curl -OL https://github.com/cloudify-cosmo/cloudify-manager-blueprints/archive/${CORE_TAG_NAME}.tar.gz &&
+    sudo tar -zxvf ${CORE_TAG_NAME}.tar.gz &&
     mv cloudify-manager-blueprints-*/ cloudify-manager-blueprints
-    sudo rm cloudify-manager-blueprints.tar.gz
+    sudo rm ${CORE_TAG_NAME}.tar.gz
 }
 
 function generate_keys
@@ -79,14 +70,10 @@ function generate_keys
 function configure_manager_blueprint_inputs
 {
 	# configure inputs
-	cd ~/cloudify
-	cp cloudify-manager-blueprints/simple/inputs.yaml.template inputs.yaml
-	sed -i "s|public_ip: ''|public_ip: \'127.0.0.1\'|g" inputs.yaml
-	sed -i "s|private_ip: ''|private_ip: \'127.0.0.1\'|g" inputs.yaml
-	sed -i "s|ssh_user: ''|ssh_user: \'${USERNAME}\'|g" inputs.yaml
-	sed -i "s|ssh_key_filename: ''|ssh_key_filename: \'~/.ssh/id_rsa\'|g" inputs.yaml
-	# configure manager blueprint
-	sudo sed -i "s|/cloudify-docker_3|/cloudify-docker-commercial_3|g" cloudify-manager-blueprints/simple/simple-manager-blueprint.yaml
+	echo "public_ip: '127.0.0.1'" >> inputs.yaml
+	echo "private_ip: '127.0.0.1'" >> inputs.yaml
+	echo "ssh_user: '${USERNAME}'" >> inputs.yaml
+	echo "ssh_key_filename: '~/.ssh/id_rsa'" >> inputs.yaml
 }
 
 function bootstrap
@@ -94,7 +81,7 @@ function bootstrap
 	cd ~/cloudify
 	echo "bootstrapping..."
 	# bootstrap the manager locally
-	cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple-manager-blueprint.yaml -i inputs.yaml --install-plugins
+	cfy bootstrap -v -p cloudify-manager-blueprints/new/simple-manager-blueprint.yaml -i inputs.yaml --install-plugins
 	if [ "$?" -ne "0" ]; then
 	  echo "Bootstrap failed, stoping provision."
 	  exit 1
@@ -128,14 +115,12 @@ function configure_shell_login
 INSTALL_FROM_PYPI=$1
 echo "Install from PyPI: ${INSTALL_FROM_PYPI}"
 CORE_TAG_NAME="master"
-PLUGINS_TAG_NAME="master"
 
 set_username
 install_prereqs
 install_pip
 create_and_source_virtualenv
 install_cli
-activate_cfy_bash_completion
 init_cfy_workdir
 get_manager_blueprints
 generate_keys
