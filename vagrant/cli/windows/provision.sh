@@ -1,5 +1,5 @@
-export CORE_TAG_NAME="3.3m5"
-export PLUGINS_TAG_NAME="1.3m5"
+export CORE_TAG_NAME="3.3m6"
+export PLUGINS_TAG_NAME="1.3m6"
 export VERSION=`cat packaging/VERSION  | grep version | sed 's/"version": "//g' | sed 's/"//g' | sed 's/,//g' | sed 's/ //g'`
 
 echo "VERSION=$VERSION"

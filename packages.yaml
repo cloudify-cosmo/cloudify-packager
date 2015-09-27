@@ -1,7 +1,7 @@
 packages:
   cloudify-ui:
     name: "cloudify-ui"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     depends:
       - "nodejs"
     package_path: "/cloudify"
@@ -31,7 +31,7 @@ packages:
 
   cloudify-ubuntu-agent:
     name: "cloudify-trusty-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     package_path: "/cloudify"
     sources_path: "/tmp/Ubuntu-agent"
     source_package_type: "dir"
@@ -53,7 +53,7 @@ packages:
   
   cloudify-ubuntu-commercial-agent:
     name: "cloudify-trusty-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     package_path: "/cloudify"
     sources_path: "/tmp/Ubuntu-agent"
     source_package_type: "dir"
@@ -75,7 +75,7 @@ packages:
         
   cloudify-ubuntu-precise-commercial-agent:
     name: "cloudify-ubuntu-precise-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     package_path: "/cloudify"
     sources_path: "/agents/Ubuntu-agent"
     source_package_type: "dir"
@@ -97,7 +97,7 @@ packages:
 
   cloudify-ubuntu-trusty-commercial-agent:
     name: "cloudify-ubuntu-trusty-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     package_path: "/cloudify"
     sources_path: "/agents/Ubuntu-agent"
     source_package_type: "dir"
@@ -119,7 +119,7 @@ packages:
 
   cloudify-debian-jessie-agent:
     name: "cloudify-debian-jessie-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     package_path: "/cloudify"
     sources_path: "/agents/debian-agent"
     source_package_type: "dir"
@@ -141,7 +141,7 @@ packages:
 
   debian-jessie-agent:
     name: "debian--agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     source_urls:
       - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
     package_path: "/agents/debian-agent"
@@ -161,7 +161,7 @@ packages:
 
   cloudify-ubuntu-trusty-agent:
     name: "cloudify-ubuntu-trusty-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     package_path: "/cloudify"
     sources_path: "/agents/Ubuntu-agent"
     source_package_type: "dir"
@@ -183,7 +183,7 @@ packages:
 
   Ubuntu-trusty-agent:
     name: "Ubuntu-trusty-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     source_urls:
       - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
     package_path: "/agents/Ubuntu-agent"
@@ -203,7 +203,7 @@ packages:
 
   cloudify-ubuntu-precise-agent:
     name: "cloudify-ubuntu-precise-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     package_path: "/cloudify"
     sources_path: "/agents/Ubuntu-agent"
     source_package_type: "dir"
@@ -225,7 +225,7 @@ packages:
 
   Ubuntu-precise-agent:
     name: "Ubuntu-precise-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     source_urls:
       - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
     package_path: "/agents/Ubuntu-agent"
@@ -245,7 +245,7 @@ packages:
 
   cloudify-centos-final-agent:
     name: "cloudify-centos-final-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     package_path: "/cloudify"
     sources_path: "/agents/centos-agent"
     source_package_type: "dir"
@@ -267,7 +267,7 @@ packages:
 
   centos-Final-agent:
     name: "centos-Final-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     source_urls:
       - "https://github.com/cloudify-cosmo/cloudify-manager/archive/master.tar.gz"
     package_path: "/agents/centos-agent"
@@ -286,7 +286,7 @@ packages:
 
   cloudify-windows-agent:
     name: "cloudify-windows-agent"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     package_path: "/cloudify"
     sources_path: "/agents/windows-agent"
     source_package_type: "dir"
@@ -301,7 +301,7 @@ packages:
 
   cloudify-linux-cli:
     name: "cloudify-linux_cli"
-    version: "3.3.0-m5"
+    version: "3.3.0-m6"
     package_path: "/cloudify"
     sources_path: "/cfy"
     source_package_type: "dir"
