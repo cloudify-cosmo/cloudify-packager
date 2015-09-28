@@ -124,10 +124,10 @@ class TestCliPackage(TestCase):
             'keystone_tenant_name': self.env.keystone_tenant_name,
             'keystone_url': self.env.keystone_url,
             'region': self.env.region,
-            'image_id': self.env.ubuntu_trusty_image_id,
+            'image_id': self.env.centos_7_image_id,
             'flavor_id': self.env.medium_flavor_id,
             'external_network_name': self.env.external_network_name,
-            'ssh_key_filename': '{0}-manager-keypair'.format(
+            'manager_public_key_name': '{0}-manager-keypair'.format(
                 self.prefix),
             'agent_public_key_name': '{0}-agent-keypair'.format(
                 self.prefix),
