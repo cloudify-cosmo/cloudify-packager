@@ -131,6 +131,7 @@ class TestCliPackage(TestCase):
                 self.prefix),
             'agent_public_key_name': '{0}-agent-keypair'.format(
                 self.prefix),
+            'install_python_compilers': 'yes'
         }
 
     def get_local_env_blueprint_file_name(self):
@@ -139,7 +140,7 @@ class TestCliPackage(TestCase):
     def get_deployment_inputs(self):
         return {
             'agent_user': 'ubuntu',
-            'image': self.env.ubuntu_image_id,
+            'image': self.env.ubuntu_trusty_image_id,
             'flavor': self.env.medium_flavor_id
         }
 
