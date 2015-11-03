@@ -12,7 +12,6 @@ export MANAGEMENT_IP
 export BROKER_URL="amqp://guest:guest@$MANAGEMENT_IP:5672//"
 # todo(adaml): this var should be injected since it propogates to the agent nodes.
 export MANAGEMENT_USER="root"
-export MANAGER_REST_PORT="8101"
 # todo(adaml): this var should be injected since it propogates to the agent nodes.
 export VIRTUALENV="$CELERY_HOME_DIR/env"
 export IS_MANAGEMENT_NODE="True"
