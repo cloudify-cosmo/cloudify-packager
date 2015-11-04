@@ -22,6 +22,7 @@ from retrying import retry
 
 from cloudify.workflows import local
 from cloudify_cli import constants as cli_constants
+from cloudify_rest_client import CloudifyClient
 import fabric.api as fab
 from fabric.api import env
 
@@ -127,11 +128,13 @@ class TestCliPackage(TestCase):
             'image_id': self.env.centos_7_image_id,
             'flavor_id': self.env.medium_flavor_id,
             'external_network_name': self.env.external_network_name,
+            'manager_server_name': self.env.management_server_name,
+            'management_network_name': self.env.management_network_name,
             'manager_public_key_name': '{0}-manager-keypair'.format(
                 self.prefix),
             'agent_public_key_name': '{0}-agent-keypair'.format(
                 self.prefix),
-        }
+            }
 
     def get_local_env_blueprint_file_name(self):
         return 'test-start-vm-blueprint.yaml'
@@ -244,6 +247,9 @@ class TestCliPackage(TestCase):
                 self.remote_bootstrap_inputs_path,
                 install_plugins),
             within_cfy_env=True)
+
+        self.manager_ip = self._manager_ip()
+        self.client = CloudifyClient(self.manager_ip)
         self.addCleanup(self.teardown_manager)
 
     def publish_hello_world_blueprint(self):
@@ -289,6 +295,7 @@ class TestCliPackage(TestCase):
                               within_cfy_env=True, retries=2)
 
     def uninstall_deployment(self, deployment_id):
+        self.cfy._wait_for_stop_dep_env_execution_if_necessary(deployment_id)
         self.logger.info('Uninstalling deployment...')
         self._execute_command('executions start -d {0} -w uninstall'
                               ''.format(deployment_id), within_cfy_env=True)
@@ -306,6 +313,15 @@ class TestCliPackage(TestCase):
         self.assert_deployment_working(
             self._get_app_property('http_endpoint'))
         self.uninstall_deployment(self.deployment_id)
+
+    def _manager_ip(self):
+        nova_client, _, _ = self.env.handler.openstack_clients()
+        for server in nova_client.servers.list():
+            if server.name == self.env.management_server_name:
+                for network, network_ips in server.networks.items():
+                    if network == self.env.management_network_name:
+                        return network_ips[1]
+        self.fail('Failed finding manager ip')
 
     def _get_app_property(self, property_name):
 
