@@ -182,7 +182,7 @@ $client.DownloadFile($url, $file)
             .format(manager_blueprints_url))
         self._execute_command(wget_cmd)
         self.test_openstack_manager_blueprint_path = \
-            '{0}\\cloudify-manager-blueprints-{1}\\new' \
+            '{0}\\cloudify-manager-blueprints-{1}' \
             '\\openstack-manager-blueprint.yaml'.format(
             self.cfy_work_dir, self.branch)  # NOQA
 
