@@ -82,13 +82,13 @@ function configure_manager_blueprint_inputs
 {
 	# configure inputs
 	cd ~/cloudify
-	cp cloudify-manager-blueprints/simple/inputs.yaml.template inputs.yaml
+	cp cloudify-manager-blueprints/simple-manager-blueprint-inputs.yaml inputs.yaml
 	sed -i "s|public_ip: ''|public_ip: \'127.0.0.1\'|g" inputs.yaml
 	sed -i "s|private_ip: ''|private_ip: \'127.0.0.1\'|g" inputs.yaml
 	sed -i "s|ssh_user: ''|ssh_user: \'${USERNAME}\'|g" inputs.yaml
 	sed -i "s|ssh_key_filename: ''|ssh_key_filename: \'~/.ssh/id_rsa\'|g" inputs.yaml
 	# configure manager blueprint
-	sudo sed -i "s|/cloudify-docker_3|/cloudify-docker-commercial_3|g" cloudify-manager-blueprints/simple/simple-manager-blueprint.yaml
+	sudo sed -i "s|/cloudify-docker_3|/cloudify-docker-commercial_3|g" cloudify-manager-blueprints/simple-manager-blueprint.yaml
 }
 
 function bootstrap
@@ -96,7 +96,7 @@ function bootstrap
 	cd ~/cloudify
 	echo "bootstrapping..."
 	# bootstrap the manager locally
-	cfy bootstrap -v -p cloudify-manager-blueprints/simple/simple-manager-blueprint.yaml -i inputs.yaml --install-plugins
+	cfy bootstrap -v -p cloudify-manager-blueprints/simple-manager-blueprint.yaml -i inputs.yaml --install-plugins
 	if [ "$?" -ne "0" ]; then
 	  echo "Bootstrap failed, stoping provision."
 	  exit 1
