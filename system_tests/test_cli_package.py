@@ -47,7 +47,7 @@ class TestCliPackage(TestCase):
         return self.env.centos_7_image_user
 
     def get_client_cfy_work_dir(self):
-        return '/cfy'
+        return '/opt/cfy'
 
     def get_local_env_outputs(self):
         self.public_ip_address = \
@@ -134,7 +134,7 @@ class TestCliPackage(TestCase):
                 self.prefix),
             'agent_public_key_name': '{0}-agent-keypair'.format(
                 self.prefix),
-            }
+        }
 
     def get_local_env_blueprint_file_name(self):
         return 'test-start-vm-blueprint.yaml'
