@@ -78,7 +78,7 @@ $content > $path""".format(
                                                WINRM_PORT, 300)
 
         url = 'http://{0}:{1}/wsman'.format(self.public_ip_address, WINRM_PORT)
-        user = 'Admin'
+        user = 'Administrator'
         self.session = winrm.Session(url, auth=(user, self.password))
 
     def get_image_name(self):
