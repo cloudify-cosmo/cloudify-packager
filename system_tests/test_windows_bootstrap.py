@@ -63,7 +63,7 @@ $content = get-content $path
 $content = $content -replace $text, $replace
 $content = $content -replace "task_retries: .*$", "task_retries: {3}"
 $content > $path""".format(
-                self.test_openstack_manager_blueprint_path,
+                self.test_manager_blueprint_path,
                 'http://gigaspaces-repository-eu.s3.amazonaws.com/org',
                 'http://tarzan/builds/GigaSpacesBuilds',
                 TASK_RETRIES))
@@ -162,7 +162,7 @@ set-content -value $data -encoding byte -path $filePath
         self._execute_command('{0}\Scripts\python.exe {1} {2}'.format(
             self.cfy_work_dir,
             remote_modify_script,
-            self.test_openstack_manager_blueprint_path))
+            self.test_manager_blueprint_path))
 
     def prepare_manager_blueprint(self):
         manager_blueprints_url = \
@@ -181,7 +181,7 @@ $client.DownloadFile($url, $file)
             'Downloading and extracting cloudify-manager-blueprints from: {0}'
             .format(manager_blueprints_url))
         self._execute_command(wget_cmd)
-        self.test_openstack_manager_blueprint_path = \
+        self.test_manager_blueprint_path = \
             '{0}\\cloudify-manager-blueprints-{1}' \
             '\\openstack-manager-blueprint.yaml'.format(
             self.cfy_work_dir, self.branch)  # NOQA
