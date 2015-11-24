@@ -60,7 +60,7 @@ class TestCliPackage(TestCase):
         if self.get_package_parameter_name() not in os.environ:
             raise ValueError(
                 '{0} environment variable not set'
-                ''.format(self.get_package_parameter_name()))
+                .format(self.get_package_parameter_name()))
 
         blueprint_filename = self.get_local_env_blueprint_file_name()
         blueprint_path = os.path.join(os.path.dirname(__file__),
@@ -86,7 +86,7 @@ class TestCliPackage(TestCase):
             name=self._testMethodName,
             ignored_modules=cli_constants.IGNORED_LOCAL_WORKFLOW_MODULES)
 
-        self.logger.info('starting vm to serve as the management vm')
+        self.logger.info('Starting vm to install CLI package on it later on')
         self.addCleanup(self.cleanup)
         self.local_env.execute('install',
                                task_retries=40,
@@ -154,7 +154,7 @@ class TestCliPackage(TestCase):
                          sudo=False, log_cmd=True, retries=0):
         if within_cfy_env:
             cmd = 'source {0}/env/bin/activate && cfy {1}' \
-                  ''.format(self.cfy_work_dir, cmd)
+                  .format(self.cfy_work_dir, cmd)
 
         if log_cmd:
             self.logger.info('Executing command: {0}'.format(cmd))
@@ -182,18 +182,15 @@ class TestCliPackage(TestCase):
                 else:
                     raise Exception('Command: {0} exited with code: '
                                     '{1}. Tried {2} times.'
-                                    ''.format(cmd, out.return_code,
-                                              retries + 1))
+                                    .format(cmd, out.return_code, retries + 1))
 
     def install_cli(self):
         self.logger.info('installing cli...')
 
-        self._execute_command('sudo curl -O {0}'
-                              ''.format(self.get_cli_package_url()))
+        self._execute_command('curl -O {0}'.format(self.get_cli_package_url()))
         self._execute_command('curl https://raw.githubusercontent.com/pypa/'
                               'pip/master/contrib/get-pip.py'
-                              ' | sudo python2.7 -'
-                              '', sudo=True)
+                              ' | sudo python2.7 -')
         self._execute_command('pip install virtualenv', sudo=True)
 
         last_ind = self.get_cli_package_url().rindex('/')
@@ -212,15 +209,18 @@ class TestCliPackage(TestCase):
         self.logger.info(
             'Adding DNS name servers to remote manager blueprint...')
         fab.run('sudo python {0} {1}'.format(
-            remote_modify_script, self.test_openstack_manager_blueprint_path))
+            remote_modify_script, self.test_manager_blueprint_path))
+
+    def get_manager_blueprint_file_name(self):
+        return 'openstack-manager-blueprint.yaml'
 
     def prepare_manager_blueprint(self):
         self.manager_blueprints_repo_dir = '{0}/cloudify-manager-blueprints' \
                                            '-commercial/' \
-                                           ''.format(self.cfy_work_dir)
-        self.test_openstack_manager_blueprint_path = \
+                                           .format(self.cfy_work_dir)
+        self.test_manager_blueprint_path = \
             os.path.join(self.manager_blueprints_repo_dir,
-                         'openstack-manager-blueprint.yaml')
+                         self.get_manager_blueprint_file_name())
 
         self.local_bootstrap_inputs_path = \
             self.cfy._get_inputs_in_temp_file(self.bootstrap_inputs,
@@ -243,7 +243,7 @@ class TestCliPackage(TestCase):
 
         self._execute_command(
             'bootstrap -p {0} -i {1} {2}'.format(
-                self.test_openstack_manager_blueprint_path,
+                self.test_manager_blueprint_path,
                 self.remote_bootstrap_inputs_path,
                 install_plugins),
             within_cfy_env=True)
@@ -252,6 +252,9 @@ class TestCliPackage(TestCase):
         self.client = CloudifyClient(self.manager_ip)
         self.addCleanup(self.teardown_manager)
 
+    def get_app_blueprint_file(self):
+        return 'blueprint.yaml'
+
     def publish_hello_world_blueprint(self):
         hello_world_url = HELLO_WORLD_URL.format(self.branch)
         blueprint_id = 'blueprint-{0}'.format(uuid.uuid4())
@@ -259,9 +262,10 @@ class TestCliPackage(TestCase):
             'Publishing hello-world example from: {0} [{1}]'.format(
                 hello_world_url, blueprint_id))
         self._execute_command('blueprints publish-archive '
-                              '-l {0} -n blueprint.yaml -b {1}'
-                              ''.format(hello_world_url,
-                                        blueprint_id),
+                              '-l {0} -n {1} -b {2}'
+                              .format(hello_world_url,
+                                      self.get_app_blueprint_file(),
+                                      blueprint_id),
                               within_cfy_env=True)
         return blueprint_id
 
@@ -282,8 +286,8 @@ class TestCliPackage(TestCase):
         self.logger.info('Creating deployment: {0}'.format(deployment_id))
         self._execute_command(
             'deployments create -b {0} -d {1} -i {2}'
-            ''.format(blueprint_id, deployment_id,
-                      self.remote_deployment_inputs_path),
+            .format(blueprint_id, deployment_id,
+                    self.remote_deployment_inputs_path),
             within_cfy_env=True)
 
         return deployment_id
@@ -291,14 +295,15 @@ class TestCliPackage(TestCase):
     def install_deployment(self, deployment_id):
         self.logger.info('Installing deployment...')
         self._execute_command('executions start -d {0} -w install'
-                              ''.format(deployment_id),
+                              .format(deployment_id),
                               within_cfy_env=True, retries=2)
 
-    def uninstall_deployment(self, deployment_id):
-        self.cfy._wait_for_stop_dep_env_execution_if_necessary(deployment_id)
+    def uninstall_deployment(self):
+        self.cfy._wait_for_stop_dep_env_execution_if_necessary(
+            self.deployment_id)
         self.logger.info('Uninstalling deployment...')
         self._execute_command('executions start -d {0} -w uninstall'
-                              ''.format(deployment_id), within_cfy_env=True)
+                              .format(self.deployment_id), within_cfy_env=True)
 
     def _test_cli_package(self):
         self.install_cli()
@@ -309,10 +314,10 @@ class TestCliPackage(TestCase):
         self.bootstrap_manager()
         blueprint_id = self.publish_hello_world_blueprint()
         self.deployment_id = self.create_deployment(blueprint_id)
+        self.addCleanup(self.uninstall_deployment)
         self.install_deployment(self.deployment_id)
         self.assert_deployment_working(
             self._get_app_property('http_endpoint'))
-        self.uninstall_deployment(self.deployment_id)
 
     def _manager_ip(self):
         nova_client, _, _ = self.env.handler.openstack_clients()
@@ -324,23 +329,13 @@ class TestCliPackage(TestCase):
         self.fail('Failed finding manager ip')
 
     def _get_app_property(self, property_name):
-
-        out = self._execute_command('deployments outputs -d {0}'
-                                    ''.format(self.deployment_id),
-                                    within_cfy_env=True)
-        value_index = out.find('Value:', out.find(property_name))
-        property_start = value_index + len('Value:') + 1
-        property_end = out.find('\r', property_start)
-        if property_end == -1:
-            property_end = out.find('\n', property_start)
-        if property_end == -1:
-            return out[property_start:]
-        return out[property_start:property_end]
+        outputs_resp = self.client.deployments.outputs.get(self.deployment_id)
+        return outputs_resp['outputs'][property_name]
 
     @retry(stop_max_attempt_number=3, wait_fixed=3000)
     def assert_deployment_working(self, url):
-        nodejs_server_page_response = requests.get(url)
-        self.assertEqual(200, nodejs_server_page_response.status_code,
+        server_page_response = requests.get(url)
+        self.assertEqual(200, server_page_response.status_code,
                          'Failed to get home page of app')
 
     def cleanup(self):
