@@ -47,7 +47,7 @@ class TestCliPackage(TestCase):
         return self.env.centos_7_image_user
 
     def get_client_cfy_work_dir(self):
-        return '/cfy'
+        return '/opt/cfy'
 
     def get_local_env_outputs(self):
         self.public_ip_address = \
@@ -187,11 +187,10 @@ class TestCliPackage(TestCase):
     def install_cli(self):
         self.logger.info('installing cli...')
 
-        self._execute_command('curl -O {0}'
-                              .format(self.get_cli_package_url()), sudo=True)
+        self._execute_command('curl -O {0}'.format(self.get_cli_package_url()))
         self._execute_command('curl https://raw.githubusercontent.com/pypa/'
                               'pip/master/contrib/get-pip.py'
-                              ' | sudo python2.7 -', sudo=True)
+                              ' | sudo python2.7 -')
         self._execute_command('pip install virtualenv', sudo=True)
 
         last_ind = self.get_cli_package_url().rindex('/')
