@@ -45,11 +45,11 @@ class TestRHEL(TestCliPackage):
     def get_local_env_inputs(self):
         return {
             'prefix': self.prefix,
-            'image_id': self.env.aws_ec2_eu_west_1_ami_rhel_7_image_id,
+            'image_id': self.env.rhel_7_image_id,
             'instance_type': self.env.medium_instance_type,
             'aws_access_key_id': self.env.aws_access_key_id,
             'aws_secret_access_key': self.env.aws_secret_access_key,
-            'ec2_region_name': self.env.aws_ec2_eu_west_1_region_name,
+            'ec2_region_name': self.env.ec2_region_name,
             'key_pair_path': '{0}/{1}-keypair.pem'.format(self.workdir,
                                                           self.prefix)
         }
@@ -58,18 +58,18 @@ class TestRHEL(TestCliPackage):
         return {
             'aws_access_key_id': self.env.aws_access_key_id,
             'aws_secret_access_key': self.env.aws_secret_access_key,
-            'ec2_region_name': self.env.aws_ec2_eu_west_1_region_name,
+            'ec2_region_name': self.env.ec2_region_name,
             'manager_keypair_name': '{0}-manager-keypair'.format(self.prefix),
             'agent_keypair_name': '{0}-agent-keypair'.format(self.prefix),
             'ssh_user': self.env.rhel_7_image_user,
             'agents_user': self.env.rhel_7_image_user,
-            'image_id': self.env.aws_ec2_eu_west_1_ami_rhel_7_image_id,
+            'image_id': self.env.rhel_7_image_id,
             'instance_type': self.env.medium_instance_type,
         }
 
     def get_deployment_inputs(self):
         return {
-            'image_id': self.env.aws_ec2_eu_west_1_ami_rhel_7_image_id,
+            'image_id': self.env.rhel_7_image_id,
             'instance_type': self.env.medium_instance_type,
             'agent_user': self.env.rhel_7_image_user,
         }
