@@ -2,13 +2,15 @@
 tosca_definitions_version: cloudify_dsl_1_2
 
 imports:
-  - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
-  - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
+  - http://www.getcloudify.org/spec/cloudify/3.3/types.yaml
+  - http://www.getcloudify.org/spec/openstack-plugin/1.3/plugin.yaml
 
 inputs:
   prefix:
     description: >
       Unique test id to be added as a prefix for resource names.
+  external_network:
+    type: string
   os_username:
     type: string
   os_password:
@@ -24,8 +26,6 @@ inputs:
   image_name:
     type: string
   key_pair_path:
-    type: string
-  external_network:
     type: string
 
 node_templates:
@@ -44,7 +44,7 @@ node_templates:
   router:
     type: cloudify.openstack.nodes.Router
     properties:
-      resource_id: { concat: [{ get_input: prefix }, '-windows-vm-router'] }
+      resource_id: { concat: [{ get_input: prefix }, '-router'] }
       openstack_config: *OPENSTACK_CONFIG
     relationships:
       - target: external_network
@@ -53,16 +53,17 @@ node_templates:
   network:
     type: cloudify.openstack.nodes.Network
     properties:
-      resource_id: { concat: [{ get_input: prefix }, '-windows-vm-network'] }
+      resource_id: { concat: [{ get_input: prefix }, '-network'] }
       openstack_config: *OPENSTACK_CONFIG
 
   subnet:
     type: cloudify.openstack.nodes.Subnet
     properties:
-      resource_id: { concat: [{ get_input: prefix }, '-windows-vm-subnet'] }
+      resource_id: { concat: [{ get_input: prefix }, '-subnet'] }
       subnet:
         ip_version: 4
         cidr: 10.67.79.0/24
+        dns_nameservers: [8.8.8.8, 8.8.4.4]
       openstack_config: *OPENSTACK_CONFIG
     relationships:
       - target: network
@@ -82,39 +83,27 @@ node_templates:
     properties:
       security_group:
         description: Basic cli VM
-      resource_id: { concat: [{ get_input: prefix }, '-windows-vm-security-group'] }
+      resource_id: { concat: [{ get_input: prefix }, '-security-group'] }
       rules:
-        - port: 3389
+        - port: 22
           remote_ip_prefix: 0.0.0.0/0
-        - port: 5985
+        - port: 8080
           remote_ip_prefix: 0.0.0.0/0
       openstack_config: *OPENSTACK_CONFIG
 
   keypair:
     type: cloudify.openstack.nodes.KeyPair
     properties:
-      resource_id: { concat: [{ get_input: prefix }, '-windows-vm-keypair'] }
+      resource_id: { concat: [{ get_input: prefix }, '-keypair'] }
       private_key_path: { get_input: key_pair_path }
       openstack_config: *OPENSTACK_CONFIG
 
-  windows_vm:
-    type: cloudify.openstack.nodes.WindowsServer
+  server:
+    type: cloudify.openstack.nodes.Server
     properties:
       install_agent: false
       image: { get_input: image_name }
       flavor: { get_input: flavor }
-      server:
-        userdata: |
-          #ps1_sysnative
-          winrm quickconfig -q
-          winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="300"}'
-          winrm set winrm/config '@{MaxTimeoutms="1800000"}'
-          winrm set winrm/config/service '@{AllowUnencrypted="true"}'
-          winrm set winrm/config/service/auth '@{Basic="true"}'
-          &netsh advfirewall firewall add rule name="WinRM 5985" protocol=TCP dir=in localport=5985 action=allow
-          &netsh advfirewall firewall add rule name="WinRM 5986" protocol=TCP dir=in localport=5986 action=allow
-          iex ((new-object net.webclient).DownloadString("https://chocolatey.org/install.ps1"))
-          choco install 7zip.commandline -y
       management_network_name: { get_property: [network, resource_id] }
       openstack_config: *OPENSTACK_CONFIG
     relationships:
@@ -130,7 +119,7 @@ node_templates:
         type: cloudify.openstack.server_connected_to_security_group
 
 outputs:
-  windows_vm_ip_address:
+  vm_public_ip_address:
     value: { get_attribute: [floating_ip, floating_ip_address] }
-  windows_vm_password:
-    value: { get_attribute: [windows_vm, password] }
+  vm_private_ip_address:
+    value: { get_attribute: [server, ip]}
