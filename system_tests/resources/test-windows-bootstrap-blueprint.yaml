@@ -63,7 +63,6 @@ node_templates:
       subnet:
         ip_version: 4
         cidr: 10.67.79.0/24
-        dns_nameservers: [8.8.4.4, 8.8.8.8]
       openstack_config: *OPENSTACK_CONFIG
     relationships:
       - target: network
@@ -81,6 +80,8 @@ node_templates:
   security_group:
     type: cloudify.openstack.nodes.SecurityGroup
     properties:
+      security_group:
+        description: Basic cli VM
       resource_id: { concat: [{ get_input: prefix }, '-windows-vm-security-group'] }
       rules:
         - port: 3389

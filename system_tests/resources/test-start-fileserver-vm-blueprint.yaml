@@ -63,6 +63,7 @@ node_templates:
       subnet:
         ip_version: 4
         cidr: 10.67.79.0/24
+        dns_nameservers: [8.8.8.8, 8.8.4.4]
       openstack_config: *OPENSTACK_CONFIG
     relationships:
       - target: network
@@ -80,11 +81,13 @@ node_templates:
   security_group:
     type: cloudify.openstack.nodes.SecurityGroup
     properties:
-      resource_id: { concat: [{ get_input: prefix }, '-security-group'] }
       security_group:
         description: Basic cli VM
+      resource_id: { concat: [{ get_input: prefix }, '-security-group'] }
       rules:
         - port: 22
+          remote_ip_prefix: 0.0.0.0/0
+        - port: 8080
           remote_ip_prefix: 0.0.0.0/0
       openstack_config: *OPENSTACK_CONFIG
 
