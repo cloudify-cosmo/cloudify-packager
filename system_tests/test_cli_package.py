@@ -293,6 +293,9 @@ class TestCliPackage(TestCase):
         return deployment_id
 
     def install_deployment(self, deployment_id):
+        self.logger.info(
+            'Waiting for 15 seconds before installing deployment...')
+        time.sleep(15)
         self.logger.info('Installing deployment...')
         self._execute_command('executions start -d {0} -w install'
                               .format(deployment_id),
