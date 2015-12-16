@@ -15,6 +15,7 @@
 
 
 import base64
+from contextlib import contextmanager
 import os
 import socket
 import time
@@ -23,6 +24,7 @@ import json
 import winrm
 
 from test_cli_package import TestCliPackage
+from test_offline_cli_package import TestOfflineCliPackage
 
 
 WINRM_PORT = 5985
@@ -31,18 +33,21 @@ HELLO_WORLD_URL = 'https://github.com/cloudify-cosmo/cloudify-hello-world-exampl
 TASK_RETRIES = 20
 
 
-class TestWindowsBootstrap(TestCliPackage):
+class TestWindowsBase(object):
     def setUp(self):
         self.session = None
         super(TestWindowsBootstrap, self).setUp()
 
-    def get_package_parameter_name(self):
+    @property
+    def package_parameter_name(self):
         return 'WINDOWS_CLI_PACKAGE_URL'
 
-    def get_local_env_blueprint_file_name(self):
+    @property
+    def local_env_blueprint_file_name(self):
         return 'test-windows-bootstrap-blueprint.yaml'
 
-    def get_client_cfy_work_dir(self):
+    @property
+    def client_cfy_work_dir(self):
         return 'C:\cloudify-cli'
 
     def get_local_env_outputs(self):
@@ -81,26 +86,11 @@ $content > $path""".format(
         user = 'Administrator'
         self.session = winrm.Session(url, auth=(user, self.password))
 
-    def get_image_name(self):
+    @property
+    def image_name(self):
         return self.env.windows_image_name
 
-    def test_windows_cli_package(self):
-        self._test_cli_package()
-
-    def _wait_for_connection_availability(self, ip_address, port, timeout=300):
-        deadline = time.time() + timeout
-        while time.time() < deadline:
-            try:
-                socket.create_connection((ip_address, port), timeout=10)
-                break
-            except IOError, e:
-                self.logger.info(
-                    'Connection to {0}:{1} is not available: {2} - retrying...'
-                    .format(ip_address, port, str(e)))
-                time.sleep(5)
-
-    def _execute_command(self, cmd, within_cfy_env=False,
-                         sudo=False, log_cmd=True, retries=0):
+    def _execute_command(self, cmd, within_cfy_env=False, log_cmd=True):
         if within_cfy_env:
             cmd = '{0}\Scripts\cfy.exe {1}'.format(self.cfy_work_dir, cmd)
 
@@ -120,6 +110,77 @@ STDERR:
                 cmd, r.status_code))
         else:
             return r.std_out
+
+    def _wait_for_connection_availability(self, ip_address, port, timeout=300):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            try:
+                socket.create_connection((ip_address, port), timeout=10)
+                break
+            except IOError, e:
+                self.logger.info(
+                    'Connection to {0}:{1} is not available: {2} - retrying...'
+                    .format(ip_address, port, str(e)))
+                time.sleep(5)
+
+    def prepare_manager_blueprint(self):
+        manager_blueprints_url = \
+            'https://github.com/cloudify-cosmo/cloudify-manager-blueprints/' \
+            'archive/{0}.zip'.format(
+                self.branch)  # NOQA
+        wget_cmd = """
+$client = New-Object System.Net.WebClient
+$url = "{0}"
+$file = "{1}"
+$client.DownloadFile($url, $file)
+7za x {1} -o{2} -y""".format(
+            manager_blueprints_url, 'cloudify-manager-blueprints.zip',
+            self.cfy_work_dir)
+        self.logger.info(
+            'Downloading and extracting cloudify-manager-blueprints from: {0}'
+            .format(manager_blueprints_url))
+        self._execute_command(wget_cmd)
+        self.test_manager_blueprint_path = \
+            '{0}\\cloudify-manager-blueprints-{1}' \
+            '\\openstack-manager-blueprint.yaml'.format(
+                self.cfy_work_dir, self.branch)  # NOQA
+
+        # self.change_to_tarzan_urls()
+
+        self._execute_command("""$inputs = '{0}'
+$inputs | Out-File {1}\inputs.json""".format(
+            json.dumps(self.bootstrap_inputs),
+            self.cfy_work_dir), log_cmd=False)
+        self.remote_bootstrap_inputs_path = \
+            '{0}\inputs.json'.format(self.cfy_work_dir)
+
+    @contextmanager
+    def dns(self, dns_name_servers=('8.8.8.8', '8.8.4.4')):
+        """
+        Enables setting custom dns servers on the local machine.
+        This is useful mainly when the bootstrap doesn't contain a
+        dns_nameservers.
+
+        :param dns_name_servers: an iterable of dns addresses.
+        defaults to ('8.8.8.8', '8.8.4.4').
+        :return: None
+        """
+        self.logger.info('Adding {0} to dns list'.format(dns_name_servers))
+        cmd = 'Set-DnsClientServerAddress -InterfaceIndex 12 ' \
+              '-ServerAddresses {0}'
+        self._execute_command(cmd.format(','.join(dns_name_servers)))
+
+        yield
+
+        self.logger.info('Removing {0} from dns list'.format(dns_name_servers))
+        self._execute_command(cmd.format('1.1.1.1'))
+
+
+class TestWindowsBootstrap(TestWindowsBase, TestCliPackage):
+
+    def test_windows_cli_package(self):
+        with self.dns():
+            self._test_cli_package()
 
     def install_cli(self):
         wget_cmd = """
@@ -164,42 +225,37 @@ set-content -value $data -encoding byte -path $filePath
             remote_modify_script,
             self.test_manager_blueprint_path))
 
-    def prepare_manager_blueprint(self):
-        manager_blueprints_url = \
-            'https://github.com/cloudify-cosmo/cloudify-manager-blueprints/' \
-            'archive/{0}.zip'.format(
-            self.branch)  # NOQA
-        wget_cmd = """
+
+class TestWindowsOfflineBootstrap(TestWindowsBase, TestOfflineCliPackage):
+
+    def test_windows_cli_package(self):
+        self._test_cli_package()
+
+    def _update_hosts_file(self, resolution):
+        cmd = 'ac -Encoding UTF8  ' \
+              'C:\Windows\system32\drivers\etc\hosts "{0}"'.format(resolution)
+        self._execute_command(cmd)
+
+    def _prepare_cli(self):
+        with self.dns():
+            wget_cmd = """
 $client = New-Object System.Net.WebClient
 $url = "{0}"
 $file = "{1}"
-$client.DownloadFile($url, $file)
-7za x {1} -o{2} -y""".format(
-            manager_blueprints_url, 'cloudify-manager-blueprints.zip',
-            self.cfy_work_dir)
-        self.logger.info(
-            'Downloading and extracting cloudify-manager-blueprints from: {0}'
-            .format(manager_blueprints_url))
+$client.DownloadFile($url, $file)""".format(self.cli_package_url,
+                                            CLI_PACKAGE_EXE)
+            self.logger.info(
+                'Downloading Windows CLI package from: {0}'.format(
+                    self.cli_package_url))
         self._execute_command(wget_cmd)
-        self.test_manager_blueprint_path = \
-            '{0}\\cloudify-manager-blueprints-{1}' \
-            '\\openstack-manager-blueprint.yaml'.format(
-            self.cfy_work_dir, self.branch)  # NOQA
 
-        # self.change_to_tarzan_urls()
+        return CLI_PACKAGE_EXE
 
-        self._execute_command("""$inputs = '{0}'
-$inputs | Out-File {1}\inputs.json""".format(
-            json.dumps(self.bootstrap_inputs),
-            self.cfy_work_dir), log_cmd=False)
-        self.remote_bootstrap_inputs_path = \
-            '{0}\inputs.json'.format(self.cfy_work_dir)
-
-    def prepare_deployment(self):
-        deployment_inputs = self.get_deployment_inputs()
-
-        self._execute_command("""$inputs = '{0}'
-$inputs | Out-File {1}\deployment-inputs.json""".format(
-            json.dumps(deployment_inputs), self.cfy_work_dir))
-        self.remote_deployment_inputs_path = \
-            '{0}\deployment-inputs.json'.format(self.cfy_work_dir)
+    def _install_cli(self, package_name):
+        self.logger.info('Installing CLI...')
+        with self.dns():
+            self._execute_command(
+                '.\{0} /SILENT /VERYSILENT /SUPPRESSMSGBOXES /DIR="{1}"'
+                ''.format(package_name, self.client_cfy_work_dir))  # NOQA
+            self.logger.info('Verifying CLI installation...')
+            self._execute_command('--version', within_cfy_env=True)

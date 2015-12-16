@@ -186,8 +186,8 @@ function get_license
     sudo cp -f /cloudify-packager/docker/cloudify-ui/LICENSE ${lic_dir}
 }
 
-CORE_TAG_NAME="3.3"
-PLUGINS_TAG_NAME="1.3"
+CORE_TAG_NAME="3.3.1"
+PLUGINS_TAG_NAME="1.3.1"
 GITHUB_USERNAME=$1
 GITHUB_PASSWORD=$2
 

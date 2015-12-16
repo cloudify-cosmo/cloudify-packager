@@ -14,10 +14,10 @@
 #    * limitations under the License.
 
 from test_cli_package import TestCliPackage
+from test_offline_cli_package import TestOfflineCliPackage
 
 
-class TestRHEL(TestCliPackage):
-
+class TestRHELBase(object):
     def _manager_ip(self):
         return self._execute_command(
             'source {0}/env/bin/activate && {1}'.format(
@@ -27,20 +27,33 @@ class TestRHEL(TestCliPackage):
             )
         )
 
-    def get_package_parameter_name(self):
+    @property
+    def package_parameter_name(self):
         return 'RHEL_CLI_PACKAGE_URL'
 
-    def get_local_env_blueprint_file_name(self):
+    @property
+    def local_env_blueprint_file_name(self):
         return 'start-ec2-worker-vm.yaml'
 
-    def get_manager_blueprint_file_name(self):
+    @property
+    def manager_blueprint_file_name(self):
         return 'aws-ec2-manager-blueprint.yaml'
 
-    def get_client_user(self):
+    @property
+    def client_user(self):
         return self.env.rhel_7_image_user
 
-    def get_app_blueprint_file(self):
+    @property
+    def app_blueprint_file(self):
         return 'ec2-blueprint.yaml'
+
+    @property
+    def image_name(self):
+        return self.env.centos_7_image_name
+
+    @property
+    def client_cfy_work_dir(self):
+        return '/opt/cfy'
 
     def get_local_env_inputs(self):
         return {
@@ -76,6 +89,16 @@ class TestRHEL(TestCliPackage):
 
     def add_dns_nameservers_to_manager_blueprint(self, *args, **kwargs):
         pass
+
+
+class TestRHEL(TestRHELBase, TestCliPackage):
+
+    def test_rhel7_cli_package(self):
+        with self.dns():
+            self._test_cli_package()
+
+
+class TestOfflineRHEL(TestRHELBase, TestOfflineCliPackage):
 
     def test_rhel7_cli_package(self):
         self._test_cli_package()
