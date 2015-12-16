@@ -14,18 +14,38 @@
 #    * limitations under the License.
 
 from test_cli_package import TestCliPackage
+from test_offline_cli_package import TestOfflineCliPackage
 
 
-class TestCentos7Bootstrap(TestCliPackage):
+class TestCentos7Base(object):
 
-    def get_package_parameter_name(self):
+    @property
+    def package_parameter_name(self):
         return 'CENTOS_7_CLI_PACKAGE_URL'
 
-    def get_image_name(self):
+    @property
+    def image_name(self):
         return self.env.centos_7_image_name
 
-    def get_client_user(self):
+    @property
+    def client_user(self):
         return self.env.centos_7_image_user
 
+    @property
+    def local_env_blueprint_file_name(self):
+        return 'test-start-vm-blueprint.yaml'
+
+    @property
+    def client_cfy_work_dir(self):
+        return '/opt/cfy'
+
+
+class TestCentos7Bootstrap(TestCentos7Base, TestCliPackage):
+    def test_centos7_cli_package(self):
+        with self.dns():
+            self._test_cli_package()
+
+
+class TestCentos7OfflineBootstrap(TestCentos7Base, TestOfflineCliPackage):
     def test_centos7_cli_package(self):
         self._test_cli_package()
