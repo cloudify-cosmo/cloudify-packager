@@ -81,6 +81,8 @@ class TestCentos65Bootstrap(TestCentos65Base, TestCliPackage):
         self._prepare_centos_env()
 
     def test_centos6_5_cli_package(self):
+        wait_for_vm_to_become_ssh_available(env, self._execute_command,
+                                            self.logger)
         with self.dns():
             self._test_cli_package()
 
@@ -91,5 +93,5 @@ class TestCentos65OfflineBootstrap(TestCentos65Base, TestOfflineCliPackage):
         super(TestCentos65OfflineBootstrap, self).additional_setup()
         self._prepare_centos_env()
 
-    def test_centos6_5_cli_package(self):
+    def test_offline_centos6_5_cli_package(self):
         self._test_cli_package()
