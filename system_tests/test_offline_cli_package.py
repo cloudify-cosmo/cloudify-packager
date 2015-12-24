@@ -530,7 +530,8 @@ class FileServer(object):
 
 
 def wait_for_vm_to_become_ssh_available(env_settings, executor, logger=None,
-                                        retries=10, retry_interval=30):
+                                        retries=10, retry_interval=30,
+                                        timeout=20):
     """
     Asserts that a machine received the ssh key for the key manager, and it is
     no ready to be connected via ssh.
@@ -538,19 +539,21 @@ def wait_for_vm_to_become_ssh_available(env_settings, executor, logger=None,
     :param executor: An executer function, which executes code on the remote
     machine.
     :param logger: custom logger. defaults to None.
-    :param retries: number of time to check for availability. default to 5.
+    :param retries: number of time to check for availability. default to 10.
     :param retry_interval: length of the intervals between each try. defaults
-    to 20.
+    to 30.
+    :param timeout: timeout for each check try. default to 60.
     :return: None
     """
     local_env_setting = copy.deepcopy(env_settings)
     local_env_setting.update({'abort_exception': FabException})
+    local_env_setting.update({'timeout': timeout})
     if logger:
         logger.info('Waiting for ssh key to register on the vm...')
     while retries >= 0:
         try:
             with fab_env(**local_env_setting):
-                executor('echo')
+                executor('echo Success')
                 if logger:
                     logger.info('Machine is ready to be logged in...')
                 return

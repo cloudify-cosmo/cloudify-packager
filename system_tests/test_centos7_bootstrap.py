@@ -13,8 +13,9 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
-from test_cli_package import TestCliPackage
-from test_offline_cli_package import TestOfflineCliPackage
+from test_cli_package import TestCliPackage, env
+from test_offline_cli_package import TestOfflineCliPackage, \
+    wait_for_vm_to_become_ssh_available
 
 
 class TestCentos7Base(object):
@@ -42,10 +43,12 @@ class TestCentos7Base(object):
 
 class TestCentos7Bootstrap(TestCentos7Base, TestCliPackage):
     def test_centos7_cli_package(self):
+        wait_for_vm_to_become_ssh_available(env, self._execute_command,
+                                            self.logger)
         with self.dns():
             self._test_cli_package()
 
 
 class TestCentos7OfflineBootstrap(TestCentos7Base, TestOfflineCliPackage):
-    def test_centos7_cli_package(self):
+    def test_offline_centos7_cli_package(self):
         self._test_cli_package()
