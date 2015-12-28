@@ -284,9 +284,9 @@ class TestOfflineCliPackage(TestCliPackage):
     def _get_manager_kp(self):
         """
         Retrieves manager kp to the local machine.
-        :return: path the local manager kp.
+        :return: path to the local manager kp.
         """
-        remote_manager_kp_path = self.env.cloudify_config['ssh_key_filename']
+        remote_manager_kp_path = self.bootstrap_inputs['ssh_key_filename']
         local_manager_kp = fab.get(remote_manager_kp_path, self.workdir)[0]
         os.chmod(local_manager_kp, stat.S_IRUSR | stat.S_IWUSR)
         return local_manager_kp
