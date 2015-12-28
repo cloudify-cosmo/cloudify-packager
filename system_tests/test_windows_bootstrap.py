@@ -23,9 +23,8 @@ import json
 
 import winrm
 
-from test_cli_package import TestCliPackage, env
-from test_offline_cli_package import TestOfflineCliPackage, \
-    wait_for_vm_to_become_ssh_available
+from test_cli_package import TestCliPackage
+from test_offline_cli_package import TestOfflineCliPackage
 
 WINRM_PORT = 5985
 CLI_PACKAGE_EXE = 'windows-cli-package.exe'
@@ -57,21 +56,6 @@ class TestWindowsBase(object):
 
     def is_install_plugins(self):
         return True
-
-    def change_to_tarzan_urls(self):
-        self._execute_command(
-            """
-$path = "{0}"
-$text = "{1}"
-$replace = "{2}"
-$content = get-content $path
-$content = $content -replace $text, $replace
-$content = $content -replace "task_retries: .*$", "task_retries: {3}"
-$content > $path""".format(
-                self.test_manager_blueprint_path,
-                'http://gigaspaces-repository-eu.s3.amazonaws.com/org',
-                'http://tarzan/builds/GigaSpacesBuilds',
-                TASK_RETRIES))
 
     def additional_setup(self):
         if 'BRANCH_NAME_CORE' not in os.environ:
@@ -145,8 +129,6 @@ $client.DownloadFile($url, $file)
             '\\openstack-manager-blueprint.yaml'.format(
                 self.cfy_work_dir, self.branch)  # NOQA
 
-        # self.change_to_tarzan_urls()
-
         self._execute_command("""$inputs = '{0}'
 $inputs | Out-File {1}\inputs.json""".format(
             json.dumps(self.bootstrap_inputs),
@@ -179,8 +161,6 @@ $inputs | Out-File {1}\inputs.json""".format(
 class TestWindowsBootstrap(TestWindowsBase, TestCliPackage):
 
     def test_windows_cli_package(self):
-        wait_for_vm_to_become_ssh_available(env, self._execute_command,
-                                            self.logger)
         with self.dns():
             self._test_cli_package()
 

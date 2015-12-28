@@ -12,7 +12,7 @@
 # * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # * See the License for the specific language governing permissions and
 #    * limitations under the License.
-
+import copy
 import os
 import time
 import uuid
@@ -21,24 +21,32 @@ from contextlib import contextmanager
 import requests
 from retrying import retry
 
+import fabric.api as fab
 from cloudify.workflows import local
 from cloudify_cli import constants as cli_constants
 from cloudify_rest_client import CloudifyClient
-import fabric.api as fab
 from fabric.api import env
-
+from fabric.context_managers import settings as fab_env, cd
 from cosmo_tester.framework.testenv import TestCase
 
+CHECK_URL = 'www.google.com'
 HELLO_WORLD_EXAMPLE_NAME = 'cloudify-hello-world-example'
 EXAMPLE_URL = 'https://github.com/cloudify-cosmo/{0}/archive/{1}.tar.gz'
-IMPLEMENTATION_MSG = 'this should be implemented in inheriting classes'
+
+
+class FabException(Exception):
+    """
+    Custom exception which replaces the standard SystemExit which is raised
+    by fabric on errors.
+    """
+    pass
 
 
 class TestCliPackage(TestCase):
 
     @property
     def package_parameter_name(self):
-        raise Exception(IMPLEMENTATION_MSG)
+        raise NotImplementedError
 
     @property
     def cli_package_url(self):
@@ -46,19 +54,39 @@ class TestCliPackage(TestCase):
 
     @property
     def client_cfy_work_dir(self):
-        raise Exception(IMPLEMENTATION_MSG)
-
-    @property
-    def propertsadawed(self):
-        raise Exception(IMPLEMENTATION_MSG)
+        raise NotImplementedError
 
     @property
     def client_user(self):
-        raise Exception(IMPLEMENTATION_MSG)
+        raise NotImplementedError
 
     @property
     def image_name(self):
-        raise Exception(IMPLEMENTATION_MSG)
+        raise NotImplementedError
+
+    @property
+    def manager_blueprint_file_name(self):
+        raise NotImplementedError
+
+    @property
+    def local_env_blueprint_file_name(self):
+        raise NotImplementedError
+
+    @property
+    def local_env_inputs(self):
+        raise NotImplementedError
+
+    @property
+    def bootstrap_inputs(self):
+        raise NotImplementedError
+
+    @property
+    def deployment_inputs(self):
+        raise NotImplementedError
+
+    @property
+    def app_blueprint_file(self):
+        raise NotImplementedError
 
     def get_local_env_outputs(self):
         self.public_ip_address = \
@@ -80,10 +108,6 @@ class TestCliPackage(TestCase):
         self.prefix = '{0}-cli-host'.format(self.test_id)
         self.bootstrap_prefix = 'cloudify-{0}'.format(self.test_id)
 
-        self.inputs = self.get_local_env_inputs()
-        self.bootstrap_inputs = self.get_bootstrap_inputs()
-        self.deployment_inputs = self.get_deployment_inputs()
-
         self.branch = os.environ.get('BRANCH_NAME_CORE', 'master')
         self.logger.info('Using branch/tag: {0}'.format(self.branch))
 
@@ -91,7 +115,7 @@ class TestCliPackage(TestCase):
                          'blueprint that starts a vm')
         self.local_env = local.init_env(
             blueprint_path,
-            inputs=self.inputs,
+            inputs=self.local_env_inputs,
             name=self._testMethodName,
             ignored_modules=cli_constants.IGNORED_LOCAL_WORKFLOW_MODULES)
 
@@ -107,55 +131,19 @@ class TestCliPackage(TestCase):
         env.update({
             'timeout': 30,
             'user': self.client_user,
-            'key_filename': self.inputs['key_pair_path'],
+            'key_filename': self.local_env_inputs['key_pair_path'],
             'host_string': self.public_ip_address,
             'connection_attempts': 10,
             'abort_on_prompts': True
         })
 
-    def get_local_env_inputs(self):
-        return {
-            'prefix': self.prefix,
-            'external_network': self.env.external_network_name,
-            'os_username': self.env.keystone_username,
-            'os_password': self.env.keystone_password,
-            'os_tenant_name': self.env.keystone_tenant_name,
-            'os_region': self.env.region,
-            'os_auth_url': self.env.keystone_url,
-            'image_name': self.image_name,
-            'flavor': self.env.medium_flavor_id,
-            'key_pair_path': '{0}/{1}-keypair.pem'.format(self.workdir,
-                                                          self.prefix)
-        }
-
-    def get_bootstrap_inputs(self):
-        return {
-            'keystone_username': self.env.keystone_username,
-            'keystone_password': self.env.keystone_password,
-            'keystone_tenant_name': self.env.keystone_tenant_name,
-            'keystone_url': self.env.keystone_url,
-            'region': self.env.region,
-            'image_id': self.env.centos_7_image_id,
-            'flavor_id': self.env.medium_flavor_id,
-            'external_network_name': self.env.external_network_name,
-            'manager_server_name': self.env.management_server_name,
-            'management_network_name': self.env.management_network_name,
-            'manager_public_key_name': '{0}-manager-keypair'.format(
-                self.prefix),
-            'agent_public_key_name': '{0}-agent-keypair'.format(
-                self.prefix),
-        }
-
-    def local_env_blueprint_file_name(self):
-        raise Exception("Each blueprint should specify it's local env "
-                        "blueprint")
-
-    def get_deployment_inputs(self):
-        return {
-            'agent_user': 'ubuntu',
-            'image': self.env.ubuntu_trusty_image_id,
-            'flavor': self.env.medium_flavor_id
-        }
+        wait_for_vm_to_become_ssh_available(env, self._execute_command,
+                                            self.logger)
+        # Since different iaas enable some default DNS which enables internet
+        # access, by this call we make sure that all of the tests begin with
+        # no dns based internet connection. In online tests, the dns is being
+        # set by the dns() context manager.
+        self.go_offline()
 
     def setUp(self):
         super(TestCliPackage, self).setUp()
@@ -218,9 +206,6 @@ class TestCliPackage(TestCase):
                                              pipe_command),
                                      sudo=sudo)
 
-    def change_to_tarzan_urls(self):
-        pass
-
     def add_dns_nameservers_to_manager_blueprint(self, local_modify_script):
         remote_modify_script = os.path.join(self.client_cfy_work_dir,
                                             'modify.py')
@@ -233,16 +218,13 @@ class TestCliPackage(TestCase):
         fab.run('sudo python {0} {1}'.format(
             remote_modify_script, self.test_manager_blueprint_path))
 
-    def get_manager_blueprint_file_name(self):
-        return 'openstack-manager-blueprint.yaml'
-
     def prepare_manager_blueprint(self):
         self.manager_blueprints_repo_dir = '{0}/cloudify-manager-blueprints' \
                                            '-commercial/' \
                                            .format(self.client_cfy_work_dir)
         self.test_manager_blueprint_path = \
             os.path.join(self.manager_blueprints_repo_dir,
-                         self.get_manager_blueprint_file_name())
+                         self.manager_blueprint_file_name)
 
         self.local_bootstrap_inputs_path = \
             self.cfy._get_inputs_in_temp_file(self.bootstrap_inputs,
@@ -251,8 +233,6 @@ class TestCliPackage(TestCase):
             os.path.join(self.client_cfy_work_dir, 'bootstrap_inputs.json')
         fab.put(self.local_bootstrap_inputs_path,
                 self.remote_bootstrap_inputs_path, use_sudo=True)
-
-        self.change_to_tarzan_urls()
 
     def bootstrap_manager(self):
         self.logger.info('Bootstrapping Cloudify manager...')
@@ -279,9 +259,6 @@ class TestCliPackage(TestCase):
     def get_hello_world_url(self):
         return EXAMPLE_URL.format(HELLO_WORLD_EXAMPLE_NAME, self.branch)
 
-    def get_app_blueprint_file(self):
-        return 'blueprint.yaml'
-
     def publish_hello_world_blueprint(self):
         hello_world_url = self.get_hello_world_url()
         blueprint_id = 'blueprint-{0}'.format(uuid.uuid4())
@@ -290,7 +267,7 @@ class TestCliPackage(TestCase):
         self._execute_command('blueprints publish-archive '
                               '-l {0} -n {1} -b {2}'
                               .format(hello_world_url,
-                                      self.get_app_blueprint_file(),
+                                      self.app_blueprint_file,
                                       blueprint_id),
                               within_cfy_env=True)
         return blueprint_id
@@ -349,13 +326,13 @@ class TestCliPackage(TestCase):
             self._get_app_property('http_endpoint'))
 
     def _manager_ip(self):
-        nova_client, _, _ = self.env.handler.openstack_clients()
-        for server in nova_client.servers.list():
-            if server.name == self.env.management_server_name:
-                for network, network_ips in server.networks.items():
-                    if network == self.env.management_network_name:
-                        return network_ips[1]
-        self.fail('Failed finding manager ip')
+        return self._execute_command(
+            'source {0}/env/bin/activate && {1}'.format(
+                self.client_cfy_work_dir,
+                'python -c "from cloudify_cli import utils;'
+                'print utils.get_management_server_ip()"'
+            )
+        )
 
     def _get_app_property(self, property_name):
         outputs_resp = self.client.deployments.outputs.get(self.deployment_id)
@@ -379,6 +356,11 @@ class TestCliPackage(TestCase):
         self._execute_command('teardown -f --ignore-deployments',
                               within_cfy_env=True)
 
+    def go_offline(self):
+        self._execute_command('chmod +w /etc/resolv.conf', sudo=True)
+        self._execute_command('echo "" > /etc/resolv.conf', sudo=True)
+        self.assert_offline()
+
     @contextmanager
     def dns(self, dns_name_servers=('8.8.8.8', '8.8.4.4')):
         """
@@ -392,17 +374,97 @@ class TestCliPackage(TestCase):
         defaults to ('8.8.8.8', '8.8.4.4').
         :return: None
         """
-        self._execute_command("chmod +w /etc/resolv.conf", sudo=True)
+        self._execute_command('chmod +w /etc/resolv.conf', sudo=True)
 
+        self._add_dns(dns_name_servers)
+
+        yield
+
+        self._remove_dns(dns_name_servers)
+
+        self.assert_offline()
+
+    def _add_dns(self, dns_name_servers=('8.8.8.8', '8.8.4.4')):
         for server in dns_name_servers:
             self.logger.info('Adding {0} to dns list'.format(server))
             self._execute_command("echo 'nameserver {0}' >> /etc/resolv.conf"
                                   .format(server), sudo=True)
 
-        yield
-
+    def _remove_dns(self, dns_name_servers=('8.8.8.8', '8.8.4.4')):
         for server in dns_name_servers:
             self.logger.info('Removing {0} from dns list'.format(server))
             self._execute_command(
-                "sed -i '/nameserver {0}/c\\' /etc/resolv.conf".format(server),
-                sudo=True)
+                "sed -i '/nameserver {0}/c\\' /etc/resolv.conf"
+                .format(server), sudo=True)
+
+    def assert_offline(self):
+        out = self._execute_command('ping -c 2 {0}'.format(CHECK_URL),
+                                    warn_only=True)
+        self.assertIn('unknown host {0}'.format(CHECK_URL), out)
+        self.assertNotIn('bytes from', out)
+
+    def install_python27(self):
+        with self.dns():
+
+            self.logger.info('installing python 2.7...')
+
+            self._execute_command('yum -y update', sudo=True)
+            self._execute_command('yum install yum-downloadonly wget '
+                                  'mlocate yum-utils python-devel '
+                                  'libyaml-devel ruby rubygems '
+                                  'ruby-devel make gcc git -y', sudo=True)
+            self._execute_command('yum groupinstall -y \'development '
+                                  'tools\'', sudo=True)
+            self._execute_command('yum install -y zlib-devel bzip2-devel '
+                                  'openssl-devel xz-libs', sudo=True)
+            self._execute_command('curl -LO http://www.python.org/ftp/python/'
+                                  '2.7.8/Python-2.7.8.tar.xz', sudo=True)
+            self._execute_command('xz -d Python-2.7.8.tar.xz', sudo=True)
+            self._execute_command('tar -xvf Python-2.7.8.tar', sudo=True)
+            with cd('Python-2.7.8'):
+                self._execute_command('./configure --prefix=/usr', sudo=True)
+                self._execute_command('make', sudo=True)
+                self._execute_command('make altinstall', sudo=True)
+            self._execute_command('alias python=python2.7', sudo=True)
+
+
+def wait_for_vm_to_become_ssh_available(env_settings, executor,
+                                        logger=None, retries=10,
+                                        retry_interval=30, timeout=20):
+    """
+    Asserts that a machine received the ssh key for the key manager, and
+    it is no ready to be connected via ssh.
+    :param env_settings: The fabric setting for the remote machine.
+    :param executor: An executer function, which executes code on the
+    remote machine.
+    :param logger: custom logger. defaults to None.
+    :param retries: number of time to check for availability. default to
+    10.
+    :param retry_interval: length of the intervals between each try.
+    defaults to 30.
+    :param timeout: timeout for each check try. default to 60.
+    :return: None
+    """
+    local_env_setting = copy.deepcopy(env_settings)
+    local_env_setting.update({'abort_exception': FabException})
+    local_env_setting.update({'timeout': timeout})
+    if logger:
+        logger.info('Waiting for ssh key to register on the vm...')
+    while retries >= 0:
+        try:
+            with fab_env(**local_env_setting):
+                executor('echo Success')
+                if logger:
+                    logger.info('Machine is ready to be logged in...')
+                return
+        except FabException as e:
+            if retries == 0:
+                raise e
+            else:
+                if logger:
+                    logger.info('Machine is not yet ready, waiting for {0}'
+                                ' secs and trying again'
+                                .format(retry_interval))
+                retries -= 1
+                time.sleep(retry_interval)
+                continue

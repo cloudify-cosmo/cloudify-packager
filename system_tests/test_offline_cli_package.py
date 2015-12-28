@@ -13,7 +13,6 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-import copy
 import stat
 import urlparse
 import uuid
@@ -24,22 +23,13 @@ from socket import gethostbyname
 from StringIO import StringIO
 
 import yaml
-from fabric.context_managers import settings as fab_env
 
 from cloudify.workflows import local
-from test_cli_package import TestCliPackage, HELLO_WORLD_EXAMPLE_NAME, fab, env
+from test_cli_package import TestCliPackage, fab_env,\
+    HELLO_WORLD_EXAMPLE_NAME, fab, env, wait_for_vm_to_become_ssh_available
 from cloudify_cli import constants as cli_constants
 
 FILE_SERVER_PORT = 8080
-CHECK_URL = 'www.google.com'
-
-
-class FabException(Exception):
-    """
-    Custom exception which replaces the standard SystemExit which is raised
-    by fabric on errors.
-    """
-    pass
 
 
 class TestOfflineCliPackage(TestCliPackage):
@@ -62,7 +52,6 @@ class TestOfflineCliPackage(TestCliPackage):
             package_name = self._prepare_cli()
             blueprint_path = self.get_hello_world_blueprint()
 
-        self._assert_offline()
         self._install_cli(package_name)
         self.logger.info('Preparing manager blueprint')
         self.prepare_manager_blueprint()
@@ -110,7 +99,7 @@ class TestOfflineCliPackage(TestCliPackage):
             blueprint_id = 'blueprint-{0}'.format(uuid.uuid4())
 
             self._upload_blueprint(blueprint_path, blueprint_id,
-                                   self.get_app_blueprint_file())
+                                   self.app_blueprint_file)
             self.deployment_id = self.create_deployment(blueprint_id)
             self.addCleanup(self.uninstall_deployment)
             self.install_deployment(self.deployment_id)
@@ -132,7 +121,7 @@ class TestOfflineCliPackage(TestCliPackage):
         example_blueprint_path = \
             os.path.join("{0}-{1}".format(HELLO_WORLD_EXAMPLE_NAME,
                                           self.branch),
-                         self.get_app_blueprint_file())
+                         self.app_blueprint_file)
         example_blueprint = StringIO()
         fab.get(example_blueprint_path, example_blueprint)
         hello_world_blueprint_yaml = yaml.load(example_blueprint.getvalue())
@@ -145,12 +134,6 @@ class TestOfflineCliPackage(TestCliPackage):
         example_blueprint.truncate()
 
         fab.put(example_blueprint, example_blueprint_path)
-
-    def _assert_offline(self):
-        out = self._execute_command('ping -c 2 {0}'.format(CHECK_URL),
-                                    warn_only=True)
-        self.assertIn('unknown host {0}'.format(CHECK_URL), out)
-        self.assertNotIn('bytes from', out)
 
     def _prepare_cli(self):
         """
@@ -284,9 +267,9 @@ class TestOfflineCliPackage(TestCliPackage):
     def _get_manager_kp(self):
         """
         Retrieves manager kp to the local machine.
-        :return: path the local manager kp.
+        :return: path to the local manager kp.
         """
-        remote_manager_kp_path = self.env.cloudify_config['ssh_key_filename']
+        remote_manager_kp_path = self.bootstrap_inputs['ssh_key_filename']
         local_manager_kp = fab.get(remote_manager_kp_path, self.workdir)[0]
         os.chmod(local_manager_kp, stat.S_IRUSR | stat.S_IWUSR)
         return local_manager_kp
@@ -364,6 +347,9 @@ class FileServer(object):
 
         self.fs_base_url = '{0}:{1}'.format(self.fab_env_conf['host_string'],
                                             FILE_SERVER_PORT)
+        wait_for_vm_to_become_ssh_available(self.fab_env_conf,
+                                            self._execute_command,
+                                            self.logger)
 
     def process_resources(self):
         """
@@ -504,9 +490,6 @@ class FileServer(object):
         :return: File server object
         """
         self.boot()
-        wait_for_vm_to_become_ssh_available(self.fab_env_conf,
-                                            self._execute_command,
-                                            self.logger)
         self.process_resources()
         self.run()
         return self
@@ -527,43 +510,3 @@ class FileServer(object):
             finally:
                 self.teardown()
         return False
-
-
-def wait_for_vm_to_become_ssh_available(env_settings, executor, logger=None,
-                                        retries=10, retry_interval=30,
-                                        timeout=20):
-    """
-    Asserts that a machine received the ssh key for the key manager, and it is
-    no ready to be connected via ssh.
-    :param env_settings: The fabric setting for the remote machine.
-    :param executor: An executer function, which executes code on the remote
-    machine.
-    :param logger: custom logger. defaults to None.
-    :param retries: number of time to check for availability. default to 10.
-    :param retry_interval: length of the intervals between each try. defaults
-    to 30.
-    :param timeout: timeout for each check try. default to 60.
-    :return: None
-    """
-    local_env_setting = copy.deepcopy(env_settings)
-    local_env_setting.update({'abort_exception': FabException})
-    local_env_setting.update({'timeout': timeout})
-    if logger:
-        logger.info('Waiting for ssh key to register on the vm...')
-    while retries >= 0:
-        try:
-            with fab_env(**local_env_setting):
-                executor('echo Success')
-                if logger:
-                    logger.info('Machine is ready to be logged in...')
-                return
-        except FabException as e:
-            if retries == 0:
-                raise e
-            else:
-                if logger:
-                    logger.info('Machine is not yet ready, waiting for {0} '
-                                'secs and trying again'.format(retry_interval))
-                retries -= 1
-                time.sleep(retry_interval)
-                continue
