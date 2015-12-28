@@ -82,6 +82,7 @@ node_templates:
     type: cloudify.openstack.nodes.SecurityGroup
     properties:
       resource_id: { concat: [{ get_input: prefix }, '-security-group'] }
+      description: 'cli vm security group'
       rules:
         - port: 22
           remote_ip_prefix: 0.0.0.0/0
