@@ -15,50 +15,26 @@
 
 from test_cli_package import TestCliPackage, env
 from test_offline_cli_package import TestOfflineCliPackage
+from test_rhel_bootstrap import TestRHELBase
 
 
-class TestRHELBase(object):
-    def _manager_ip(self):
-        return self._execute_command(
-            'source {0}/env/bin/activate && {1}'.format(
-                self.cfy_work_dir,
-                'python -c "from cloudify_cli import utils;'
-                'print utils.get_management_server_ip()"'
-            )
-        )
-
+class TestRHEL65Base(TestRHELBase):
     @property
     def package_parameter_name(self):
-        return 'RHEL_CLI_PACKAGE_URL'
-
-    @property
-    def local_env_blueprint_file_name(self):
-        return 'start-ec2-worker-vm.yaml'
-
-    @property
-    def manager_blueprint_file_name(self):
-        return 'aws-ec2-manager-blueprint.yaml'
+        return 'CENTOS_6_5_CLI_PACKAGE_URL'
 
     @property
     def client_user(self):
         return self.env.rhel_7_image_user
 
     @property
-    def app_blueprint_file(self):
-        return 'ec2-blueprint.yaml'
-
-    @property
     def image_name(self):
-        return self.env.centos_7_image_name
-
-    @property
-    def client_cfy_work_dir(self):
-        return '/opt/cfy'
+        return self.env.rhel_65_image_id
 
     def get_local_env_inputs(self):
         return {
             'prefix': self.prefix,
-            'image_id': self.env.rhel_7_image_id,
+            'image_id': self.image_name,
             'instance_type': self.env.medium_instance_type,
             'aws_access_key_id': self.env.aws_access_key_id,
             'aws_secret_access_key': self.env.aws_secret_access_key,
@@ -76,30 +52,35 @@ class TestRHELBase(object):
             'agent_keypair_name': '{0}-agent-keypair'.format(self.prefix),
             'ssh_user': self.env.rhel_7_image_user,
             'agents_user': self.env.rhel_7_image_user,
-            'image_id': self.env.rhel_7_image_id,
+            'image_id': self.image_name,
             'instance_type': self.env.medium_instance_type,
         }
 
     def get_deployment_inputs(self):
         return {
-            'image_id': self.env.rhel_7_image_id,
+            'image_id': self.image_name,
             'instance_type': self.env.medium_instance_type,
             'agent_user': self.env.rhel_7_image_user,
         }
 
-    def add_dns_nameservers_to_manager_blueprint(self, *args, **kwargs):
-        pass
 
+class TestRHEL65(TestRHEL65Base, TestCliPackage):
 
-class TestRHEL(TestRHELBase, TestCliPackage):
+    def additional_setup(self):
+        super(TestRHEL65, self).additional_setup()
+        self.install_python27()
 
-    def test_rhel7_cli_package(self):
+    def test_rhel65_cli_package(self):
         self.wait_for_vm_to_become_ssh_available(env, self._execute_command)
         with self.dns():
             self._test_cli_package()
 
 
-class TestOfflineRHEL(TestRHELBase, TestOfflineCliPackage):
+class TestOfflineRHEL65(TestRHEL65Base, TestOfflineCliPackage):
 
-    def test_offline_rhel7_cli_package(self):
+    def additional_setup(self):
+        super(TestOfflineRHEL65, self).additional_setup()
+        self.install_python27()
+
+    def test_offline_rhel65_cli_package(self):
         self._test_cli_package()

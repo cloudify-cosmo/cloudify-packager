@@ -24,8 +24,7 @@ import json
 import winrm
 
 from test_cli_package import TestCliPackage, env
-from test_offline_cli_package import TestOfflineCliPackage, \
-    wait_for_vm_to_become_ssh_available
+from test_offline_cli_package import TestOfflineCliPackage
 
 WINRM_PORT = 5985
 CLI_PACKAGE_EXE = 'windows-cli-package.exe'
@@ -179,8 +178,7 @@ $inputs | Out-File {1}\inputs.json""".format(
 class TestWindowsBootstrap(TestWindowsBase, TestCliPackage):
 
     def test_windows_cli_package(self):
-        wait_for_vm_to_become_ssh_available(env, self._execute_command,
-                                            self.logger)
+        self.wait_for_vm_to_become_ssh_available(env, self._execute_command)
         with self.dns():
             self._test_cli_package()
 

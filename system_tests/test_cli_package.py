@@ -14,12 +14,15 @@
 #    * limitations under the License.
 
 import os
+import copy
 import time
 import uuid
 from contextlib import contextmanager
 
 import requests
 from retrying import retry
+from fabric.context_managers import settings as fab_env
+from fabric.context_managers import cd
 
 from cloudify.workflows import local
 from cloudify_cli import constants as cli_constants
@@ -406,3 +409,76 @@ class TestCliPackage(TestCase):
             self._execute_command(
                 "sed -i '/nameserver {0}/c\\' /etc/resolv.conf".format(server),
                 sudo=True)
+
+    def wait_for_vm_to_become_ssh_available(self, env_settings, executor,
+                                            retries=10, retry_interval=30,
+                                            timeout=20):
+        """
+        Asserts that a machine received the ssh key for the key manager, and it is
+        no ready to be connected via ssh.
+        :param env_settings: The fabric setting for the remote machine.
+        :param executor: An executer function, which executes code on the remote
+        machine.
+        :param retries: number of time to check for availability. default to 10.
+        :param retry_interval: length of the intervals between each try. defaults
+        to 30.
+        :param timeout: timeout for each check try. default to 60.
+        :return: None
+        """
+        local_env_setting = copy.deepcopy(env_settings)
+        local_env_setting.update({'abort_exception': FabException})
+        local_env_setting.update({'timeout': timeout})
+        if self.logger:
+            self.logger.info('Waiting for ssh key to register on the vm...')
+        while retries >= 0:
+            try:
+                with fab_env(**local_env_setting):
+                    executor('echo Success')
+                    if self.logger:
+                        self.logger.info('Machine is ready to be logged in...')
+                    return
+            except FabException as e:
+                if retries == 0:
+                    raise e
+                else:
+                    if self.logger:
+                        self.logger.info(
+                            'Machine is not yet ready, waiting for {0} '
+                            'secs and trying again'.format(retry_interval))
+                    retries -= 1
+                    time.sleep(retry_interval)
+                    continue
+
+    def install_python27(self):
+        self.wait_for_vm_to_become_ssh_available(env, self._execute_command,
+                                                 self.logger)
+        with self.dns():
+
+            self.logger.info('installing python 2.7...')
+
+            self._execute_command('yum -y update', sudo=True)
+            self._execute_command('yum install yum-downloadonly wget '
+                                  'mlocate yum-utils python-devel '
+                                  'libyaml-devel ruby rubygems '
+                                  'ruby-devel make gcc git -y', sudo=True)
+            self._execute_command('yum groupinstall -y \'development '
+                                  'tools\'', sudo=True)
+            self._execute_command('yum install -y zlib-devel bzip2-devel '
+                                  'openssl-devel xz-libs', sudo=True)
+            self._execute_command('curl -LO http://www.python.org/ftp/python/'
+                                  '2.7.8/Python-2.7.8.tar.xz', sudo=True)
+            self._execute_command('xz -d Python-2.7.8.tar.xz', sudo=True)
+            self._execute_command('tar -xvf Python-2.7.8.tar', sudo=True)
+            with cd('Python-2.7.8'):
+                self._execute_command('./configure --prefix=/usr', sudo=True)
+                self._execute_command('make', sudo=True)
+                self._execute_command('make altinstall', sudo=True)
+            self._execute_command('alias python=python2.7', sudo=True)
+
+
+class FabException(Exception):
+    """
+    Custom exception which replaces the standard SystemExit which is raised
+    by fabric on errors.
+    """
+    pass
