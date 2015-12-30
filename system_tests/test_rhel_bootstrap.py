@@ -50,7 +50,7 @@ class TestRHELBase(object):
 
     @property
     def image_name(self):
-        return self.env.centos_7_image_name
+        return self.env.rhel_7_image_id
 
     @property
     def client_cfy_work_dir(self):
@@ -59,7 +59,7 @@ class TestRHELBase(object):
     def get_local_env_inputs(self):
         return {
             'prefix': self.prefix,
-            'image_id': self.env.rhel_7_image_id,
+            'image_id': self.image_name,
             'instance_type': self.env.medium_instance_type,
             'aws_access_key_id': self.env.aws_access_key_id,
             'aws_secret_access_key': self.env.aws_secret_access_key,
