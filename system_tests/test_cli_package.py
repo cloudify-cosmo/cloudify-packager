@@ -142,6 +142,8 @@ class TestCliPackage(TestCase):
             'management_network_name': self.env.management_network_name,
             'manager_public_key_name': '{0}-manager-keypair'.format(
                 self.prefix),
+            'ssh_key_filename': '~/.ssh/{0}-cloudify-manager-kp.pem'.format(
+                self.prefix),
             'agent_public_key_name': '{0}-agent-keypair'.format(
                 self.prefix),
         }
