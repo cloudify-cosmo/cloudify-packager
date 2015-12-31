@@ -50,6 +50,10 @@ node_templates:
           from_port: 22
           to_port: 22
           cidr_ip: 0.0.0.0/0
+        - ip_protocol: tcp
+          from_port: 5985
+          to_port: 5985
+          cidr_ip: 0.0.0.0/0
       aws_config: *AWS_CONFIG
 
   keypair:
@@ -60,12 +64,23 @@ node_templates:
       aws_config: *AWS_CONFIG
 
   server:
-    type: cloudify.aws.nodes.Instance
+    type: cloudify.aws.nodes.WindowsInstance
     properties:
       install_agent: false
       image_id: { get_input: image_id }
       instance_type: { get_input: instance_type }
       aws_config: *AWS_CONFIG
+      parameters:
+        user_data: |
+          <powershell>
+          &winrm quickconfig -q
+          &winrm set winrm/config              '@{MaxTimeoutms="1800000"}'
+          &winrm set winrm/config/winrs        '@{MaxMemoryPerShellMB="300"}'
+          &winrm set winrm/config/service      '@{AllowUnencrypted="true"}'
+          &winrm set winrm/config/service/auth '@{Basic="true"}'
+          &netsh advfirewall firewall add rule name="WinRM 5985" protocol=TCP dir=in localport=5985 action=allow
+          &netsh advfirewall firewall add rule name="WinRM 5986" protocol=TCP dir=in localport=5986 action=allow
+          </powershell>
     relationships:
       - type: cloudify.aws.relationships.instance_connected_to_elastic_ip
         target: elastic_ip
@@ -80,3 +95,5 @@ outputs:
     value: { get_attribute: [elastic_ip, aws_resource_id] }
   vm_private_ip_address:
     value: { get_attribute: [server, ip]}
+  windows_vm_password:
+      value: { get_attribute: [server, password]}
