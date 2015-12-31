@@ -1,0 +1,99 @@
+
+tosca_definitions_version: cloudify_dsl_1_2
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.4m3/types.yaml
+  - http://www.getcloudify.org/spec/aws-plugin/1.4/plugin.yaml
+
+inputs:
+  prefix:
+    description: >
+      Unique string to be added as a prefix for resource names.
+
+  instance_type:
+    type: string
+    default: m3.medium
+
+  image_id:
+    type: string
+
+  key_pair_path:
+    type: string
+
+  aws_access_key_id:
+    type: string
+
+  aws_secret_access_key:
+    type: string
+
+  ec2_region_name:
+    type: string
+
+node_templates:
+
+  elastic_ip:
+    type: cloudify.aws.nodes.ElasticIP
+    properties:
+      resource_id: { concat: [{ get_input: prefix }, '-elastic-ip'] }
+      aws_config: &AWS_CONFIG
+        aws_access_key_id: { get_input: aws_access_key_id }
+        aws_secret_access_key: { get_input: aws_secret_access_key }
+        ec2_region_name: { get_input: ec2_region_name }
+
+  security_group:
+    type: cloudify.aws.nodes.SecurityGroup
+    properties:
+      description: Created for the VM that is used by a test to do the whole work
+      resource_id: { concat: [{ get_input: prefix }, '-security-group'] }
+      rules:
+        - ip_protocol: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+        - ip_protocol: tcp
+          from_port: 5985
+          to_port: 5985
+          cidr_ip: 0.0.0.0/0
+      aws_config: *AWS_CONFIG
+
+  keypair:
+    type: cloudify.aws.nodes.KeyPair
+    properties:
+      resource_id: { concat: [{ get_input: prefix }, '-keypair'] }
+      private_key_path: { get_input: key_pair_path }
+      aws_config: *AWS_CONFIG
+
+  server:
+    type: cloudify.aws.nodes.WindowsInstance
+    properties:
+      install_agent: false
+      image_id: { get_input: image_id }
+      instance_type: { get_input: instance_type }
+      aws_config: *AWS_CONFIG
+      parameters:
+        user_data: |
+          <powershell>
+          &winrm quickconfig -q
+          &winrm set winrm/config              '@{MaxTimeoutms="1800000"}'
+          &winrm set winrm/config/winrs        '@{MaxMemoryPerShellMB="300"}'
+          &winrm set winrm/config/service      '@{AllowUnencrypted="true"}'
+          &winrm set winrm/config/service/auth '@{Basic="true"}'
+          &netsh advfirewall firewall add rule name="WinRM 5985" protocol=TCP dir=in localport=5985 action=allow
+          &netsh advfirewall firewall add rule name="WinRM 5986" protocol=TCP dir=in localport=5986 action=allow
+          </powershell>
+    relationships:
+      - type: cloudify.aws.relationships.instance_connected_to_elastic_ip
+        target: elastic_ip
+      - type: cloudify.aws.relationships.instance_connected_to_keypair
+        target: keypair
+      - type: cloudify.aws.relationships.instance_connected_to_security_group
+        target: security_group
+
+outputs:
+  vm_public_ip_address:
+    description: Public IP of the worker VM created for purposes of a test
+    value: { get_attribute: [elastic_ip, aws_resource_id] }
+  vm_private_ip_address:
+    value: { get_attribute: [server, ip]}
+  windows_vm_password:
+      value: { get_attribute: [server, password]}

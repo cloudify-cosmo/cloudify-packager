@@ -1,4 +1,3 @@
-
 tosca_definitions_version: cloudify_dsl_1_2
 
 imports:
@@ -9,7 +8,6 @@ inputs:
   prefix:
     description: >
       Unique string to be added as a prefix for resource names.
-
   instance_type:
     type: string
     default: m3.medium

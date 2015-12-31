@@ -12,11 +12,9 @@
 # * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
-
 import stat
+import tempfile
 import urlparse
-import uuid
-import json
 import os
 import time
 from socket import gethostbyname
@@ -25,8 +23,7 @@ from StringIO import StringIO
 import yaml
 
 from cloudify.workflows import local
-from test_cli_package import TestCliPackage, fab_env,\
-    HELLO_WORLD_EXAMPLE_NAME, fab, env, wait_for_vm_to_become_ssh_available
+from test_cli_package import TestCliPackage, fab_env, fab, wait_for_connection
 from cloudify_cli import constants as cli_constants
 
 FILE_SERVER_PORT = 8080
@@ -38,147 +35,84 @@ class TestOfflineCliPackage(TestCliPackage):
         Tests cli package in offline mode (Only Linux compatible)
         :return:
         """
-        self.keystone_url = self.bootstrap_inputs['keystone_url']
-        iaas_resolver = '{0} {1}' \
-            .format(*self._resolve_url_to_ip_and_netloc(self.keystone_url))
-        iaas_resolver_cmd = 'echo {0} >> /etc/hosts'.format(iaas_resolver)
+        iaas_mapping = '{0} {1}'\
+            .format(*self._get_ip_and_netloc(self.iaas_url))
 
-        # Make sure cli machine is up with a registered ssh key
-        wait_for_vm_to_become_ssh_available(env, self._execute_command,
-                                            self.logger)
-
-        with self.dns():
+        with self.get_dns():
             self.logger.info('Preparing CLI and downloading example')
-            package_name = self._prepare_cli()
-            blueprint_path = self.get_hello_world_blueprint()
+            self.prepare_cli()
+            example_archive_path = self.get_example(self.helloworld_url)
 
-        self._install_cli(package_name)
-        self.logger.info('Preparing manager blueprint')
+        self.install_cli()
         self.prepare_manager_blueprint()
-        self._update_hosts_file(iaas_resolver)
+        self.prepare_hosts_file(iaas_mapping, self.centos_client_env)
 
         # Getting the remote manager blueprint and preparing resources
         self.logger.info('Retrieving remote manager blueprint file...')
-        manager_blueprint = StringIO()
-        fab.get(self.test_manager_blueprint_path, manager_blueprint)
-        manager_blueprint_yaml = yaml.load(manager_blueprint.getvalue())
-        resources_to_download = self._get_resource_list(manager_blueprint_yaml)
+        resources_to_download = \
+            self._get_resource_list(self._get_remote_blueprint())
 
-        # each os should implement any vm-related function before this comment
-
-        with FileServer(self._get_file_server_inputs(), resources_to_download,
-                        FILE_SERVER_PORT, self.logger) as fs:
+        with FileServer(self.fileserver_blueprint, self.file_server_inputs,
+                        resources_to_download, FILE_SERVER_PORT,
+                        self.logger) as fs:
             additional_inputs = fs.get_processed_inputs()
-            self._update_inputs_file(additional_inputs)
+            additional_inputs.update(self.bootstrap_inputs)
 
-            self.logger.info('Bootstrapping...')
-            self.bootstrap_manager()
-
-            # Adding iaas resolver for the manager machine.
-            self.logger.info('adding {0} to /etc/hosts of the manager vm'
-                             .format(iaas_resolver))
-            manager_fab_conf = {
-                'user': self.client_user,
+            self.prepare_inputs_and_bootstrap(additional_inputs)
+            self.manager_fab_conf = {
+                'user': 'centos',
                 'key_filename': self._get_manager_kp(),
                 'host_string': self.manager_ip,
                 'timeout': 30,
                 'connection_attempts': 10
             }
-            wait_for_vm_to_become_ssh_available(manager_fab_conf,
-                                                self._execute_command,
-                                                self.logger)
-            self._run_cmd_on_custom_machine(iaas_resolver_cmd,
-                                            manager_fab_conf, sudo=True)
+            self.assert_offline(self.manager_fab_conf, run_on_client=False)
 
-            # Uploading, deploying and testing hello_world blueprint
-            # Any sleep is to allow the execution to complete
-            # TODO: remove this line when the openstack sg description fix is applied  # NOQA
-            self._update_example_sg()
+            # Adding iaas resolver for the manager machine.
+            self.logger.info('adding {0} to /etc/hosts of the manager vm'
+                             .format(iaas_mapping))
+            wait_for_connection(self.manager_fab_conf,
+                                self._execute_command_on_linux,
+                                self.logger)
+            self._execute_command_on_linux(
+                'echo {0} >> /etc/hosts'.format(iaas_mapping),
+                fabric_env=self.manager_fab_conf,
+                sudo=True)
 
             self.logger.info('Testing the example deployment cycle...')
-            blueprint_id = 'blueprint-{0}'.format(uuid.uuid4())
 
-            self._upload_blueprint(blueprint_path, blueprint_id,
-                                   self.app_blueprint_file)
+            blueprint_id = \
+                self.publish_hello_world_blueprint(example_archive_path)
             self.deployment_id = self.create_deployment(blueprint_id)
             self.addCleanup(self.uninstall_deployment)
             self.install_deployment(self.deployment_id)
             self.assert_deployment_working(
                 self._get_app_property('http_endpoint'))
 
-    def _update_hosts_file(self, resolution):
-        """
-        This function is needed in order to make the transition to windows
-        easier
-        :param resolution: The resolution rule of url per address.
-        :return:
-        """
-        self._execute_command('echo {0} >> /etc/hosts'.format(resolution),
-                              sudo=True)
+    def _get_yaml_in_temp_file(self, dict_to_write, dict_prefix):
+        yaml_to_write = dict_to_write or {}
+        yaml_file = tempfile.mktemp(prefix='{0}-'.format(dict_prefix),
+                                    suffix='-dict_to_write.json',
+                                    dir=self.workdir)
+        with open(yaml_file, 'w') as f:
+            f.write(yaml.dump(yaml_to_write))
+        return yaml_file
 
-    def _update_example_sg(self):
+    def _get_remote_blueprint(self, env=None):
+        env = env or self.centos_client_env
+        manager_blueprint = StringIO()
+        with fab_env(**env):
+            fab.get(self.manager_blueprint_path, manager_blueprint)
+        return yaml.load(manager_blueprint.getvalue())
 
-        example_blueprint_path = \
-            os.path.join("{0}-{1}".format(HELLO_WORLD_EXAMPLE_NAME,
-                                          self.branch),
-                         self.app_blueprint_file)
-        example_blueprint = StringIO()
-        fab.get(example_blueprint_path, example_blueprint)
-        hello_world_blueprint_yaml = yaml.load(example_blueprint.getvalue())
+    def prepare_hosts_file(self, iaas_mapping, fabric_env):
+        self.update_hosts_file(iaas_mapping, fabric_env)
 
-        hello_world_blueprint_yaml['node_templates']['security_group'][
-            'properties']['security_group'] = {'description': ''}
-
-        example_blueprint.seek(0)
-        json.dump(hello_world_blueprint_yaml, example_blueprint)
-        example_blueprint.truncate()
-
-        fab.put(example_blueprint, example_blueprint_path)
-
-    def _prepare_cli(self):
-        """
-        Downloads the cli and any additional resource required by the cli
-        :return: cli package name
-        """
-        self.logger.info('installing cli...')
-
-        self._get_resource(self.cli_package_url, ops='-LO', sudo=True)
-        self._get_resource('https://bootstrap.pypa.io/get-pip.py',
-                           pipe_command='sudo python2.7 -')
-        self._execute_command('pip install virtualenv', sudo=True)
-
-        last_ind = self.cli_package_url.rindex('/')
-        return self.cli_package_url[last_ind + 1:]
-
-    def _install_cli(self, package_name):
-        """
-        Installs the cli from the package_name
-        :param package_name: the package to install.
-        :return:
-        """
-        self.logger.info('Installing CLI')
-        self._execute_command('rpm -i {0}'.format(package_name), sudo=True)
-
-    def _update_inputs_file(self, additional_inputs):
-        """
-        Update the remote bootstrap inputs file.
-
-        :param additional_inputs the additional inputs to append
-        :return:None
-        """
-        # Retrieve inputs from cli vm
-        inputs_file = StringIO()
-        fab.get(self.remote_bootstrap_inputs_path, inputs_file)
-        inputs = yaml.load(inputs_file.getvalue())
-
-        # Update the inputs to include the additional inputs
-        inputs.update(additional_inputs)
-        inputs_file.seek(0)
-        json.dump(inputs, inputs_file)
-        inputs_file.truncate()
-
-        # Write the inputs back to the cli vm.
-        fab.put(inputs_file, self.remote_bootstrap_inputs_path)
+    def update_hosts_file(self, resolution, fabric_env):
+        self._execute_command_on_linux(
+            'echo {0} >> /etc/hosts'.format(resolution),
+            fabric_env,
+            sudo=True)
 
     def _get_resource_list(self, blueprint):
         """
@@ -210,36 +144,20 @@ class TestOfflineCliPackage(TestCliPackage):
                 resources[k] = v['default']
         return resources
 
-    def get_hello_world_blueprint(self):
+    def get_example(self, example_url):
         """
-        Retrieve hello_world blueprint
+        Retrieves hello_world blueprint
         :return: the name of the package on the cli vm.
         """
-        hello_world_url = self.get_hello_world_url()
         self.logger.info('Downloading hello-world example '
                          'from {0} onto the cli vm'
-                         .format(hello_world_url))
+                         .format(example_url))
 
-        self._get_resource(hello_world_url, ops='-Lk', pipe_command='tar xvz')
+        self._get_resource(example_url, curl_ops='-LOk')
 
-        return '{0}-{1}'.format(HELLO_WORLD_EXAMPLE_NAME, self.branch)
+        return os.path.basename(example_url)
 
-    def _upload_blueprint(self, blueprint_path, blueprint_id,
-                          blueprint_name):
-        """
-        Upload blueprint to the vm
-        :param blueprint_path: blueprints path.
-        :param blueprint_id: blueprints id.
-        :param blueprint_name: blueprints main blueprint name.
-        :return: None
-        """
-        self._execute_command('blueprints upload -p {0}/blueprint.yaml'
-                              ' -b {1}'.format(blueprint_path,
-                                               blueprint_id,
-                                               blueprint_name),
-                              within_cfy_env=True)
-
-    def _resolve_url_to_ip_and_netloc(self, url):
+    def _get_ip_and_netloc(self, url):
         """
         Receives an url and translate the netloc part (portless) to an ip, and
         retrieves a tuple with the source netloc and the translated ip
@@ -250,30 +168,31 @@ class TestOfflineCliPackage(TestCliPackage):
         url_base = netloc.split(':')[0] if ':' in netloc else netloc
         return gethostbyname(url_base), url_base
 
-    def _run_cmd_on_custom_machine(self, cmd, fab_conf, sudo=False, retries=3):
-        """
-        Runs a command on a remote machine using fabric (would work only on
-        machines with fabric).
-        :param cmd: the command to run.
-        :param fab_conf: fabric environment settings.
-        :param sudo: whether run the cmd in sudo mode.
-        :param retries: number of times to retry the cmd.
-        :return: None
-        """
-        with fab_env(**fab_conf):
-            self._execute_command(cmd, sudo=sudo, retries=retries)
-
     def _get_manager_kp(self):
         """
         Retrieves manager kp to the local machine.
         :return: path to the local manager kp.
         """
         remote_manager_kp_path = self.bootstrap_inputs['ssh_key_filename']
-        local_manager_kp = fab.get(remote_manager_kp_path, self.workdir)[0]
+        with fab_env(**self.centos_client_env):
+            local_manager_kp = fab.get(remote_manager_kp_path, self.workdir)[0]
         os.chmod(local_manager_kp, stat.S_IRUSR | stat.S_IWUSR)
         return local_manager_kp
 
-    def _get_file_server_inputs(self):
+    def _get_agent_kp(self):
+        """
+        Retrieves manager kp to the local machine.
+        :return: path to the local manager kp.
+        """
+        remote_agent_kp_path = \
+            self.bootstrap_inputs['agent_private_key_path']
+        with fab_env(**self.centos_client_env):
+            local_agent_kp = fab.get(remote_agent_kp_path, self.workdir)[0]
+        os.chmod(local_agent_kp, stat.S_IRUSR | stat.S_IWUSR)
+        return local_agent_kp
+
+    @property
+    def file_server_inputs(self):
         """
         Returns inputs for the file server vm.
         :return: inputs for the file server vm.
@@ -288,14 +207,17 @@ class TestOfflineCliPackage(TestCliPackage):
             'os_auth_url': self.env.keystone_url,
             'image_name': self.env.centos_7_image_id,
             'flavor': self.env.medium_flavor_id,
-            'key_pair_path':
-                '{0}/{1}-keypair-FileServer.pem'.format(self.workdir,
-                                                        self.prefix)
+            'key_pair_path': '{0}/{1}-keypair-FileServer.pem'
+                             .format(self.workdir, self.prefix)
         }
+
+    @property
+    def fileserver_blueprint(self):
+        return 'test-os-fileserver-vm-blueprint.yaml'
 
 
 class FileServer(object):
-    def __init__(self, inputs, resources, port, logger):
+    def __init__(self, fileserver_blueprint, inputs, resources, port, logger):
         """
         A class which manager a file server vm.
 
@@ -310,7 +232,7 @@ class FileServer(object):
         self.logger = logger
         self.resources = resources
         self.fileserver_path = 'File-Server'
-        self.blueprint = 'test-start-fileserver-vm-blueprint.yaml'
+        self.blueprint = fileserver_blueprint
         self.blueprint_path = os.path.join(os.path.dirname(__file__),
                                            'resources', self.blueprint)
         self.server_cmd = 'python -m SimpleHTTPServer {0}'.format(self.port)
@@ -346,9 +268,9 @@ class FileServer(object):
 
         self.fs_base_url = '{0}:{1}'.format(self.fab_env_conf['host_string'],
                                             FILE_SERVER_PORT)
-        wait_for_vm_to_become_ssh_available(self.fab_env_conf,
-                                            self._execute_command,
-                                            self.logger)
+        wait_for_connection(self.fab_env_conf,
+                            self._execute_command,
+                            self.logger)
 
     def process_resources(self):
         """
@@ -397,8 +319,9 @@ class FileServer(object):
         rel_path = url_parts.path[1:]
         fs_path = os.path.join(self.fileserver_path, rel_path)
         self.logger.info('Downloading {0} to {1}'.format(url, fs_path))
-        self._execute_command('curl --create-dirs -Lo {0} {1}'
-                              .format(fs_path, url), retries=2)
+        self._execute_command(
+            'curl --create-dirs -Lo {0} {1}'
+            .format(fs_path, url), retries=2)
         url = url.replace(url_parts.netloc, self.fs_base_url)
         url = url.replace(url_parts.scheme, 'http')
         return url
@@ -418,12 +341,16 @@ class FileServer(object):
         :return:
         """
         # Needed in order to start the file server in detached mode.
-        self._execute_command('yum install -y screen', sudo=True, retries=5)
+        self._execute_command(
+            'yum install -y screen',
+            sudo=True,
+            retries=5)
 
         self.logger.info('Starting up SimpleHTTPServer on {0}'
                          .format(self.port))
         self._execute_command('cd {0} && screen -dm {1}'
-                              .format(self.fileserver_path, self.server_cmd),
+                              .format(self.fileserver_path,
+                                      self.server_cmd),
                               pty=False)
 
     def stop(self):
@@ -442,8 +369,14 @@ class FileServer(object):
         """
         return self.processed_inputs
 
-    def _execute_command(self, cmd, sudo=False, pty=True, log_cmd=True,
-                         retries=0, warn_only=False):
+    def _execute_command(
+            self,
+            cmd,
+            sudo=False,
+            pty=True,
+            log_cmd=True,
+            retries=0,
+            warn_only=False):
         """
         Executed the given command on the file server vm.
 
@@ -458,6 +391,7 @@ class FileServer(object):
             self.logger.info('Executing command: {0}'.format(cmd))
         else:
             self.logger.info('Executing command: ***')
+
         with fab_env(**self.fab_env_conf):
             while True:
                 if sudo:

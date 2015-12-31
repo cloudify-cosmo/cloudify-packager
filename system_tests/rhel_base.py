@@ -2,7 +2,7 @@ class RHELBase(object):
 
     @property
     def local_env_blueprint_file_name(self):
-        return 'start-ec2-worker-vm-blueprint.yaml'
+        return 'test-ec2-linux-vm-blueprint.yaml'
 
     @property
     def manager_blueprint_file_name(self):
@@ -56,6 +56,10 @@ class RHELBase(object):
             'key_pair_path': '{0}/{1}-keypair.pem'.format(self.workdir,
                                                           self.prefix)
         }
+
+    @property
+    def iaas_url(self):
+        return 'ec2.{0}.amazonaws.com'.format(self.env.ec2_region_name)
 
     def add_dns_nameservers_to_manager_blueprint(self, *args, **kwargs):
         pass
