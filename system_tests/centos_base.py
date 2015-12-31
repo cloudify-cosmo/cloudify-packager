@@ -76,6 +76,10 @@ class CentosBase(object):
                                                           self.prefix)
         }
 
+    @property
+    def iaas_url(self):
+        return self.bootstrap_inputs['keystone_url']
+
 
 class Centos7Base(CentosBase):
 

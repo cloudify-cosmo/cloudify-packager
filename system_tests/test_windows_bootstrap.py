@@ -23,7 +23,7 @@ import json
 
 import winrm
 
-from test_cli_package import TestCliPackage
+from test_cli_package import TestCliPackage, CHECK_URL
 from test_offline_cli_package import TestOfflineCliPackage
 
 WINRM_PORT = 5985
@@ -35,6 +35,8 @@ TASK_RETRIES = 20
 class TestWindowsBase(object):
     def setUp(self):
         self.session = None
+        self._dns_cmdlet = 'Set-DnsClientServerAddress -InterfaceIndex 12 ' \
+                           '-ServerAddresses {0}'
         super(TestWindowsBootstrap, self).setUp()
 
     @property
@@ -48,6 +50,56 @@ class TestWindowsBase(object):
     @property
     def client_cfy_work_dir(self):
         return 'C:\cloudify-cli'
+
+    @property
+    def app_blueprint_file(self):
+        return 'ec2-blueprint.yaml'
+
+    @property
+    def manager_blueprint_file_name(self):
+        return 'aws-ec2-manager-blueprint.yaml'
+
+    @property
+    def iaas_url(self):
+        return 'ec2.{0}.amazonaws.com'.format(self.env.ec2_region_name)
+
+    def go_offline(self):
+        self._execute_command(self._dns_cmdlet.format('1.1.1.1'))
+
+    @property
+    def local_env_inputs(self):
+        return {
+            'prefix': self.prefix,
+            'image_id': self.env.windows_server_2012_r2_image_id,
+            'instance_type': self.env.medium_instance_type,
+            'aws_access_key_id': self.env.aws_access_key_id,
+            'aws_secret_access_key': self.env.aws_secret_access_key,
+            'ec2_region_name': self.env.ec2_region_name,
+            'key_pair_path': '{0}/{1}-keypair.pem'.format(self.workdir,
+                                                          self.prefix)
+        }
+
+    @property
+    def bootstrap_inputs(self):
+        return {
+            'aws_access_key_id': self.env.aws_access_key_id,
+            'aws_secret_access_key': self.env.aws_secret_access_key,
+            'ec2_region_name': self.env.ec2_region_name,
+            'manager_keypair_name': '{0}-manager-keypair'.format(self.prefix),
+            'agent_keypair_name': '{0}-agent-keypair'.format(self.prefix),
+            'ssh_user': 'centos',
+            'agents_user': 'centos',
+            'image_id': self.env.centos_7_image_id,
+            'instance_type': self.env.medium_instance_type,
+        }
+
+    @property
+    def deployment_inputs(self):
+        return {
+            'image_id': self.env.centos_7_image_id,
+            'instance_type': self.env.medium_instance_type,
+            'agent_user': 'centos',
+        }
 
     def get_local_env_outputs(self):
         self.public_ip_address = \
@@ -73,6 +125,10 @@ class TestWindowsBase(object):
     @property
     def image_name(self):
         return self.env.windows_image_name
+
+    @property
+    def client_user(self):
+        return self.env.windows_server_2012_image_user
 
     def _execute_command(self, cmd, within_cfy_env=False, log_cmd=True):
         if within_cfy_env:
@@ -148,21 +204,49 @@ $inputs | Out-File {1}\inputs.json""".format(
         :return: None
         """
         self.logger.info('Adding {0} to dns list'.format(dns_name_servers))
-        cmd = 'Set-DnsClientServerAddress -InterfaceIndex 12 ' \
-              '-ServerAddresses {0}'
-        self._execute_command(cmd.format(','.join(dns_name_servers)))
+        self._execute_command(
+            self._dns_cmdlet.format(','.join(dns_name_servers)))
 
         yield
 
         self.logger.info('Removing {0} from dns list'.format(dns_name_servers))
-        self._execute_command(cmd.format('1.1.1.1'))
+        self._execute_command(self._dns_cmdlet.format('1.1.1.1'))
+
+        self.assert_offline()
+
+    def assert_offline(self):
+        out = self._execute_command('ping -n 2 {0}'.format(CHECK_URL))
+        self.assertIn(
+            'Ping request could not find host {0}.'.format(CHECK_URL), out)
+        self.assertNotIn('Reply from', out)
 
 
 class TestWindowsBootstrap(TestWindowsBase, TestCliPackage):
 
+    @property
+    def local_env_blueprint_file_name(self):
+        return 'start-ec2-worker-vm.yaml'
+
+    @property
+    def manager_blueprint_file_name(self):
+        return 'aws-ec2-manager-blueprint.yaml'
+
+    def bootstrap_inputs(self):
+        pass
+
+    def deployment_inputs(self):
+        pass
+
+    def client_user(self):
+        # Some user retrieved
+        pass
+
+    def local_env_inputs(self):
+        pass
+
     def test_windows_cli_package(self):
-        with self.dns():
-            self._test_cli_package()
+        self._add_dns()
+        self._test_cli_package()
 
     def install_cli(self):
         wget_cmd = """

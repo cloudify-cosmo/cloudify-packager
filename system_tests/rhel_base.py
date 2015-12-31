@@ -57,6 +57,10 @@ class RHELBase(object):
                                                           self.prefix)
         }
 
+    @property
+    def iaas_url(self):
+        return 'ec2.{0}.amazonaws.com'.format(self.env.ec2_region_name)
+
     def add_dns_nameservers_to_manager_blueprint(self, *args, **kwargs):
         pass
 

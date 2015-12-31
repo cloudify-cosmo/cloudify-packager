@@ -38,7 +38,7 @@ class TestOfflineCliPackage(TestCliPackage):
         Tests cli package in offline mode (Only Linux compatible)
         :return:
         """
-        self.keystone_url = self.bootstrap_inputs['keystone_url']
+        self.iaas_url = self.get_iaas_url()
         iaas_resolver = '{0} {1}' \
             .format(*self._resolve_url_to_ip_and_netloc(self.keystone_url))
         iaas_resolver_cmd = 'echo {0} >> /etc/hosts'.format(iaas_resolver)

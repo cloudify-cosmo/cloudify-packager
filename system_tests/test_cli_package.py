@@ -88,6 +88,10 @@ class TestCliPackage(TestCase):
     def app_blueprint_file(self):
         raise NotImplementedError
 
+    @property
+    def iaas_url(self):
+        raise NotImplementedError
+
     def get_local_env_outputs(self):
         self.public_ip_address = \
             self.local_env.outputs()['vm_public_ip_address']
