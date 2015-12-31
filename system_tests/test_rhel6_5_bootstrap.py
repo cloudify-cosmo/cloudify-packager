@@ -24,6 +24,14 @@ class TestRHEL65Base(TestRHELBase):
         return 'CENTOS_6_5_CLI_PACKAGE_URL'
 
     @property
+    def manager_blueprint_file_name(self):
+        return 'aws-ec2-manager-blueprint.yaml'
+
+    @property
+    def local_env_blueprint_file_name(self):
+        return 'start-ec2-worker-vm.yaml'
+
+    @property
     def client_user(self):
         return self.env.rhel_7_image_user
 
