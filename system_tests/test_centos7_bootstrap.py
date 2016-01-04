@@ -13,42 +13,17 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
-from test_cli_package import TestCliPackage, env
-from test_offline_cli_package import TestOfflineCliPackage, \
-    wait_for_vm_to_become_ssh_available
+from test_cli_package import TestCliPackage
+from test_offline_cli_package import TestOfflineCliPackage
+from centos_base import Centos7Base
 
 
-class TestCentos7Base(object):
-
-    @property
-    def package_parameter_name(self):
-        return 'CENTOS_7_CLI_PACKAGE_URL'
-
-    @property
-    def image_name(self):
-        return self.env.centos_7_image_name
-
-    @property
-    def client_user(self):
-        return self.env.centos_7_image_user
-
-    @property
-    def local_env_blueprint_file_name(self):
-        return 'test-start-vm-blueprint.yaml'
-
-    @property
-    def client_cfy_work_dir(self):
-        return '/opt/cfy'
-
-
-class TestCentos7Bootstrap(TestCentos7Base, TestCliPackage):
+class Centos7Bootstrap(Centos7Base, TestCliPackage):
     def test_centos7_cli_package(self):
-        wait_for_vm_to_become_ssh_available(env, self._execute_command,
-                                            self.logger)
-        with self.dns():
-            self._test_cli_package()
+        self._add_dns()
+        self._test_cli_package()
 
 
-class TestCentos7OfflineBootstrap(TestCentos7Base, TestOfflineCliPackage):
+class Centos7OfflineBootstrap(Centos7Base, TestOfflineCliPackage):
     def test_offline_centos7_cli_package(self):
         self._test_cli_package()
