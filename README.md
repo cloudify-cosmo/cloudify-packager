@@ -1,6 +1,8 @@
 Cloudify-Packager
 =================
 
+* Master [![Circle CI](https://circleci.com/gh/cloudify-cosmo/cloudify-packager/tree/master.svg?&style=shield)](https://circleci.com/gh/cloudify-cosmo/cloudify-packager/tree/master)
+
 Cloudify's packager provides tools and configuration objects we use to build Cloudify's Management environments, agents and demo images.
 
 ### [Docker Images](http://www.docker.com)
