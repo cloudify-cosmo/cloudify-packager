@@ -2,7 +2,7 @@ class RHELBase(object):
 
     @property
     def local_env_blueprint_file_name(self):
-        return 'start-ec2-worker-vm.yaml'
+        return 'start-ec2-worker-vm-blueprint.yaml'
 
     @property
     def manager_blueprint_file_name(self):
