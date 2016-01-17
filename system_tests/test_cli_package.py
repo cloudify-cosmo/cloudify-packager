@@ -219,8 +219,7 @@ class TestCliPackage(TestCase):
             remote_modify_script, self.test_manager_blueprint_path))
 
     def prepare_manager_blueprint(self):
-        self.manager_blueprints_repo_dir = '{0}/cloudify-manager-blueprints' \
-                                           '-commercial/' \
+        self.manager_blueprints_repo_dir = '{0}/cloudify-manager-blueprints/' \
                                            .format(self.client_cfy_work_dir)
         self.test_manager_blueprint_path = \
             os.path.join(self.manager_blueprints_repo_dir,
