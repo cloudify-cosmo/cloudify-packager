@@ -187,8 +187,7 @@ class TestCliPackage(TestCase):
         self.logger.info('installing cli...')
 
         self._get_resource(self.cli_package_url, ops='-LO', sudo=True)
-        self._get_resource('https://raw.githubusercontent.com/pypa/'
-                           'pip/master/contrib/get-pip.py', ops='-L',
+        self._get_resource('https://bootstrap.pypa.io/get-pip.py', ops='-L',
                            pipe_command='sudo python2.7 -')
         self._execute_command('pip install virtualenv', sudo=True)
 
