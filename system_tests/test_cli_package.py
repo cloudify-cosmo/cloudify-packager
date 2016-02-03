@@ -303,8 +303,6 @@ class TestCliPackage(TestCase):
                               within_cfy_env=True, retries=2)
 
     def uninstall_deployment(self):
-        self.cfy._wait_for_stop_dep_env_execution_if_necessary(
-            self.deployment_id)
         self.logger.info('Uninstalling deployment...')
         self._execute_command('executions start -d {0} -w uninstall'
                               .format(self.deployment_id), within_cfy_env=True)
