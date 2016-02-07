@@ -1,0 +1,24 @@
+dsl_definitions:
+
+  fabric_env: &FAB_ENV
+    user: { get_input: ssh_user }
+    key_filename: { get_input: ssh_key_filename }
+    host_string: { get_attribute: [server_ip, aws_resource_id] }
+
+node_types:
+
+  build.nodes.Plugin:
+    derived_from: cloudify.nodes.SoftwareComponent
+    properties:
+        type: string
+        default: { get_input: pip_source_rpm_url }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: fabric.fabric_plugin.tasks.run_script
+          inputs:
+            script_path:
+              # should link to online provisioning script
+              default: scripts/plugin/create.sh
+            fabric_env:
+              default: &FAB_ENV
