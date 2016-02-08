@@ -20,41 +20,30 @@ inputs:
     type: string
     default: 'us-east-1'
 
-  use_existing_manager_keypair:
+  use_existing_keypair:
     type: boolean
-    default: false
+    default: true
 
-  manager_keypair_name:
+  keypair_name:
     type: string
-    default: cloudify-manager-kp
+    default: vagrant_build
 
   ssh_key_filename:
     type: string
-    default: '~/.ssh/cloudify-manager-kp.pem'
+    default: "~/.ssh/aws/vagrant_build.pem"
 
-  agent_private_key_path:
-    type: string
-    default: '~/.ssh/cloudify-agent-kp.pem'
-
-  use_existing_manager_group:
+  use_existing_security_group:
     type: boolean
-    default: false
+    default: true
 
-  use_existing_agent_group:
-    type: boolean
-    default: false
-
-  manager_security_group_name:
+  security_group_name:
     type: string
-    default: 'cloudify-manager-security-group'
+    default: vagrant_linux_build
 
-  agent_security_group_name:
+  build_server_name:
     type: string
-    default: 'cloudify-agent-security-group'
-
-  manager_server_name:
-    type: string
-    default: 'cloudify-manager-server'
+    # maybe concat here to provide an explicit build name
+    default: build_server
 
   ssh_user:
     type: string
@@ -80,18 +69,17 @@ node_templates:
   management_keypair:
     type: cloudify.aws.nodes.KeyPair
     properties:
-      use_external_resource: { get_input: use_existing_manager_keypair }
-      resource_id: { get_input: manager_keypair_name }
+      use_external_resource: { get_input: use_existing_keypair }
+      resource_id: { get_input: keypair_name }
       private_key_path: { get_input: ssh_key_filename }
       aws_config: *aws_configuration
 
   security_group:
     type: cloudify.aws.nodes.SecurityGroup
     properties:
-      resource_id: { get_input: agent_security_group_name }
-      use_external_resource: { get_input: use_existing_agent_group }
-      description: Security group for Cloudify agent VMs
-      rules:
+      resource_id: { get_input: security_group_name }
+      use_external_resource: { get_input: use_existing_security_group }
+      description: Security group for Cvagrant_linux_build:
         - ip_protocol: tcp
           from_port: 22
           to_port: 22
@@ -106,7 +94,7 @@ node_templates:
   build_host:
     type: cloudify.aws.nodes.Instance
     properties:
-      resource_id: { get_input: manager_server_name }
+      resource_id: { get_input: build_server_name }
       image_id: { get_input: image_id }
       instance_type: { get_input: instance_type }
       install_agent: false
