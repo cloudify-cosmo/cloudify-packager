@@ -1,24 +1,28 @@
-dsl_definitions:
+inputs:
 
-  fabric_env: &FAB_ENV
-    user: { get_input: ssh_user }
-    key_filename: { get_input: ssh_key_filename }
-    host_string: { get_attribute: [server_ip, aws_resource_id] }
 
 node_types:
-
-  build.nodes.Plugin:
+  build.nodes.Generic:
     derived_from: cloudify.nodes.SoftwareComponent
     properties:
-        type: string
-        default: { get_input: pip_source_rpm_url }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: fabric.fabric_plugin.tasks.run_script
-          inputs:
-            script_path:
-              # should link to online provisioning script
-              default: scripts/plugin/create.sh
-            fabric_env:
-              default: &FAB_ENV
+      core_tag_name:
+        default: { get_input: core_tag_name }
+      common_builder_script_url:
+        # https://raw.githubusercontent.com/cloudify-cosmo/cloudify-packager/$CORE_TAG_NAME/common/provision.sh
+        default: { concat: ['https://raw.githubusercontent.com/cloudify-cosmo/cloudify-packager/', { get_property: [SELF, core_tag_name] }, '/common/provision.sh'] }
+      github_username:
+        default: { get_input: github_username }
+      github_password:
+        default: { get_input: github_password }
+      aws_access_key_id:
+        default: { get_input: aws_access_key_id }
+      aws_access_key:
+        default: { get_input: aws_secret_access_key }
+      plugin_name:
+        default: { get_input: plugin_name }
+      plugin_tag_name:
+        default: { get_input: plugin_tag_name }
+
+outputs:
+  plugin:
+    value: { get_attribute: [ build, s3_url ] }
