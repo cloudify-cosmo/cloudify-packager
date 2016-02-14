@@ -1,0 +1,66 @@
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
+  - http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml
+
+inputs:
+  github_username:
+    type: string
+    default: ''
+
+  github_password:
+    type: string
+    default: ''
+
+  version:
+    type: string
+    default: ''
+
+  prerelease:
+    type: string
+    default: ''
+
+  build:
+    type: integer
+    default: ''
+
+  core_tag_name:
+    type: string
+
+node_types:
+  build.nodes.Generic:
+    derived_from: cloudify.nodes.SoftwareComponent
+    properties:
+      common_builder_script_url:
+        # https://raw.githubusercontent.com/cloudify-cosmo/cloudify-packager/$CORE_TAG_NAME/common/provision.sh
+        default: { concat: ['https://raw.githubusercontent.com/cloudify-cosmo/cloudify-packager/', { get_property: [SELF, core_tag_name] }, '/common/provision.sh'] }
+      github_username:
+        default: { get_input: github_username }
+      github_password:
+        default: { get_input: github_password }
+      aws_access_key_id:
+        default: { get_input: aws_access_key_id }
+      aws_access_key:
+        default: { get_input: aws_secret_access_key }
+      aws_s3_bucket:
+        default: gigaspaces-repository-eu
+      aws_s3_path:
+        default: { concat: ['org/cloudify3/', { get_property: [SELF, version] }, /, { get_property: [SELF, prerelease]}]}
+      version:
+        default: { get_input: version }
+      prerelease:
+        default: { get_input: prerelease }
+      build:
+        default: { get_input: build }
+      core_tag_name:
+        default: { get_input: core_tag_name }
+      # plugin_tag_name:
+      #   default: { get_input: plugin_tag_name }
+
+plugins:
+  cli:
+    install: false
+    executor: central_deployment_agent
+
+outputs:
+  package_url:
+    value: { get_attribute: [ build, s3_url ] }
