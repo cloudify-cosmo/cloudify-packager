@@ -74,7 +74,8 @@ node_templates:
     properties:
       resource_id: { get_input: security_group_name }
       use_external_resource: { get_input: use_existing_security_group }
-      description: Security group for Cvagrant_linux_build:
+      description: Security group for vagrant_linux_build:
+      rules:
         - ip_protocol: tcp
           from_port: 22
           to_port: 22
