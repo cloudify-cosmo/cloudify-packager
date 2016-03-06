@@ -18,7 +18,7 @@ class CentosBase(object):
 
     @property
     def local_env_blueprint_file_name(self):
-        return 'test-start-vm-blueprint.yaml'
+        return 'test-ec2-linux-vm-blueprint.yaml'
 
     @property
     def client_cfy_work_dir(self):
@@ -75,6 +75,10 @@ class CentosBase(object):
             'key_pair_path': '{0}/{1}-keypair.pem'.format(self.workdir,
                                                           self.prefix)
         }
+
+    @property
+    def iaas_url(self):
+        return self.bootstrap_inputs['keystone_url']
 
 
 class Centos7Base(CentosBase):
