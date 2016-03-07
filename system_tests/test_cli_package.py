@@ -375,8 +375,8 @@ class TestCliPackage(TestCase):
             os.path.join(os.path.dirname(__file__),
                          'resources/add_nameservers_to_subnet.py'))
         self.bootstrap_manager(self.bootstrap_inputs)
-        example_path = self.helloworld_url
-        self.deployment_id = self.create_deployment(example_path)
+        blueprint_id = self.publish_hello_world_blueprint(self.helloworld_url)
+        self.deployment_id = self.create_deployment(blueprint_id)
         self.addCleanup(self.uninstall_deployment)
         self.install_deployment(self.deployment_id)
         self.assert_deployment_working(

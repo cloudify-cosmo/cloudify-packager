@@ -18,7 +18,7 @@ class CentosBase(object):
 
     @property
     def local_env_blueprint_file_name(self):
-        return 'test-ec2-linux-vm-blueprint.yaml'
+        return 'test-os-linux-vm-blueprint.yaml'
 
     @property
     def client_cfy_work_dir(self):
