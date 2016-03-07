@@ -376,7 +376,8 @@ class FileServer(object):
             pty=True,
             log_cmd=True,
             retries=0,
-            warn_only=False):
+            warn_only=False,
+            **_):
         """
         Executed the given command on the file server vm.
 
