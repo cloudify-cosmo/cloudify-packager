@@ -23,7 +23,7 @@ class RHELBase(object):
     @property
     def deployment_inputs(self):
         return {
-            'image_id': self.image_name,
+            'image_id': self.env.rhel_7_image_id,
             'instance_type': self.env.medium_instance_type,
             'agent_user': self.env.rhel_7_image_user
         }
@@ -36,9 +36,9 @@ class RHELBase(object):
             'ec2_region_name': self.env.ec2_region_name,
             'manager_keypair_name': '{0}-manager-keypair'.format(self.prefix),
             'agent_keypair_name': '{0}-agent-keypair'.format(self.prefix),
-            'ssh_user': 'centos',
-            'agents_user': 'centos',
-            'image_id': self.env.centos_7_image_id,
+            'ssh_user': self.env.rhel_7_image_user,
+            'agents_user': self.env.rhel_7_image_user,
+            'image_id': self.env.rhel_7_image_id,
             'instance_type': self.env.medium_instance_type,
             'ssh_key_filename': '~/.ssh/{0}-cloudify-manager-kp.pem'.format(
                 self.prefix),
