@@ -4,7 +4,7 @@ function print_params() {
     echo "## print common parameters"
 
     declare -A params=( ["VERSION"]=$VERSION ["PRERELEASE"]=$PRERELEASE ["BUILD"]=$BUILD \
-                        ["CORE_TAG_NAME"]=$CORE_TAG_NAME ["PLUGINS_TAG_NAME"]=$PLUGINS_TAG_NAME )
+                        ["CORE_TAG_NAME"]=$CORE_TAG_NAME )
     for param in "${!params[@]}"
     do
             echo "$param - ${params["$param"]}"
@@ -60,7 +60,6 @@ export VERSION="3.4.0"
 export PRERELEASE="m3"
 export BUILD="392"
 export CORE_TAG_NAME="3.4m3"
-export PLUGINS_TAG_NAME="1.3.1"
 export AWS_S3_BUCKET="gigaspaces-repository-eu"
 export AWS_S3_PATH="org/cloudify3/${VERSION}/${PRERELEASE}"
 
