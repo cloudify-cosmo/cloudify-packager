@@ -1,3 +1,4 @@
+#!/bin/bash
 
 function print_params() {
 
