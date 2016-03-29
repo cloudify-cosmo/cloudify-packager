@@ -1,6 +1,6 @@
 
 cli_package_urls:
-     windows_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0/m4-RELEASE/cloudify-windows-cli_3.4.0-m4-b393.exe
-     centos_7_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0/m4-RELEASE/cloudify-centos-Core-cli-3.4.0-m4_b393.x86_64.rpm
-     centos_6_5_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0/m4-RELEASE/cloudify-centos-Final-cli-3.4.0-m4_b393.x86_64.rpm
-     rhel_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0/m4-RELEASE/cloudify-redhat-Maipo-cli-3.4.0-m4_b393.x86_64.rpm
+     windows_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0/m3-RELEASE/cloudify-windows-cli_3.4.0-m3-b392.exe
+     centos_7_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0/m3-RELEASE/cloudify-centos-Core-cli-3.4.0-m3_b392.x86_64.rpm
+     centos_6_5_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0/m3-RELEASE/cloudify-centos-Final-cli-3.4.0-m3_b392.x86_64.rpm
+     rhel_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0/m3-RELEASE/cloudify-redhat-Maipo-cli-3.4.0-m3_b392.x86_64.rpm
