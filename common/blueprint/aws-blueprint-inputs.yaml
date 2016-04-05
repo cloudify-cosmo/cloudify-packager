@@ -1,0 +1,18 @@
+# Credentials and identification in order to connect to ec2
+aws_access_key_id: ''
+aws_secret_access_key: ''
+#image_id: 'ami-61bbf104'
+#instance_type: 'm3.medium'
+
+#keypair_name: 'cloudify-manager-kp'
+#use_existing_security_group: false
+#use_existing_keypair: '~/.ssh/cloudify-manager-kp.pem'
+#ssh_user: 'centos'
+#ssh_key_filename: ''
+
+#security_group_name: 'cloudify-manager-security-group'
+#build_server_name: 'cloudify-manager-server'
+
+# If no region is provided, the plugin will fallback to the default region for your user.
+# The default value is matched to the default image_id and instance_type.
+#ec2_region_name: 'us-east-1'
