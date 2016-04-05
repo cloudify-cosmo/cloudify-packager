@@ -1,5 +1,4 @@
 imports:
-  - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
   - http://www.getcloudify.org/spec/fabric-plugin/1.4/plugin.yaml
 
 inputs:
