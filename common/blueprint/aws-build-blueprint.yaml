@@ -93,7 +93,6 @@ node_templates:
       instance_type: { get_input: instance_type }
       install_agent: false
       aws_config: *aws_configuration
-      host_ip: { get_attribute: [server_ip, aws_resource_id]}
     relationships:
       - type: cloudify.aws.relationships.instance_connected_to_elastic_ip
         target: server_ip
