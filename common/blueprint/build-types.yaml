@@ -28,7 +28,7 @@ inputs:
 
   build:
     type: integer
-    default: ''
+    default:
 
   core_tag_name:
     type: string
