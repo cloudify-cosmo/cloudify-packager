@@ -80,6 +80,14 @@ class CentosBase(object):
     def iaas_url(self):
         return self.bootstrap_inputs['keystone_url']
 
+    def additional_setup(self):
+        self.local_env = None
+        self.addCleanup(self._remove_keypairs)
+        super(CentosBase, self).additional_setup()
+
+    def _remove_keypairs(self):
+        self.env.handler.remove_keypairs_from_local_env(self.local_env)
+
 
 class Centos7Base(CentosBase):
 
