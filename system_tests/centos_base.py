@@ -85,7 +85,7 @@ class Centos7Base(CentosBase):
 
     @property
     def package_parameter_name(self):
-        return 'CENTOS_7_CLI_PACKAGE_URL'
+        return 'RHEL_CENTOS_CLI_PACKAGE_URL'
 
     @property
     def image_name(self):
@@ -100,7 +100,7 @@ class Centos65Base(CentosBase):
 
     @property
     def package_parameter_name(self):
-        return 'CENTOS_6_5_CLI_PACKAGE_URL'
+        return 'RHEL_CENTOS_CLI_PACKAGE_URL'
 
     @property
     def image_name(self):
@@ -112,4 +112,3 @@ class Centos65Base(CentosBase):
 
     def additional_setup(self):
         super(Centos65Base, self).additional_setup()
-        self.install_python27()

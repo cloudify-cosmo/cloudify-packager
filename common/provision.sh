@@ -53,7 +53,8 @@ function upload_to_s3() {
       -H "Content-Type: $content_type" \
       -H "$acl" \
       -H "Authorization: AWS ${AWS_ACCESS_KEY_ID}:$signature" \
-      "https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file"
+      "https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file" &&
+    echo "## successfully uploaded $file"
 }
 
 
