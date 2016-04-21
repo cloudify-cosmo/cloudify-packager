@@ -28,7 +28,6 @@ class TestRHEL65(RHEL65Base, TestCliPackage):
 
     def additional_setup(self):
         super(TestRHEL65, self).additional_setup()
-        self.install_python27()
 
     def test_rhel6_5_cli_package(self):
         self._add_dns()

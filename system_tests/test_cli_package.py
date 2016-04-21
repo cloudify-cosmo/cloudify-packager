@@ -17,6 +17,7 @@ import json
 import os
 import time
 import uuid
+import ast
 from contextlib import contextmanager
 
 import requests
@@ -28,6 +29,7 @@ from cloudify_cli import constants as cli_constants
 from cloudify_rest_client import CloudifyClient
 from fabric.context_managers import settings as fab_env, cd
 from cosmo_tester.framework.testenv import TestCase
+
 
 CHECK_URL = 'www.google.com'
 HELLO_WORLD_EXAMPLE_NAME = 'cloudify-hello-world-example'
@@ -185,8 +187,7 @@ class TestCliPackage(TestCase):
         if not fabric_env:
             fabric_env = self.centos_client_env
         if within_cfy_env:
-            cmd = 'source {0}/env/bin/activate && cfy {1}' \
-                  .format(self.client_cfy_work_dir, cmd)
+            cmd = 'cfy {0}'.format(cmd)
 
         if log_cmd:
             self.logger.info('Executing command: {0}'.format(cmd))
@@ -219,13 +220,7 @@ class TestCliPackage(TestCase):
 
     def prepare_cli(self):
         self.logger.info('installing cli...')
-
         self._get_resource(self.cli_package_url, curl_ops='-LO', sudo=True)
-        self._get_resource('https://bootstrap.pypa.io/get-pip.py',
-                           curl_ops='-L | sudo python2.7 -')
-        self.client_executor('pip install virtualenv',
-                             self.centos_client_env,
-                             sudo=True)
 
     def install_cli(self, *args, **kwargs):
         last_ind = self.cli_package_url.rindex('/')
@@ -293,7 +288,6 @@ class TestCliPackage(TestCase):
                           inputs,
                           inputs_is_file=False):
         self.logger.info('Bootstrapping Cloudify manager...')
-
         self.client_executor(
             'init',
             fabric_env=self.centos_client_env,
@@ -305,7 +299,7 @@ class TestCliPackage(TestCase):
 
         bootstrap_command = """bootstrap -p {0} -i "{1}" {2}""".format(
             self.manager_blueprint_path,
-            json.dumps(inputs).replace('"', "'"),
+            json.dumps(inputs).replace('"', "'").replace(' ', ''),
             install_plugins)
         if inputs_is_file:
             bootstrap_command = """bootstrap -p {0} -i {1} {2}""".format(
@@ -342,7 +336,9 @@ class TestCliPackage(TestCase):
         self.client_executor(
             """deployments create -b {0} -d {1} -i "{2}" """
             .format(blueprint_id, deployment_id,
-                    json.dumps(self.deployment_inputs).replace('"', "'")),
+                    json.dumps(
+                            self.deployment_inputs).replace(
+                            '"', "'").replace(' ', '')),
             fabric_env=self.centos_client_env,
             within_cfy_env=True)
 
@@ -379,22 +375,40 @@ class TestCliPackage(TestCase):
         self.deployment_id = self.create_deployment(blueprint_id)
         self.addCleanup(self.uninstall_deployment)
         self.install_deployment(self.deployment_id)
+        self.logger.info("Deployment {0} installed successfully! will now "
+                         "make sure it actually "
+                         "works".format(self.deployment_id))
+        self.logger.info("deployment http endpoint is: {0}".format(
+                self._get_app_property('http_endpoint')))
         self.assert_deployment_working(
             self._get_app_property('http_endpoint'))
 
     def _manager_ip(self):
-        return self._execute_command_on_linux(
-            'source {0}/env/bin/activate && {1}'.format(
-                self.client_cfy_work_dir,
-                'python -c "from cloudify_cli import utils;'
-                'print utils.get_management_server_ip()"'
-            ),
-            fabric_env=self.centos_client_env
-        )
+        ip = self._execute_command_on_linux('status'.format(
+                 self.client_cfy_work_dir), fabric_env=self.centos_client_env,
+                 within_cfy_env=True).replace(
+                 "Getting management services status... [ip=", '').replace(
+                 ']', '')
+        self.logger.info(ip)
+        return ip.split('\n')[0]
 
     def _get_app_property(self, property_name):
-        outputs_resp = self.client.deployments.outputs.get(self.deployment_id)
-        return outputs_resp['outputs'][property_name]
+        outputs_raw = (self._execute_command_on_linux(
+                'deployments outputs -d {0}'.format(self.deployment_id),
+                fabric_env=self.centos_client_env, within_cfy_env=True))
+        self.logger.info(outputs_raw)
+        s = outputs_raw[outputs_raw.find('\n')+1:]
+        list_of_outputs = s.split(' - ')
+        list_of_outputs.pop(0)
+        outputs_list_of_dicts = [ast.literal_eval(
+                '{'+'{0}"{1}"'.format(
+                        e.split('\n')[0], e.split('\n')[2].replace(
+                                'Value:', '').replace(' ', ''))+'}')
+                   for e in list_of_outputs]
+        outputs_dict = {}
+        for e in outputs_list_of_dicts:
+            outputs_dict.update(e)
+        return outputs_dict[property_name]
 
     @retry(stop_max_attempt_number=3, wait_fixed=3000)
     def assert_deployment_working(self, url):
