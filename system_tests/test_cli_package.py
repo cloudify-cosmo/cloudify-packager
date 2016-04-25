@@ -225,7 +225,7 @@ class TestCliPackage(TestCase):
     def install_cli(self, *args, **kwargs):
         last_ind = self.cli_package_url.rindex('/')
         package_name = self.cli_package_url[last_ind + 1:]
-        self.client_executor('rpm -i {0}'.format(package_name),
+        self.client_executor('rpm -i {0} || dpkg -i {0}'.format(package_name),
                              self.centos_client_env,
                              sudo=True)
 
