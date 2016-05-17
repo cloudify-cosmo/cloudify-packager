@@ -85,6 +85,8 @@ class TestWindowsBase(TestCliPackage):
             'ec2_region_name': self.env.ec2_region_name,
             'manager_keypair_name': '{0}-manager-keypair'.format(self.prefix),
             'agent_keypair_name': '{0}-agent-keypair'.format(self.prefix),
+            'manager_security_group_name': '{0}-manager'.format(self.prefix),
+            'agent_security_group_name': '{0}-agent'.format(self.prefix),
             'ssh_user': 'centos',
             'ignore_bootstrap_validations': 'true',
             'agents_user': 'centos',
