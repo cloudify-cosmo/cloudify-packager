@@ -12,12 +12,12 @@
 # * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # * See the License for the specific language governing permissions and
 #    * limitations under the License.
-import copy
-import json
 import os
-import time
-import uuid
 import ast
+import json
+import time
+import copy
+import uuid
 from contextlib import contextmanager
 
 import requests
@@ -25,10 +25,10 @@ from retrying import retry
 
 import fabric.api as fab
 from cloudify.workflows import local
-from cloudify_cli import constants as cli_constants
 from cloudify_rest_client import CloudifyClient
-from fabric.context_managers import settings as fab_env, cd
+from cloudify_cli import constants as cli_constants
 from cosmo_tester.framework.testenv import TestCase
+from fabric.context_managers import settings as fab_env, cd
 
 
 CHECK_URL = 'www.google.com'
@@ -41,6 +41,7 @@ class FabException(Exception):
     Custom exception which replaces the standard SystemExit which is raised
     by fabric on errors.
     """
+
     pass
 
 
@@ -335,10 +336,9 @@ class TestCliPackage(TestCase):
         self.logger.info('Creating deployment: {0}'.format(deployment_id))
         self.client_executor(
             """deployments create -b {0} -d {1} -i "{2}" """
-            .format(blueprint_id, deployment_id,
-                    json.dumps(
-                            self.deployment_inputs).replace(
-                            '"', "'").replace(' ', '')),
+            .format(blueprint_id, deployment_id, json.dumps(
+                self.deployment_inputs).replace(
+                '"', "'").replace(' ', '')),
             fabric_env=self.centos_client_env,
             within_cfy_env=True)
 
@@ -379,32 +379,32 @@ class TestCliPackage(TestCase):
                          "make sure it actually "
                          "works".format(self.deployment_id))
         self.logger.info("deployment http endpoint is: {0}".format(
-                self._get_app_property('http_endpoint')))
+            self._get_app_property('http_endpoint')))
         self.assert_deployment_working(
             self._get_app_property('http_endpoint'))
 
     def _manager_ip(self):
         ip = self._execute_command_on_linux('status'.format(
-                 self.client_cfy_work_dir), fabric_env=self.centos_client_env,
-                 within_cfy_env=True).replace(
-                 "Getting management services status... [ip=", '').replace(
-                 ']', '')
+            self.client_cfy_work_dir), fabric_env=self.centos_client_env,
+            within_cfy_env=True).replace(
+            "Getting management services status... [ip=", '').replace(
+            ']', '')
         self.logger.info(ip)
         return ip.split('\n')[0]
 
     def _get_app_property(self, property_name):
         outputs_raw = (self._execute_command_on_linux(
-                'deployments outputs -d {0}'.format(self.deployment_id),
-                fabric_env=self.centos_client_env, within_cfy_env=True))
+            'deployments outputs -d {0}'.format(self.deployment_id),
+            fabric_env=self.centos_client_env, within_cfy_env=True))
         self.logger.info(outputs_raw)
-        s = outputs_raw[outputs_raw.find('\n')+1:]
+        s = outputs_raw[outputs_raw.find('\n') + 1:]
         list_of_outputs = s.split(' - ')
         list_of_outputs.pop(0)
         outputs_list_of_dicts = [ast.literal_eval(
-                '{'+'{0}"{1}"'.format(
-                        e.split('\n')[0], e.split('\n')[2].replace(
-                                'Value:', '').replace(' ', ''))+'}')
-                   for e in list_of_outputs]
+            '{' + '{0}"{1}"'.format(
+                e.split('\n')[0], e.split('\n')[2].replace(
+                    'Value:', '').replace(' ', '')) + '}')
+            for e in list_of_outputs]
         outputs_dict = {}
         for e in outputs_list_of_dicts:
             outputs_dict.update(e)
