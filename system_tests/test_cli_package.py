@@ -12,24 +12,32 @@
 # * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # * See the License for the specific language governing permissions and
 #    * limitations under the License.
-import copy
-import json
 import os
-import time
-import uuid
 import ast
+import json
+import time
+import copy
+import re
+import uuid
 from contextlib import contextmanager
 
 import requests
 from retrying import retry
+import sh
 
 import fabric.api as fab
 from cloudify.workflows import local
-from cloudify_cli import constants as cli_constants
 from cloudify_rest_client import CloudifyClient
-from fabric.context_managers import settings as fab_env, cd
+from cloudify_cli import constants as cli_constants
 from cosmo_tester.framework.testenv import TestCase
+from cosmo_tester.framework.util import sh_bake
+from fabric.context_managers import settings as fab_env, cd
 
+# The cfy helper doesn't provide an init method, so we'll do it ourselves
+cfy = sh_bake(sh.cfy)
+
+# If we get a recycled floating IP we'll have a bad day without this
+fab.env['disable_known_hosts'] = True
 
 CHECK_URL = 'www.google.com'
 HELLO_WORLD_EXAMPLE_NAME = 'cloudify-hello-world-example'
@@ -41,6 +49,7 @@ class FabException(Exception):
     Custom exception which replaces the standard SystemExit which is raised
     by fabric on errors.
     """
+
     pass
 
 
@@ -250,7 +259,7 @@ class TestCliPackage(TestCase):
             fab.run('sudo python {0} {1}'.format(
                 remote_modify_script, self.manager_blueprint_path))
 
-    def prepare_manager_blueprint(self):
+    def prepare_manager_blueprint(self, env=None):
         self.logger.info('Preparing manager blueprint')
         self.manager_blueprints_dir = \
             '{0}/cloudify-manager-blueprints'.format(
@@ -312,11 +321,18 @@ class TestCliPackage(TestCase):
             fabric_env=self.centos_client_env,
             within_cfy_env=True)
 
-        self.assertIn('bootstrapping complete', out, 'Bootstrap has failed')
+        # TODO: This is really not where specific wording checks for bootstrap
+        # output belong, but left in for the moment until this test can be
+        # reworked as there is a lot of cruft
+        self.assertIn('Bootstrap complete', out, 'Bootstrap has failed')
 
         self.manager_ip = self._manager_ip()
         self.client = CloudifyClient(self.manager_ip)
         self.addCleanup(self.teardown_manager)
+        with self.cfy.workdir:
+            cfy.init()
+        self.cfy.use(self.manager_ip)
+        self.cfy.upload_plugins()
 
     def publish_hello_world_blueprint(self, source_archive):
         blueprint_id = 'blueprint-{0}'.format(uuid.uuid4())
@@ -335,10 +351,9 @@ class TestCliPackage(TestCase):
         self.logger.info('Creating deployment: {0}'.format(deployment_id))
         self.client_executor(
             """deployments create -b {0} -d {1} -i "{2}" """
-            .format(blueprint_id, deployment_id,
-                    json.dumps(
-                            self.deployment_inputs).replace(
-                            '"', "'").replace(' ', '')),
+            .format(blueprint_id, deployment_id, json.dumps(
+                self.deployment_inputs).replace(
+                '"', "'").replace(' ', '')),
             fabric_env=self.centos_client_env,
             within_cfy_env=True)
 
@@ -379,32 +394,41 @@ class TestCliPackage(TestCase):
                          "make sure it actually "
                          "works".format(self.deployment_id))
         self.logger.info("deployment http endpoint is: {0}".format(
-                self._get_app_property('http_endpoint')))
+            self._get_app_property('http_endpoint')))
         self.assert_deployment_working(
             self._get_app_property('http_endpoint'))
 
     def _manager_ip(self):
-        ip = self._execute_command_on_linux('status'.format(
-                 self.client_cfy_work_dir), fabric_env=self.centos_client_env,
-                 within_cfy_env=True).replace(
-                 "Getting management services status... [ip=", '').replace(
-                 ']', '')
+        # Expecting a line like:
+        # Requesting status from manager... [ip=192.0.2.24]
+        ip = re.search(
+            '\[ip='  # [ literal needs escaping
+            '('  # start of match group
+            '[\d.]'  # character class of digits and (literal) .
+            '{7,15}'  # repeat between 7 and 15 times
+            ')'  # end of match group
+            '\]',  # literal ]
+            self._execute_command_on_linux(
+                'status',
+                fabric_env=self.centos_client_env,
+                within_cfy_env=True),
+            ).group(1)
         self.logger.info(ip)
         return ip.split('\n')[0]
 
     def _get_app_property(self, property_name):
         outputs_raw = (self._execute_command_on_linux(
-                'deployments outputs -d {0}'.format(self.deployment_id),
-                fabric_env=self.centos_client_env, within_cfy_env=True))
+            'deployments outputs -d {0}'.format(self.deployment_id),
+            fabric_env=self.centos_client_env, within_cfy_env=True))
         self.logger.info(outputs_raw)
-        s = outputs_raw[outputs_raw.find('\n')+1:]
+        s = outputs_raw[outputs_raw.find('\n') + 1:]
         list_of_outputs = s.split(' - ')
         list_of_outputs.pop(0)
         outputs_list_of_dicts = [ast.literal_eval(
-                '{'+'{0}"{1}"'.format(
-                        e.split('\n')[0], e.split('\n')[2].replace(
-                                'Value:', '').replace(' ', ''))+'}')
-                   for e in list_of_outputs]
+            '{' + '{0}"{1}"'.format(
+                e.split('\n')[0], e.split('\n')[2].replace(
+                    'Value:', '').replace(' ', '')) + '}')
+            for e in list_of_outputs]
         outputs_dict = {}
         for e in outputs_list_of_dicts:
             outputs_dict.update(e)
@@ -535,7 +559,8 @@ class TestCliPackage(TestCase):
 
 def wait_for_connection(env_settings, executor,
                         logger=None, retries=10,
-                        retry_interval=30, timeout=10):
+                        retry_interval=30, timeout=10,
+                        start_delay=30):
     """
     Asserts that a machine received the ssh key for the key manager, and
     it is no ready to be connected via ssh.
@@ -548,17 +573,17 @@ def wait_for_connection(env_settings, executor,
     :param retry_interval: length of the intervals between each try.
     defaults to 30.
     :param timeout: timeout for each check try. default to 60.
+    :param start_delay: Time in seconds to wait before starting. Sometimes
+    required due to delay in IaaS configuration of SSH on deployed guests.
     :return: None
     """
     local_env_setting = copy.deepcopy(env_settings)
     local_env_setting.update({'abort_exception': FabException})
     local_env_setting.update({'timeout': timeout})
 
-    # Sometimes when not enough time is given before logging in, the iaas
-    # requests for some password.
-    # cooldown_time = 60
-    # logger.info('Waiting for {0} seconds before checking ssh connection'
-    #             .format(cooldown_time))
+    logger.info('Waiting for {0} seconds before checking ssh connection'
+                .format(start_delay))
+    time.sleep(start_delay)
 
     if logger:
         logger.info('Waiting for ssh key to register on the vm...')

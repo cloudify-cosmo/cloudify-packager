@@ -67,6 +67,7 @@ class TestOfflineCliPackage(TestCliPackage):
                 'connection_attempts': 10
             }
             self.assert_offline(self.manager_fab_conf, run_on_client=False)
+            self.cfy.upload_plugins()
 
             # Adding iaas resolver for the manager machine.
             self.logger.info('adding {0} to /etc/hosts of the manager vm'
@@ -328,7 +329,7 @@ class FileServer(object):
 
     def teardown(self):
         """
-        tears down the file server vm
+        Tears down the file server vm
         :return:
         """
         self.logger.info('Tearing down file server vm')
@@ -355,7 +356,7 @@ class FileServer(object):
 
     def stop(self):
         """
-        stops the file server service
+        Stops the file server service
         :return:
         """
         self.logger.info('Shutting down SimpleHTTPServer')
