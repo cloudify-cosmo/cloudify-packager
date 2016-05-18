@@ -384,7 +384,7 @@ class TestCliPackage(TestCase):
             self._get_app_property('http_endpoint'))
 
     def _manager_ip(self):
-        ip = self._execute_command_on_linux('status'.format(
+        ip = self.client_executor('status'.format(
                  self.client_cfy_work_dir), fabric_env=self.centos_client_env,
                  within_cfy_env=True).replace(
                  "Getting management services status... [ip=", '').replace(
@@ -393,7 +393,7 @@ class TestCliPackage(TestCase):
         return ip.split('\n')[0]
 
     def _get_app_property(self, property_name):
-        outputs_raw = (self._execute_command_on_linux(
+        outputs_raw = (self.client_executor(
                 'deployments outputs -d {0}'.format(self.deployment_id),
                 fabric_env=self.centos_client_env, within_cfy_env=True))
         self.logger.info(outputs_raw)
