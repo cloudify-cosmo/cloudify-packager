@@ -67,4 +67,3 @@ export AWS_S3_PATH="org/cloudify3/${VERSION}/${PRERELEASE}"
 
 
 print_params
-install_common_prereqs
