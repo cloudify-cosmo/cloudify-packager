@@ -1,4 +1,4 @@
-export CORE_TAG_NAME="3.4m5"
+export CORE_TAG_NAME="3.4rc1"
 export PLUGINS_TAG_NAME="1.3"
 
 pip install wheel
