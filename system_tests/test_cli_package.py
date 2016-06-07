@@ -312,7 +312,7 @@ class TestCliPackage(TestCase):
             fabric_env=self.centos_client_env,
             within_cfy_env=True)
 
-        self.assertIn('bootstrapping complete', out, 'Bootstrap has failed')
+        self.assertIn('Bootstrap complete', out, 'Bootstrap has failed')
 
         self.manager_ip = self._manager_ip()
         self.client = CloudifyClient(self.manager_ip)
