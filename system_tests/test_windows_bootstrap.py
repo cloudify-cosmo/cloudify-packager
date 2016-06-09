@@ -42,7 +42,7 @@ class TestWindowsBase(TestCliPackage):
 
     @property
     def client_cfy_work_dir(self):
-        return 'C:/cloudify-cli'
+        return 'C:\cloudify'
 
     @property
     def app_blueprint_file(self):
@@ -135,8 +135,8 @@ class TestWindowsBase(TestCliPackage):
     def install_cli(self):
         self.logger.info('Installing CLI...')
         self._execute_command_on_windows(
-            '.\{0} /SILENT /VERYSILENT /SUPPRESSMSGBOXES /DIR="{1}"'
-            ''.format(CLI_PACKAGE_EXE, self.client_cfy_work_dir))  # NOQA
+            '.\{0} /SILENT /VERYSILENT /SUPPRESSMSGBOXES'
+            ''.format(CLI_PACKAGE_EXE))  # NOQA
         self.logger.info('Verifying CLI installation...')
         self.client_executor('--version', within_cfy_env=True)
 
