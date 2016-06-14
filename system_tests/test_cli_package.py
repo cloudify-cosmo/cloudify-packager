@@ -17,6 +17,7 @@ import ast
 import json
 import time
 import copy
+import re
 import uuid
 from contextlib import contextmanager
 
@@ -35,7 +36,8 @@ import sh
 from cosmo_tester.framework.util import sh_bake
 cfy = sh_bake(sh.cfy)
 
-
+# If we get a recycled floating IP we'll have a bad day without this
+fab.env['disable_known_hosts'] = True
 
 CHECK_URL = 'www.google.com'
 HELLO_WORLD_EXAMPLE_NAME = 'cloudify-hello-world-example'
@@ -334,7 +336,8 @@ class TestCliPackage(TestCase):
         self.manager_ip = self._manager_ip()
         self.client = CloudifyClient(self.manager_ip)
         self.addCleanup(self.teardown_manager)
-        cfy.init()
+        with self.cfy.workdir:
+            cfy.init()
         self.cfy.use(self.manager_ip)
         self.cfy.upload_plugins()
 
@@ -424,11 +427,19 @@ class TestCliPackage(TestCase):
             self._get_app_property('http_endpoint'))
 
     def _manager_ip(self):
-        ip = self._execute_command_on_linux('status'.format(
-            self.client_cfy_work_dir), fabric_env=self.centos_client_env,
-            within_cfy_env=True).replace(
-            "Retrieving management services status... [ip=", '').replace(
-            ']', '').strip()
+        ip = re.search(
+            '\[ip='  # [ literal needs escaping
+            '('  # start of match group
+            '[\d.]'  # character class of digits and (literal) .
+            '{7,15}'  # repeat between 7 and 15 times
+            ')'  # end of match group
+            '\]'  # literal ]
+            ,
+            self._execute_command_on_linux(
+                'status',
+                fabric_env=self.centos_client_env,
+                within_cfy_env=True),
+            ).group(1)
         self.logger.info(ip)
         return ip.split('\n')[0]
 
