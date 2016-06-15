@@ -42,23 +42,10 @@ class TestOfflineCliPackage(TestCliPackage):
             self.logger.info('Preparing CLI and downloading example')
             self.prepare_cli()
             example_archive_path = self.get_example(self.helloworld_url)
-            example_blueprint_path = 'cloudify-hello-world-example-master'
-            self.client_executor('tar -xzf {}'.format(example_archive_path))
-            self.client_executor('rm {}'.format(example_archive_path))
-            example_blueprint_path = os.path.join(
-                example_blueprint_path,
-                self.app_blueprint_file
-            )
-
-            plugins = os.environ.get('CLOUDIFY_MANAGER_PLUGINS', '')
-            if len(plugins) > 0:
-                plugins = plugins.split(',')
-            offline_plugins = self.make_plugins_available_offline(
-                plugins=plugins,
-            )
 
         self.install_cli()
         self.prepare_manager_blueprint()
+        self.prepare_hosts_file(iaas_mapping, self.centos_client_env)
 
         # Getting the remote manager blueprint and preparing resources
         self.logger.info('Retrieving remote manager blueprint file...')
