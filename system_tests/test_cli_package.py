@@ -378,16 +378,6 @@ class TestCliPackage(TestCase):
 
         return deployment_id
 
-    def install_plugins(self, plugins):
-        for plugin in plugins:
-            self.client_executor(
-                'plugins upload -p {plugin_location}'.format(
-                    plugin_location=plugin,
-                ),
-                fabric_env=self.centos_client_env,
-                within_cfy_env=True,
-            )
-
     def install_deployment(self, deployment_id):
         self.logger.info(
             'Waiting for 15 seconds before installing deployment...')
