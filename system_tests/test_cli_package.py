@@ -297,15 +297,17 @@ class TestCliPackage(TestCase):
         if self.is_install_plugins():
             install_plugins = '--install-plugins'
 
-        bootstrap_command = """bootstrap -p {0} -i "{1}" {2}""".format(
-            self.manager_blueprint_path,
-            json.dumps(inputs).replace('"', "'").replace(' ', ''),
-            install_plugins)
-        if inputs_is_file:
-            bootstrap_command = """bootstrap -p {0} -i {1} {2}""".format(
+        bootstrap_command = \
+            "bootstrap --skip-validations -p {0} -i \"{1}\" {2}".format(
                 self.manager_blueprint_path,
-                inputs,
+                json.dumps(inputs).replace('"', "'").replace(' ', ''),
                 install_plugins)
+        if inputs_is_file:
+            bootstrap_command = \
+                "bootstrap --skip-validations -p {0} -i {1} {2}".format(
+                    self.manager_blueprint_path,
+                    inputs,
+                    install_plugins)
 
         out = self.client_executor(
             bootstrap_command,
