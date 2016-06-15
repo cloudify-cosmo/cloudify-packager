@@ -267,17 +267,6 @@ class TestCliPackage(TestCase):
         self.manager_blueprint_path = \
             os.path.join(self.manager_blueprints_dir,
                          self.manager_blueprint_file_name)
-        env = env or self.centos_client_env
-        with fab_env(**env):
-            fab.run(
-                'sudo yum install -y git && '
-                'cd /tmp && '
-                'git clone https://github.com/cloudify-cosmo/'
-                'cloudify-manager-blueprints.git && '
-                'cd cloudify-manager-blueprints && '
-                'git checkout f2d73c6 && '
-                'sudo cp -r * {}'.format(self.manager_blueprints_dir)
-            )
 
     def write_file_remotely(self, local_file_path, remote_file_path, env=None,
                             sudo=False, **kwargs):
