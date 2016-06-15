@@ -353,17 +353,6 @@ class TestCliPackage(TestCase):
             within_cfy_env=True)
         return blueprint_id
 
-    def upload_hello_world_blueprint(self, source_blueprint):
-        blueprint_id = 'blueprint-{0}'.format(uuid.uuid4())
-        self.logger.info('Uploading hello-world example from: {0} [{1}]'
-                         .format(source_blueprint, blueprint_id))
-        self.client_executor(
-            'blueprints upload -p {0} -b {1}'
-            .format(source_blueprint, blueprint_id),
-            fabric_env=self.centos_client_env,
-            within_cfy_env=True)
-        return blueprint_id
-
     def create_deployment(self, blueprint_id, *_):
         deployment_id = 'deployment-{0}'.format(uuid.uuid4())
 
