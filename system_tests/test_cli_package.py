@@ -17,19 +17,27 @@ import ast
 import json
 import time
 import copy
+import re
 import uuid
 from contextlib import contextmanager
 
 import requests
 from retrying import retry
+import sh
 
 import fabric.api as fab
 from cloudify.workflows import local
 from cloudify_rest_client import CloudifyClient
 from cloudify_cli import constants as cli_constants
 from cosmo_tester.framework.testenv import TestCase
+from cosmo_tester.framework.util import sh_bake
 from fabric.context_managers import settings as fab_env, cd
 
+# The cfy helper doesn't provide an init method, so we'll do it ourselves
+cfy = sh_bake(sh.cfy)
+
+# If we get a recycled floating IP we'll have a bad day without this
+fab.env['disable_known_hosts'] = True
 
 CHECK_URL = 'www.google.com'
 HELLO_WORLD_EXAMPLE_NAME = 'cloudify-hello-world-example'
@@ -251,7 +259,7 @@ class TestCliPackage(TestCase):
             fab.run('sudo python {0} {1}'.format(
                 remote_modify_script, self.manager_blueprint_path))
 
-    def prepare_manager_blueprint(self):
+    def prepare_manager_blueprint(self, env=None):
         self.logger.info('Preparing manager blueprint')
         self.manager_blueprints_dir = \
             '{0}/cloudify-manager-blueprints'.format(
@@ -313,11 +321,15 @@ class TestCliPackage(TestCase):
             fabric_env=self.centos_client_env,
             within_cfy_env=True)
 
-        self.assertIn('bootstrapping complete', out, 'Bootstrap has failed')
+        self.assertIn('Bootstrap complete', out, 'Bootstrap has failed')
 
         self.manager_ip = self._manager_ip()
         self.client = CloudifyClient(self.manager_ip)
         self.addCleanup(self.teardown_manager)
+        with self.cfy.workdir:
+            cfy.init()
+        self.cfy.use(self.manager_ip)
+        self.cfy.upload_plugins()
 
     def publish_hello_world_blueprint(self, source_archive):
         blueprint_id = 'blueprint-{0}'.format(uuid.uuid4())
@@ -384,11 +396,20 @@ class TestCliPackage(TestCase):
             self._get_app_property('http_endpoint'))
 
     def _manager_ip(self):
-        ip = self._execute_command_on_linux('status'.format(
-            self.client_cfy_work_dir), fabric_env=self.centos_client_env,
-            within_cfy_env=True).replace(
-            "Getting management services status... [ip=", '').replace(
-            ']', '')
+        # Expecting a line like:
+        # Requesting status from manager... [ip=192.0.2.24]
+        ip = re.search(
+            '\[ip='  # [ literal needs escaping
+            '('  # start of match group
+            '[\d.]'  # character class of digits and (literal) .
+            '{7,15}'  # repeat between 7 and 15 times
+            ')'  # end of match group
+            '\]',  # literal ]
+            self._execute_command_on_linux(
+                'status',
+                fabric_env=self.centos_client_env,
+                within_cfy_env=True),
+            ).group(1)
         self.logger.info(ip)
         return ip.split('\n')[0]
 
@@ -535,7 +556,8 @@ class TestCliPackage(TestCase):
 
 def wait_for_connection(env_settings, executor,
                         logger=None, retries=10,
-                        retry_interval=30, timeout=10):
+                        retry_interval=30, timeout=10,
+                        start_delay=30):
     """
     Asserts that a machine received the ssh key for the key manager, and
     it is no ready to be connected via ssh.
@@ -548,17 +570,17 @@ def wait_for_connection(env_settings, executor,
     :param retry_interval: length of the intervals between each try.
     defaults to 30.
     :param timeout: timeout for each check try. default to 60.
+    :param start_delay: Time in seconds to wait before starting. Sometimes
+    required due to delay in IaaS configuration of SSH on deployed guests.
     :return: None
     """
     local_env_setting = copy.deepcopy(env_settings)
     local_env_setting.update({'abort_exception': FabException})
     local_env_setting.update({'timeout': timeout})
 
-    # Sometimes when not enough time is given before logging in, the iaas
-    # requests for some password.
-    # cooldown_time = 60
-    # logger.info('Waiting for {0} seconds before checking ssh connection'
-    #             .format(cooldown_time))
+    logger.info('Waiting for {0} seconds before checking ssh connection'
+                .format(start_delay))
+    time.sleep(start_delay)
 
     if logger:
         logger.info('Waiting for ssh key to register on the vm...')
