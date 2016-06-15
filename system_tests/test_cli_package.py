@@ -23,17 +23,17 @@ from contextlib import contextmanager
 
 import requests
 from retrying import retry
+import sh
 
 import fabric.api as fab
 from cloudify.workflows import local
 from cloudify_rest_client import CloudifyClient
 from cloudify_cli import constants as cli_constants
 from cosmo_tester.framework.testenv import TestCase
+from cosmo_tester.framework.util import sh_bake
 from fabric.context_managers import settings as fab_env, cd
 
-# TODO: Reorder these
-import sh
-from cosmo_tester.framework.util import sh_bake
+# The cfy helper doesn't provide an init method, so we'll do it ourselves
 cfy = sh_bake(sh.cfy)
 
 # If we get a recycled floating IP we'll have a bad day without this
@@ -272,9 +272,10 @@ class TestCliPackage(TestCase):
             fab.run(
                 'sudo yum install -y git && '
                 'cd /tmp && '
-                'git clone https://github.com/cloudify-cosmo/cloudify-manager-blueprints.git && '
+                'git clone https://github.com/cloudify-cosmo/'
+                'cloudify-manager-blueprints.git && '
                 'cd cloudify-manager-blueprints && '
-			'git checkout f2d73c6 && '
+                'git checkout f2d73c6 && '
                 'sudo cp -r * {}'.format(self.manager_blueprints_dir)
             )
 
@@ -427,14 +428,15 @@ class TestCliPackage(TestCase):
             self._get_app_property('http_endpoint'))
 
     def _manager_ip(self):
+        # Expecting a line like:
+        # Requesting status from manager... [ip=192.0.2.24]
         ip = re.search(
             '\[ip='  # [ literal needs escaping
             '('  # start of match group
             '[\d.]'  # character class of digits and (literal) .
             '{7,15}'  # repeat between 7 and 15 times
             ')'  # end of match group
-            '\]'  # literal ]
-            ,
+            '\]',  # literal ]
             self._execute_command_on_linux(
                 'status',
                 fabric_env=self.centos_client_env,
