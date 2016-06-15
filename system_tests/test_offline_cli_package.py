@@ -124,8 +124,7 @@ class TestOfflineCliPackage(TestCliPackage):
 
         inputs = blueprint.get('inputs')
         if inputs:
-            for section in ['agent_package_urls', 'plugin_resources',
-                            'dsl_resources']:
+            for section in ['agent_package_urls', 'dsl_resources']:
                 additional_inputs[section] = inputs[section]['default']
 
             additional_inputs.update(self._get_modules_and_components(inputs))
