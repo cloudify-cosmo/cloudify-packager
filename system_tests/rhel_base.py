@@ -53,6 +53,7 @@ class RHELBase(object):
             'manager_keypair_name': '{0}-manager-keypair'.format(self.prefix),
             'agent_keypair_name': '{0}-agent-keypair'.format(self.prefix),
             'ssh_user': self.env.rhel_7_image_user,
+            'ignore_bootstrap_validations': 'true',
             'agents_user': self.env.rhel_7_image_user,
             'image_id': self.env.rhel_7_image_id,
             'instance_type': self.env.medium_instance_type,
