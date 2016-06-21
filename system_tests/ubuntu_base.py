@@ -52,6 +52,7 @@ class UbuntuBase(object):
             'ec2_region_name': self.env.ec2_region_name,
             'manager_keypair_name': '{0}-manager-keypair'.format(self.prefix),
             'agent_keypair_name': '{0}-agent-keypair'.format(self.prefix),
+            'ignore_bootstrap_validations': 'true',
             'ssh_user': self.env.rhel_7_image_user,
             'agents_user': self.env.rhel_7_image_user,
             'image_id': self.env.rhel_7_image_id,

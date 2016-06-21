@@ -44,6 +44,7 @@ class CentosBase(object):
     def bootstrap_inputs(self):
         return {
             'keystone_username': self.env.keystone_username,
+            'ignore_bootstrap_validations': 'true',
             'keystone_password': self.env.keystone_password,
             'keystone_tenant_name': self.env.keystone_tenant_name,
             'keystone_url': self.env.keystone_url,
