@@ -14,6 +14,8 @@
 #    * limitations under the License.
 
 
+from nose.tools import nottest
+
 from test_cli_package import TestCliPackage
 from test_offline_cli_package import TestOfflineCliPackage
 from centos_base import Centos65Base
@@ -28,5 +30,6 @@ class Centos65Bootstrap(Centos65Base, TestCliPackage):
 
 class Centos65OfflineBootstrap(Centos65Base, TestOfflineCliPackage):
 
+    @nottest
     def test_offline_centos6_5_cli_package(self):
         self._test_cli_package()

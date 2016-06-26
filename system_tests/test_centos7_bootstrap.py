@@ -13,6 +13,8 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
+from nose.tools import nottest
+
 from test_cli_package import TestCliPackage
 from test_offline_cli_package import TestOfflineCliPackage
 from centos_base import Centos7Base
@@ -25,5 +27,6 @@ class Centos7Bootstrap(Centos7Base, TestCliPackage):
 
 
 class Centos7OfflineBootstrap(Centos7Base, TestOfflineCliPackage):
+    @nottest
     def test_offline_centos7_cli_package(self):
         self._test_cli_package()
