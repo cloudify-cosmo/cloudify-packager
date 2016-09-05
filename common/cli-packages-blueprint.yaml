@@ -3,3 +3,6 @@ cli_package_urls:
      windows_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0.2/ga-RELEASE/cloudify-windows-cli_3.4.0.2-ga-b402.exe
      rhel_centos_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0.2/ga-RELEASE/cloudify-3.4.0~2.ga-402.el6.x86_64.rpm
      debian_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0.2/ga-RELEASE/cloudify_3.4.0~2.ga-402_amd64.deb
+     windows_telco_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0.2/ga-RELEASE/cloudify-telecom-windows-cli_3.4.0.2-ga-b402.exe
+     rhel_centos_telco_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0.2/ga-RELEASE/cloudify-telecom-3.4.0~2.ga-402.el6.x86_64.rpm
+     debian_telco_cli_package_url: http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.4.0.2/ga-RELEASE/cloudify-telecom_3.4.0~2.ga-402_amd64.deb
