@@ -59,9 +59,9 @@ function upload_to_s3() {
 
 
 export VERSION="4.0.0"
-export PRERELEASE="m2"
-export BUILD="462"
-export CORE_TAG_NAME="4.0m2"
+export PRERELEASE="m3"
+export BUILD="463"
+export CORE_TAG_NAME="4.0m3"
 export AWS_S3_BUCKET="gigaspaces-repository-eu"
 export AWS_S3_PATH="org/cloudify3/${VERSION}/${PRERELEASE}"
 
