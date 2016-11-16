@@ -59,9 +59,9 @@ function upload_to_s3() {
 
 
 export VERSION="4.0.0"
-export PRERELEASE="m7"
-export BUILD="467"
-export CORE_TAG_NAME="4.0m7"
+export PRERELEASE="m8"
+export BUILD="468"
+export CORE_TAG_NAME="4.0m8"
 export AWS_S3_BUCKET="gigaspaces-repository-eu"
 export AWS_S3_PATH="org/cloudify3/${VERSION}/${PRERELEASE}"
 export PREMIUM_FOLDER="premium-edition-pkg"
