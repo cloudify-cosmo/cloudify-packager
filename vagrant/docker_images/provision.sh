@@ -1,6 +1,6 @@
 #! /bin/bash -e
 
-CORE_TAG_NAME="4.0m8"
+CORE_TAG_NAME="4.0m9"
 
 
 install_docker()
