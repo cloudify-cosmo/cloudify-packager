@@ -57,12 +57,13 @@ def main():
                  cidr_ip='0.0.0.0/0')
     print('Security Group created: {}'.format(sg_name))
 
-    reserv = conn.run_instances(image_id=settings['factory_ami'],
-                                key_name=kp_name,
-                                instance_type=settings['instance_type'],
-                                security_groups=[sg],
-                                block_device_map=mapping,
-                                instance_profile_name=settings['aws_iam_group'])
+    reserv = conn.run_instances(
+            image_id=settings['factory_ami'],
+            key_name=kp_name,
+            instance_type=settings['instance_type'],
+            security_groups=[sg],
+            block_device_map=mapping,
+            instance_profile_name=settings['aws_iam_group'])
 
     factory_instance = reserv.instances[0]
     RESOURCES.append(factory_instance)
@@ -198,6 +199,7 @@ def do_work():
     run('aws s3 cp publish_Vagrantfile s3://{}/{}'.format(
         settings['aws_s3_bucket'], 'Vagrantfile'))
 
+
 def cleanup():
     print('cleaning up..')
     for item in RESOURCES:
@@ -219,6 +221,7 @@ def cleanup():
             print('{} deleted'.format(item))
         else:
             print('{} not cleared'.format(item))
+
 
 try:
     main()
