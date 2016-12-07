@@ -23,8 +23,11 @@ VARS = {
             "openjdk-7-jdk"
         ],
         "package_url": "https://aphyr.com/riemann/riemann_0.2.6_all.deb",
-        "langohr_url": "https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/langohr/2.11.0/langohr.jar",
-        "config_url": "https://raw.githubusercontent.com/cloudify-cosmo/cloudify-manager/master/plugins/riemann-controller/riemann_controller/resources/manager.config",
+        "langohr_url": "https://s3-eu-west-1.amazonaws.com/"
+                       "gigaspaces-repository-eu/langohr/2.11.0/langohr.jar",
+        "config_url": "https://raw.githubusercontent.com/cloudify-cosmo/"
+                      "cloudify-manager/master/plugins/riemann-controller/"
+                      "riemann_controller/resources/manager.config",
         "ports": ["5555"],
         "persistence_path": ["/etc/service/riemann"],
     },
@@ -39,7 +42,8 @@ VARS = {
             "curl",
             "openjdk-7-jdk"
         ],
-        "package_url": "https://download.elasticsearch.org/logstash/logstash/logstash-1.3.2-flatjar.jar",
+        "package_url": "https://download.elasticsearch.org/logstash/"
+                       "logstash/logstash-1.3.2-flatjar.jar",
         "init_file": {
             "log_file": "/var/log/logstash.out",
         },
@@ -61,18 +65,22 @@ VARS = {
             "curl",
             "openjdk-7-jdk",
         ],
-        "elasticsearch_tar_url": "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.tar.gz",
+        "elasticsearch_tar_url": "https://download.elasticsearch.org/"
+                                 "elasticsearch/elasticsearch/"
+                                 "elasticsearch-1.0.1.tar.gz",
         "ports": ["9200"],
         "min_mem": "1024m",
         "max_mem": "1024m",
-        "persistence_path": ["/etc/service/elasticsearch/data", "/etc/service/elasticsearch/logs"],
+        "persistence_path": ["/etc/service/elasticsearch/data",
+                             "/etc/service/elasticsearch/logs"],
     },
     "influxdb": {
         "service_name": "influxdb",
         "reqs": [
             "curl",
         ],
-        "package_url": "http://s3.amazonaws.com/influxdb/influxdb_0.8.0_amd64.deb",
+        "package_url": "http://s3.amazonaws.com/influxdb/"
+                       "influxdb_0.8.0_amd64.deb",
         "ports": ["8086"],
         "persistence_path": ["/opt/influxdb/shared/data"],
     },
@@ -105,12 +113,23 @@ VARS = {
             "pyzmq==14.3.1"
         ],
         "modules": {
-                "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",
-                "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",
-                "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
-                "cloudify_diamond_plugin": "git+git://github.com/cloudify-cosmo/cloudify-diamond-plugin.git@master",
-                "cloudify_agent": "git+git://github.com/cloudify-cosmo/cloudify-agent.git@master",
-                "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
+                "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/"
+                                        "cloudify-rest-client.git@master",
+                "cloudify_plugins_common": "git+git://github.com/"
+                                           "cloudify-cosmo/"
+                                           "cloudify-plugins-common."
+                                           "git@master",
+                "cloudify_script_plugin": "git+git://github.com/"
+                                          "cloudify-cosmo/"
+                                          "cloudify-script-plugin.git@master",
+                "cloudify_diamond_plugin": "git+git://github.com/"
+                                           "cloudify-cosmo/"
+                                           "cloudify-diamond-plugin."
+                                           "git@master",
+                "cloudify_agent": "git+git://github.com/cloudify-cosmo/"
+                                  "cloudify-agent.git@master",
+                "cloudify_manager": "-b master https://github.com/"
+                                    "cloudify-cosmo/cloudify-manager.git",
             },
         "workers_autoscale": "5,2",
         "ports": [],
@@ -123,18 +142,31 @@ VARS = {
             "python2.7"
         ],
         "modules": {
-            # all these modules are only installed so we could eventually use plugin installation code
-            # from cloudify-agent
-            "cloudify_rest_client": "git+git://github.com/cloudify-cosmo/cloudify-rest-client.git@master",
-            "cloudify_plugins_common": "git+git://github.com/cloudify-cosmo/cloudify-plugins-common.git@master",
-            "cloudify_script_plugin": "git+git://github.com/cloudify-cosmo/cloudify-script-plugin.git@master",
-            "cloudify_diamond_plugin": "git+git://github.com/cloudify-cosmo/cloudify-diamond-plugin.git@master",
-            "cloudify_agent": "git+git://github.com/cloudify-cosmo/cloudify-agent.git@master",
+            # all these modules are only installed so we could eventually
+            # use plugin installation code from cloudify-agent
+            "cloudify_rest_client": "git+git://github.com/"
+                                    "cloudify-cosmo/cloudify-rest-client."
+                                    "git@master",
+            "cloudify_plugins_common": "git+git://github.com/"
+                                       "cloudify-cosmo/"
+                                       "cloudify-plugins-common.git@master",
+            "cloudify_script_plugin": "git+git://github.com/"
+                                      "cloudify-cosmo/"
+                                      "cloudify-script-plugin.git@master",
+            "cloudify_diamond_plugin": "git+git://github.com/"
+                                       "cloudify-cosmo/"
+                                       "cloudify-diamond-plugin.git@master",
+            "cloudify_agent": "git+git://github.com/cloudify-cosmo/"
+                              "cloudify-agent.git@master",
 
-            "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/cloudify-amqp-influxdb.git@master",
-            "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/cloudify-dsl-parser.git@master",
-            "flask_securest": "git+git://github.com/cloudify-cosmo/flask-securest.git@0.6",
-            "cloudify_manager": "-b master https://github.com/cloudify-cosmo/cloudify-manager.git",
+            "cloudify_amqp_influxdb": "git+git://github.com/cloudify-cosmo/"
+                                      "cloudify-amqp-influxdb.git@master",
+            "cloudify_dsl_parser": "git+git://github.com/cloudify-cosmo/"
+                                   "cloudify-dsl-parser.git@master",
+            "flask_securest": "git+git://github.com/cloudify-cosmo/"
+                              "flask-securest.git@0.6",
+            "cloudify_manager": "-b master https://github.com/cloudify-cosmo/"
+                                "cloudify-manager.git",
         },
         "ports": ["8100", "8101"],
         "persistence_path": ["/opt/manager/resources", "/var/log/cloudify"],
@@ -147,8 +179,11 @@ VARS = {
             "python2.7",
             "make"
         ],
-        "nodejs_latest_url": "http://nodejs.org/dist/v0.10.25/node-v0.10.25.tar.gz",
-        "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/org/cloudify3/3.3.0/rc1-RELEASE/cloudify-ui_3.3.0-rc1-b278_amd64.deb",
+        "nodejs_latest_url": "http://nodejs.org/dist/v0.10.25/"
+                             "node-v0.10.25.tar.gz",
+        "ui_package_url": "http://gigaspaces-repository-eu.s3.amazonaws.com/"
+                          "org/cloudify3/3.3.0/rc1-RELEASE/"
+                          "cloudify-ui_3.3.0-rc1-b278_amd64.deb",
         "ports": ["80"],
     }
 }
