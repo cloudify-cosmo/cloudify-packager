@@ -13,6 +13,8 @@ checkout:
 
 dependencies:
   override:
+    - pip install --upgrade pip
+    - pip install setuptools --upgrade
     - pip install tox
 
 test:
