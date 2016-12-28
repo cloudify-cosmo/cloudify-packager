@@ -59,10 +59,10 @@ function upload_to_s3() {
 
 
 export VERSION="4.0.0"
-export PRERELEASE="m10"
+export PRERELEASE="m11"
 # from 4.0m9 we decided not to using build number in packages names
 #export BUILD=""
-export CORE_TAG_NAME="4.0m10"
+export CORE_TAG_NAME="4.0m11"
 export AWS_S3_BUCKET="gigaspaces-repository-eu"
 export AWS_S3_PATH="org/cloudify3/${VERSION}/${PRERELEASE}"
 export PREMIUM_FOLDER="premium-edition-pkg"
