@@ -21,6 +21,7 @@ import base64
 
 import winrm
 import yaml
+from nose.tools import nottest
 
 from cosmo_tester.framework.util import YamlPatcher
 from test_cli_package import TestCliPackage, CHECK_URL
@@ -379,6 +380,7 @@ class TestWindowsBootstrap(TestWindowsBase):
 
 class TestWindowsOfflineBootstrap(TestWindowsBase, TestOfflineCliPackage):
 
+    @nottest
     def test_offline_windows_cli_package(self):
         self._test_cli_package()
 
