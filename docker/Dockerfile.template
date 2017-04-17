@@ -304,6 +304,8 @@ ADD rest_service/ /etc/service/rest-service/
 
 WORKDIR /opt/manager/
 
+RUN mkdir -p /opt/manager/resources/uploaded-snapshots
+
 RUN echo install dependencies && \
     apt-get install -y {% for dep in manager.reqs %} {{ dep }}{% endfor %} && \
     \
