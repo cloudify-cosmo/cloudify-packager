@@ -16,11 +16,11 @@ function install_common_prereqs () {
 
     echo "## install common prerequisites"
     if  which yum >> /dev/null; then
-        sudo yum -y install openssl
+        sudo yum -y install openssl-1.0.1k
         SUDO="sudo"
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
-        sudo apt-get -y install openssl
+        sudo apt-get -y install openssl=1.0.1k
         SUDO="sudo"
     else
         echo 'probably windows machine'
