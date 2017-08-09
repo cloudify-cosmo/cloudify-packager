@@ -50,7 +50,8 @@ function upload_to_s3() {
     echo "## uploading https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file"
     if which yum >> /dev/null || which apt-get >> /dev/null;then
         echo -e "${AWS_ACCESS_KEY_ID?}\n${AWS_ACCESS_KEY?}\n\n\n\n\nY\ny\n" | s3cmd --configure &&
-        s3cmd put -d -H -P "$file" "s3://$AWS_S3_BUCKET/$AWS_S3_PATH/"
+        echo "s3cmd put -H -P $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/"
+        s3cmd put -H -P "$file" "s3://$AWS_S3_BUCKET/$AWS_S3_PATH/"
     else
         curl -v -X PUT -T "$file" \
           -H "Host: $AWS_S3_BUCKET.s3.amazonaws.com" \
