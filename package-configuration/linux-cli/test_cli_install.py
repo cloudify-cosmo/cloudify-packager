@@ -22,7 +22,7 @@ import os
 get_cloudify = __import__("get-cloudify")
 
 cloudify_cli_url = \
-    'https://github.com/cloudify-cosmo/cloudify-cli/archive/3.2.tar.gz'
+    'https://github.com/cloudify-cosmo/cloudify-cli/archive/17.6.30.tar.gz'
 
 
 class CliInstallTests(testtools.TestCase):
@@ -47,7 +47,7 @@ class CliInstallTests(testtools.TestCase):
             cfy_path = os.path.join(
                 self.get_cloudify._get_env_bin_path(tempdir), 'cfy')
             proc = self.get_cloudify.run('{0} --version'.format(cfy_path))
-            self.assertIn('Cloudify CLI 3', proc.aggr_stdout)
+            self.assertIn('Cloudify CLI 17', proc.aggr_stdout)
         finally:
             shutil.rmtree(tempdir)
 
@@ -67,7 +67,7 @@ class CliInstallTests(testtools.TestCase):
             cfy_path = os.path.join(
                 self.get_cloudify._get_env_bin_path(tempdir), 'cfy')
             proc = self.get_cloudify.run('{0} --version'.format(cfy_path))
-            self.assertIn('Cloudify CLI 3', proc.aggr_stderr)
+            self.assertIn('Cloudify CLI 17', proc.aggr_stdout)
         finally:
             shutil.rmtree(tempdir)
             temp_requirements_file.close()
