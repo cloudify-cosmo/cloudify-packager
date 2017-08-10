@@ -21,22 +21,25 @@ function install_common_prereqs () {
     echo "## install common prerequisites"
     if  which yum >> /dev/null; then
         sudo yum -y install openssl
-        sudo yum -y install python-pip
+        #sudo yum -y install python-pip
         SUDO="sudo"
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
         sudo apt-get -y install openssl
-        sudo apt-get -y install python-pip
+        #sudo apt-get -y install python-pip
         SUDO="sudo"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Installing on OSX"
         SUDO="sudo"
-        sudo easy_install pip
+        #sudo easy_install pip
     else
         echo 'probably windows machine'
-        wget get-pip.py
-        python get-pip.py
+        #wget get-pip.py
+        #python get-pip.py
     fi
+    #curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+    wget https://bootstrap.pypa.io/get-pip.py
+    python get-pip.py
     sudo pip install awscli
 }
 
