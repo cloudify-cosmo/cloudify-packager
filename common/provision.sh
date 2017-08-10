@@ -25,6 +25,7 @@ function install_common_prereqs () {
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
         sudo apt-get -y install openssl
+        sudo apt-get -y install python-pip
         SUDO="sudo"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Installing on OSX"
@@ -32,6 +33,7 @@ function install_common_prereqs () {
     else
         echo 'probably windows machine'
     fi
+    sudo pip install awscli
 }
 
 function create_md5() {
@@ -53,15 +55,17 @@ function upload_to_s3() {
     signature=$(echo -en "${string}" | openssl sha1 -hmac "${AWS_ACCESS_KEY}" -binary | base64)
 
     echo "## uploading https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file"
-
-    curl -v -X PUT -T "$file" \
-      -H "Host: $AWS_S3_BUCKET.s3.amazonaws.com" \
-      -H "Date: $date" \
-      -H "Content-Type: $content_type" \
-      -H "$acl" \
-      -H "Authorization: AWS ${AWS_ACCESS_KEY_ID}:$signature" \
-      "https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file" &&
-    echo "## successfully uploaded $file"
+    export AWS_SECRET_ACCESS_KEY=$AWS_ACCESS_KEY
+    aws s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
+    
+#     curl -v -X PUT -T "$file" \
+#       -H "Host: $AWS_S3_BUCKET.s3.amazonaws.com" \
+#       -H "Date: $date" \
+#       -H "Content-Type: $content_type" \
+#       -H "$acl" \
+#       -H "Authorization: AWS ${AWS_ACCESS_KEY_ID}:$signature" \
+#       "https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file" &&
+#     echo "## successfully uploaded $file"
 }
 
 print_params
