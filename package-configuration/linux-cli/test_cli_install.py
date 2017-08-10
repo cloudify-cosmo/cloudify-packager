@@ -47,7 +47,7 @@ class CliInstallTests(testtools.TestCase):
             cfy_path = os.path.join(
                 self.get_cloudify._get_env_bin_path(tempdir), 'cfy')
             proc = self.get_cloudify.run('{0} --version'.format(cfy_path))
-            self.assertIn('Cloudify CLI 3', proc.aggr_stdout)
+            self.assertIn('Cloudify CLI 17', proc.aggr_stdout)
         finally:
             shutil.rmtree(tempdir)
 
@@ -67,7 +67,7 @@ class CliInstallTests(testtools.TestCase):
             cfy_path = os.path.join(
                 self.get_cloudify._get_env_bin_path(tempdir), 'cfy')
             proc = self.get_cloudify.run('{0} --version'.format(cfy_path))
-            self.assertIn('Cloudify CLI 17.6.30', proc.aggr_stderr)
+            self.assertIn('Cloudify CLI 17', proc.aggr_stdout)
         finally:
             shutil.rmtree(tempdir)
             temp_requirements_file.close()
