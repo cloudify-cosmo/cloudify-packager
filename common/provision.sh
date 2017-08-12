@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 function print_params() {
 
@@ -21,10 +21,12 @@ function install_common_prereqs () {
     echo "## install common prerequisites"
     if  which yum >> /dev/null; then
         sudo yum -y install openssl
+        yum install -y s3cmd
         SUDO="sudo"
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
         sudo apt-get -y install openssl
+        sudo apt-get -y install s3cmd
         SUDO="sudo"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Installing on OSX"
@@ -53,15 +55,20 @@ function upload_to_s3() {
     signature=$(echo -en "${string}" | openssl sha1 -hmac "${AWS_ACCESS_KEY}" -binary | base64)
 
     echo "## uploading https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file"
-
-    curl -v -X PUT -T "$file" \
-      -H "Host: $AWS_S3_BUCKET.s3.amazonaws.com" \
-      -H "Date: $date" \
-      -H "Content-Type: $content_type" \
-      -H "$acl" \
-      -H "Authorization: AWS ${AWS_ACCESS_KEY_ID}:$signature" \
-      "https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file" &&
-    echo "## successfully uploaded $file"
+    if which yum >> /dev/null || which apt-get >> /dev/null;then
+        echo -e "${AWS_ACCESS_KEY_ID?}\n${AWS_ACCESS_KEY?}\n\n\n\n\nY\ny\n" | s3cmd --configure &&
+        echo "s3cmd put -H -P $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/"
+        s3cmd put -H -P "$file" "s3://$AWS_S3_BUCKET/$AWS_S3_PATH/"
+    else
+        curl -v -X PUT -T "$file" \
+          -H "Host: $AWS_S3_BUCKET.s3.amazonaws.com" \
+          -H "Date: $date" \
+          -H "Content-Type: $content_type" \
+          -H "$acl" \
+          -H "Authorization: AWS ${AWS_ACCESS_KEY_ID}:$signature" \
+          "https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file" &&
+          echo "## successfully uploaded $file"
+    fi
 }
 
 print_params
