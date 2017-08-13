@@ -39,7 +39,7 @@ function install_common_prereqs () {
     fi
     curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
     $SUDO python get-pip.py
-    pip install awscli
+    $SUDO pip install awscli
 }
 
 function create_md5() {
