@@ -61,10 +61,10 @@ function upload_to_s3() {
     signature=$(echo -en "${string}" | openssl sha1 -hmac "${AWS_ACCESS_KEY}" -binary | base64)
 
     echo "## uploading https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file"
-    echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
-    echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
     export AWS_SECRET_ACCESS_KEY=${AWS_ACCESS_KEY} &&
     export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} &&
+    echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+    echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
     aws s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
     
 #     curl -v -X PUT -T "$file" \
