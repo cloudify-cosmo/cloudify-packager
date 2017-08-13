@@ -63,7 +63,7 @@ function upload_to_s3() {
     echo "## uploading https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file"
     export AWS_SECRET_ACCESS_KEY=${AWS_ACCESS_KEY}
     export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-    aws s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
+    $SUDO aws s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
     
 #     curl -v -X PUT -T "$file" \
 #       -H "Host: $AWS_S3_BUCKET.s3.amazonaws.com" \
