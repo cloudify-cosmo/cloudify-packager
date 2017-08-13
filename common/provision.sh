@@ -38,7 +38,7 @@ function install_common_prereqs () {
         #python get-pip.py
     fi
     curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
-    python get-pip.py
+    $SUDO python get-pip.py
     $SUDO pip install awscli
 }
 
