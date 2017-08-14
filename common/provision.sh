@@ -67,6 +67,7 @@ function upload_to_s3() {
     export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} &&
     echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
     echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
+    echo "$awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/"
     $awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
     
 #     curl -v -X PUT -T "$file" \
