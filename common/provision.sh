@@ -32,8 +32,8 @@ function install_common_prereqs () {
         #SUDO="sudo"
     else
         echo 'probably windows machine'
-        aws_path=`which aws`
-        awscli="python `cygpath -w $aws_path`"
+        aws_path=`cygpath -w $(which aws)`
+        awscli="python $aws_path"
     fi
     curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
     $SUDO python get-pip.py
