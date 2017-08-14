@@ -22,22 +22,18 @@ function install_common_prereqs () {
     awscli="aws"
     if  which yum >> /dev/null; then
         sudo yum -y install openssl
-        #sudo yum -y install python-pip
         SUDO="sudo"
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
         sudo apt-get -y install openssl
-        #sudo apt-get -y install python-pip
         SUDO="sudo"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Installing on OSX"
         SUDO="sudo"
-        #sudo easy_install pip
     else
         echo 'probably windows machine'
-        awscli="python `cygpath -w $(which aws)`"
-        #wget get-pip.py
-        #python get-pip.py
+        aws_path=$(which aws)
+        awscli="python `cygpath -w $aws_path`"
     fi
     curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
     $SUDO python get-pip.py
@@ -56,11 +52,11 @@ function upload_to_s3() {
 
     local file_ext=$1
     file=$(basename $(find . -type f -name "*.$file_ext"))
-    date=$(date +"%a, %d %b %Y %T %z")
-    acl="x-amz-acl:public-read"
-    content_type='application/x-compressed-exe'
-    string="PUT\n\n$content_type\n$date\n$acl\n/$AWS_S3_BUCKET/$AWS_S3_PATH/$file"
-    signature=$(echo -en "${string}" | openssl sha1 -hmac "${AWS_ACCESS_KEY}" -binary | base64)
+    #date=$(date +"%a, %d %b %Y %T %z")
+    #acl="x-amz-acl:public-read"
+    #content_type='application/x-compressed-exe'
+    #string="PUT\n\n$content_type\n$date\n$acl\n/$AWS_S3_BUCKET/$AWS_S3_PATH/$file"
+    #signature=$(echo -en "${string}" | openssl sha1 -hmac "${AWS_ACCESS_KEY}" -binary | base64)
 
     echo "## uploading https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file"
     export AWS_SECRET_ACCESS_KEY=${AWS_ACCESS_KEY} &&
@@ -68,7 +64,7 @@ function upload_to_s3() {
     echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
     echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
     echo "aws path"
-    echo `cygpath -w $(which aws)`
+    echo $aws_path
     echo "$awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/"
     $awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
     
