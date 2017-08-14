@@ -32,7 +32,7 @@ function install_common_prereqs () {
         #SUDO="sudo"
     else
         echo 'probably windows machine'
-        aws_path=$(which aws)
+        aws_path=`which aws`
         awscli="python `cygpath -w $aws_path`"
     fi
     curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
@@ -63,8 +63,6 @@ function upload_to_s3() {
     export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} &&
     echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
     echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
-    echo "aws path"
-    echo $aws_path
     echo "$awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/"
     $awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
     
