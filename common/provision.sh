@@ -64,7 +64,8 @@ function upload_to_s3() {
         awscli="python `cygpath -w $(which aws)`"
     fi
     echo "$awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/"
-    $awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
+    $awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/ &&
+    echo "## successfully uploaded $file"
     
 #     curl -v -X PUT -T "$file" \
 #       -H "Host: $AWS_S3_BUCKET.s3.amazonaws.com" \
