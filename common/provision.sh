@@ -29,7 +29,7 @@ function install_common_prereqs () {
         SUDO="sudo"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Installing on OSX"
-        SUDO="sudo"
+        #SUDO="sudo"
     else
         echo 'probably windows machine'
         aws_path=$(which aws)
