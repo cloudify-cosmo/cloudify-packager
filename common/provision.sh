@@ -19,6 +19,7 @@ function print_params() {
 function install_common_prereqs () {
 
     echo "## install common prerequisites"
+    awscli="aws"
     if  which yum >> /dev/null; then
         sudo yum -y install openssl
         #sudo yum -y install python-pip
@@ -34,6 +35,7 @@ function install_common_prereqs () {
         #sudo easy_install pip
     else
         echo 'probably windows machine'
+        awscli="python `cygpath -w $(which aws)`"
         #wget get-pip.py
         #python get-pip.py
     fi
@@ -65,7 +67,7 @@ function upload_to_s3() {
     export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} &&
     echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
     echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
-    aws s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
+    $awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
     
 #     curl -v -X PUT -T "$file" \
 #       -H "Host: $AWS_S3_BUCKET.s3.amazonaws.com" \
