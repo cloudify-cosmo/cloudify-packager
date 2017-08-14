@@ -42,7 +42,12 @@ function create_md5() {
 
     local file_ext=$1
     echo "## create md5"
-    md5sum=$(md5sum -t *.$file_ext) &&
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        md5cmd="md5 -r"
+    else
+        md5cmd="md5sum -t"
+    fi
+    md5sum=$($md5cmd *.$file_ext) &&
     echo $md5sum | $SUDO tee ${md5sum##* }.md5
 }
 
