@@ -19,7 +19,6 @@ function print_params() {
 function install_common_prereqs () {
 
     echo "## install common prerequisites"
-    awscli="aws"
     if  which yum >> /dev/null; then
         sudo yum -y install openssl
         SUDO="sudo"
@@ -33,11 +32,12 @@ function install_common_prereqs () {
     else
         echo 'probably windows machine'
         aws_path=$(cygpath -w `which aws`)
-        awscli="python $aws_path"
+        awscli="python `cygpath -w $(which aws)`"
     fi
     curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
     $SUDO python get-pip.py
     $SUDO pip install awscli
+    
 }
 
 function create_md5() {
@@ -61,8 +61,10 @@ function upload_to_s3() {
     echo "## uploading https://$AWS_S3_BUCKET.s3.amazonaws.com/$AWS_S3_PATH/$file"
     export AWS_SECRET_ACCESS_KEY=${AWS_ACCESS_KEY} &&
     export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} &&
-    echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
-    echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
+    awscli="aws"
+    if [[ "$OSTYPE" == "cygwin" ]]; then
+        awscli="python `cygpath -w $(which aws)`"
+    fi
     echo "$awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/"
     $awscli s3 cp --acl public-read $file s3://$AWS_S3_BUCKET/$AWS_S3_PATH/
     
