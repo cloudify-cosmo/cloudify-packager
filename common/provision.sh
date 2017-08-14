@@ -42,7 +42,7 @@ function create_md5() {
 
     local file_ext=$1
     echo "## create md5"
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
         md5cmd="md5 -r"
     else
         md5cmd="md5sum -t"
