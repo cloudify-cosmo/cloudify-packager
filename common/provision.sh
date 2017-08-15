@@ -20,7 +20,7 @@ function install_common_prereqs () {
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
         sudo apt-get -y install openssl
-        SUDO="sudo"
+        #SUDO="sudo"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Installing on OSX"
     else
