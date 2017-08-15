@@ -4,19 +4,11 @@ function print_params() {
 
     echo "## print common parameters"
 
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "VERSION=$VERSION"
-        echo "PRERELEASE=$PRERELEASE"
-        echo "VERSION=$PRERELEASE"
-        echo "CORE_BRANCH=$CORE_BRANCH"
-    else
-        declare -A params=( ["VERSION"]=$VERSION ["PRERELEASE"]=$PRERELEASE \
-         ["CORE_BRANCH"]=$CORE_BRANCH ["CORE_TAG_NAME"]=$CORE_TAG_NAME )
-        for param in "${!params[@]}"
-        do
-            echo "$param - ${params["$param"]}"
-        done
-    fi
+    arr[0]="VERSION=$VERSION"
+    arr[1]="PRERELEASE=$PRERELEASE"
+    arr[2]="CORE_BRANCH=$CORE_BRANCH"
+    arr[2]="CORE_TAG_NAME=$CORE_TAG_NAME"
+    echo ${arr[@]}
 }
 
 function install_common_prereqs () {
