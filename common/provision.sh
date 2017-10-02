@@ -15,11 +15,11 @@ function install_common_prereqs () {
 
     echo "## install common prerequisites"
     if  which yum >> /dev/null; then
-        sudo yum -y install openssl
+        sudo yum -y install openssl ca-certificates
         SUDO="sudo"
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
-        sudo apt-get -y install openssl
+        sudo apt-get -y install openssl ca-certificates
         SUDO="sudo"
         if [ "`lsb_release -r -s`" == "16.04" ];then
             sudo apt-get -y install python
