@@ -19,7 +19,7 @@ function install_common_prereqs () {
         SUDO="sudo"
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
-        sudo apt-get -y install openssl ca-certificates curl
+        sudo apt-get -y install openssl
         SUDO="sudo"
         if [ "`lsb_release -r -s`" == "16.04" ];then
             sudo apt-get -y install python
