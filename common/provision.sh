@@ -17,6 +17,8 @@ function install_common_prereqs () {
     if  which yum >> /dev/null; then
         sudo yum -y install openssl ca-certificates curl
         SUDO="sudo"
+        # Setting this for Centos only, as it seems to break otherwise on 6.5
+        CURL_OPTIONS="-1"
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
         sudo apt-get -y install openssl
@@ -30,7 +32,7 @@ function install_common_prereqs () {
         echo 'Probably windows machine'
     fi
     
-    curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+    curl $CURL_OPTIONS "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
     $SUDO python get-pip.py
     $SUDO pip install wheel==0.29.0
     $SUDO pip install awscli
