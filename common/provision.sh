@@ -30,7 +30,7 @@ function install_common_prereqs () {
         echo 'Probably windows machine'
     fi
     
-    curl -1 "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+    curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
     $SUDO python get-pip.py
     $SUDO pip install wheel==0.29.0
     $SUDO pip install awscli
