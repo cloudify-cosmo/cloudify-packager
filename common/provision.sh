@@ -36,7 +36,7 @@ function install_common_prereqs () {
     $SUDO python get-pip.py &&
     $SUDO pip install wheel==0.29.0 &&
     $SUDO pip install awscli &&
-    echo"## end of installing common prerequisites"
+    echo "## end of installing common prerequisites"
     
 }
 
