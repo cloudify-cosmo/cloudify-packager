@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 function print_params() {
 
@@ -33,9 +33,13 @@ function install_common_prereqs () {
         echo 'Probably windows machine'
     fi
     
+    echo "curl $CURL_OPTIONS "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py""
     curl $CURL_OPTIONS "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" &&
+    echo "$SUDO python get-pip.py"
     $SUDO python get-pip.py &&
+    echo "$SUDO pip install wheel==0.29.0"
     $SUDO pip install wheel==0.29.0 &&
+    echo "$SUDO pip install awscli"
     $SUDO pip install awscli &&
     echo "## end of installing common prerequisites"
     
