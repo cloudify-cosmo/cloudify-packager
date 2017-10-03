@@ -15,7 +15,7 @@ function install_common_prereqs () {
 
     echo "## install common prerequisites"
     if  which yum >> /dev/null; then
-        sudo yum -y install openssl ca-certificates curl
+        sudo yum -y install openssl curl
         SUDO="sudo"
         # Setting this for Centos only, as it seems to break otherwise on 6.5
         CURL_OPTIONS="-1"
