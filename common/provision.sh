@@ -21,7 +21,7 @@ function install_common_prereqs () {
         CURL_OPTIONS="-1"
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
-        sudo apt-get -y install openssl
+        sudo apt-get -y install openssl libssl-dev
         SUDO="sudo"
         if [ "`lsb_release -r -s`" == "16.04" ];then
             sudo apt-get -y install python
