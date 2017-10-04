@@ -20,7 +20,7 @@ function install_common_prereqs () {
         SUDO="sudo"
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
-        sudo apt-get -y install openssl
+        sudo apt-get -y install openssl libssl-dev
         SUDO="sudo"
     else
         echo 'probably windows machine'
