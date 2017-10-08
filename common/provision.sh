@@ -28,6 +28,7 @@ function install_common_prereqs () {
         fi
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Installing on OSX"
+        break
     else
         echo 'Probably windows machine'
     fi
