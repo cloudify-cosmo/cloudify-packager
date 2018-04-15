@@ -28,7 +28,6 @@ function install_common_prereqs () {
         fi
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Installing on OSX"
-        SUDO="sudo"
     else
         echo 'Probably windows machine'
     fi
