@@ -14,13 +14,11 @@ function print_params() {
 function install_common_prereqs () {
 
     echo "## install common prerequisites"
-    install_pip_cmd="pip install --upgrade pip==9.0.1"
     if  which yum >> /dev/null; then
         sudo yum -y install openssl curl
         SUDO="sudo"
         # Setting this for Centos only, as it seems to break otherwise on 6.5
         CURL_OPTIONS="-1"
-        $SUDO $install_pip_cmd
     elif which apt-get >> /dev/null; then
         sudo apt-get update &&
         sudo apt-get -y install openssl libssl-dev
@@ -28,19 +26,15 @@ function install_common_prereqs () {
         if [ "`lsb_release -r -s`" == "16.04" ];then
             sudo apt-get -y install python
         fi
-        $SUDO $install_pip_cmd
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Installing on OSX"
-        $SUDO $install_pip_cmd
     else
         echo 'Probably windows machine'
-        $SUDO python -m $install_pip_cmd
     fi
     
-    #curl $CURL_OPTIONS "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" &&
-    #$SUDO python get-pip.py &&
+    curl $CURL_OPTIONS "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" &&
+    $SUDO python get-pip.py pip==9.0.3 &&
     $SUDO pip install wheel==0.29.0 &&
-    $SUDO pip install setuptools==36.8.0 &&
     $SUDO pip install awscli &&
     echo "## end of installing common prerequisites"
     
