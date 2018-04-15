@@ -28,6 +28,7 @@ function install_common_prereqs () {
         fi
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Installing on OSX"
+        SUDO="sudo"
     else
         echo 'Probably windows machine'
     fi
@@ -35,6 +36,7 @@ function install_common_prereqs () {
     curl $CURL_OPTIONS "https://bootstrap.pypa.io/2.6/get-pip.py" -o "get-pip.py" &&
     $SUDO python get-pip.py pip==9.0.1 &&
     $SUDO pip install wheel==0.29.0 &&
+    $SUDO pip install setuptools==36.8.0 &&
     $SUDO pip install awscli &&
     echo "## end of installing common prerequisites"
     
