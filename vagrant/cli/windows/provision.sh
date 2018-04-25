@@ -1,4 +1,4 @@
-export CORE_TAG_NAME="4.3.1"
+export CORE_TAG_NAME="4.3.2"
 export PLUGINS_TAG_NAME="1.3"
 export VERSION=`cat packaging/VERSION  | grep version | sed 's/"version": "//g' | sed 's/"//g' | sed 's/,//g' | sed 's/ //g'`
 
