@@ -408,7 +408,7 @@ class CloudifyInstaller():
         try:
             import virtualenv  # NOQA
             return True
-        except:
+        except ImportError:
             return False
 
     def install_virtualenv(self):
@@ -423,7 +423,7 @@ class CloudifyInstaller():
         try:
             import pip  # NOQA
             return True
-        except:
+        except ImportError:
             return False
 
     def install_pip(self):

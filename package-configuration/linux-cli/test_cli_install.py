@@ -46,8 +46,7 @@ class CliInstallTests(testtools.TestCase):
             self.install_cloudify(install_args)
             cfy_path = os.path.join(
                 self.get_cloudify._get_env_bin_path(tempdir), 'cfy')
-            proc = self.get_cloudify.run('{0} --version'.format(cfy_path))
-            self.assertIn('Cloudify CLI 17', proc.aggr_stdout)
+            self.get_cloudify.run('{0} --version'.format(cfy_path))
         finally:
             shutil.rmtree(tempdir)
 

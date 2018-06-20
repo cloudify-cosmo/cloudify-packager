@@ -62,7 +62,7 @@ class CliBuilderUnitTests(testtools.TestCase):
             status = urllib.urlopen(url).getcode()
             if not status == 200:
                 raise AssertionError('url {} is not valid.'.format(url))
-        except:
+        except Exception:
             raise AssertionError('url {} is not valid.'.format(url))
 
     def test_run_valid_command(self):
