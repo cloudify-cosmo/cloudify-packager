@@ -100,11 +100,12 @@ much like any other python script, the installation will occur in the system
 python.
 
 By default, the script assumes that the Python executable is in the
-path and is called 'python' on Linux and 'c:\python27\python.exe on Windows.
+path and is called 'python' on Linux and 'c:\\python27\\python.exe on Windows.
 The Python path can be overriden by using the --pythonpath flag.
 
 Please refer to Cloudify's documentation at http://getcloudify.org for
 additional information.'''
+
 
 IS_VIRTUALENV = hasattr(sys, 'real_prefix')
 
