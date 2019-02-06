@@ -1,5 +1,0 @@
-#!/bin/bash
-# description "ElasticSearch service"
-#
-ES_JAVA_OPTS="-Xmx1024m -Xms1024m"
-/etc/service/elasticsearch/bin/elasticsearch
