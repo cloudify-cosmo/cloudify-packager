@@ -44,7 +44,7 @@ pipeline {
 
             container('py27') {
               dir ("${env.WORKSPACE}/test") {
-                runTox('test')
+                runTox('py27')
               }
             }
           }
