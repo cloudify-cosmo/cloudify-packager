@@ -1,7 +1,7 @@
 def runTox(String do_env) {
   sh script:"""
     sudo pip install tox
-    pyhton -m tox -e ${do_env}
+    python -m tox -e ${do_env}
     """
 }
 pipeline {
