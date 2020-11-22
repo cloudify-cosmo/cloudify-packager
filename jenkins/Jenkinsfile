@@ -1,0 +1,56 @@
+def runTox(String do_env) {
+  sh script:"""
+    sudo pip install tox
+    pyhton -m tox -e ${do_env}
+    """
+}
+pipeline {
+  agent {
+    kubernetes {
+      label "cfy-packager-mb-${env.BUILD_NUMBER}"
+      defaultContainer 'jnlp'
+      yamlFile 'jenkins/build-pod.yaml'
+    }
+  }
+
+  options {
+    checkoutToSubdirectory('cloudify-packager')
+    buildDiscarder(logRotator(numToKeepStr:'10'))
+    timeout(time: 60, unit: 'MINUTES')
+    timestamps()
+  }
+
+  environment{
+    PROJECT = "cloudify-packager"
+  }
+
+  stages {
+    stage ('flake8 & test') {
+      parallel {
+        stage('flake8') {
+          steps {
+            sh script: "mkdir -p ${env.WORKSPACE}/flake8 && cp -rf ${env.WORKSPACE}/${env.PROJECT}/. ${env.WORKSPACE}/flake8", label: "copying repo to seperate workspace"
+
+            container('py27') {
+              dir ("${env.WORKSPACE}/flake8") {
+                runTox('flake8')
+              }
+            }
+          }
+        }
+        stage('test') {
+          steps {
+            sh script: "mkdir -p ${env.WORKSPACE}/test && cp -rf ${env.WORKSPACE}/${env.PROJECT}/. ${env.WORKSPACE}/test", label: "copying repo to seperate workspace"
+
+            container('py27') {
+              dir ("${env.WORKSPACE}/test") {
+                runTox('test')
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
